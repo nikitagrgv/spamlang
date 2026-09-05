@@ -200,6 +200,11 @@ public class Sema
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
+
+        if (callee.Symbol is not FuncSymbol funcSym)
+        {
+            Error($"Expected function symbol, got {callee.Symbol.Name}({callee.Symbol.GetType().Name})", expr);
+        }
     }
 
     private void VisitExprIdentifier(ExprIdentifier expr)
