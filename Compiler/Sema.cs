@@ -50,7 +50,7 @@ public class Sema
             Debug.Assert(param.Type.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
 
             Type type = param.Type.ResolvedType;
-            ReadOnlySpan<char> name = TokenValue(param.NameToken);
+            ReadOnlySpan<char> name = GetTokenValue(param.NameToken);
 
             ParamSymbol sym = new()
             {
@@ -133,7 +133,7 @@ public class Sema
 
         Debug.Assert(type != null);
 
-        ReadOnlySpan<char> name = TokenValue(stmt.NameToken);
+        ReadOnlySpan<char> name = GetTokenValue(stmt.NameToken);
         VariableSymbol sym = new()
         {
             Declaration = stmt,
@@ -200,8 +200,17 @@ public class Sema
     private void VisitExprUnary(ExprUnary exprUnary)
     {
         VisitExpr(exprUnary.Expr);
+        Debug.Assert(exprUnary.Expr.ResolvedType != null);
 
-        Debug.Assert(exprUnary.Expr);
+        TokenType op = GetTokenType(exprUnary.OperatorToken);
+        if (!CanUseUnary(exprUnary.Expr.ResolvedType, op))
+        {
+            Error($"Cannot use unary operator {op} on {exprUnary.Expr.ResolvedType}", exprUnary);
+            exprUnary.Expr.ResolvedType = BuiltinType.Error;
+            return;
+        }
+
+        exprUnary.ResolvedType = exprUnary.Expr.ResolvedType;
     }
 
     private void RegisterBuiltin(Scope scope)
@@ -248,7 +257,7 @@ public class Sema
         }
 
         Scope scope = CurrentScope();
-        ReadOnlySpan<char> name = TokenValue(fd.NameToken);
+        ReadOnlySpan<char> name = GetTokenValue(fd.NameToken);
 
         FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
         FuncSymbol sym = new()
@@ -307,7 +316,7 @@ public class Sema
     {
         Debug.Assert(typeDecl.ResolvedType == null);
 
-        ReadOnlySpan<char> name = TokenValue(typeDecl.TypeNameToken);
+        ReadOnlySpan<char> name = GetTokenValue(typeDecl.TypeNameToken);
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
         {
@@ -428,9 +437,14 @@ public class Sema
     }
 
 
-    private ReadOnlySpan<char> TokenValue(int tokenIndex)
+    private ReadOnlySpan<char> GetTokenValue(int tokenIndex)
     {
         return _tokens[tokenIndex].Value(_code);
+    }
+
+    private TokenType GetTokenType(int tokenIndex)
+    {
+        return _tokens[tokenIndex].Type;
     }
 
     private void Error(string message, Node node)
