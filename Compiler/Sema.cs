@@ -397,35 +397,26 @@ public class Sema
         expr.ResolvedType = BuiltinType.I32;
     }
 
-    private static ulong ParseIntLiteralValue(ReadOnlySpan<char> str, out bool ok)
+    private static ulong ParseIntLiteralValue(ReadOnlySpan<char> str)
     {
         // TODO: Can parse without ToString?
-        try
+        if (str[0] != '0')
         {
-            ok = true;
-            if (str[0] != '0')
-            {
-                return Convert.ToUInt64(str.ToString(), 10);
-            }
-
-            if (str.Length == 1)
-            {
-                return 0;
-            }
-
-            char next = str[1];
-            return next switch
-            {
-                'x' or 'X' => Convert.ToUInt64(str[2..].ToString(), 16),
-                'b' or 'B' => Convert.ToUInt64(str[2..].ToString(), 2),
-                _ => Convert.ToUInt64(str[1..].ToString(), 8)
-            };
+            return Convert.ToUInt64(str.ToString(), 10);
         }
-        catch (Exception)
+
+        if (str.Length == 1)
         {
-            ok = false;
             return 0;
         }
+
+        char next = str[1];
+        return next switch
+        {
+            'x' or 'X' => Convert.ToUInt64(str[2..].ToString(), 16),
+            'b' or 'B' => Convert.ToUInt64(str[2..].ToString(), 2),
+            _ => Convert.ToUInt64(str[1..].ToString(), 8)
+        };
     }
 
     private void VisitExprUnary(ExprUnary expr)
