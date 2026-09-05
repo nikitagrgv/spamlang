@@ -394,6 +394,11 @@ public class Sema
         // TODO: Compute in parser/lexer? Duplicated with lexer
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
+        if (str.Length == 1 && str[0] == '0')
+        {
+            expr.Value = 0;
+        }
+
         if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
         {
             expr.Value = Convert.ToUInt64(str[2..].ToString(), 16);
@@ -402,7 +407,7 @@ public class Sema
         {
             expr.Value = Convert.ToUInt64(str[2..].ToString(), 2);
         }
-        else if (str.Length > 1 && str.StartsWith("0", StringComparison.OrdinalIgnoreCase))
+        else if (str.StartsWith("0", StringComparison.OrdinalIgnoreCase))
         {
             expr.Value = Convert.ToUInt64(str[1..].ToString(), 8);
         }
