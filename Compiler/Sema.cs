@@ -193,6 +193,13 @@ public class Sema
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
+
+        if (callee.Symbol == null)
+        {
+            // Already reported
+            expr.ResolvedType = BuiltinType.Error;
+            return;
+        }
     }
 
     private void VisitExprIdentifier(ExprIdentifier expr)
