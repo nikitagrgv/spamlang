@@ -238,7 +238,7 @@ public class Sema
 
         if (funcSym.Declaration.Params.Count != expr.Args.Count)
         {
-            Error($"Function {funcSym.Name} takes {funcSym.Declaration.Params.Count} arguments, got {expr.Args.Count}",
+            Error($"Function \"{funcSym.Name}\" takes {funcSym.Declaration.Params.Count} arguments, got {expr.Args.Count}",
                 expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
