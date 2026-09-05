@@ -106,10 +106,15 @@ public class Sema
                     Scope scope = new(CurrentScope());
                     b.Scope = scope;
                     PushScope(scope);
-                    VisitBlock(b, out Stmt? innerLastStatement, out terminator);
+                    VisitBlock(b, out Stmt? innerLastStatement, out Stmt? innerTerminator);
                     if (innerLastStatement != null)
                     {
                         lastStatement = innerLastStatement;
+                    }
+
+                    if (innerTerminator != null)
+                    {
+                        terminator = innerTerminator;
                     }
 
                     PopScope();
