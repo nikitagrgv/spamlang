@@ -216,9 +216,16 @@ public class Sema
             return;
         }
 
-        foreach (Expr arg in expr.Args)
+        for (int i = 0; i < expr.Args.Count; ++i)
         {
+            Param param = funcSym.Declaration.Params[i];
+            Expr arg = expr.Args[i];
+
+            Debug.Assert(param.Type.ResolvedType != null, "Must be already resolved");
             Debug.Assert(arg.ResolvedType != null, "Must be resolved above");
+
+            Expr newArg = Adapt(arg, param.Type.ResolvedType);
+            expr.Args[i] = newArg;
         }
     }
 
