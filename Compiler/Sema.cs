@@ -203,7 +203,9 @@ public class Sema
 
         if (callee.Symbol is not FuncSymbol funcSym)
         {
-            Error($"Expected function symbol, got {callee.Symbol.Name}({callee.Symbol.GetType().Name})", expr);
+            Error($"Expected function, got {callee.Symbol.Name}({callee.Symbol.GetType().Name})", expr);
+            expr.ResolvedType = BuiltinType.Error;
+            return;
         }
     }
 
