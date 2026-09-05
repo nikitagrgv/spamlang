@@ -194,7 +194,7 @@ public class Sema
         if (stmt.TypeDecl != null)
         {
             type = ResolveType(stmt.TypeDecl);
-            if (stmt.Expr != null && type != BuiltinType.Error)
+            if (stmt.Expr != null)
             {
                 stmt.Expr = Adapt(stmt.Expr, type);
             }
