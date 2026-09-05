@@ -182,7 +182,10 @@ public class Sema
         Debug.Assert(expr.Left.ResolvedType != null);
         Debug.Assert(expr.Right.ResolvedType != null);
 
-        if (expr.Left.ResolvedType == BuiltinType.Error || expr.Right.ResolvedType == BuiltinType.Error)
+        Type leftType = expr.Left.ResolvedType;
+        Type rightType = expr.Right.ResolvedType;
+
+        if (leftType == BuiltinType.Error || rightType == BuiltinType.Error)
         {
             // Already reported
             expr.ResolvedType = BuiltinType.Error;
@@ -190,7 +193,17 @@ public class Sema
         }
 
         TokenType op = GetTokenType(expr.OperatorToken);
-        Type? common = GetCommonType(expr.Left.ResolvedType, expr.Right.ResolvedType, op);
+        Type? commonType = GetCommonType(leftType, rightType, op);
+        if (commonType == null)
+        {
+            Error($"Cannot use {op} on {leftType} and {rightType}", expr);
+            expr.ResolvedType = BuiltinType.Error;
+            return;
+        }
+
+        expr.Left = Adapt(expr.Left, commonType);
+        expr.Right = Adapt(expr.Right, commonType);
+        expr.ResolvedType = commonType;
     }
 
     private void VisitExprCall(ExprCall expr)
