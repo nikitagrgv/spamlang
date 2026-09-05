@@ -9,6 +9,7 @@ public class Sema
     private readonly IReadOnlyList<Token> _tokens;
     private readonly TypeRegistry _typeRegistry = new();
     private readonly List<Scope> _scopes = new(); // TODO: Do we need list? Or just current scope?
+    private readonly List<FuncSymbol> _funcStack = new();
 
     public Sema(string code, IReadOnlyList<Token> tokens, Diagnostic diag)
     {
@@ -42,6 +43,8 @@ public class Sema
     {
         Debug.Assert(fd.Symbol != null, $"Must be registered in {nameof(RegisterFunctionSymbols)}");
 
+        _funcStack.Add(fd.Symbol);
+
         Scope scope = new(CurrentScope());
         PushScope(scope);
 
@@ -68,6 +71,9 @@ public class Sema
         VisitBlock(fd.Body);
 
         PopScope();
+
+        Debug.Assert(_funcStack[^1] == fd.Symbol);
+        _funcStack.RemoveAt(_funcStack.Count - 1);
     }
 
     private void VisitBlock(Block block)
