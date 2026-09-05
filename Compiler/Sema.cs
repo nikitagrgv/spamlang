@@ -209,6 +209,12 @@ public class Sema
         FuncType funcType = (FuncType)currentFunc.Type;
         Type returnType = funcType.ReturnType;
 
+        if (returnType == BuiltinType.Error)
+        {
+            // Already reported
+            return;
+        }
+
         if (returnType == BuiltinType.Void)
         {
             if (stmt.Expr != null)
