@@ -209,14 +209,24 @@ public class Sema
         FuncType funcType = (FuncType)currentFunc.Type;
         Type returnType = funcType.ReturnType;
 
-        if (stmt.Expr != null && returnType == BuiltinType.Void)
+        if (returnType == BuiltinType.Void)
         {
-            Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" returns void",
-                stmt);
+            if (stmt.Expr != null)
+            {
+                Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" returns void",
+                    stmt);
+            }
+
             return;
         }
-        
-        
+
+        if (stmt.Expr == null)
+        {
+            Error($"Function \"{currentFunc.Name}\" must return value", stmt);
+            return;
+        }
+
+        stmt.Expr = Adapt(stmt.Expr, returnType);
     }
 
     private void VisitExpr(Expr expr)
