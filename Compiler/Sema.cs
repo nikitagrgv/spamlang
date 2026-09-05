@@ -190,6 +190,7 @@ public class Sema
         {
             // TODO: Implement more complex callees, like `myfunc()[4]()`
             Error("Only identifiers can be called", expr);
+            expr.ResolvedType = BuiltinType.Error;
             return;
         }
     }
