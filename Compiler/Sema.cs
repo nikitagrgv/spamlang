@@ -324,7 +324,8 @@ public class Sema
     private void VisitExprCall(ExprCall expr)
     {
         VisitExpr(expr.Callee);
-        foreach (Expr arg in expr.Args)
+        List<Expr> args = expr.Args;
+        foreach (Expr arg in args)
         {
             VisitExpr(arg);
         }
@@ -354,26 +355,27 @@ public class Sema
         Debug.Assert(funcSym.Type is FuncType);
         FuncType funcType = (FuncType)funcSym.Type;
 
-        if (funcType.ParamTypes.Count != expr.Args.Count)
+        IReadOnlyList<Type> funcParams = funcType.ParamTypes;
+        if (funcParams.Count != args.Count)
         {
             Error(
-                $"Function \"{funcSym.Name}\" takes {funcSym.Declaration.Params.Count} arguments, got {expr.Args.Count}",
+                $"Function \"{funcSym.Name}\" takes {funcSym.Declaration.Params.Count} arguments, got {args.Count}",
                 expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
 
 
-        for (int i = 0; i < expr.Args.Count; ++i)
+        for (int i = 0; i < args.Count; ++i)
         {
-            Type paramType = funcType.ParamTypes[i];
-            Expr arg = expr.Args[i];
+            Type paramType = funcParams[i];
+            Expr arg = args[i];
 
             Debug.Assert(paramType != null, "Must be already resolved");
             Debug.Assert(arg.ResolvedType != null, "Must be resolved above");
 
             Expr newArg = Adapt(arg, paramType);
-            expr.Args[i] = newArg;
+            args[i] = newArg;
         }
 
         expr.ResolvedType = funcType.ReturnType;
