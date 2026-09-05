@@ -88,6 +88,7 @@ public class Sema
                     Scope scope = new(CurrentScope());
                     PushScope(scope);
                     b.Scope = scope;
+                    VisitBlock(b);
                     PopScope();
                     break;
                 case StmtAssign stmtAssign:
