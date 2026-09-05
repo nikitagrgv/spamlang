@@ -71,13 +71,9 @@ public class Sema
         VisitBlock(fd.Body, out Stmt? lastStatement, out Stmt? _);
 
         FuncType funcType = (FuncType)fd.Symbol.Type;
-        if (funcType.ReturnType != BuiltinType.Void)
+        if (funcType.ReturnType != BuiltinType.Void && lastStatement is not StmtReturn)
         {
-            bool hasLastReturn = lastStatement is StmtReturn;
-            if (!hasLastReturn)
-            {
-                Error($"No return statement on the end of function \"{fd.Symbol.Name}\"", fd);
-            }
+            Error($"No return statement on the end of function \"{fd.Symbol.Name}\"", fd);
         }
 
         PopScope();
