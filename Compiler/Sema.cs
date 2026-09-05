@@ -105,7 +105,47 @@ public class Sema
     private void VisitStmtAssign(StmtAssign stmt)
     {
         // TODO: Add value categories (lvalue/rvalue). Allow use any expression as target
-        
+
+        VisitExpr(stmt.Target);
+        VisitExpr(stmt.Value);
+
+        Debug.Assert(stmt.Target.ResolvedType != null);
+        Debug.Assert(stmt.Value.ResolvedType != null);
+
+        if (stmt.Target is not ExprIdentifier target)
+        {
+            Error("Only identifiers can be used as assign target", stmt.Target);
+            return;
+        }
+
+        if (target.Symbol == null)
+        {
+            // Already reported
+            return;
+        }
+
+        switch (target.Symbol)
+        {
+            case FuncSymbol funcSymbol:
+                Error($"Cannot assign to function \"{target.Symbol.Name}\"", stmt.Target);
+                return;
+            case TypeSymbol typeSymbol:
+                Error($"Cannot assign to type \"{target.Symbol.Name}\"", stmt.Target);
+                return;
+            case ParamSymbol paramSymbol:
+                break;
+            case VariableSymbol variableSymbol:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        if (target.Symbol is not FuncSymbol funcSym)
+        {
+            Error($"Expected function, got \"{callee.Symbol.Name}\"({callee.Symbol.GetType().Name})", expr);
+            expr.ResolvedType = BuiltinType.Error;
+            return;
+        }
     }
 
     private void VisitStmtExpr(StmtExpr stmt)
