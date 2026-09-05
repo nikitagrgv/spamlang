@@ -166,9 +166,6 @@ public class Sema
             case ExprInt exprInt:
                 VisitExprInt(exprInt);
                 break;
-            case ExprPrimary exprPrimary:
-                VisitExprPrimary(exprPrimary);
-                break;
             case ExprUnary exprUnary:
                 VisitExprUnary(exprUnary);
                 break;
@@ -190,10 +187,6 @@ public class Sema
     }
 
     private void VisitExprInt(ExprInt exprInt)
-    {
-    }
-
-    private void VisitExprPrimary(ExprPrimary exprPrimary)
     {
     }
 
