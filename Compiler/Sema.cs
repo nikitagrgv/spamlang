@@ -399,6 +399,7 @@ public class Sema
 
     private static ulong ParseIntLiteralValue(ReadOnlySpan<char> str)
     {
+        // TODO: Can parse without ToString?
         if (str[0] != '0')
         {
             return Convert.ToUInt64(str.ToString(), 10);
