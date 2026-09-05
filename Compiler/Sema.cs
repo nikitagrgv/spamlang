@@ -393,7 +393,7 @@ public class Sema
         if (!CanUseUnary(expr.Expr.ResolvedType, op))
         {
             Error($"Cannot use unary operator \"{op}\" on type \"{expr.Expr.ResolvedType}\"", expr);
-            expr.Expr.ResolvedType = BuiltinType.Error;
+            expr.ResolvedType = BuiltinType.Error;
             return;
         }
 
