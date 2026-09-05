@@ -140,12 +140,7 @@ public class Sema
                 throw new ArgumentOutOfRangeException();
         }
 
-        if (target.Symbol is not FuncSymbol funcSym)
-        {
-            Error($"Expected function, got \"{callee.Symbol.Name}\"({callee.Symbol.GetType().Name})", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
-        }
+        Type targetType = target.Symbol.Type;
     }
 
     private void VisitStmtExpr(StmtExpr stmt)
