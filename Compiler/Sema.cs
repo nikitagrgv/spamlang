@@ -398,8 +398,7 @@ public class Sema
         {
             expr.Value = 0;
         }
-
-        if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+        else if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
         {
             expr.Value = Convert.ToUInt64(str[2..].ToString(), 16);
         }
