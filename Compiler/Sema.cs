@@ -200,7 +200,7 @@ public class Sema
             case VariableSymbol variableSymbol:
                 break;
             case TypeSymbol typeSymbol:
-                // TODO: Allow that, e.g. `i32.TypeSize`
+                // TODO: Allow that, for e.g. `i32.TypeSize`
                 Error($"Type cannot be used as an identifier: {name}", expr);
                 expr.ResolvedType = BuiltinType.Error;
                 return;
