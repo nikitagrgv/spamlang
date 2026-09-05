@@ -70,6 +70,21 @@ public class Sema
         fd.Body.Scope = scope;
         VisitBlock(fd.Body);
 
+        FuncType funcType = (FuncType)fd.Symbol.Type;
+        if (funcType.ReturnType != BuiltinType.Void)
+        {
+            bool hasLastReturn = false;
+            if (fd.Body.Stmts.Count > 0)
+            {
+                hasLastReturn = fd.Body.Stmts[^1] is StmtReturn;
+            }
+
+            if (!hasLastReturn)
+            {
+                Error($"No return statement on the end of function \"{fd.Symbol.Name}\"", fd);
+            }
+        }
+
         PopScope();
 
         Debug.Assert(_funcStack[^1] == fd.Symbol);
