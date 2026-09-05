@@ -68,10 +68,10 @@ public class Sema
         }
 
         fd.Body.Scope = scope;
-        VisitBlock(fd.Body, out Stmt? lastStatement, out Stmt? _);
+        VisitBlock(fd.Body, out Stmt? terminator);
 
         FuncType funcType = (FuncType)fd.Symbol.Type;
-        if (funcType.ReturnType != BuiltinType.Void && lastStatement is not StmtReturn)
+        if (funcType.ReturnType != BuiltinType.Void && terminator == null)
         {
             Error($"No return statement on the end of function \"{fd.Symbol.Name}\"", fd);
         }
@@ -82,17 +82,14 @@ public class Sema
         _funcStack.RemoveAt(_funcStack.Count - 1);
     }
 
-    private void VisitBlock(Block block, out Stmt? lastStatement, out Stmt? terminator)
+    private void VisitBlock(Block block, out Stmt? terminator)
     {
         Debug.Assert(block.Scope != null, "Block scope must be set from outside");
 
-        lastStatement = null;
         terminator = null;
         bool unreachableReported = false;
         foreach (Stmt stmt in block.Stmts)
         {
-            lastStatement = stmt;
-
             if (terminator != null && !unreachableReported)
             {
                 unreachableReported = true;
@@ -106,11 +103,7 @@ public class Sema
                     Scope scope = new(CurrentScope());
                     b.Scope = scope;
                     PushScope(scope);
-                    VisitBlock(b, out Stmt? innerLastStatement, out Stmt? innerTerminator);
-                    if (innerLastStatement != null)
-                    {
-                        lastStatement = innerLastStatement;
-                    }
+                    VisitBlock(b, out Stmt? innerTerminator);
 
                     if (innerTerminator != null)
                     {
