@@ -397,7 +397,7 @@ public class Sema
         expr.ResolvedType = BuiltinType.I32;
     }
 
-    static ulong ParseIntLiteralValue(ReadOnlySpan<char> str)
+    private static ulong ParseIntLiteralValue(ReadOnlySpan<char> str)
     {
         if (str[0] != '0')
         {
