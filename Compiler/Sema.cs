@@ -195,11 +195,11 @@ public class Sema
 
         switch (sym)
         {
-            case FuncSymbol funcSymbol:
-            case ParamSymbol paramSymbol:
-            case VariableSymbol variableSymbol:
+            case FuncSymbol:
+            case ParamSymbol:
+            case VariableSymbol:
                 break;
-            case TypeSymbol typeSymbol:
+            case TypeSymbol:
                 // TODO: Allow that, for e.g. `i32.TypeSize`
                 Error($"Type cannot be used as an identifier: {name}", expr);
                 expr.ResolvedType = BuiltinType.Error;
@@ -207,6 +207,9 @@ public class Sema
             default:
                 throw new ArgumentOutOfRangeException(nameof(sym));
         }
+
+        expr.Symbol = sym;
+        expr.ResolvedType = sym.Type;
     }
 
     private void VisitExprInt(ExprInt expr)
