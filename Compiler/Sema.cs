@@ -98,7 +98,7 @@ public class Sema
             {
                 unreachableReported = true;
                 Token termTok = _tokens[terminator.StartToken];
-                Error($"Unreachable code, terminated at {termTok.Line}{termTok.Column}", stmt);
+                Error($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt);
             }
 
             switch (stmt)
