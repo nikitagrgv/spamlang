@@ -86,8 +86,8 @@ public class Sema
             {
                 case Block b:
                     Scope scope = new(CurrentScope());
-                    PushScope(scope);
                     b.Scope = scope;
+                    PushScope(scope);
                     VisitBlock(b);
                     PopScope();
                     break;
