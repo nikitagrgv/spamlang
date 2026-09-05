@@ -140,6 +140,14 @@ public class Sema
         }
 
         Type targetType = target.Symbol.Type;
+        Type valueType = stmt.Value.ResolvedType;
+        if (valueType == BuiltinType.Error)
+        {
+            // Already reported
+            return;
+        }
+
+        stmt.Value = Adapt(stmt.Value, targetType);
     }
 
     private void VisitStmtExpr(StmtExpr stmt)
