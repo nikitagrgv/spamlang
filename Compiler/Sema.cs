@@ -324,8 +324,7 @@ public class Sema
     private void VisitExprCall(ExprCall expr)
     {
         VisitExpr(expr.Callee);
-        List<Expr> args = expr.Args;
-        foreach (Expr arg in args)
+        foreach (Expr arg in expr.Args)
         {
             VisitExpr(arg);
         }
@@ -356,6 +355,7 @@ public class Sema
         FuncType funcType = (FuncType)funcSym.Type;
 
         IReadOnlyList<Type> funcParams = funcType.ParamTypes;
+        List<Expr> args = expr.Args;
         if (funcParams.Count != args.Count)
         {
             Error(
