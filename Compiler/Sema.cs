@@ -188,9 +188,24 @@ public class Sema
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
         {
-            Error($"Identifier not found: {name}", expr);
+            Error($"Symbol not found: {name}", expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
+        }
+
+        switch (sym)
+        {
+            case FuncSymbol funcSymbol:
+            case ParamSymbol paramSymbol:
+            case VariableSymbol variableSymbol:
+                break;
+            case TypeSymbol typeSymbol:
+                // TODO: Allow that, e.g. `i32.TypeSize`
+                Error($"Type cannot be used as an identifier: {name}", expr);
+                expr.ResolvedType = BuiltinType.Error;
+                return;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(sym));
         }
     }
 
