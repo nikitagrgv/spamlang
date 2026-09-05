@@ -73,7 +73,7 @@ public class Sema
         FuncType funcType = (FuncType)fd.Symbol.Type;
         if (funcType.ReturnType != BuiltinType.Void && terminator == null)
         {
-            Error($"No return statement on the end of function \"{fd.Symbol.Name}\"", fd);
+            _diag.AddError($"No return statement on the end of function \"{fd.Symbol.Name}\"", _tokens[fd.EndToken]);
         }
 
         PopScope();
