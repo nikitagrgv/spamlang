@@ -200,7 +200,11 @@ public class Sema
     {
         Debug.Assert(_funcStack.Count > 0);
         FuncSymbol currentFunc = _funcStack[^1];
-        
+
+        if (stmt.Expr != null)
+        {
+            VisitExpr(stmt.Expr);
+        }
     }
 
     private void VisitExpr(Expr expr)
