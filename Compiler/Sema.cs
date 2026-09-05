@@ -393,30 +393,29 @@ public class Sema
     {
         // TODO: Compute in parser/lexer? Duplicated with lexer
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
-
-        if (str[0] == '0')
-        {
-            if (str.Length == 1)
-            {
-                expr.Value = 0;
-            }
-            else
-            {
-                char next = str[1];
-                expr.Value = next switch
-                {
-                    'x' or 'X' => Convert.ToUInt64(str[2..].ToString(), 16),
-                    'b' or 'B' => Convert.ToUInt64(str[2..].ToString(), 2),
-                    _ => Convert.ToUInt64(str[1..].ToString(), 8)
-                };
-            }
-        }
-        else
-        {
-            expr.Value = Convert.ToUInt64(str.ToString(), 10);
-        }
-
+        expr.Value = ParseIntLiteralValue(str);
         expr.ResolvedType = BuiltinType.I32;
+    }
+
+    static ulong ParseIntLiteralValue(ReadOnlySpan<char> str)
+    {
+        if (str[0] != '0')
+        {
+            return Convert.ToUInt64(str.ToString(), 10);
+        }
+
+        if (str.Length == 1)
+        {
+            return 0;
+        }
+
+        char next = str[1];
+        return next switch
+        {
+            'x' or 'X' => Convert.ToUInt64(str[2..].ToString(), 16),
+            'b' or 'B' => Convert.ToUInt64(str[2..].ToString(), 2),
+            _ => Convert.ToUInt64(str[1..].ToString(), 8)
+        };
     }
 
     private void VisitExprUnary(ExprUnary expr)
