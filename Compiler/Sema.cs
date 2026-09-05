@@ -68,7 +68,7 @@ public class Sema
         }
 
         fd.Body.Scope = scope;
-        VisitBlock(fd.Body);
+        VisitBlock(fd.Body, out Stmt? _);
 
         FuncType funcType = (FuncType)fd.Symbol.Type;
         if (funcType.ReturnType != BuiltinType.Void)
@@ -86,11 +86,11 @@ public class Sema
         _funcStack.RemoveAt(_funcStack.Count - 1);
     }
 
-    private void VisitBlock(Block block)
+    private void VisitBlock(Block block, out Stmt? terminator)
     {
         Debug.Assert(block.Scope != null, "Block scope must be set from outside");
 
-        Stmt? terminator = null;
+        terminator = null;
         bool unreachableReported = false;
         foreach (Stmt stmt in block.Stmts)
         {
@@ -107,7 +107,7 @@ public class Sema
                     Scope scope = new(CurrentScope());
                     b.Scope = scope;
                     PushScope(scope);
-                    VisitBlock(b);
+                    VisitBlock(b, out terminator);
                     PopScope();
                     break;
                 case StmtAssign stmtAssign:
