@@ -351,7 +351,10 @@ public class Sema
             return;
         }
 
-        if (funcSym.Declaration.Params.Count != expr.Args.Count)
+        Debug.Assert(funcSym.Type is FuncType);
+        FuncType funcType = (FuncType)funcSym.Type;
+
+        if (funcType.ParamTypes.Count != expr.Args.Count)
         {
             Error(
                 $"Function \"{funcSym.Name}\" takes {funcSym.Declaration.Params.Count} arguments, got {expr.Args.Count}",
@@ -360,8 +363,6 @@ public class Sema
             return;
         }
 
-        Debug.Assert(funcSym.Type is FuncType);
-        FuncType funcType = (FuncType)funcSym.Type;
 
         for (int i = 0; i < expr.Args.Count; ++i)
         {
