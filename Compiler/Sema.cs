@@ -207,6 +207,19 @@ public class Sema
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
+
+        if (funcSym.Declaration.Params.Count != expr.Args.Count)
+        {
+            Error($"Function {funcSym.Name} takes {funcSym.Declaration.Params.Count} arguments, got {expr.Args.Count}",
+                expr);
+            expr.ResolvedType = BuiltinType.Error;
+            return;
+        }
+
+        foreach (Expr arg in expr.Args)
+        {
+            Debug.Assert(arg.ResolvedType != null, "Must be resolved above");
+        }
     }
 
     private void VisitExprIdentifier(ExprIdentifier expr)
