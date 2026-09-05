@@ -90,8 +90,17 @@ public class Sema
     {
         Debug.Assert(block.Scope != null, "Block scope must be set from outside");
 
+        Stmt? terminator = null;
+        bool unreachableReported = false;
         foreach (Stmt stmt in block.Stmts)
         {
+            if (terminator != null && !unreachableReported)
+            {
+                unreachableReported = true;
+                Token termTok = _tokens[terminator.StartToken];
+                Error($"Unreachable code, terminated at {termTok.Line}{termTok.Column}", stmt);
+            }
+
             switch (stmt)
             {
                 case Block b:
@@ -112,6 +121,7 @@ public class Sema
                     break;
                 case StmtReturn stmtReturn:
                     VisitStmtReturn(stmtReturn);
+                    terminator = stmtReturn;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stmt));
