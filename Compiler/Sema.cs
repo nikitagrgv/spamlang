@@ -196,7 +196,7 @@ public class Sema
         Type? commonType = GetCommonType(leftType, rightType, op);
         if (commonType == null)
         {
-            Error($"Cannot use {op} on {leftType} and {rightType}", expr);
+            Error($"Cannot use \"{op}\" on \"{leftType}\" and \"{rightType}\"", expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
@@ -231,14 +231,15 @@ public class Sema
 
         if (callee.Symbol is not FuncSymbol funcSym)
         {
-            Error($"Expected function, got {callee.Symbol.Name}({callee.Symbol.GetType().Name})", expr);
+            Error($"Expected function, got \"{callee.Symbol.Name}\"({callee.Symbol.GetType().Name})", expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
 
         if (funcSym.Declaration.Params.Count != expr.Args.Count)
         {
-            Error($"Function \"{funcSym.Name}\" takes {funcSym.Declaration.Params.Count} arguments, got {expr.Args.Count}",
+            Error(
+                $"Function \"{funcSym.Name}\" takes {funcSym.Declaration.Params.Count} arguments, got {expr.Args.Count}",
                 expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
@@ -268,7 +269,7 @@ public class Sema
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
         {
-            Error($"Symbol not found: {name}", expr);
+            Error($"Symbol not found: \"{name}\"", expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
@@ -281,7 +282,7 @@ public class Sema
                 break;
             case TypeSymbol:
                 // TODO: Allow that, for e.g. `i32.TypeSize`
-                Error($"Type cannot be used as an identifier: {name}", expr);
+                Error($"Type cannot be used as an identifier: \"{name}\"", expr);
                 expr.ResolvedType = BuiltinType.Error;
                 return;
             default:
@@ -305,7 +306,7 @@ public class Sema
         TokenType op = GetTokenType(expr.OperatorToken);
         if (!CanUseUnary(expr.Expr.ResolvedType, op))
         {
-            Error($"Cannot use unary operator {op} on {expr.Expr.ResolvedType}", expr);
+            Error($"Cannot use unary operator \"{op}\" on type \"{expr.Expr.ResolvedType}\"", expr);
             expr.Expr.ResolvedType = BuiltinType.Error;
             return;
         }
@@ -420,7 +421,7 @@ public class Sema
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
         {
-            Error($"Type not found: {name}", typeDecl);
+            Error($"Type not found: \"{name}\"", typeDecl);
             typeDecl.ResolvedType = BuiltinType.Error;
             return typeDecl.ResolvedType;
         }
@@ -428,7 +429,7 @@ public class Sema
         TypeSymbol? typeSym = sym as TypeSymbol;
         if (typeSym == null)
         {
-            Error($"Type expected: {name}. Given: {sym.GetType().Name}", typeDecl);
+            Error($"Type expected: \"{name}\". Given: \"{sym.GetType().Name}\"", typeDecl);
             typeDecl.ResolvedType = BuiltinType.Error;
             return typeDecl.ResolvedType;
         }
@@ -491,7 +492,7 @@ public class Sema
             return cast;
         }
 
-        Error($"Cannot implicitly cast {type} to {targetType}", expr);
+        Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr);
         return expr;
     }
 
