@@ -176,11 +176,19 @@ public class Sema
     {
         Debug.Assert(stmt.Expr != null || stmt.TypeDecl != null, "Must be guaranteed by parser");
 
+        ReadOnlySpan<char> name = GetTokenValue(stmt.NameToken);
+
         Type? type = null;
         if (stmt.Expr != null)
         {
             VisitExpr(stmt.Expr);
             type = stmt.Expr.ResolvedType;
+
+            if (type == BuiltinType.Void)
+            {
+                Error($"Cannot assign variable \"{name}\" to void expression", stmt);
+                type = BuiltinType.Error;
+            }
         }
 
         if (stmt.TypeDecl != null)
@@ -194,7 +202,6 @@ public class Sema
 
         Debug.Assert(type != null);
 
-        ReadOnlySpan<char> name = GetTokenValue(stmt.NameToken);
         VariableSymbol sym = new()
         {
             Declaration = stmt,
