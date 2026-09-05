@@ -209,7 +209,7 @@ public class Compiler
                 PrintAst(depth + 1, n.Body);
                 break;
             case StmtLet n:
-                Console.WriteLine($"{fullPrefix}StmtLet | Type {n.TypeDecl}");
+                Console.WriteLine($"{fullPrefix}StmtLet");
                 PrintSymbol(depth + 1, n.Symbol);
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 if (n.TypeDecl != null)
