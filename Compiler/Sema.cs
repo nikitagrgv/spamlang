@@ -180,6 +180,18 @@ public class Sema
 
     private void VisitExprCall(ExprCall expr)
     {
+        VisitExpr(expr.Callee);
+        foreach (Expr arg in expr.Args)
+        {
+            VisitExpr(arg);
+        }
+
+        if (expr.Callee is not ExprIdentifier callee)
+        {
+            // TODO: Implement more complex callees, like `myfunc()[4]()`
+            Error("Only identifiers can be called", expr);
+            return;
+        }
     }
 
     private void VisitExprIdentifier(ExprIdentifier expr)
