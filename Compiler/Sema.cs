@@ -176,6 +176,21 @@ public class Sema
 
     private void VisitExprBinary(ExprBinary expr)
     {
+        VisitExpr(expr.Left);
+        VisitExpr(expr.Right);
+
+        Debug.Assert(expr.Left.ResolvedType != null);
+        Debug.Assert(expr.Right.ResolvedType != null);
+
+        if (expr.Left.ResolvedType == BuiltinType.Error || expr.Right.ResolvedType == BuiltinType.Error)
+        {
+            // Already reported
+            expr.ResolvedType = BuiltinType.Error;
+            return;
+        }
+
+        TokenType op = GetTokenType(expr.OperatorToken);
+        Type? common = GetCommonType(expr.Left.ResolvedType, expr.Right.ResolvedType, op);
     }
 
     private void VisitExprCall(ExprCall expr)
