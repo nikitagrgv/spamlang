@@ -199,15 +199,17 @@ public class Sema
     private void VisitStmtReturn(StmtReturn stmt)
     {
         Debug.Assert(_funcStack.Count > 0);
-        FuncSymbol currentFunc = _funcStack[^1];
-        FuncType funcType = (FuncType)currentFunc.Type;
 
         if (stmt.Expr != null)
         {
             VisitExpr(stmt.Expr);
         }
 
-        if (stmt.Expr != null && funcType.ReturnType == BuiltinType.Void)
+        FuncSymbol currentFunc = _funcStack[^1];
+        FuncType funcType = (FuncType)currentFunc.Type;
+        Type returnType = funcType.ReturnType;
+
+        if (stmt.Expr != null && returnType == BuiltinType.Void)
         {
             Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" have no return type",
                 stmt);
