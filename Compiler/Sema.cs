@@ -174,6 +174,8 @@ public class Sema
 
     private void VisitStmtLet(StmtLet stmt)
     {
+        // NOTE: Uninit is ok, defaults to zero
+
         Debug.Assert(stmt.Expr != null || stmt.TypeDecl != null, "Must be guaranteed by parser");
 
         ReadOnlySpan<char> name = GetTokenValue(stmt.NameToken);
