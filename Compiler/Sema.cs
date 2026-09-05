@@ -200,10 +200,17 @@ public class Sema
     {
         Debug.Assert(_funcStack.Count > 0);
         FuncSymbol currentFunc = _funcStack[^1];
+        FuncType funcType = (FuncType)currentFunc.Type;
 
         if (stmt.Expr != null)
         {
             VisitExpr(stmt.Expr);
+        }
+
+        if (stmt.Expr != null && funcType.ReturnType == BuiltinType.Void)
+        {
+            Error($"Unexpected expression in return statement. \"{currentFunc.Name}\" have no return type", stmt);
+            return;
         }
     }
 
