@@ -99,6 +99,8 @@ public abstract class ExprPrimary : Expr
 public sealed class ExprInt : ExprPrimary
 {
     public required int LiteralToken { get; init; }
+
+    public ulong Value { get; set; }
 }
 
 public sealed class ExprIdentifier : ExprPrimary
