@@ -73,12 +73,7 @@ public class Sema
         FuncType funcType = (FuncType)fd.Symbol.Type;
         if (funcType.ReturnType != BuiltinType.Void)
         {
-            bool hasLastReturn = false;
-            if (fd.Body.Stmts.Count > 0)
-            {
-                hasLastReturn = fd.Body.Stmts[^1] is StmtReturn;
-            }
-
+            bool hasLastReturn = fd.Body.Stmts.Count > 0 && fd.Body.Stmts[^1] is StmtReturn;
             if (!hasLastReturn)
             {
                 Error($"No return statement on the end of function \"{fd.Symbol.Name}\"", fd);
