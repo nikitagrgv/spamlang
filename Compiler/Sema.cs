@@ -126,15 +126,14 @@ public class Sema
 
         switch (target.Symbol)
         {
-            case FuncSymbol funcSymbol:
+            case FuncSymbol:
                 Error($"Cannot assign to function \"{target.Symbol.Name}\"", stmt.Target);
                 return;
-            case TypeSymbol typeSymbol:
+            case TypeSymbol:
                 Error($"Cannot assign to type \"{target.Symbol.Name}\"", stmt.Target);
                 return;
-            case ParamSymbol paramSymbol:
-                break;
-            case VariableSymbol variableSymbol:
+            case ParamSymbol:
+            case VariableSymbol:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
