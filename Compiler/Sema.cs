@@ -198,6 +198,9 @@ public class Sema
 
     private void VisitStmtReturn(StmtReturn stmt)
     {
+        Debug.Assert(_funcStack.Count > 0);
+        FuncSymbol currentFunc = _funcStack[^1];
+        
     }
 
     private void VisitExpr(Expr expr)
