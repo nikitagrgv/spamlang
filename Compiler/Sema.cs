@@ -393,7 +393,17 @@ public class Sema
     {
         // TODO: Compute in parser/lexer? Duplicated with lexer
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
-        expr.Value = ParseIntLiteralValue(str);
+
+        try
+        {
+            expr.Value = ParseIntLiteralValue(str);
+        }
+        catch (Exception)
+        {
+            expr.Value = 0;
+            Error($"Invalid integer literal: {str}", expr);
+        }
+
         expr.ResolvedType = BuiltinType.I32;
     }
 
