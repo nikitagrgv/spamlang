@@ -206,7 +206,7 @@ public class Sema
         if (stmt.TypeDecl != null)
         {
             type = ResolveType(stmt.TypeDecl);
-            if (stmt.Expr != null)
+            if (stmt.Expr != null && stmt.Expr.ResolvedType != BuiltinType.Void) // Skip void, already reported
             {
                 stmt.Expr = Adapt(stmt.Expr, type);
             }
