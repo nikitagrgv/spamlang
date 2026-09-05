@@ -209,7 +209,8 @@ public class Sema
 
         if (stmt.Expr != null && funcType.ReturnType == BuiltinType.Void)
         {
-            Error($"Unexpected expression in return statement. \"{currentFunc.Name}\" have no return type", stmt);
+            Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" have no return type",
+                stmt);
             return;
         }
     }
