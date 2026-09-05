@@ -174,37 +174,45 @@ public class Sema
         }
     }
 
-    private void VisitExprBinary(ExprBinary exprBinary)
+    private void VisitExprBinary(ExprBinary expr)
     {
     }
 
-    private void VisitExprCall(ExprCall exprCall)
+    private void VisitExprCall(ExprCall expr)
     {
     }
 
-    private void VisitExprIdentifier(ExprIdentifier exprIdentifier)
+    private void VisitExprIdentifier(ExprIdentifier expr)
     {
-    }
-
-    private void VisitExprInt(ExprInt exprInt)
-    {
-        exprInt.ResolvedType = BuiltinType.I32;
-    }
-
-    private void VisitExprUnary(ExprUnary exprUnary)
-    {
-        VisitExpr(exprUnary.Expr);
-        Debug.Assert(exprUnary.Expr.ResolvedType != null);
-
-        TokenType op = GetTokenType(exprUnary.OperatorToken);
-        if (!CanUseUnary(exprUnary.Expr.ResolvedType, op))
+        ReadOnlySpan<char> name = GetTokenValue(expr.IdentifierToken);
+        Symbol? sym = LookupRecursive(name);
+        if (sym == null)
         {
-            Error($"Cannot use unary operator {op} on {exprUnary.Expr.ResolvedType}", exprUnary);
-            exprUnary.Expr.ResolvedType = BuiltinType.Error;
+            Error($"Identifier not found: {name}", expr);
+            expr.ResolvedType = BuiltinType.Error;
+            return;
+        }
+    }
+
+    private void VisitExprInt(ExprInt expr)
+    {
+        expr.ResolvedType = BuiltinType.I32;
+    }
+
+    private void VisitExprUnary(ExprUnary expr)
+    {
+        VisitExpr(expr.Expr);
+        Debug.Assert(expr.Expr.ResolvedType != null);
+
+        TokenType op = GetTokenType(expr.OperatorToken);
+        if (!CanUseUnary(expr.Expr.ResolvedType, op))
+        {
+            Error($"Cannot use unary operator {op} on {expr.Expr.ResolvedType}", expr);
+            expr.Expr.ResolvedType = BuiltinType.Error;
             return;
         }
 
-        exprUnary.ResolvedType = exprUnary.Expr.ResolvedType;
+        expr.ResolvedType = expr.Expr.ResolvedType;
     }
 
     private void RegisterBuiltin(Scope scope)
