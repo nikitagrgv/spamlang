@@ -188,6 +188,7 @@ public class Sema
 
     private void VisitExprInt(ExprInt exprInt)
     {
+        exprInt.ResolvedType = BuiltinType.I32;
     }
 
     private void VisitExprUnary(ExprUnary exprUnary)
