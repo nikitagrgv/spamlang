@@ -216,17 +216,22 @@ public class Sema
             return;
         }
 
+        Debug.Assert(funcSym.Type is FuncType);
+        FuncType funcType = (FuncType)funcSym.Type;
+
         for (int i = 0; i < expr.Args.Count; ++i)
         {
-            Param param = funcSym.Declaration.Params[i];
+            Type paramType = funcType.ParamTypes[i];
             Expr arg = expr.Args[i];
 
-            Debug.Assert(param.Type.ResolvedType != null, "Must be already resolved");
+            Debug.Assert(paramType != null, "Must be already resolved");
             Debug.Assert(arg.ResolvedType != null, "Must be resolved above");
 
-            Expr newArg = Adapt(arg, param.Type.ResolvedType);
+            Expr newArg = Adapt(arg, paramType);
             expr.Args[i] = newArg;
         }
+
+        expr.ResolvedType = funcType.ReturnType;
     }
 
     private void VisitExprIdentifier(ExprIdentifier expr)
