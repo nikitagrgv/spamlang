@@ -211,10 +211,12 @@ public class Sema
 
         if (stmt.Expr != null && returnType == BuiltinType.Void)
         {
-            Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" have no return type",
+            Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" returns void",
                 stmt);
             return;
         }
+        
+        
     }
 
     private void VisitExpr(Expr expr)
