@@ -591,11 +591,6 @@ public class Sema
         return typeDecl.ResolvedType;
     }
 
-    private Symbol? LookupLocal(ReadOnlySpan<char> name)
-    {
-        return CurrentScope().LookupLocal(name);
-    }
-
     private Symbol? LookupRecursive(ReadOnlySpan<char> name)
     {
         return CurrentScope().LookupRecursive(name);
