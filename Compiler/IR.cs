@@ -34,7 +34,7 @@ public abstract class IRValue
 
     public virtual string PrettyPrint()
     {
-        return $"%{Id}";
+        return $"{Type} %{Id}";
     }
 }
 
@@ -78,7 +78,7 @@ public sealed class IRInstructionRet : IRInstruction
             return "ret";
         }
 
-        return $"ret {Value.Type} {Value.PrettyPrint()}";
+        return $"ret {Value.PrettyPrint()}";
     }
 }
 
@@ -86,6 +86,11 @@ public sealed class IRInstructionAlloca : IRInstruction
 {
     public required Type AllocatedType { get; init; }
     public override Type Type => BuiltinType.Ptr;
+
+    public override string PrettyPrint()
+    {
+        return $"%{Id} = alloca {AllocatedType}";
+    }
 }
 
 public sealed class IRInstructionLoad : IRInstruction
@@ -93,6 +98,11 @@ public sealed class IRInstructionLoad : IRInstruction
     public required Type LoadedType { get; init; }
     public required IRValue Address { get; init; }
     public override Type Type => LoadedType;
+
+    public override string PrettyPrint()
+    {
+        return $"%{Id} = load {LoadedType}, {Address.PrettyPrint()}";
+    }
 }
 
 public sealed class IRInstructionStore : IRInstruction
