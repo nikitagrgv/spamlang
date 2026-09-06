@@ -424,11 +424,11 @@ public class Compiler
             if (inst.Type != BuiltinType.Void)
             {
                 inst.Id = ++counter;
-                Console.WriteLine($"  %{inst.Id} = {inst.PrettyPrint()}");
+                Console.WriteLine($"  %{inst.Id} = {inst.FullPrint()}");
             }
             else
             {
-                Console.WriteLine($"  {inst.PrettyPrint()}");
+                Console.WriteLine($"  {inst.FullPrint()}");
             }
         }
     }

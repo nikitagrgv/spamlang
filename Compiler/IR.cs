@@ -32,9 +32,14 @@ public abstract class IRValue
     public abstract Type Type { get; }
     public int Id { get; set; } = -1;
 
-    public virtual string PrettyPrint()
+    public string Print()
     {
         return $"{Type} %{Id}";
+    }
+
+    public virtual string FullPrint()
+    {
+        return Print();
     }
 }
 
@@ -45,7 +50,7 @@ public sealed class IRConstantInt : IRValue
 
     public override Type Type => IntType;
 
-    public override string PrettyPrint()
+    public override string FullPrint()
     {
         return $"{IntType} {Value}";
     }
@@ -71,14 +76,14 @@ public sealed class IRInstructionRet : IRInstruction
     public override Type Type => BuiltinType.Void;
     public override bool IsTerminator => true;
 
-    public override string PrettyPrint()
+    public override string FullPrint()
     {
         if (Value == null)
         {
             return "ret";
         }
 
-        return $"ret {Value.PrettyPrint()}";
+        return $"ret {Value.Print()}";
     }
 }
 
@@ -87,7 +92,7 @@ public sealed class IRInstructionAlloca : IRInstruction
     public required Type AllocatedType { get; init; }
     public override Type Type => BuiltinType.Ptr;
 
-    public override string PrettyPrint()
+    public override string FullPrint()
     {
         return $"%{Id} = alloca {AllocatedType}";
     }
@@ -99,9 +104,9 @@ public sealed class IRInstructionLoad : IRInstruction
     public required IRValue Address { get; init; }
     public override Type Type => LoadedType;
 
-    public override string PrettyPrint()
+    public override string FullPrint()
     {
-        return $"%{Id} = load {LoadedType}, {Address.PrettyPrint()}";
+        return $"%{Id} = load {LoadedType}, {Address.Print()}";
     }
 }
 
@@ -110,6 +115,11 @@ public sealed class IRInstructionStore : IRInstruction
     public required IRValue Value { get; init; }
     public required IRValue Address { get; init; }
     public override Type Type => BuiltinType.Void;
+
+    public override string FullPrint()
+    {
+        return $"store {Value.Print()}, {Address.Print()}";
+    }
 }
 
 public enum IRBinaryOp
