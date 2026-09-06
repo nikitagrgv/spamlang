@@ -113,6 +113,7 @@ public class Compiler
 
         if (_diag.HasErrors)
         {
+            _diag.Report();
             Console.WriteLine("Sema had errors");
             ReportTime("Lexer", dtLexer);
             ReportTime("Parser", dtParser);
@@ -126,6 +127,9 @@ public class Compiler
             // TODO#
             Console.WriteLine("================================");
         }
+
+        IRGen irGen = new(_code, _tokens, _diag);
+        irGen.Run();
 
         _diag.Report();
 
