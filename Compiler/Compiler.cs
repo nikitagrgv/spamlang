@@ -424,12 +424,9 @@ public class Compiler
             if (inst.Type != BuiltinType.Void)
             {
                 inst.Id = ++counter;
-                Console.WriteLine($"  %{inst.Id} = {inst.FullPrint()}");
             }
-            else
-            {
-                Console.WriteLine($"  {inst.FullPrint()}");
-            }
+
+            Console.WriteLine($"  {inst.FullPrint()}");
         }
     }
 }
