@@ -32,7 +32,7 @@ public abstract class IRValue
     public abstract Type Type { get; }
     public int Id { get; set; } = -1;
 
-    public string Print()
+    public virtual string Print()
     {
         return $"{Type} %{Id}";
     }
@@ -49,6 +49,11 @@ public sealed class IRConstantInt : IRValue
     public required Int128 Value { get; init; }
 
     public override Type Type => IntType;
+
+    public override string Print()
+    {
+        return $"{Value}";
+    }
 
     public override string FullPrint()
     {
