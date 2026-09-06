@@ -47,7 +47,7 @@ public sealed class IRConstantInt : IRValue
 
     public override string PrettyPrint()
     {
-        return $"{Value}({IntType.Name})";
+        return $"{IntType} {Value}";
     }
 }
 
@@ -70,6 +70,16 @@ public sealed class IRInstructionRet : IRInstruction
     public required IRValue? Value { get; init; }
     public override Type Type => BuiltinType.Void;
     public override bool IsTerminator => true;
+
+    public override string PrettyPrint()
+    {
+        if (Value == null)
+        {
+            return "ret";
+        }
+
+        return $"ret {Value.Type} {Value.PrettyPrint()}";
+    }
 }
 
 public sealed class IRInstructionAlloca : IRInstruction
