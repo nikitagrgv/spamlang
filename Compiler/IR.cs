@@ -81,3 +81,29 @@ public sealed class IRInstructionStore : IRInstruction
     public required IRValue Address { get; init; }
     public override Type Type => BuiltinType.Void;
 }
+
+public enum IRBinaryOp
+{
+    Add,
+    Sub,
+    Mul,
+    SDiv,
+    UDiv,
+    SRem,
+    URem,
+}
+
+public sealed class IRInstructionBinary : IRInstruction
+{
+    public required IRBinaryOp Op { get; init; }
+    public required IRValue Left { get; init; }
+    public required IRValue Right { get; init; }
+    public override Type Type => Left.Type;
+}
+
+public sealed class IRInstructionCall : IRInstruction
+{
+    public required IRFunction Callee { get; init; }
+    public required List<IRValue> Args { get; init; }
+    public override Type Type => Callee.Type.ReturnType;
+}
