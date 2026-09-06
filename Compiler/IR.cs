@@ -31,6 +31,11 @@ public abstract class IRValue
 {
     public abstract Type Type { get; }
     public int Id { get; set; } = -1;
+
+    public virtual string PrettyPrint()
+    {
+        return $"%{Id}";
+    }
 }
 
 public sealed class IRConstantInt : IRValue
@@ -39,6 +44,11 @@ public sealed class IRConstantInt : IRValue
     public required Int128 Value { get; init; }
 
     public override Type Type => IntType;
+
+    public override string PrettyPrint()
+    {
+        return $"{Value}({IntType.Name})";
+    }
 }
 
 public sealed class IRParam : IRValue
