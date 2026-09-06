@@ -54,11 +54,6 @@ public sealed class IRConstantInt : IRValue
     {
         return $"{Value}";
     }
-
-    public override string FullPrint()
-    {
-        return $"{IntType} {Value}";
-    }
 }
 
 public sealed class IRParam : IRValue
