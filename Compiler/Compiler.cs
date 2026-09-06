@@ -383,15 +383,15 @@ public class Compiler
 
     private void PrintIR(IRModule module)
     {
-        int counter = -1;
         foreach (IRFunction func in module.Functions)
         {
-            PrintIR(func, ref counter);
+            PrintIR(func);
         }
     }
 
-    private void PrintIR(IRFunction func, ref int counter)
+    private void PrintIR(IRFunction func)
     {
+        int counter = -1;
         Console.Write($"fn @{func.Name}(");
         for (int i = 0; i < func.Params.Count; i++)
         {
