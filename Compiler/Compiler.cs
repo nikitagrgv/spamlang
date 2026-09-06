@@ -383,6 +383,53 @@ public class Compiler
 
     private void PrintIR(IRModule module)
     {
-        
+        int counter = -1;
+        foreach (IRFunction func in module.Functions)
+        {
+            PrintIR(func, ref counter);
+        }
+    }
+
+    private void PrintIR(IRFunction func, ref int counter)
+    {
+        Console.Write($"fn @{func.Name}(");
+        for (int i = 0; i < func.Params.Count; i++)
+        {
+            IRParam param = func.Params[i];
+            if (i != 0)
+            {
+                Console.Write(", ");
+            }
+
+            param.Id = ++counter;
+            Console.Write($"{param.Type} %{param.Id}");
+        }
+
+        Console.Write($") -> {func.Type.ReturnType}");
+        Console.WriteLine();
+        Console.WriteLine("{");
+        foreach (IRBasicBlock bb in func.BasicBlocks)
+        {
+            PrintIR(bb, ref counter);
+        }
+
+        Console.WriteLine("}");
+    }
+
+    private void PrintIR(IRBasicBlock bb, ref int counter)
+    {
+        Console.WriteLine($"{bb.Name}:");
+        foreach (IRInstruction inst in bb.Instructions)
+        {
+            if (inst.Type != BuiltinType.Void)
+            {
+                inst.Id = ++counter;
+                Console.WriteLine($"  %{inst.Id} = {inst}");
+            }
+            else
+            {
+                Console.WriteLine($"  {inst}");
+            }
+        }
     }
 }
