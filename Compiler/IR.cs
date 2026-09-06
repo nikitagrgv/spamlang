@@ -24,7 +24,24 @@ public class IRBasicBlock
         Instructions.Add(instruction);
     }
 
-    public IRInstruction? Terminator => Instructions.LastOrDefault();
+    public IRInstruction? Terminator
+    {
+        get
+        {
+            if (Instructions.Count == 0)
+            {
+                return null;
+            }
+
+            IRInstruction last = Instructions[^1];
+            if (!last.IsTerminator)
+            {
+                return null;
+            }
+
+            return last;
+        }
+    }
 }
 
 public abstract class IRValue
