@@ -121,15 +121,15 @@ public class Compiler
             return false;
         }
 
+        IRGen irGen = new(_code, _tokens, _diag);
+        irGen.Run(parserResult.CompilationUnit);
+
         if (_flags.DebugIR)
         {
             Console.WriteLine("================================");
             // TODO#
             Console.WriteLine("================================");
         }
-
-        IRGen irGen = new(_code, _tokens, _diag);
-        irGen.Run();
 
         _diag.Report();
 
