@@ -92,6 +92,9 @@ public class Compiler
             }
 
             _diag.Report();
+
+            ReportTime("Lexer", dtLexer);
+            ReportTime("Parser", dtParser);
             return false;
         }
 
@@ -111,6 +114,9 @@ public class Compiler
         if (_diag.HasErrors)
         {
             Console.WriteLine("Sema had errors");
+            ReportTime("Lexer", dtLexer);
+            ReportTime("Parser", dtParser);
+            ReportTime("Sema", dtSema);
             return false;
         }
 
@@ -122,7 +128,22 @@ public class Compiler
         }
 
         _diag.Report();
+
+        ReportTime("Lexer", dtLexer);
+        ReportTime("Parser", dtParser);
+        ReportTime("Sema", dtSema);
+
         return !_diag.HasErrors;
+    }
+
+    void ReportTime(string what, TimeSpan dt)
+    {
+        if (!_flags.DebugTimer)
+        {
+            return;
+        }
+
+        Console.WriteLine($"{what} Time: {dt.Milliseconds}ms");
     }
 
     private void PrintTokens()
