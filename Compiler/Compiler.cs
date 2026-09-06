@@ -386,6 +386,7 @@ public class Compiler
         foreach (IRFunction func in module.Functions)
         {
             PrintIR(func);
+            Console.WriteLine();
         }
     }
 
