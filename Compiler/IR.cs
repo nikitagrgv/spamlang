@@ -32,14 +32,14 @@ public abstract class IRValue
     public abstract Type Type { get; }
     public int Id { get; set; } = -1;
 
-    public virtual string Print()
+    public virtual string PrintOperand()
     {
         return $"{Type} %{Id}";
     }
 
-    public virtual string FullPrint()
+    public virtual string PrintDefinition()
     {
-        return Print();
+        return PrintOperand();
     }
 }
 
@@ -50,7 +50,7 @@ public sealed class IRConstantInt : IRValue
 
     public override Type Type => IntType;
 
-    public override string Print()
+    public override string PrintOperand()
     {
         return $"{Value}";
     }
@@ -76,14 +76,14 @@ public sealed class IRInstructionRet : IRInstruction
     public override Type Type => BuiltinType.Void;
     public override bool IsTerminator => true;
 
-    public override string FullPrint()
+    public override string PrintDefinition()
     {
         if (Value == null)
         {
             return "ret";
         }
 
-        return $"ret {Value.Print()}";
+        return $"ret {Value.PrintOperand()}";
     }
 }
 
@@ -92,7 +92,7 @@ public sealed class IRInstructionAlloca : IRInstruction
     public required Type AllocatedType { get; init; }
     public override Type Type => BuiltinType.Ptr;
 
-    public override string FullPrint()
+    public override string PrintDefinition()
     {
         return $"%{Id} = alloca {AllocatedType}";
     }
@@ -104,9 +104,9 @@ public sealed class IRInstructionLoad : IRInstruction
     public required IRValue Address { get; init; }
     public override Type Type => LoadedType;
 
-    public override string FullPrint()
+    public override string PrintDefinition()
     {
-        return $"%{Id} = load {LoadedType}, {Address.Print()}";
+        return $"%{Id} = load {LoadedType}, {Address.PrintOperand()}";
     }
 }
 
@@ -116,9 +116,9 @@ public sealed class IRInstructionStore : IRInstruction
     public required IRValue Address { get; init; }
     public override Type Type => BuiltinType.Void;
 
-    public override string FullPrint()
+    public override string PrintDefinition()
     {
-        return $"store {Value.Print()}, {Address.Print()}";
+        return $"store {Value.PrintOperand()}, {Address.PrintOperand()}";
     }
 }
 
@@ -140,9 +140,9 @@ public sealed class IRInstructionBinary : IRInstruction
     public required IRValue Right { get; init; }
     public override Type Type => Left.Type;
 
-    public override string FullPrint()
+    public override string PrintDefinition()
     {
-        return $"%{Id} = {Op} {Left.Print()}, {Right.Print()}";
+        return $"%{Id} = {Op} {Left.PrintOperand()}, {Right.PrintOperand()}";
     }
 }
 
@@ -152,7 +152,7 @@ public sealed class IRInstructionCall : IRInstruction
     public required List<IRValue> Args { get; init; }
     public override Type Type => Callee.Type.ReturnType;
 
-    public override string FullPrint()
+    public override string PrintDefinition()
     {
         string ret = "";
         if (Type != BuiltinType.Void)
@@ -160,7 +160,7 @@ public sealed class IRInstructionCall : IRInstruction
             ret += $"%{Id} = ";
         }
 
-        ret += $"call {Type} @{Callee.Name}({string.Join(", ", Args.Select(a => a.Print()))})";
+        ret += $"call {Type} @{Callee.Name}({string.Join(", ", Args.Select(a => a.PrintOperand()))})";
         return ret;
     }
 }

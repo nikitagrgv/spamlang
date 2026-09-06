@@ -426,7 +426,7 @@ public class Compiler
                 inst.Id = ++counter;
             }
 
-            Console.WriteLine($"  {inst.FullPrint()}");
+            Console.WriteLine($"  {inst.PrintDefinition()}");
         }
     }
 }
