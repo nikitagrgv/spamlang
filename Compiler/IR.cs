@@ -83,7 +83,7 @@ public sealed class IRParam : IRValue
 
 public abstract class IRInstruction : IRValue
 {
-    public required IRBasicBlock? Parent { get; set; }
+    public IRBasicBlock? Parent { get; set; }
     public virtual bool IsTerminator => false;
 }
 
