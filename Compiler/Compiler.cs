@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Compiler;
 
 public class Compiler
@@ -37,10 +39,16 @@ public class Compiler
 
     private bool Compile(string code)
     {
+        Stopwatch sw = new();
+
         _code = code;
         _diag.Clear();
+
+        sw.Restart();
         Lexer lexer = new();
         Lexer.Result lexerResult = lexer.Run(_code, _diag);
+        TimeSpan dtLexer = sw.Elapsed;
+
         if (lexerResult.HasErrors)
         {
             Console.WriteLine("Lexer had errors");
@@ -62,8 +70,11 @@ public class Compiler
             Console.WriteLine("================================");
         }
 
+
+        sw.Restart();
         Parser parser = new();
         Parser.Result parserResult = parser.Run(_code, _tokens, _diag);
+        TimeSpan dtParser = sw.Elapsed;
 
         if (parserResult.HasErrors)
         {
@@ -83,8 +94,10 @@ public class Compiler
             return false;
         }
 
+        sw.Restart();
         Sema sema = new(_code, _tokens, _diag);
         sema.Run(parserResult.CompilationUnit);
+        TimeSpan dtSema = sw.Elapsed;
 
         // Print after sema to include sema info
         if (_flags.DebugParser)
