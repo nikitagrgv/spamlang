@@ -122,12 +122,12 @@ public class Compiler
         }
 
         IRGen irGen = new(_code, _tokens, _diag);
-        irGen.Run(parserResult.CompilationUnit);
+        IRModule irModule = irGen.Run(parserResult.CompilationUnit);
 
         if (_flags.DebugIR)
         {
             Console.WriteLine("================================");
-            // TODO#
+            PrintIR(irModule);
             Console.WriteLine("================================");
         }
 
@@ -379,5 +379,10 @@ public class Compiler
     {
         string indent = MakeIndent(depth);
         Console.WriteLine($"{indent}Symbol: {symbol}");
+    }
+
+    private void PrintIR(IRModule module)
+    {
+        
     }
 }

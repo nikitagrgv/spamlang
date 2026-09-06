@@ -13,7 +13,7 @@ public class IRGen
         _tokens = tokens;
     }
 
-    public void Run(CompilationUnit unit)
+    public IRModule Run(CompilationUnit unit)
     {
     }
 }
