@@ -69,7 +69,7 @@ public sealed class IRConstantInt : IRValue
 
     public override string PrintOperand()
     {
-        return $"{Value}";
+        return $"{Type} {Value}";
     }
 }
 
