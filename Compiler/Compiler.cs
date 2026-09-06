@@ -7,7 +7,8 @@ public class Compiler
         public bool DebugLexer = false;
         public bool DebugLexerPretty = false;
         public bool DebugParser = false;
-        public bool DebugSema = false;
+        public bool DebugSema = false; // TODO: Unused, remove?
+        public bool DebugIR = false;
     }
 
     private readonly IFileSystem _fs;
@@ -93,10 +94,16 @@ public class Compiler
             Console.WriteLine("================================");
         }
 
-        if (_flags.DebugSema)
+        if (_diag.HasErrors)
+        {
+            Console.WriteLine("Sema had errors");
+            return false;
+        }
+
+        if (_flags.DebugIR)
         {
             Console.WriteLine("================================");
-            // PrintSema(parserResult.CompilationUnit);
+            // TODO#
             Console.WriteLine("================================");
         }
 
