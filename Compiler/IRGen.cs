@@ -15,5 +15,12 @@ public class IRGen
 
     public IRModule Run(CompilationUnit unit)
     {
+        List<IRFunction> functions = new();
+
+        IRModule module = new()
+        {
+            Functions = functions,
+        };
+        return module;
     }
 }
