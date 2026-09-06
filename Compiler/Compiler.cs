@@ -11,6 +11,7 @@ public class Compiler
         public bool DebugParser = false;
         public bool DebugSema = false; // TODO: Unused, remove?
         public bool DebugIR = false;
+        public bool DebugTimer = false;
     }
 
     private readonly IFileSystem _fs;

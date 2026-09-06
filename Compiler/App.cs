@@ -22,6 +22,9 @@ class App
         [Argument("ir")]
         public bool DebugIR { get; set; }
 
+        [Argument("timer")]
+        public bool DebugTimer { get; set; }
+
         [PositionalArgsList]
         public List<string> Files { get; set; }
     }
@@ -35,6 +38,7 @@ class App
             DebugParser = arguments.DebugParser,
             DebugSema = arguments.DebugSema,
             DebugIR = arguments.DebugIR,
+            DebugTimer = arguments.DebugTimer,
         };
         return flags;
     }
