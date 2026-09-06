@@ -139,6 +139,11 @@ public sealed class IRInstructionBinary : IRInstruction
     public required IRValue Left { get; init; }
     public required IRValue Right { get; init; }
     public override Type Type => Left.Type;
+
+    public override string FullPrint()
+    {
+        return $"%{Id} = {Op} {Left.Print()}, {Right.Print()}";
+    }
 }
 
 public sealed class IRInstructionCall : IRInstruction
@@ -146,4 +151,16 @@ public sealed class IRInstructionCall : IRInstruction
     public required IRFunction Callee { get; init; }
     public required List<IRValue> Args { get; init; }
     public override Type Type => Callee.Type.ReturnType;
+
+    public override string FullPrint()
+    {
+        string ret = "";
+        if (Type != BuiltinType.Void)
+        {
+            ret += $"%{Id} = ";
+        }
+
+        ret += $"call {Type} @{Callee.Name}({string.Join(", ", Args.Select(a => a.Print()))})";
+        return ret;
+    }
 }
