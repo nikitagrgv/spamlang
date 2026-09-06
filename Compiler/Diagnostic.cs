@@ -60,6 +60,30 @@ public class Diagnostic
         HasErrors = true;
     }
 
+    public void AddError(string message, Token token)
+    {
+        AddError(message, token.Position, token.Length, token.Line, token.Column);
+    }
+
+    public void AddWarning(string message, int pos, int len, int line, int col)
+    {
+        DiagnosticEntry entry = new()
+        {
+            Severity = DiagnosticSeverity.Warning,
+            Message = message,
+            Position = pos,
+            Length = len,
+            Line = line,
+            Column = col,
+        };
+        _entries.Add(entry);
+    }
+
+    public void AddWarning(string message, Token token)
+    {
+        AddWarning(message, token.Position, token.Length, token.Line, token.Column);
+    }
+
     public void Report()
     {
         foreach (DiagnosticEntry entry in _entries)

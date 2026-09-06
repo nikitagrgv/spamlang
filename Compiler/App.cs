@@ -16,6 +16,9 @@ class App
         [Argument("parser")]
         public bool DebugParser { get; set; }
 
+        [Argument("sema")]
+        public bool DebugSema { get; set; }
+
         [PositionalArgsList]
         public List<string> Files { get; set; }
     }
@@ -26,7 +29,8 @@ class App
         {
             DebugLexer = arguments.DebugLexer,
             DebugLexerPretty = arguments.DebugLexerPretty,
-            DebugParser = arguments.DebugParser
+            DebugParser = arguments.DebugParser,
+            DebugSema = arguments.DebugSema,
         };
         return flags;
     }

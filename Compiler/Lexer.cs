@@ -104,11 +104,7 @@ public class Lexer
                 {
                     token.Type = TokenType.Invalid;
                     _hasErrors = true;
-                    _diag.AddError("Invalid integer literal",
-                        token.Position,
-                        token.Length,
-                        token.Line,
-                        token.Column);
+                    _diag.AddError("Invalid integer literal", token);
                 }
 
                 tokens.Add(token);
@@ -132,11 +128,7 @@ public class Lexer
                 pos += wordLen;
                 column += wordLen;
                 _hasErrors = true;
-                _diag.AddError("Invalid token",
-                    invalidToken.Position,
-                    invalidToken.Length,
-                    invalidToken.Line,
-                    invalidToken.Column);
+                _diag.AddError("Invalid token", invalidToken);
                 continue;
             }
 

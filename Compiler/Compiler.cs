@@ -7,6 +7,7 @@ public class Compiler
         public bool DebugLexer = false;
         public bool DebugLexerPretty = false;
         public bool DebugParser = false;
+        public bool DebugSema = false;
     }
 
     private readonly IFileSystem _fs;
@@ -68,6 +69,23 @@ public class Compiler
             Console.WriteLine("Parser had errors");
         }
 
+        if (parserResult.HasErrors)
+        {
+            if (_flags.DebugParser)
+            {
+                Console.WriteLine("================================");
+                PrintAst(parserResult.CompilationUnit);
+                Console.WriteLine("================================");
+            }
+
+            _diag.Report();
+            return false;
+        }
+
+        Sema sema = new(_code, _tokens, _diag);
+        sema.Run(parserResult.CompilationUnit);
+
+        // Print after sema to include sema info
         if (_flags.DebugParser)
         {
             Console.WriteLine("================================");
@@ -75,10 +93,11 @@ public class Compiler
             Console.WriteLine("================================");
         }
 
-        if (parserResult.HasErrors)
+        if (_flags.DebugSema)
         {
-            _diag.Report();
-            return false;
+            Console.WriteLine("================================");
+            // PrintSema(parserResult.CompilationUnit);
+            Console.WriteLine("================================");
         }
 
         _diag.Report();
@@ -168,16 +187,18 @@ public class Compiler
                 n.Stmts.ForEach(stmt => PrintAst(depth + 1, stmt));
                 break;
             case Param n:
-                Console.WriteLine($"{fullPrefix}Param");
+                Console.WriteLine($"{fullPrefix}Param | Type {n.Type}");
+                PrintSymbol(depth + 1, n.Symbol);
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 PrintAst(depth + 1, n.Type);
                 break;
             case TypeDecl n:
-                Console.WriteLine($"{fullPrefix}TypeDecl");
+                Console.WriteLine($"{fullPrefix}TypeDecl | Type {n.ResolvedType}");
                 PrintAstToken(depth + 1, n.TypeNameToken, "Type");
                 break;
             case FuncDecl n:
                 Console.WriteLine($"{fullPrefix}FuncDecl");
+                PrintSymbol(depth + 1, n.Symbol);
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 n.Params.ForEach(p => PrintAst(depth + 1, p));
                 if (n.ReturnType != null)
@@ -189,10 +210,11 @@ public class Compiler
                 break;
             case StmtLet n:
                 Console.WriteLine($"{fullPrefix}StmtLet");
+                PrintSymbol(depth + 1, n.Symbol);
                 PrintAstToken(depth + 1, n.NameToken, "Name");
-                if (n.Type != null)
+                if (n.TypeDecl != null)
                 {
-                    PrintAst(depth + 1, n.Type);
+                    PrintAst(depth + 1, n.TypeDecl);
                 }
 
                 if (n.Expr != null)
@@ -225,26 +247,28 @@ public class Compiler
                 break;
 
             case ExprBinary n:
-                Console.WriteLine($"{fullPrefix}BinaryExpr: {PrettyExpr(n)}");
+                Console.WriteLine($"{fullPrefix}BinaryExpr: {PrettyExpr(n)} | Type = {n.ResolvedType}");
                 PrintAstToken(depth + 1, n.OperatorToken, "Operator");
                 PrintAst(depth + 1, n.Left, "Left");
                 PrintAst(depth + 1, n.Right, "Right");
                 break;
             case ExprUnary n:
-                Console.WriteLine($"{fullPrefix}UnaryExpr: {PrettyExpr(n)}");
+                Console.WriteLine($"{fullPrefix}UnaryExpr: {PrettyExpr(n)} | Type = {n.ResolvedType}");
                 PrintAstToken(depth + 1, n.OperatorToken, "Operator");
                 PrintAst(depth + 1, n.Expr);
                 break;
             case ExprCall n:
-                Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)}");
+                Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)} | Type = {n.ResolvedType}");
                 PrintAst(depth + 1, n.Callee);
                 n.Args.ForEach(arg => PrintAst(depth + 1, arg));
                 break;
             case ExprInt n:
-                Console.WriteLine($"{fullPrefix}ExprInt: {TokenValue(n.LiteralToken)}");
+                Console.WriteLine(
+                    $"{fullPrefix}ExprInt: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | Type = {n.ResolvedType} | Value = {n.Value} | IsNegative = {n.IsNegative}");
                 break;
             case ExprIdentifier n:
-                Console.WriteLine($"{fullPrefix}ExprIdentifier: {TokenValue(n.IdentifierToken)}");
+                Console.WriteLine(
+                    $"{fullPrefix}ExprIdentifier: {TokenValue(n.IdentifierToken)} | Type = {n.ResolvedType}");
                 break;
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
@@ -289,7 +313,7 @@ public class Compiler
 
                 return ret;
             case ExprInt exprInt:
-                return TokenValue(exprInt.LiteralToken);
+                return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
             case ExprIdentifier exprIdentifier:
                 return TokenValue(exprIdentifier.IdentifierToken);
             default: throw new Exception("Unknown node type: " + expr.GetType().Name);
@@ -303,5 +327,11 @@ public class Compiler
     {
         string indent = MakeIndent(depth);
         Console.WriteLine($"{indent}{name}: \"{_tokens[token].Value(_code)}\"");
+    }
+
+    private void PrintSymbol(int depth, Symbol? symbol)
+    {
+        string indent = MakeIndent(depth);
+        Console.WriteLine($"{indent}Symbol: {symbol}");
     }
 }

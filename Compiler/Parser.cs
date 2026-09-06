@@ -387,7 +387,7 @@ public class Parser
             StartToken = begin,
             EndToken = end,
             NameToken = nameToken,
-            Type = typeDecl,
+            TypeDecl = typeDecl,
             Expr = expr
         };
     }
@@ -512,13 +512,26 @@ public class Parser
         int begin = _cursor;
         if (TryConsume(TokenType.Plus) || TryConsume(TokenType.Minus))
         {
+            int opToken = _cursor - 1;
+            if (TryConsume(TokenType.LiteralInt))
+            {
+                int literalToken = _cursor - 1;
+                bool negated = _tokens[opToken].Type == TokenType.Minus;
+                return new ExprInt
+                {
+                    StartToken = begin,
+                    EndToken = End(begin),
+                    LiteralToken = literalToken,
+                    IsNegative = negated
+                };
+            }
+
             Expr expr = ParseUnary();
-            int end = End(begin);
             return new ExprUnary
             {
                 StartToken = begin,
-                EndToken = end,
-                OperatorToken = begin,
+                EndToken = End(begin),
+                OperatorToken = opToken,
                 Expr = expr
             };
         }
@@ -569,6 +582,7 @@ public class Parser
                 StartToken = begin,
                 EndToken = end,
                 LiteralToken = begin,
+                IsNegative = false
             };
         }
 
@@ -610,11 +624,7 @@ public class Parser
     {
         _hasErrors = true;
         string message = UnexpectedTokenMessage(given, expected);
-        _diag?.AddError(message,
-            given.Position,
-            given.Length,
-            given.Line,
-            given.Column);
+        _diag?.AddError(message, given);
     }
 
     private string UnexpectedTokenMessage(Token given, TokenType? expected = null)
