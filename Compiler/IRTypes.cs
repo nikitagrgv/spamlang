@@ -18,6 +18,11 @@ public sealed class IRFunction : IRValue
     {
         return $"{Type} @{Name}";
     }
+
+    public override string PrintDefinition()
+    {
+        return $"{Signature} @{Name}";
+    }
 }
 
 public sealed class IRBasicBlock
