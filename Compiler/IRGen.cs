@@ -215,7 +215,6 @@ public class IRGen
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
         IRValue callee = GenExprValue(block, expr.Callee, variableToValue);
-        Debug.Assert(callee is IRFunctionPtr);
 
         List<IRValue> args = new();
         foreach (Expr arg in expr.Args)
@@ -227,7 +226,8 @@ public class IRGen
         IRInstructionCall call = new()
         {
             Args = args,
-            Callee = (IRFunctionPtr)callee,
+            Callee = callee,
+            Signature = 
         };
         block.Add(call);
         return call;
