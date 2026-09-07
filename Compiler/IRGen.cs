@@ -251,7 +251,8 @@ public class IRGen
     private IRValue GenExprIdentifierValue(ExprIdentifier expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
         Debug.Assert(expr.Symbol != null);
-        Debug.Assert(variableToValue.ContainsKey(expr.Symbol));
+        
+        // TODO# check function in separate dict
 
         Symbol sym = expr.Symbol;
         IRValue value = variableToValue[sym];

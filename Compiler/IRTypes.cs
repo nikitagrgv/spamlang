@@ -1,11 +1,11 @@
 namespace Compiler;
 
-public class IRModule
+public sealed class IRModule
 {
     public required List<IRFunction> Functions { get; init; }
 }
 
-public class IRFunction : IRValue
+public sealed class IRFunction : IRValue
 {
     public required string Name { get; init; }
     public required FuncType FuncType { get; init; }
@@ -20,7 +20,7 @@ public class IRFunction : IRValue
     }
 }
 
-public class IRBasicBlock
+public sealed class IRBasicBlock
 {
     public required string Name { get; init; }
     public required List<IRInstruction> Instructions { get; init; }
