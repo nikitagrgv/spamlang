@@ -271,7 +271,6 @@ public class IRGen
         return value;
     }
 
-
     private IRValue GenExprAddr(IRBasicBlock block, Expr expr)
     {
         Debug.Assert(expr.ResolvedType != null);
