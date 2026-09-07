@@ -7,6 +7,7 @@ public class IRGen
     private readonly string _code;
     private readonly Diagnostic _diag;
     private readonly IReadOnlyList<Token> _tokens;
+    private readonly List<Dictionary<Symbol, IRValue>> _symbolScopes = new();
 
     public IRGen(string code, List<Token> tokens, Diagnostic diag)
     {
@@ -17,8 +18,10 @@ public class IRGen
 
     public IRModule Run(CompilationUnit unit)
     {
-        List<IRFunction> functions = new();
+        Dictionary<Symbol, IRValue> globalScope = new();
+        _symbolScopes.Add(globalScope);
 
+        List<IRFunction> functions = new();
         foreach (FuncDecl funcDecl in unit.FuncDecls)
         {
             IRFunction func = GenFunction(funcDecl);
@@ -29,6 +32,8 @@ public class IRGen
         {
             Functions = functions,
         };
+
+        _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
         return module;
     }
 
@@ -251,7 +256,7 @@ public class IRGen
     private IRValue GenExprIdentifierValue(ExprIdentifier expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
         Debug.Assert(expr.Symbol != null);
-        
+
         // TODO# check function in separate dict
 
         Symbol sym = expr.Symbol;
