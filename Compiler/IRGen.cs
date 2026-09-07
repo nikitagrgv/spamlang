@@ -54,12 +54,12 @@ public class IRGen
         };
         basicBlocks.Add(entry);
 
-        Dictionary<Symbol, IRValue> variableToValue = new();
+        Dictionary<Symbol, IRValue> funcScope = new();
         List<IRParam> irParams = new();
-        GenParams(entry, funcDecl.Params, irParams, variableToValue);
-        GenLocals(entry, locals, variableToValue);
+        GenParams(entry, funcDecl.Params, irParams, funcScope);
+        GenLocals(entry, locals, funcScope);
 
-        GenBlock(entry, funcDecl.Body, variableToValue);
+        GenBlock(entry, funcDecl.Body, funcScope);
 
         return new IRFunction
         {
