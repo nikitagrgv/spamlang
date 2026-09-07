@@ -292,8 +292,6 @@ public class IRGen
             default:
                 throw new UnreachableException();
         }
-
-        return MakeZeroInitialized(BuiltinType.Ptr);
     }
 
     private IRValue MakeZeroInitialized(Type type)
