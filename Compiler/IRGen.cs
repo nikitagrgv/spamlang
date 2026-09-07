@@ -121,6 +121,10 @@ public class IRGen
         IReadOnlyDictionary<Symbol, IRValue> localToValue)
     {
         IRValue? value = null;
+        if (stmtReturn.Expr != null)
+        {
+            value = GenExpr(entry, stmtReturn.Expr, localToValue);
+        }
 
         IRInstructionRet ret = new()
         {
@@ -129,8 +133,13 @@ public class IRGen
         entry.Add(ret);
     }
 
+    private IRValue GenExpr(IRBasicBlock entry, Expr expr, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    {
+    }
+
     private IRValue MakeZeroInitialized(Type type)
     {
+        // TODO: Don't allocate, put in static fields
         if (type == BuiltinType.I32 || type == BuiltinType.Ptr)
         {
             return new IRConstantInt
