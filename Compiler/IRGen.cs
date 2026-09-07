@@ -158,7 +158,7 @@ public class IRGen
             case ExprImplicitCast exprImplicitCast:
                 return GenExprImplicitCastValue(block, exprImplicitCast);
             case ExprIdentifier exprIdentifier:
-                return GenExprIdentifierValue(exprIdentifier);
+                return GenExprIdentifierValue(block, exprIdentifier);
             case ExprInt exprInt:
                 return GenExprIntValue(exprInt);
             case ExprUnary exprUnary:
@@ -254,13 +254,22 @@ public class IRGen
         return cast;
     }
 
-    private IRValue GenExprIdentifierValue(ExprIdentifier expr)
+    private IRValue GenExprIdentifierValue(IRBasicBlock block, ExprIdentifier expr)
     {
         Debug.Assert(expr.Symbol != null);
+        Debug.Assert(expr.ResolvedType != null);
+
         Symbol sym = expr.Symbol;
-        IRValue? value = LookupValue(sym);
-        Debug.Assert(value != null);
-        return value;
+        IRValue? addr = LookupValue(sym);
+        Debug.Assert(addr != null);
+
+        IRInstructionLoad load = new()
+        {
+            LoadedType = expr.ResolvedType,
+            Address = addr,
+        };
+        block.Add(load);
+        return addr;
     }
 
     private IRValue GenExprIntValue(ExprInt expr)
