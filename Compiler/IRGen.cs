@@ -66,6 +66,8 @@ public class IRGen
         Dictionary<Symbol, IRValue> localToValue = new();
         GenLocals(entry, locals, localToValue);
 
+        GenBody(entry, funcDecl.Body, localToValue);
+
         return new IRFunction
         {
             BasicBlocks = basicBlocks,
@@ -73,6 +75,72 @@ public class IRGen
             Params = irParams,
             Type = funcType,
         };
+    }
+
+    private void GenBody(IRBasicBlock entry, Block body, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    {
+        foreach (Stmt stmt in body.Stmts)
+        {
+            switch (stmt)
+            {
+                case Block block:
+                    GenBody(entry, block, localToValue);
+                    break;
+                case StmtAssign stmtAssign:
+                    GenStmtAssign(entry, stmtAssign, localToValue);
+                    break;
+                case StmtExpr stmtExpr:
+                    GenStmtExpr(entry, stmtExpr, localToValue);
+                    break;
+                case StmtLet stmtLet:
+                    GenStmtLet(entry, stmtLet, localToValue);
+                    break;
+                case StmtReturn stmtReturn:
+                    GenStmtReturn(entry, stmtReturn, localToValue);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(stmt));
+            }
+        }
+    }
+
+    private void GenStmtAssign(IRBasicBlock entry, StmtAssign stmtAssign,
+        IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    {
+    }
+
+    private void GenStmtExpr(IRBasicBlock entry, StmtExpr stmtExpr, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    {
+    }
+
+    private void GenStmtLet(IRBasicBlock entry, StmtLet stmtLet, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    {
+    }
+
+    private void GenStmtReturn(IRBasicBlock entry, StmtReturn stmtReturn,
+        IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    {
+        IRValue? value = null;
+
+        IRInstructionRet ret = new()
+        {
+            Value = value,
+        };
+        entry.Add(ret);
+    }
+
+    private IRValue MakeZeroInitialized(Type type)
+    {
+        if (type == BuiltinType.I32 || type == BuiltinType.Ptr)
+        {
+            return new IRConstantInt
+            {
+                Value = 0,
+                IntType = type,
+            };
+        }
+
+        throw new NotImplementedException();
     }
 
     private void GenLocals(IRBasicBlock entry, List<StmtLet> locals, Dictionary<Symbol, IRValue> localToValue)
