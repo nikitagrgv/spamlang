@@ -218,9 +218,16 @@ public class IRGen
     private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr)
     {
         IRValue operand = GenExprValue(block, expr.Expr);
-        IRValue zero = MakeZeroInitialized(operand.Type);
         TokenType opTokType = _tokens[expr.OperatorToken].Type;
-        return GenBinaryOp(block, zero, operand, opTokType);
+        switch (opTokType)
+        {
+            case TokenType.Minus:
+            case TokenType.Plus:
+                IRValue zero = MakeZeroInitialized(operand.Type);
+                return GenBinaryOp(block, zero, operand, opTokType);
+            default:
+                throw new UnreachableException();
+        }
     }
 
     private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, TokenType tokenType)
