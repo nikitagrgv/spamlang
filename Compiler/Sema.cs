@@ -196,6 +196,7 @@ public class Sema
 
         Type targetType = stmt.Target.ResolvedType;
         Type valueType = stmt.Value.ResolvedType;
+
         if (valueType == BuiltinType.Error)
         {
             // Already reported
