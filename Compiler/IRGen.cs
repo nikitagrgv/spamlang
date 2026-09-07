@@ -80,6 +80,18 @@ public class IRGen
         foreach (StmtLet let in locals)
         {
             Debug.Assert(let.Symbol != null);
+
+            Symbol sym = let.Symbol;
+            Type type = sym.Type;
+
+            IRInstructionAlloca alloca = new()
+            {
+                AllocatedType = type,
+            };
+            entry.Add(alloca);
+
+            Debug.Assert(!localToValue.ContainsKey(sym));
+            localToValue.Add(sym, alloca);
         }
     }
 
