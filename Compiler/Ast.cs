@@ -122,7 +122,7 @@ public sealed class ExprCall : ExprPrimary
 public abstract class ExprCast : Expr
 {
     public required Expr Operand { get; init; }
-    public required Type? Target { get; set; }
+    public required Type Target { get; init; }
 }
 
 public sealed class ExprImplicitCast : ExprCast

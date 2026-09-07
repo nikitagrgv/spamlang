@@ -239,8 +239,6 @@ public class IRGen
     private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
-        Debug.Assert(expr.Target != null);
-
         IRValue value = GenExprValue(block, expr.Operand, variableToValue);
         IRInstructionCast cast = new()
         {
