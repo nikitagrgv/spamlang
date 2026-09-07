@@ -275,6 +275,9 @@ public class IRGen
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory == ValueCategory.LValue);
+        
+        // TODO#
+        return MakeZeroInitialized(BuiltinType.Ptr);
     }
 
     private IRValue MakeZeroInitialized(Type type)
