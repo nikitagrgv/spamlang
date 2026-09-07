@@ -93,25 +93,26 @@ public class IRGen
     }
 
     private void GenStmtAssign(IRBasicBlock block, StmtAssign stmtAssign,
-        IReadOnlyDictionary<Symbol, IRValue> localToValue)
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
     }
 
-    private void GenStmtExpr(IRBasicBlock block, StmtExpr stmtExpr, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    private void GenStmtExpr(IRBasicBlock block, StmtExpr stmtExpr,
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
     }
 
-    private void GenStmtLet(IRBasicBlock block, StmtLet stmtLet, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    private void GenStmtLet(IRBasicBlock block, StmtLet stmtLet, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
     }
 
     private void GenStmtReturn(IRBasicBlock block, StmtReturn stmtReturn,
-        IReadOnlyDictionary<Symbol, IRValue> localToValue)
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
         IRValue? value = null;
         if (stmtReturn.Expr != null)
         {
-            value = GenExprValue(block, stmtReturn.Expr, localToValue);
+            value = GenExprValue(block, stmtReturn.Expr, variableToValue);
         }
 
         IRInstructionRet ret = new()
@@ -121,14 +122,14 @@ public class IRGen
         block.Add(ret);
     }
 
-    private IRValue GenExprValue(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    private IRValue GenExprValue(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory != null);
 
         if (expr.ValueCategory == ValueCategory.LValue)
         {
-            IRValue addr = GenExprAddr(block, expr, localToValue);
+            IRValue addr = GenExprAddr(block, expr, variableToValue);
             IRInstructionLoad load = new()
             {
                 LoadedType = expr.ResolvedType,
@@ -141,23 +142,59 @@ public class IRGen
         switch (expr)
         {
             case ExprBinary exprBinary:
+                return GenExprBinaryValue(block, exprBinary, variableToValue);
                 break;
             case ExprCall exprCall:
+                return GenExprCallValue(block, exprCall, variableToValue);
                 break;
             case ExprImplicitCast exprImplicitCast:
+                return GenExprImplicitCastValue(block, exprImplicitCast, variableToValue);
                 break;
             case ExprIdentifier exprIdentifier:
+                return GenExprIdentifierValue(block, exprIdentifier, variableToValue);
                 break;
             case ExprInt exprInt:
+                return GenExprIntValue(block, exprInt, variableToValue);
                 break;
             case ExprUnary exprUnary:
+                return GenExprUnaryValue(block, exprUnary, variableToValue);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
     }
 
-    private IRValue GenExprAddr(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    private IRValue GenExprBinaryValue(IRBasicBlock block, ExprBinary expr,
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    {
+    }
+
+    private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr,
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    {
+    }
+
+    private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr,
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    {
+    }
+
+    private IRValue GenExprIdentifierValue(IRBasicBlock block, ExprIdentifier expr,
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    {
+    }
+
+    private IRValue GenExprIntValue(IRBasicBlock block, ExprInt expr,
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    {
+    }
+
+    private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr,
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    {
+    }
+
+    private IRValue GenExprAddr(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
     }
 
