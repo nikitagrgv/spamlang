@@ -214,8 +214,6 @@ public class IRGen
     private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
-        // TODO#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
         IRValue callee = GenExprValue(block, expr.Callee, variableToValue);
         Debug.Assert(callee is IRFunctionPtr);
 
