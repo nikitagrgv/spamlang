@@ -77,6 +77,7 @@ public sealed class StmtExpr : Stmt
 public abstract class Expr : Node
 {
     public Type? ResolvedType { get; set; }
+    public ValueCategory? ValueCategory { get; set; }
 }
 
 public sealed class ExprBinary : Expr
