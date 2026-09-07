@@ -253,11 +253,8 @@ public class IRGen
     private IRValue GenExprIdentifierValue(ExprIdentifier expr)
     {
         Debug.Assert(expr.Symbol != null);
-
-        // TODO# check function in separate dict
-
         Symbol sym = expr.Symbol;
-        IRValue value = variableToValue[sym];
+        IRValue value = Lookup(sym);
         return value;
     }
 
