@@ -74,6 +74,16 @@ public class IRGen
 
         GenBlock(entry, funcDecl.Body);
 
+        if (function.Signature.ReturnType == BuiltinType.Void &&
+            (entry.Instructions.Count == 0 || !entry.Instructions[^1].IsTerminator))
+        {
+            IRInstructionRet ret = new()
+            {
+                Value = null
+            };
+            entry.Add(ret);
+        }
+
         _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
     }
 
