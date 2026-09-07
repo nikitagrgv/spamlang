@@ -135,6 +135,9 @@ public class IRGen
 
     private IRValue GenExpr(IRBasicBlock entry, Expr expr, IReadOnlyDictionary<Symbol, IRValue> localToValue)
     {
+        Debug.Assert(expr.ResolvedType != null);
+        // TODO#
+        return MakeZeroInitialized(expr.ResolvedType);
     }
 
     private IRValue MakeZeroInitialized(Type type)
