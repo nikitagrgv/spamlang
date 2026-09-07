@@ -66,5 +66,16 @@ public class IRGen
 
     private void CollectLocals(Block body, List<StmtLet> locals)
     {
+        foreach (Stmt stmt in body.Stmts)
+        {
+            if (stmt is StmtLet let)
+            {
+                locals.Add(let);
+            }
+            else if (stmt is Block block)
+            {
+                CollectLocals(block, locals);
+            }
+        }
     }
 }
