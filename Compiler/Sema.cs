@@ -174,7 +174,7 @@ public class Sema
 
     private void VisitStmtAssign(StmtAssign stmt)
     {
-        // TODO: Add value categories (lvalue/rvalue). Allow use any expression as target
+        // TODO: Add assignable check (const), make functions lvalue
 
         VisitExpr(stmt.Target);
         VisitExpr(stmt.Value);
@@ -182,35 +182,21 @@ public class Sema
         Debug.Assert(stmt.Target.ResolvedType != null);
         Debug.Assert(stmt.Value.ResolvedType != null);
 
-        if (stmt.Target is not ExprIdentifier target)
-        {
-            Error("Only identifiers can be used as assign target", stmt.Target);
-            return;
-        }
-
-        if (target.Symbol == null)
+        if (stmt.Target.ResolvedType == BuiltinType.Error)
         {
             // Already reported
             return;
         }
 
-        switch (target.Symbol)
+        if (stmt.Target.ValueCategory != ValueCategory.LValue)
         {
-            case FuncSymbol:
-                Error($"Cannot assign to function \"{target.Symbol.Name}\"", stmt.Target);
-                return;
-            case TypeSymbol:
-                Error($"Cannot assign to type \"{target.Symbol.Name}\"", stmt.Target);
-                return;
-            case ParamSymbol:
-            case VariableSymbol:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+            Error("Only lvalue can be used as assignment target", stmt.Target);
+            return;
         }
 
-        Type targetType = target.Symbol.Type;
+        Type targetType = stmt.Target.ResolvedType;
         Type valueType = stmt.Value.ResolvedType;
+
         if (valueType == BuiltinType.Error)
         {
             // Already reported
@@ -348,10 +334,15 @@ public class Sema
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
+
+        Debug.Assert(expr.ResolvedType != null);
+        Debug.Assert(expr.ValueCategory != null);
     }
 
     private void VisitExprBinary(ExprBinary expr)
     {
+        expr.ValueCategory = ValueCategory.RValue;
+
         VisitExpr(expr.Left);
         VisitExpr(expr.Right);
 
@@ -384,6 +375,8 @@ public class Sema
 
     private void VisitExprCall(ExprCall expr)
     {
+        expr.ValueCategory = ValueCategory.RValue;
+
         VisitExpr(expr.Callee);
         foreach (Expr arg in expr.Args)
         {
@@ -444,6 +437,8 @@ public class Sema
 
     private void VisitExprIdentifier(ExprIdentifier expr)
     {
+        expr.ValueCategory = ValueCategory.RValue;
+
         ReadOnlySpan<char> name = GetTokenValue(expr.IdentifierToken);
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
@@ -457,6 +452,8 @@ public class Sema
         {
             case ParamSymbol:
             case VariableSymbol:
+                expr.ValueCategory = ValueCategory.LValue;
+                break;
             case FuncSymbol:
                 break;
             case TypeSymbol:
@@ -476,6 +473,8 @@ public class Sema
     {
         // TODO: Refactor, handle negation in lexer and make it a part of the literal?
         // TODO: Overflows checks
+
+        expr.ValueCategory = ValueCategory.RValue;
 
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
@@ -564,6 +563,8 @@ public class Sema
 
     private void VisitExprUnary(ExprUnary expr)
     {
+        expr.ValueCategory = ValueCategory.RValue;
+
         VisitExpr(expr.Expr);
         Debug.Assert(expr.Expr.ResolvedType != null);
 
@@ -748,6 +749,7 @@ public class Sema
                 Operand = expr,
                 Target = targetType,
                 ResolvedType = targetType,
+                ValueCategory = ValueCategory.RValue,
             };
             return cast;
         }
@@ -784,7 +786,7 @@ public class Sema
 
         if (type == BuiltinType.I32)
         {
-            return true;
+            return op == TokenType.Plus || op == TokenType.Minus;
         }
 
         return false;

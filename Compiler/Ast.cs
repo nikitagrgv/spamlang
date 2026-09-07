@@ -77,10 +77,12 @@ public sealed class StmtExpr : Stmt
 public abstract class Expr : Node
 {
     public Type? ResolvedType { get; set; }
+    public ValueCategory? ValueCategory { get; set; }
 }
 
 public sealed class ExprBinary : Expr
 {
+    // TODO: Enum of operation instead of token
     public required int OperatorToken { get; init; }
     public required Expr Left { get; set; }
     public required Expr Right { get; set; }
@@ -120,7 +122,7 @@ public sealed class ExprCall : ExprPrimary
 public abstract class ExprCast : Expr
 {
     public required Expr Operand { get; init; }
-    public required Type? Target { get; set; }
+    public required Type Target { get; init; }
 }
 
 public sealed class ExprImplicitCast : ExprCast

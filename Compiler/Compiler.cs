@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Compiler;
 
 public class Compiler
@@ -7,7 +9,9 @@ public class Compiler
         public bool DebugLexer = false;
         public bool DebugLexerPretty = false;
         public bool DebugParser = false;
-        public bool DebugSema = false;
+        public bool DebugSema = false; // TODO: Unused, remove?
+        public bool DebugIR = false;
+        public bool DebugTimer = false;
     }
 
     private readonly IFileSystem _fs;
@@ -36,10 +40,16 @@ public class Compiler
 
     private bool Compile(string code)
     {
+        Stopwatch sw = new();
+
         _code = code;
         _diag.Clear();
+
+        sw.Restart();
         Lexer lexer = new();
         Lexer.Result lexerResult = lexer.Run(_code, _diag);
+        TimeSpan dtLexer = sw.Elapsed;
+
         if (lexerResult.HasErrors)
         {
             Console.WriteLine("Lexer had errors");
@@ -61,8 +71,11 @@ public class Compiler
             Console.WriteLine("================================");
         }
 
+
+        sw.Restart();
         Parser parser = new();
         Parser.Result parserResult = parser.Run(_code, _tokens, _diag);
+        TimeSpan dtParser = sw.Elapsed;
 
         if (parserResult.HasErrors)
         {
@@ -79,11 +92,16 @@ public class Compiler
             }
 
             _diag.Report();
+
+            ReportTime("Lexer", dtLexer);
+            ReportTime("Parser", dtParser);
             return false;
         }
 
+        sw.Restart();
         Sema sema = new(_code, _tokens, _diag);
         sema.Run(parserResult.CompilationUnit);
+        TimeSpan dtSema = sw.Elapsed;
 
         // Print after sema to include sema info
         if (_flags.DebugParser)
@@ -93,15 +111,43 @@ public class Compiler
             Console.WriteLine("================================");
         }
 
-        if (_flags.DebugSema)
+        if (_diag.HasErrors)
+        {
+            _diag.Report();
+            Console.WriteLine("Sema had errors");
+            ReportTime("Lexer", dtLexer);
+            ReportTime("Parser", dtParser);
+            ReportTime("Sema", dtSema);
+            return false;
+        }
+
+        IRGen irGen = new(_code, _tokens, _diag);
+        IRModule irModule = irGen.Run(parserResult.CompilationUnit);
+
+        if (_flags.DebugIR)
         {
             Console.WriteLine("================================");
-            // PrintSema(parserResult.CompilationUnit);
+            PrintIR(irModule);
             Console.WriteLine("================================");
         }
 
         _diag.Report();
+
+        ReportTime("Lexer", dtLexer);
+        ReportTime("Parser", dtParser);
+        ReportTime("Sema", dtSema);
+
         return !_diag.HasErrors;
+    }
+
+    void ReportTime(string what, TimeSpan dt)
+    {
+        if (!_flags.DebugTimer)
+        {
+            return;
+        }
+
+        Console.WriteLine($"{what} Time: {dt.Milliseconds}ms");
     }
 
     private void PrintTokens()
@@ -333,5 +379,55 @@ public class Compiler
     {
         string indent = MakeIndent(depth);
         Console.WriteLine($"{indent}Symbol: {symbol}");
+    }
+
+    private void PrintIR(IRModule module)
+    {
+        foreach (IRFunction func in module.Functions)
+        {
+            PrintIR(func);
+            Console.WriteLine();
+        }
+    }
+
+    private void PrintIR(IRFunction func)
+    {
+        int counter = -1;
+        Console.Write($"fn @{func.Name}(");
+        for (int i = 0; i < func.Params.Count; i++)
+        {
+            IRParam param = func.Params[i];
+            if (i != 0)
+            {
+                Console.Write(", ");
+            }
+
+            param.Id = ++counter;
+            Console.Write($"{param.Type} %{param.Id}");
+        }
+
+        Console.Write($") -> {func.Signature.ReturnType}");
+        Console.WriteLine();
+        Console.WriteLine("{");
+        foreach (IRBasicBlock bb in func.BasicBlocks)
+        {
+            PrintIR(bb, ref counter);
+        }
+
+        Console.WriteLine("}");
+    }
+
+    private void PrintIR(IRBasicBlock bb, ref int counter)
+    {
+        Console.WriteLine($"{bb.Name}:");
+        foreach (IRInstruction inst in bb.Instructions)
+        {
+            if (inst.Type != BuiltinType.Void)
+            {
+                inst.Id = ++counter;
+            }
+
+            Console.WriteLine($"  {inst.PrintDefinition()}");
+        }
     }
 }
