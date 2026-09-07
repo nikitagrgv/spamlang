@@ -338,10 +338,10 @@ public class Sema
 
     private void VisitExprBinary(ExprBinary expr)
     {
+        expr.ValueCategory = ValueCategory.RValue;
+
         VisitExpr(expr.Left);
         VisitExpr(expr.Right);
-
-        expr.ValueCategory = ValueCategory.RValue;
 
         Debug.Assert(expr.Left.ResolvedType != null);
         Debug.Assert(expr.Right.ResolvedType != null);
