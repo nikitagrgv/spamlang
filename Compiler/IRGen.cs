@@ -34,7 +34,7 @@ public class IRGen
 
     private IRFunction GenFunction(FuncDecl funcDecl)
     {
-        // TODO: Reuse lists
+        // TODO: Reuse lists/dicts
         Debug.Assert(funcDecl.Symbol is { Type: FuncType });
         FuncType funcType = (FuncType)funcDecl.Symbol.Type;
 
@@ -62,7 +62,9 @@ public class IRGen
         basicBlocks.Add(entry);
 
         GenParams(entry, irParams);
-        GenLocals(entry, locals);
+
+        Dictionary<Symbol, IRValue> localToValue = new();
+        GenLocals(entry, locals, localToValue);
 
         return new IRFunction
         {
@@ -73,10 +75,11 @@ public class IRGen
         };
     }
 
-    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals)
+    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals, Dictionary<Symbol, IRValue> localToValue)
     {
         foreach (StmtLet let in locals)
         {
+            Debug.Assert(let.Symbol != null);
         }
     }
 
