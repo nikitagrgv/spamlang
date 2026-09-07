@@ -54,7 +54,7 @@ public class IRGen
         CollectLocals(funcDecl.Body, locals);
 
         List<IRBasicBlock> basicBlocks = new();
-        IRBasicBlock entry = new IRBasicBlock
+        IRBasicBlock entry = new()
         {
             Instructions = new List<IRInstruction>(),
             Name = "entry",
