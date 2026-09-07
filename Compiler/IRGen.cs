@@ -170,23 +170,23 @@ public class IRGen
         foreach (Param param in funcParams)
         {
             Debug.Assert(param.Symbol != null);
-            Debug.Assert(param.Type.ResolvedType != null);
+            Symbol sym = param.Symbol;
 
-            Type type = param.Type.ResolvedType;
             IRParam irParam = new()
             {
-                ParamType = type,
+                ParamType = sym.Type,
                 Index = irParams.Count,
             };
             irParams.Add(irParam);
 
             IRInstructionAlloca alloca = new()
             {
-                AllocatedType = type,
+                AllocatedType = sym.Type,
             };
             entry.Add(alloca);
 
             Debug.Assert(!variableToValue.ContainsKey(param.Symbol));
+            variableToValue.Add(param.Symbol, alloca);
         }
 
         for (int i = 0; i < irParams.Count; i++)
