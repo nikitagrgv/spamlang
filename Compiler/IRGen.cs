@@ -61,7 +61,7 @@ public class IRGen
         };
         basicBlocks.Add(entry);
 
-        AllocParams(entry, irParams);
+        GenParams(entry, irParams);
 
         return new IRFunction
         {
@@ -72,7 +72,7 @@ public class IRGen
         };
     }
 
-    private void AllocParams(IRBasicBlock entry, List<IRParam> irParams)
+    private void GenParams(IRBasicBlock entry, List<IRParam> irParams)
     {
         int initialNumInstructions = entry.Instructions.Count;
         foreach (IRParam param in irParams)
