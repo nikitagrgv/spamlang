@@ -163,7 +163,21 @@ public class IRGen
     {
         IRValue left = GenExprValue(block, expr.Left, variableToValue);
         IRValue right = GenExprValue(block, expr.Right, variableToValue);
+        TokenType opTokType = _tokens[expr.OperatorToken].Type;
+        return GenBinaryOp(block, left, right, opTokType);
+    }
 
+    private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr,
+        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    {
+        IRValue operand = GenExprValue(block, expr.Expr, variableToValue);
+        IRValue zero = MakeZeroInitialized(operand.Type);
+        TokenType opTokType = _tokens[expr.OperatorToken].Type;
+        GenBinaryOp(block, zero, operand, opTokType);
+    }
+
+    private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, TokenType tokenType)
+    {
         Debug.Assert(left.Type == right.Type);
 
         bool signed;
@@ -177,7 +191,7 @@ public class IRGen
         }
 
         IRBinaryOp op;
-        switch (_tokens[expr.OperatorToken].Type)
+        switch (tokenType)
         {
             case TokenType.Plus: op = IRBinaryOp.Add; break;
             case TokenType.Minus: op = IRBinaryOp.Sub; break;
@@ -217,10 +231,6 @@ public class IRGen
     {
     }
 
-    private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
-    {
-    }
 
     private IRValue GenExprAddr(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
