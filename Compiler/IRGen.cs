@@ -61,6 +61,8 @@ public class IRGen
         };
         basicBlocks.Add(entry);
 
+        AllocParams(entry, irParams);
+
         return new IRFunction
         {
             BasicBlocks = basicBlocks,
@@ -68,6 +70,18 @@ public class IRGen
             Params = irParams,
             Type = funcType,
         };
+    }
+
+    private void AllocParams(IRBasicBlock entry, List<IRParam> irParams)
+    {
+        foreach (IRParam param in irParams)
+        {
+            IRInstructionAlloca alloca = new()
+            {
+                AllocatedType = param.ParamType,
+            };
+            entry.Add(alloca);
+        }
     }
 
     private void CollectLocals(Block body, List<StmtLet> locals)
