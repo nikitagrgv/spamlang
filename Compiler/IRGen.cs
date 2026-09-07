@@ -143,22 +143,16 @@ public class IRGen
         {
             case ExprBinary exprBinary:
                 return GenExprBinaryValue(block, exprBinary, variableToValue);
-                break;
             case ExprCall exprCall:
                 return GenExprCallValue(block, exprCall, variableToValue);
-                break;
             case ExprImplicitCast exprImplicitCast:
                 return GenExprImplicitCastValue(block, exprImplicitCast, variableToValue);
-                break;
             case ExprIdentifier exprIdentifier:
                 return GenExprIdentifierValue(block, exprIdentifier, variableToValue);
-                break;
             case ExprInt exprInt:
                 return GenExprIntValue(block, exprInt, variableToValue);
-                break;
             case ExprUnary exprUnary:
                 return GenExprUnaryValue(block, exprUnary, variableToValue);
-                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
