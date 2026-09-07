@@ -484,6 +484,8 @@ public class Sema
         // TODO: Refactor, handle negation in lexer and make it a part of the literal?
         // TODO: Overflows checks
 
+        expr.ValueCategory = ValueCategory.RValue;
+
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
         Int128 value = 0;
