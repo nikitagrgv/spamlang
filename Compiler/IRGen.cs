@@ -111,7 +111,7 @@ public class IRGen
         IRValue? value = null;
         if (stmtReturn.Expr != null)
         {
-            value = GenExpr(block, stmtReturn.Expr, localToValue);
+            value = GenExprValue(block, stmtReturn.Expr, localToValue);
         }
 
         IRInstructionRet ret = new()
@@ -121,7 +121,7 @@ public class IRGen
         block.Add(ret);
     }
 
-    private IRValue GenExpr(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    private IRValue GenExprValue(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> localToValue)
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory != null);
@@ -136,6 +136,24 @@ public class IRGen
             };
             block.Add(load);
             return load;
+        }
+
+        switch (expr)
+        {
+            case ExprBinary exprBinary:
+                break;
+            case ExprCall exprCall:
+                break;
+            case ExprImplicitCast exprImplicitCast:
+                break;
+            case ExprIdentifier exprIdentifier:
+                break;
+            case ExprInt exprInt:
+                break;
+            case ExprUnary exprUnary:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(expr));
         }
     }
 
