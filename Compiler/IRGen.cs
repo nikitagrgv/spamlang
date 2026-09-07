@@ -252,6 +252,12 @@ public class IRGen
     private IRValue GenExprIdentifierValue(IRBasicBlock block, ExprIdentifier expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
+        Debug.Assert(expr.Symbol != null);
+        Debug.Assert(variableToValue.ContainsKey(expr.Symbol));
+
+        Symbol sym = expr.Symbol;
+        IRValue value = variableToValue[sym];
+        return value;
     }
 
     private IRValue GenExprIntValue(ExprInt expr)
