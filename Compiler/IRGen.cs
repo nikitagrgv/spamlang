@@ -106,6 +106,14 @@ public class IRGen
 
     private void GenStmtAssign(IRBasicBlock block, StmtAssign stmtAssign)
     {
+        IRValue value = GenExprValue(block, stmtAssign.Value);
+        IRValue addr = GenExprAddr(block, stmtAssign.Target);
+        IRInstructionStore store = new()
+        {
+            Value = value,
+            Address = addr,
+        };
+        block.Add(store);
     }
 
     private void GenStmtExpr(IRBasicBlock block, StmtExpr stmtExpr)
