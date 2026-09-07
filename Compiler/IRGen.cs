@@ -84,6 +84,7 @@ public class IRGen
         }
 
         Debug.Assert(entry.Terminator != null);
+
         _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
     }
 
