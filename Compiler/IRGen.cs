@@ -62,6 +62,7 @@ public class IRGen
         basicBlocks.Add(entry);
 
         GenParams(entry, irParams);
+        GenLocals(entry, locals);
 
         return new IRFunction
         {
@@ -70,6 +71,13 @@ public class IRGen
             Params = irParams,
             Type = funcType,
         };
+    }
+
+    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals)
+    {
+        foreach (StmtLet let in locals)
+        {
+        }
     }
 
     private void GenParams(IRBasicBlock entry, List<IRParam> irParams)
