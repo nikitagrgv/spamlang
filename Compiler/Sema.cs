@@ -182,34 +182,19 @@ public class Sema
         Debug.Assert(stmt.Target.ResolvedType != null);
         Debug.Assert(stmt.Value.ResolvedType != null);
 
-        if (stmt.Target is not ExprIdentifier target)
-        {
-            Error("Only identifiers can be used as assign target", stmt.Target);
-            return;
-        }
-
-        if (target.Symbol == null)
+        if (stmt.Target.ResolvedType == BuiltinType.Error)
         {
             // Already reported
             return;
         }
 
-        switch (target.Symbol)
+        if (stmt.Target.ValueCategory != ValueCategory.LValue)
         {
-            case FuncSymbol:
-                Error($"Cannot assign to function \"{target.Symbol.Name}\"", stmt.Target);
-                return;
-            case TypeSymbol:
-                Error($"Cannot assign to type \"{target.Symbol.Name}\"", stmt.Target);
-                return;
-            case ParamSymbol:
-            case VariableSymbol:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+            Error("Only lvalue can be used as assignment target", stmt.Target);
+            return;
         }
 
-        Type targetType = target.Symbol.Type;
+        Type targetType = stmt.Target.ResolvedType;
         Type valueType = stmt.Value.ResolvedType;
         if (valueType == BuiltinType.Error)
         {
