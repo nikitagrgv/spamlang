@@ -254,7 +254,8 @@ public class IRGen
     {
         Debug.Assert(expr.Symbol != null);
         Symbol sym = expr.Symbol;
-        IRValue value = LookupValue(sym);
+        IRValue? value = LookupValue(sym);
+        Debug.Assert(value != null);
         return value;
     }
 
@@ -307,8 +308,9 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(!variableToValue.ContainsKey(sym));
-            variableToValue.Add(sym, alloca);
+            Debug.Assert(LookupValue(sym) == null);
+            Dictionary<Symbol, IRValue> scope = CurrentScope;
+            scope.Add(sym, alloca);
         }
     }
 
@@ -370,7 +372,7 @@ public class IRGen
 
     private Dictionary<Symbol, IRValue> CurrentScope => _symbolScopes[^1];
 
-    private IRValue LookupValue(Symbol symbol)
+    private IRValue? LookupValue(Symbol symbol)
     {
         for (int i = _symbolScopes.Count - 1; i >= 0; --i)
         {
@@ -381,6 +383,6 @@ public class IRGen
             }
         }
 
-        throw new UnreachableException();
+        return null;
     }
 }
