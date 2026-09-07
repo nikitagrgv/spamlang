@@ -214,6 +214,8 @@ public class IRGen
     private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
+        IRValue callee = GenExprValue(block, expr.Callee, variableToValue);
+
         List<IRValue> args = new();
         foreach (Expr arg in expr.Args)
         {
