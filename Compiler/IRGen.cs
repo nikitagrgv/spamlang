@@ -246,8 +246,7 @@ public class IRGen
         return cast;
     }
 
-    private IRValue GenExprIdentifierValue(IRBasicBlock block, ExprIdentifier expr,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprIdentifierValue(ExprIdentifier expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
         Debug.Assert(expr.Symbol != null);
         Debug.Assert(variableToValue.ContainsKey(expr.Symbol));
