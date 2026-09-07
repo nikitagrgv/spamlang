@@ -355,6 +355,8 @@ public class Sema
         VisitExpr(expr.Left);
         VisitExpr(expr.Right);
 
+        expr.ValueCategory = ValueCategory.RValue;
+
         Debug.Assert(expr.Left.ResolvedType != null);
         Debug.Assert(expr.Right.ResolvedType != null);
 
@@ -384,6 +386,8 @@ public class Sema
 
     private void VisitExprCall(ExprCall expr)
     {
+        expr.ValueCategory = ValueCategory.RValue;
+
         VisitExpr(expr.Callee);
         foreach (Expr arg in expr.Args)
         {
