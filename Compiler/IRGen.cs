@@ -190,6 +190,10 @@ public class IRGen
 
     private IRValue GenExprAddr(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
+        Debug.Assert(expr.ResolvedType != null);
+        Debug.Assert(expr.ValueCategory == ValueCategory.LValue);
+        
+        
     }
 
     private IRValue MakeZeroInitialized(Type type)
