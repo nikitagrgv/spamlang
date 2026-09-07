@@ -107,6 +107,7 @@ public class IRGen
 
     private void GenStmtExpr(IRBasicBlock block, StmtExpr stmtExpr)
     {
+        GenExprValue(block, stmtExpr.Expr);
     }
 
     private void GenStmtLet(IRBasicBlock block, StmtLet stmtLet)
@@ -275,7 +276,7 @@ public class IRGen
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory == ValueCategory.LValue);
-        
+
         // TODO#
         return MakeZeroInitialized(BuiltinType.Ptr);
     }
