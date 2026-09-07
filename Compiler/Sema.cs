@@ -334,6 +334,9 @@ public class Sema
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
+
+        Debug.Assert(expr.ResolvedType != null);
+        Debug.Assert(expr.ValueCategory != null);
     }
 
     private void VisitExprBinary(ExprBinary expr)
