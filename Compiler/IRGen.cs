@@ -38,18 +38,6 @@ public class IRGen
         Debug.Assert(funcDecl.Symbol is { Type: FuncType });
         FuncType funcType = (FuncType)funcDecl.Symbol.Type;
 
-        List<IRParam> irParams = new();
-        foreach (Param param in funcDecl.Params)
-        {
-            Debug.Assert(param.Type.ResolvedType != null);
-            IRParam p = new()
-            {
-                ParamType = param.Type.ResolvedType,
-                Index = irParams.Count,
-            };
-            irParams.Add(p);
-        }
-
         List<StmtLet> locals = new();
         CollectLocals(funcDecl.Body, locals);
 
@@ -61,9 +49,9 @@ public class IRGen
         };
         basicBlocks.Add(entry);
 
-        GenParams(entry, irParams);
-
         Dictionary<Symbol, IRValue> variableToValue = new();
+        List<IRParam> irParams = new();
+        GenParams(entry, funcDecl.Params, irParams, variableToValue);
         GenLocals(entry, locals, variableToValue);
 
         GenBody(entry, funcDecl.Body, variableToValue);
@@ -175,16 +163,30 @@ public class IRGen
         }
     }
 
-    private void GenParams(IRBasicBlock entry, List<IRParam> irParams)
+    private void GenParams(IRBasicBlock entry, IReadOnlyList<Param> funcParams, List<IRParam> irParams,
+        Dictionary<Symbol, IRValue> variableToValue)
     {
         int initialNumInstructions = entry.Instructions.Count;
-        foreach (IRParam param in irParams)
+        foreach (Param param in funcParams)
         {
+            Debug.Assert(param.Symbol != null);
+            Debug.Assert(param.Type.ResolvedType != null);
+
+            Type type = param.Type.ResolvedType;
+            IRParam irParam = new()
+            {
+                ParamType = type,
+                Index = irParams.Count,
+            };
+            irParams.Add(irParam);
+
             IRInstructionAlloca alloca = new()
             {
-                AllocatedType = param.ParamType,
+                AllocatedType = type,
             };
             entry.Add(alloca);
+
+            Debug.Assert(!variableToValue.ContainsKey(param.Symbol));
         }
 
         for (int i = 0; i < irParams.Count; i++)
