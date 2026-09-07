@@ -373,7 +373,7 @@ public class IRGen
 
     private Dictionary<Symbol, IRValue> CurrentScope => _symbolScopes[^1];
 
-    private IRValue? Lookup(Symbol symbol)
+    private IRValue Lookup(Symbol symbol)
     {
         for (int i = _symbolScopes.Count - 1; i >= 0; --i)
         {
@@ -384,6 +384,6 @@ public class IRGen
             }
         }
 
-        return null;
+        throw new UnreachableException();
     }
 }
