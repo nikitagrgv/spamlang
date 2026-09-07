@@ -166,6 +166,8 @@ public class IRGen
     private void GenParams(IRBasicBlock entry, IReadOnlyList<Param> funcParams, List<IRParam> irParams,
         Dictionary<Symbol, IRValue> variableToValue)
     {
+        Debug.Assert(irParams.Count == 0);
+
         int initialNumInstructions = entry.Instructions.Count;
         foreach (Param param in funcParams)
         {
