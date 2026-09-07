@@ -24,8 +24,24 @@ public class IRGen
         List<IRFunction> functions = new();
         foreach (FuncDecl funcDecl in unit.FuncDecls)
         {
-            IRFunction func = GenFunction(funcDecl);
+            Debug.Assert(funcDecl.Symbol is { Type: FuncType });
+            FuncType funcType = (FuncType)funcDecl.Symbol.Type;
+
+            IRFunction func = new()
+            {
+                BasicBlocks = new List<IRBasicBlock>(),
+                Name = funcDecl.Symbol.Name,
+                Params = new List<IRParam>(),
+                Signature = funcType,
+            };
             functions.Add(func);
+        }
+
+        for (int i = 0; i < unit.FuncDecls.Count; i++)
+        {
+            FuncDecl funcDecl = unit.FuncDecls[i];
+            IRFunction function = functions[i];
+            GenFunction(funcDecl, function);
         }
 
         IRModule module = new()
@@ -37,41 +53,28 @@ public class IRGen
         return module;
     }
 
-    private IRFunction GenFunction(FuncDecl funcDecl)
+    private void GenFunction(FuncDecl funcDecl, IRFunction function)
     {
         // TODO: Reuse lists/dicts
-        Debug.Assert(funcDecl.Symbol is { Type: FuncType });
-        FuncType funcType = (FuncType)funcDecl.Symbol.Type;
-
         List<StmtLet> locals = new();
         CollectLocals(funcDecl.Body, locals);
 
-        List<IRBasicBlock> basicBlocks = new();
         IRBasicBlock entry = new()
         {
             Instructions = new List<IRInstruction>(),
             Name = "entry",
         };
-        basicBlocks.Add(entry);
+        function.BasicBlocks.Add(entry);
 
         Dictionary<Symbol, IRValue> funcScope = new();
         _symbolScopes.Add(funcScope);
 
-        List<IRParam> irParams = new();
-        GenParams(entry, funcDecl.Params, irParams);
+        GenParams(entry, funcDecl.Params, function.Params);
         GenLocals(entry, locals);
 
         GenBlock(entry, funcDecl.Body);
 
         _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
-
-        return new IRFunction
-        {
-            BasicBlocks = basicBlocks,
-            Name = funcDecl.Symbol.Name,
-            Params = irParams,
-            Signature = funcType,
-        };
     }
 
     private void GenBlock(IRBasicBlock block, Block blockNode)
