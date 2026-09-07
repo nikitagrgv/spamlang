@@ -239,13 +239,13 @@ public class IRGen
     private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
-        Debug.Assert(expr.ResolvedType != null);
+        Debug.Assert(expr.Target != null);
 
         IRValue value = GenExprValue(block, expr.Operand, variableToValue);
         IRInstructionCast cast = new()
         {
             Value = value,
-            CastTo = expr.ResolvedType
+            CastTo = expr.Target
         };
         block.Add(cast);
         return cast;
