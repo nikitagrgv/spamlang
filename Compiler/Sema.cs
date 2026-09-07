@@ -174,7 +174,7 @@ public class Sema
 
     private void VisitStmtAssign(StmtAssign stmt)
     {
-        // TODO: Add assignable check (const)
+        // TODO: Add assignable check (const), make functions lvalue
 
         VisitExpr(stmt.Target);
         VisitExpr(stmt.Value);
