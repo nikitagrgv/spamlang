@@ -77,26 +77,26 @@ public class IRGen
         };
     }
 
-    private void GenBody(IRBasicBlock entry, Block body, IReadOnlyDictionary<Symbol, IRValue> localToValue)
+    private void GenBody(IRBasicBlock entry, Block body, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
         foreach (Stmt stmt in body.Stmts)
         {
             switch (stmt)
             {
                 case Block block:
-                    GenBody(entry, block, localToValue);
+                    GenBody(entry, block, variableToValue);
                     break;
                 case StmtAssign stmtAssign:
-                    GenStmtAssign(entry, stmtAssign, localToValue);
+                    GenStmtAssign(entry, stmtAssign, variableToValue);
                     break;
                 case StmtExpr stmtExpr:
-                    GenStmtExpr(entry, stmtExpr, localToValue);
+                    GenStmtExpr(entry, stmtExpr, variableToValue);
                     break;
                 case StmtLet stmtLet:
-                    GenStmtLet(entry, stmtLet, localToValue);
+                    GenStmtLet(entry, stmtLet, variableToValue);
                     break;
                 case StmtReturn stmtReturn:
-                    GenStmtReturn(entry, stmtReturn, localToValue);
+                    GenStmtReturn(entry, stmtReturn, variableToValue);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stmt));
