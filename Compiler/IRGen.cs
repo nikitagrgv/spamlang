@@ -279,8 +279,18 @@ public class IRGen
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory == ValueCategory.LValue);
+        switch (expr)
+        {
+            case ExprIdentifier exprIdentifier:
+                Debug.Assert(exprIdentifier.Symbol != null);
+                Symbol sym = exprIdentifier.Symbol;
+                IRValue? value = LookupValue(sym);
+                Debug.Assert(value != null);
+                return value;
+            default:
+                throw new UnreachableException();
+        }
 
-        // TODO#
         return MakeZeroInitialized(BuiltinType.Ptr);
     }
 
