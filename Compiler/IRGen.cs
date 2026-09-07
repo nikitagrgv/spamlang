@@ -254,22 +254,15 @@ public class IRGen
         return cast;
     }
 
-    private IRValue GenExprIdentifierValue(IRBasicBlock block, ExprIdentifier expr)
+    private IRValue GenExprIdentifierValue(ExprIdentifier expr)
     {
         Debug.Assert(expr.Symbol != null);
-        Debug.Assert(expr.ResolvedType != null);
+        Debug.Assert(expr.Symbol is FuncSymbol, "Variables can't reach here (other are lvalues)");
 
         Symbol sym = expr.Symbol;
-        IRValue? addr = LookupValue(sym);
-        Debug.Assert(addr != null);
-
-        IRInstructionLoad load = new()
-        {
-            LoadedType = expr.ResolvedType,
-            Address = addr,
-        };
-        block.Add(load);
-        return addr;
+        IRValue? value = LookupValue(sym);
+        Debug.Assert(value != null);
+        return value;
     }
 
     private IRValue GenExprIntValue(ExprInt expr)
