@@ -174,7 +174,7 @@ public class Sema
 
     private void VisitStmtAssign(StmtAssign stmt)
     {
-        // TODO: Add value categories (lvalue/rvalue). Allow use any expression as target
+        // TODO: Add assignable check (const)
 
         VisitExpr(stmt.Target);
         VisitExpr(stmt.Value);
