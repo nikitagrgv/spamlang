@@ -161,6 +161,28 @@ public class IRGen
     private IRValue GenExprBinaryValue(IRBasicBlock block, ExprBinary expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
+        IRValue left = GenExprValue(block, expr.Left, variableToValue);
+        IRValue right = GenExprValue(block, expr.Right, variableToValue);
+
+        IRBinaryOp op;
+        Token opTok = _tokens[expr.OperatorToken];
+        switch (opTok.Type)
+        {
+            case TokenType.Plus:
+            case TokenType.Minus:
+            case TokenType.Slash:
+            case TokenType.Star:
+            case TokenType.Percent:
+        }
+
+        IRInstructionBinary instr = new()
+        {
+            Left = left,
+            Right = right,
+            Op = 
+        };
+        block.Add(instr);
+        return instr;
     }
 
     private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr,
@@ -192,8 +214,6 @@ public class IRGen
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory == ValueCategory.LValue);
-        
-        
     }
 
     private IRValue MakeZeroInitialized(Type type)

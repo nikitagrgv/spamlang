@@ -13,6 +13,7 @@ public enum TokenType
     Semicolon,
 
     Assign,
+
     Plus,
     Minus,
     Star,
