@@ -74,6 +74,7 @@ public class IRGen
 
     private void AllocParams(IRBasicBlock entry, List<IRParam> irParams)
     {
+        int initialNumInstructions = entry.Instructions.Count;
         foreach (IRParam param in irParams)
         {
             IRInstructionAlloca alloca = new()
@@ -81,6 +82,19 @@ public class IRGen
                 AllocatedType = param.ParamType,
             };
             entry.Add(alloca);
+        }
+
+        for (int i = 0; i < irParams.Count; i++)
+        {
+            IRParam param = irParams[i];
+            IRInstruction alloca = entry.Instructions[initialNumInstructions + i];
+            Debug.Assert(alloca is IRInstructionAlloca);
+            IRInstructionStore store = new()
+            {
+                Value = param,
+                Address = alloca
+            };
+            entry.Add(store);
         }
     }
 
