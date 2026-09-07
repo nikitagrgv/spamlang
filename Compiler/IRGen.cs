@@ -54,7 +54,12 @@ public class IRGen
         CollectLocals(funcDecl.Body, locals);
 
         List<IRBasicBlock> basicBlocks = new();
-        GenBlocks(funcDecl, basicBlocks);
+        IRBasicBlock entry = new IRBasicBlock
+        {
+            Instructions = new List<IRInstruction>(),
+            Name = "entry",
+        };
+        basicBlocks.Add(entry);
 
         return new IRFunction
         {
@@ -63,10 +68,6 @@ public class IRGen
             Params = irParams,
             Type = funcType,
         };
-    }
-
-    private void GenBlocks(FuncDecl funcDecl, List<IRBasicBlock> basicBlocks)
-    {
     }
 
     private void CollectLocals(Block body, List<StmtLet> locals)
