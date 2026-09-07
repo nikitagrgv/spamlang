@@ -185,8 +185,8 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(!variableToValue.ContainsKey(param.Symbol));
-            variableToValue.Add(param.Symbol, alloca);
+            Debug.Assert(!variableToValue.ContainsKey(sym));
+            variableToValue.Add(sym, alloca);
         }
 
         for (int i = 0; i < irParams.Count; i++)
