@@ -247,6 +247,8 @@ public class IRGen
             Value = value,
             CastTo = expr.ResolvedType
         };
+        block.Add(cast);
+        return cast;
     }
 
     private IRValue GenExprIdentifierValue(IRBasicBlock block, ExprIdentifier expr,
