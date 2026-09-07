@@ -5,12 +5,19 @@ public class IRModule
     public required List<IRFunction> Functions { get; init; }
 }
 
-public class IRFunction
+public class IRFunction : IRValue
 {
     public required string Name { get; init; }
-    public required FuncType Type { get; init; }
+    public required FuncType FuncType { get; init; }
     public required List<IRParam> Params { get; init; }
     public required List<IRBasicBlock> BasicBlocks { get; init; }
+
+    public override Type Type => BuiltinType.Ptr;
+
+    public override string PrintOperand()
+    {
+        return $"{Type} @{Name}";
+    }
 }
 
 public class IRBasicBlock
@@ -57,17 +64,6 @@ public abstract class IRValue
     public virtual string PrintDefinition()
     {
         return PrintOperand();
-    }
-}
-
-public sealed class IRFunctionPtr : IRValue
-{
-    public required IRFunction Function { get; init; }
-    public override Type Type => BuiltinType.Ptr;
-
-    public override string PrintOperand()
-    {
-        return $"{Type} @{Function.Name}";
     }
 }
 
@@ -176,9 +172,12 @@ public sealed class IRInstructionBinary : IRInstruction
 
 public sealed class IRInstructionCall : IRInstruction
 {
-    public required IRFunctionPtr Callee { get; init; }
+    public required IRValue Callee { get; init; }
+    public required FuncType Signature { get; init; }
+
     public required List<IRValue> Args { get; init; }
-    public override Type Type => Callee.Function.Type.ReturnType;
+
+    public override Type Type => Signature.ReturnType;
 
     public override string PrintDefinition()
     {
@@ -188,7 +187,17 @@ public sealed class IRInstructionCall : IRInstruction
             ret += $"%{Id} = ";
         }
 
-        ret += $"call {Type} @{Callee.Function.Name}({string.Join(", ", Args.Select(a => a.PrintOperand()))})";
+        string name;
+        if (Callee is IRFunction func)
+        {
+            name = $"@{func.Name}";
+        }
+        else
+        {
+            name = $"{Callee.PrintOperand()}";
+        }
+
+        ret += $"call {Type} {name}({string.Join(", ", Args.Select(a => a.PrintOperand()))})";
         return ret;
     }
 }

@@ -61,7 +61,7 @@ public class IRGen
             BasicBlocks = basicBlocks,
             Name = funcDecl.Symbol.Name,
             Params = irParams,
-            Type = funcType,
+            FuncType = funcType,
         };
     }
 
