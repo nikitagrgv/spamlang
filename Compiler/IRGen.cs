@@ -150,7 +150,7 @@ public class IRGen
             case ExprIdentifier exprIdentifier:
                 return GenExprIdentifierValue(block, exprIdentifier, variableToValue);
             case ExprInt exprInt:
-                return GenExprIntValue(block, exprInt, variableToValue);
+                return GenExprIntValue(exprInt);
             case ExprUnary exprUnary:
                 return GenExprUnaryValue(block, exprUnary, variableToValue);
             default:
@@ -254,8 +254,7 @@ public class IRGen
     {
     }
 
-    private IRValue GenExprIntValue(IRBasicBlock block, ExprInt expr,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprIntValue(ExprInt expr)
     {
         Debug.Assert(expr.ResolvedType != null);
 
