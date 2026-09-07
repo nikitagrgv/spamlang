@@ -229,11 +229,21 @@ public class IRGen
         {
             Args = args,
         };
+        block.Add(call);
+        return call;
     }
 
     private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
+        Debug.Assert(expr.ResolvedType != null);
+
+        IRValue value = GenExprValue(block, expr.Operand, variableToValue);
+        IRInstructionCast cast = new()
+        {
+            Value = value,
+            CastTo = expr.ResolvedType
+        };
     }
 
     private IRValue GenExprIdentifierValue(IRBasicBlock block, ExprIdentifier expr,

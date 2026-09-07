@@ -181,3 +181,15 @@ public sealed class IRInstructionCall : IRInstruction
         return ret;
     }
 }
+
+public sealed class IRInstructionCast : IRInstruction
+{
+    public required IRValue Value { get; init; }
+    public required Type CastTo { get; init; }
+    public override Type Type => CastTo;
+
+    public override string PrintDefinition()
+    {
+        return $"%{Id} = cast {CastTo}, {Value.PrintOperand()}";
+    }
+}
