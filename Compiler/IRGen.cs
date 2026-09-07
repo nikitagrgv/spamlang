@@ -257,6 +257,14 @@ public class IRGen
     private IRValue GenExprIntValue(IRBasicBlock block, ExprInt expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
+        Debug.Assert(expr.ResolvedType != null);
+
+        IRConstantInt value = new()
+        {
+            Value = expr.Value,
+            IntType = expr.ResolvedType,
+        };
+        return value;
     }
 
 
