@@ -254,7 +254,7 @@ public class IRGen
     {
         Debug.Assert(expr.Symbol != null);
         Symbol sym = expr.Symbol;
-        IRValue value = Lookup(sym);
+        IRValue value = LookupValue(sym);
         return value;
     }
 
@@ -370,7 +370,7 @@ public class IRGen
 
     private Dictionary<Symbol, IRValue> CurrentScope => _symbolScopes[^1];
 
-    private IRValue Lookup(Symbol symbol)
+    private IRValue LookupValue(Symbol symbol)
     {
         for (int i = _symbolScopes.Count - 1; i >= 0; --i)
         {
