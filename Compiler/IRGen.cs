@@ -214,6 +214,17 @@ public class IRGen
     private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr,
         IReadOnlyDictionary<Symbol, IRValue> variableToValue)
     {
+        List<IRValue> args = new();
+        foreach (Expr arg in expr.Args)
+        {
+            IRValue argValue = GenExprValue(block, arg, variableToValue);
+            args.Add(argValue);
+        }
+
+        IRInstructionCall call = new()
+        {
+            Args = args,
+        };
     }
 
     private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr,
