@@ -434,6 +434,8 @@ public class Sema
 
     private void VisitExprIdentifier(ExprIdentifier expr)
     {
+        expr.ValueCategory = ValueCategory.RValue;
+
         ReadOnlySpan<char> name = GetTokenValue(expr.IdentifierToken);
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
@@ -443,7 +445,6 @@ public class Sema
             return;
         }
 
-        expr.ValueCategory = ValueCategory.RValue;
         switch (sym)
         {
             case ParamSymbol:
@@ -559,6 +560,8 @@ public class Sema
 
     private void VisitExprUnary(ExprUnary expr)
     {
+        expr.ValueCategory = ValueCategory.RValue;
+
         VisitExpr(expr.Expr);
         Debug.Assert(expr.Expr.ResolvedType != null);
 
@@ -743,6 +746,7 @@ public class Sema
                 Operand = expr,
                 Target = targetType,
                 ResolvedType = targetType,
+                ValueCategory = ValueCategory.RValue,
             };
             return cast;
         }
