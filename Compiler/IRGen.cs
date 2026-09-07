@@ -58,10 +58,10 @@ public class IRGen
         _symbolScopes.Add(funcScope);
 
         List<IRParam> irParams = new();
-        GenParams(entry, funcDecl.Params, irParams, funcScope);
-        GenLocals(entry, locals, funcScope);
+        GenParams(entry, funcDecl.Params, irParams);
+        GenLocals(entry, locals);
 
-        GenBlock(entry, funcDecl.Body, funcScope);
+        GenBlock(entry, funcDecl.Body);
 
         _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
 
@@ -74,26 +74,26 @@ public class IRGen
         };
     }
 
-    private void GenBlock(IRBasicBlock block, Block blockNode, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private void GenBlock(IRBasicBlock block, Block blockNode)
     {
         foreach (Stmt stmt in blockNode.Stmts)
         {
             switch (stmt)
             {
                 case Block b:
-                    GenBlock(block, b, variableToValue);
+                    GenBlock(block, b);
                     break;
                 case StmtAssign stmtAssign:
-                    GenStmtAssign(block, stmtAssign, variableToValue);
+                    GenStmtAssign(block, stmtAssign);
                     break;
                 case StmtExpr stmtExpr:
-                    GenStmtExpr(block, stmtExpr, variableToValue);
+                    GenStmtExpr(block, stmtExpr);
                     break;
                 case StmtLet stmtLet:
-                    GenStmtLet(block, stmtLet, variableToValue);
+                    GenStmtLet(block, stmtLet);
                     break;
                 case StmtReturn stmtReturn:
-                    GenStmtReturn(block, stmtReturn, variableToValue);
+                    GenStmtReturn(block, stmtReturn);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stmt));
@@ -101,27 +101,24 @@ public class IRGen
         }
     }
 
-    private void GenStmtAssign(IRBasicBlock block, StmtAssign stmtAssign,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private void GenStmtAssign(IRBasicBlock block, StmtAssign stmtAssign)
     {
     }
 
-    private void GenStmtExpr(IRBasicBlock block, StmtExpr stmtExpr,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private void GenStmtExpr(IRBasicBlock block, StmtExpr stmtExpr)
     {
     }
 
-    private void GenStmtLet(IRBasicBlock block, StmtLet stmtLet, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private void GenStmtLet(IRBasicBlock block, StmtLet stmtLet)
     {
     }
 
-    private void GenStmtReturn(IRBasicBlock block, StmtReturn stmtReturn,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private void GenStmtReturn(IRBasicBlock block, StmtReturn stmtReturn)
     {
         IRValue? value = null;
         if (stmtReturn.Expr != null)
         {
-            value = GenExprValue(block, stmtReturn.Expr, variableToValue);
+            value = GenExprValue(block, stmtReturn.Expr);
         }
 
         IRInstructionRet ret = new()
@@ -131,14 +128,14 @@ public class IRGen
         block.Add(ret);
     }
 
-    private IRValue GenExprValue(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprValue(IRBasicBlock block, Expr expr)
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory != null);
 
         if (expr.ValueCategory == ValueCategory.LValue)
         {
-            IRValue addr = GenExprAddr(block, expr, variableToValue);
+            IRValue addr = GenExprAddr(block, expr);
             IRInstructionLoad load = new()
             {
                 LoadedType = expr.ResolvedType,
@@ -151,35 +148,33 @@ public class IRGen
         switch (expr)
         {
             case ExprBinary exprBinary:
-                return GenExprBinaryValue(block, exprBinary, variableToValue);
+                return GenExprBinaryValue(block, exprBinary);
             case ExprCall exprCall:
-                return GenExprCallValue(block, exprCall, variableToValue);
+                return GenExprCallValue(block, exprCall);
             case ExprImplicitCast exprImplicitCast:
-                return GenExprImplicitCastValue(block, exprImplicitCast, variableToValue);
+                return GenExprImplicitCastValue(block, exprImplicitCast);
             case ExprIdentifier exprIdentifier:
-                return GenExprIdentifierValue(exprIdentifier, variableToValue);
+                return GenExprIdentifierValue(exprIdentifier);
             case ExprInt exprInt:
                 return GenExprIntValue(exprInt);
             case ExprUnary exprUnary:
-                return GenExprUnaryValue(block, exprUnary, variableToValue);
+                return GenExprUnaryValue(block, exprUnary);
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
     }
 
-    private IRValue GenExprBinaryValue(IRBasicBlock block, ExprBinary expr,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprBinaryValue(IRBasicBlock block, ExprBinary expr)
     {
-        IRValue left = GenExprValue(block, expr.Left, variableToValue);
-        IRValue right = GenExprValue(block, expr.Right, variableToValue);
+        IRValue left = GenExprValue(block, expr.Left);
+        IRValue right = GenExprValue(block, expr.Right);
         TokenType opTokType = _tokens[expr.OperatorToken].Type;
         return GenBinaryOp(block, left, right, opTokType);
     }
 
-    private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr)
     {
-        IRValue operand = GenExprValue(block, expr.Expr, variableToValue);
+        IRValue operand = GenExprValue(block, expr.Expr);
         IRValue zero = MakeZeroInitialized(operand.Type);
         TokenType opTokType = _tokens[expr.OperatorToken].Type;
         return GenBinaryOp(block, zero, operand, opTokType);
@@ -220,15 +215,14 @@ public class IRGen
         return instr;
     }
 
-    private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr)
     {
-        IRValue callee = GenExprValue(block, expr.Callee, variableToValue);
+        IRValue callee = GenExprValue(block, expr.Callee);
 
         List<IRValue> args = new();
         foreach (Expr arg in expr.Args)
         {
-            IRValue argValue = GenExprValue(block, arg, variableToValue);
+            IRValue argValue = GenExprValue(block, arg);
             args.Add(argValue);
         }
 
@@ -244,10 +238,9 @@ public class IRGen
         return call;
     }
 
-    private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr,
-        IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr)
     {
-        IRValue value = GenExprValue(block, expr.Operand, variableToValue);
+        IRValue value = GenExprValue(block, expr.Operand);
         IRInstructionCast cast = new()
         {
             Value = value,
@@ -257,7 +250,7 @@ public class IRGen
         return cast;
     }
 
-    private IRValue GenExprIdentifierValue(ExprIdentifier expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprIdentifierValue(ExprIdentifier expr)
     {
         Debug.Assert(expr.Symbol != null);
 
@@ -281,7 +274,7 @@ public class IRGen
     }
 
 
-    private IRValue GenExprAddr(IRBasicBlock block, Expr expr, IReadOnlyDictionary<Symbol, IRValue> variableToValue)
+    private IRValue GenExprAddr(IRBasicBlock block, Expr expr)
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory == ValueCategory.LValue);
@@ -302,7 +295,7 @@ public class IRGen
         throw new NotImplementedException();
     }
 
-    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals, Dictionary<Symbol, IRValue> variableToValue)
+    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals)
     {
         foreach (StmtLet let in locals)
         {
@@ -322,8 +315,7 @@ public class IRGen
         }
     }
 
-    private void GenParams(IRBasicBlock entry, IReadOnlyList<Param> funcParams, List<IRParam> irParams,
-        Dictionary<Symbol, IRValue> variableToValue)
+    private void GenParams(IRBasicBlock entry, IReadOnlyList<Param> funcParams, List<IRParam> irParams)
     {
         Debug.Assert(irParams.Count == 0);
 
@@ -377,5 +369,21 @@ public class IRGen
                 CollectLocals(block, locals);
             }
         }
+    }
+
+    private Dictionary<Symbol, IRValue> CurrentScope => _symbolScopes[^1];
+
+    private IRValue? Lookup(Symbol symbol)
+    {
+        for (int i = _symbolScopes.Count - 1; i >= 0; --i)
+        {
+            Dictionary<Symbol, IRValue> scope = _symbolScopes[i];
+            if (scope.TryGetValue(symbol, out IRValue? value))
+            {
+                return value;
+            }
+        }
+
+        return null;
     }
 }
