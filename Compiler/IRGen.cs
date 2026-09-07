@@ -26,7 +26,6 @@ public class IRGen
         {
             Debug.Assert(funcDecl.Symbol is { Type: FuncType });
             FuncType funcType = (FuncType)funcDecl.Symbol.Type;
-
             IRFunction func = new()
             {
                 BasicBlocks = new List<IRBasicBlock>(),
@@ -34,6 +33,7 @@ public class IRGen
                 Params = new List<IRParam>(),
                 Signature = funcType,
             };
+            globalScope.Add(funcDecl.Symbol, func);
             functions.Add(func);
         }
 
