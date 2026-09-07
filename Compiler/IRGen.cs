@@ -158,7 +158,7 @@ public class IRGen
             case ExprImplicitCast exprImplicitCast:
                 return GenExprImplicitCastValue(block, exprImplicitCast);
             case ExprIdentifier exprIdentifier:
-                return GenExprIdentifierValue(block, exprIdentifier);
+                return GenExprIdentifierValue(exprIdentifier);
             case ExprInt exprInt:
                 return GenExprIntValue(exprInt);
             case ExprUnary exprUnary:
