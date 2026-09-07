@@ -223,11 +223,13 @@ public class IRGen
             args.Add(argValue);
         }
 
+        Debug.Assert(callee.Type is FuncType);
+
         IRInstructionCall call = new()
         {
             Args = args,
             Callee = callee,
-            Signature = 
+            Signature = (FuncType)callee.Type,
         };
         block.Add(call);
         return call;
