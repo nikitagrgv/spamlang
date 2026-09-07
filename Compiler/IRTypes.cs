@@ -60,6 +60,17 @@ public abstract class IRValue
     }
 }
 
+public sealed class IRFunctionPtr : IRValue
+{
+    public required IRFunction Function { get; init; }
+    public override Type Type => BuiltinType.Ptr;
+
+    public override string PrintOperand()
+    {
+        return $"{Type} @{Function.Name}";
+    }
+}
+
 public sealed class IRConstantInt : IRValue
 {
     public required Type IntType { get; init; }
@@ -165,9 +176,9 @@ public sealed class IRInstructionBinary : IRInstruction
 
 public sealed class IRInstructionCall : IRInstruction
 {
-    public required IRFunction Callee { get; init; }
+    public required IRFunctionPtr Callee { get; init; }
     public required List<IRValue> Args { get; init; }
-    public override Type Type => Callee.Type.ReturnType;
+    public override Type Type => Callee.Function.Type.ReturnType;
 
     public override string PrintDefinition()
     {
@@ -177,7 +188,7 @@ public sealed class IRInstructionCall : IRInstruction
             ret += $"%{Id} = ";
         }
 
-        ret += $"call {Type} @{Callee.Name}({string.Join(", ", Args.Select(a => a.PrintOperand()))})";
+        ret += $"call {Type} @{Callee.Function.Name}({string.Join(", ", Args.Select(a => a.PrintOperand()))})";
         return ret;
     }
 }
