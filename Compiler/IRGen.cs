@@ -309,8 +309,7 @@ public class IRGen
             entry.Add(alloca);
 
             Debug.Assert(LookupValue(sym) == null);
-            Dictionary<Symbol, IRValue> scope = CurrentScope;
-            scope.Add(sym, alloca);
+            CurrentScope.Add(sym, alloca);
         }
     }
 
