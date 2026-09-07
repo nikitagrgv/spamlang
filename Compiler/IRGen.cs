@@ -173,7 +173,7 @@ public class IRGen
         IRValue operand = GenExprValue(block, expr.Expr, variableToValue);
         IRValue zero = MakeZeroInitialized(operand.Type);
         TokenType opTokType = _tokens[expr.OperatorToken].Type;
-        GenBinaryOp(block, zero, operand, opTokType);
+        return GenBinaryOp(block, zero, operand, opTokType);
     }
 
     private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, TokenType tokenType)
