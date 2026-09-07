@@ -123,6 +123,27 @@ public class IRGen
 
     private void GenStmtLet(IRBasicBlock block, StmtLet stmtLet)
     {
+        Debug.Assert(stmtLet.Symbol != null);
+
+        IRValue value;
+        if (stmtLet.Expr != null)
+        {
+            value = GenExprValue(block, stmtLet.Expr);
+        }
+        else
+        {
+            value = MakeZeroInitialized(stmtLet.Symbol.Type);
+        }
+
+        IRValue? addr = LookupValue(stmtLet.Symbol);
+        Debug.Assert(addr != null);
+
+        IRInstructionStore store = new()
+        {
+            Value = value,
+            Address = addr,
+        };
+        block.Add(store);
     }
 
     private void GenStmtReturn(IRBasicBlock block, StmtReturn stmtReturn)
