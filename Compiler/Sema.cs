@@ -457,10 +457,13 @@ public class Sema
             return;
         }
 
+        expr.ValueCategory = ValueCategory.RValue;
         switch (sym)
         {
             case ParamSymbol:
             case VariableSymbol:
+                expr.ValueCategory = ValueCategory.LValue;
+                break;
             case FuncSymbol:
                 break;
             case TypeSymbol:
