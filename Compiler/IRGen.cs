@@ -63,10 +63,10 @@ public class IRGen
 
         GenParams(entry, irParams);
 
-        Dictionary<Symbol, IRValue> localToValue = new();
-        GenLocals(entry, locals, localToValue);
+        Dictionary<Symbol, IRValue> variableToValue = new();
+        GenLocals(entry, locals, variableToValue);
 
-        GenBody(entry, funcDecl.Body, localToValue);
+        GenBody(entry, funcDecl.Body, variableToValue);
 
         return new IRFunction
         {
@@ -155,7 +155,7 @@ public class IRGen
         throw new NotImplementedException();
     }
 
-    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals, Dictionary<Symbol, IRValue> localToValue)
+    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals, Dictionary<Symbol, IRValue> variableToValue)
     {
         foreach (StmtLet let in locals)
         {
@@ -170,8 +170,8 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(!localToValue.ContainsKey(sym));
-            localToValue.Add(sym, alloca);
+            Debug.Assert(!variableToValue.ContainsKey(sym));
+            variableToValue.Add(sym, alloca);
         }
     }
 
