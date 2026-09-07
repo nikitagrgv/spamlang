@@ -786,7 +786,7 @@ public class Sema
 
         if (type == BuiltinType.I32)
         {
-            return true;
+            return op == TokenType.Plus || op == TokenType.Minus;
         }
 
         return false;
