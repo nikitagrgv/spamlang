@@ -6,11 +6,9 @@ fn main(): i32
         let xxx: i32 = -5;
         x = xxx + 1;
     }
-    let y = spam(0xabc * x, x);
-    x = spam(5 + 1 * spam(-2 + 3) * -4, -4 + y);
-    spam(5 + 1 * spam(-2 + 3) * -4, -4 + y);
+    let y = spam(0xabc * x, spam(-2 + 3, x));
+    spam(5 + 1 * -4, -4 + y);
     noop();
-    noop() = noop();
     let z: i32 = 0b111110101 / 2;
     return x + y * z;
 }
