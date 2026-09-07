@@ -164,22 +164,34 @@ public class IRGen
         IRValue left = GenExprValue(block, expr.Left, variableToValue);
         IRValue right = GenExprValue(block, expr.Right, variableToValue);
 
-        IRBinaryOp op;
-        Token opTok = _tokens[expr.OperatorToken];
-        switch (opTok.Type)
+        Debug.Assert(left.Type == right.Type);
+
+        bool signed;
+        if (left.Type == BuiltinType.I32)
         {
-            case TokenType.Plus:
-            case TokenType.Minus:
-            case TokenType.Slash:
-            case TokenType.Star:
-            case TokenType.Percent:
+            signed = true;
+        }
+        else
+        {
+            throw new UnreachableException();
+        }
+
+        IRBinaryOp op;
+        switch (_tokens[expr.OperatorToken].Type)
+        {
+            case TokenType.Plus: op = IRBinaryOp.Add; break;
+            case TokenType.Minus: op = IRBinaryOp.Sub; break;
+            case TokenType.Star: op = IRBinaryOp.Mul; break;
+            case TokenType.Slash: op = signed ? IRBinaryOp.SDiv : IRBinaryOp.UDiv; break;
+            case TokenType.Percent: op = signed ? IRBinaryOp.SRem : IRBinaryOp.URem; break;
+            default: throw new UnreachableException();
         }
 
         IRInstructionBinary instr = new()
         {
             Left = left,
             Right = right,
-            Op = 
+            Op = op,
         };
         block.Add(instr);
         return instr;
