@@ -406,7 +406,7 @@ public class Compiler
             Console.Write($"{param.Type} %{param.Id}");
         }
 
-        Console.Write($") -> {func.FuncType.ReturnType}");
+        Console.Write($") -> {func.Signature.ReturnType}");
         Console.WriteLine();
         Console.WriteLine("{");
         foreach (IRBasicBlock bb in func.BasicBlocks)

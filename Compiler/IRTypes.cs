@@ -8,7 +8,7 @@ public sealed class IRModule
 public sealed class IRFunction : IRValue
 {
     public required string Name { get; init; }
-    public required FuncType FuncType { get; init; }
+    public required FuncType Signature { get; init; }
     public required List<IRParam> Params { get; init; }
     public required List<IRBasicBlock> BasicBlocks { get; init; }
 
