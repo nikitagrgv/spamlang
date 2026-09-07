@@ -55,11 +55,15 @@ public class IRGen
         basicBlocks.Add(entry);
 
         Dictionary<Symbol, IRValue> funcScope = new();
+        _symbolScopes.Add(funcScope);
+
         List<IRParam> irParams = new();
         GenParams(entry, funcDecl.Params, irParams, funcScope);
         GenLocals(entry, locals, funcScope);
 
         GenBlock(entry, funcDecl.Body, funcScope);
+
+        _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
 
         return new IRFunction
         {
