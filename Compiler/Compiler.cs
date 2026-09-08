@@ -121,8 +121,10 @@ public class Compiler
             return false;
         }
 
+        sw.Restart();
         IRGen irGen = new(_code, _tokens, _diag);
         IRModule irModule = irGen.Run(parserResult.CompilationUnit);
+        TimeSpan dtIRGen = sw.Elapsed;
 
         if (_flags.DebugIR)
         {
@@ -136,6 +138,7 @@ public class Compiler
         ReportTime("Lexer", dtLexer);
         ReportTime("Parser", dtParser);
         ReportTime("Sema", dtSema);
+        ReportTime("IR", dtIRGen);
 
         return !_diag.HasErrors;
     }
