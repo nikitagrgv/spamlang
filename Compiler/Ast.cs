@@ -82,14 +82,14 @@ public abstract class Expr : Node
 
 public sealed class ExprBinary : Expr
 {
-    public required BinaryOp OpType { get; init; }
+    public required BinaryOp Op { get; init; }
     public required Expr Left { get; set; }
     public required Expr Right { get; set; }
 }
 
 public sealed class ExprUnary : Expr
 {
-    public required UnaryOp OpType { get; init; }
+    public required UnaryOp Op { get; init; }
     public required Expr Expr { get; set; }
 }
 

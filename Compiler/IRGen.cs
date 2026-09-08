@@ -202,14 +202,14 @@ public class IRGen
     {
         IRValue left = GenExprValue(block, expr.Left);
         IRValue right = GenExprValue(block, expr.Right);
-        return GenBinaryOp(block, left, right, expr.OpType);
+        return GenBinaryOp(block, left, right, expr.Op);
     }
 
     private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr)
     {
         IRValue operand = GenExprValue(block, expr.Expr);
         BinaryOp op;
-        switch (expr.OpType)
+        switch (expr.Op)
         {
             case UnaryOp.Minus: op = BinaryOp.Minus; break;
             case UnaryOp.Plus: op = BinaryOp.Plus; break;

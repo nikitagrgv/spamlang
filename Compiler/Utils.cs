@@ -4,7 +4,7 @@ namespace Compiler;
 
 public static class Utils
 {
-    public static string ToSymbolString(this UnaryOp op)
+    public static string ToString(this UnaryOp op)
     {
         return op switch
         {
@@ -14,7 +14,7 @@ public static class Utils
         };
     }
 
-    public static string ToSymbolString(this BinaryOp op)
+    public static string ToString(this BinaryOp op)
     {
         return op switch
         {
@@ -23,7 +23,30 @@ public static class Utils
             BinaryOp.Mul => "*",
             BinaryOp.Div => "/",
             BinaryOp.Rem => "%",
-            _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
+            _ => throw new UnreachableException()
+        };
+    }
+
+    public static UnaryOp ToUnaryOp(TokenType token)
+    {
+        return token switch
+        {
+            TokenType.Plus => UnaryOp.Plus,
+            TokenType.Minus => UnaryOp.Minus,
+            _ => throw new UnreachableException()
+        };
+    }
+
+    public static BinaryOp ToBinaryOp(TokenType token)
+    {
+        return token switch
+        {
+            TokenType.Plus => BinaryOp.Plus,
+            TokenType.Minus => BinaryOp.Minus,
+            TokenType.Star => BinaryOp.Mul,
+            TokenType.Slash => BinaryOp.Div,
+            TokenType.Percent => BinaryOp.Rem,
+            _ => throw new UnreachableException()
         };
     }
 }

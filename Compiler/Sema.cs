@@ -359,11 +359,10 @@ public class Sema
             return;
         }
 
-        TokenType op = GetTokenType(expr.OperatorToken);
-        Type? commonType = GetCommonType(leftType, rightType, op);
+        Type? commonType = GetCommonType(leftType, rightType, expr.Op);
         if (commonType == null)
         {
-            Error($"Cannot use \"{op}\" on \"{leftType}\" and \"{rightType}\"", expr);
+            Error($"Cannot use \"{Utils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
@@ -568,10 +567,9 @@ public class Sema
         VisitExpr(expr.Expr);
         Debug.Assert(expr.Expr.ResolvedType != null);
 
-        TokenType op = GetTokenType(expr.OperatorToken);
-        if (!CanUseUnary(expr.Expr.ResolvedType, op))
+        if (!CanUseUnary(expr.Expr.ResolvedType, expr.Op))
         {
-            Error($"Cannot use unary operator \"{op}\" on type \"{expr.Expr.ResolvedType}\"", expr);
+            Error($"Cannot use unary operator \"{expr.Op}\" on type \"{expr.Expr.ResolvedType}\"", expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
@@ -758,7 +756,7 @@ public class Sema
         return expr;
     }
 
-    private Type? GetCommonType(Type a, Type b, TokenType op)
+    private Type? GetCommonType(Type a, Type b, BinaryOp op)
     {
         if (a == b)
         {
@@ -780,13 +778,13 @@ public class Sema
         return null;
     }
 
-    private bool CanUseUnary(Type type, TokenType op)
+    private bool CanUseUnary(Type type, UnaryOp op)
     {
         // TODO: Put this info in type
 
         if (type == BuiltinType.I32)
         {
-            return op == TokenType.Plus || op == TokenType.Minus;
+            return op == UnaryOp.Plus || op == UnaryOp.Minus;
         }
 
         return false;
