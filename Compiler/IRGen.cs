@@ -209,7 +209,7 @@ public class IRGen
     {
         IRValue operand = GenExprValue(block, expr.Expr);
         BinaryOp op;
-        switch (expr.Op)
+        switch (expr.OpType)
         {
             case UnaryOp.Minus: op = BinaryOp.Minus; break;
             case UnaryOp.Plus: op = BinaryOp.Plus; break;

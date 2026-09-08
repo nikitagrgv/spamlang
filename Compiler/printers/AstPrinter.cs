@@ -112,14 +112,12 @@ public class AstPrinter
                 break;
 
             case ExprBinary n:
-                Console.WriteLine($"{fullPrefix}BinaryExpr: {PrettyExpr(n)} | Type = {n.ResolvedType}");
-                PrintAstToken(depth + 1, n.OperatorToken, "Operator");
+                Console.WriteLine($"{fullPrefix}BinaryExpr({n.OpType}): {PrettyExpr(n)} | Type = {n.ResolvedType}");
                 PrintAst(depth + 1, n.Left, "Left");
                 PrintAst(depth + 1, n.Right, "Right");
                 break;
             case ExprUnary n:
-                Console.WriteLine($"{fullPrefix}UnaryExpr: {PrettyExpr(n)} | Type = {n.ResolvedType}");
-                PrintAstToken(depth + 1, n.OperatorToken, "Operator");
+                Console.WriteLine($"{fullPrefix}UnaryExpr({n.OpType}): {PrettyExpr(n)} | Type = {n.ResolvedType}");
                 PrintAst(depth + 1, n.Expr);
                 break;
             case ExprCall n:
@@ -152,12 +150,12 @@ public class AstPrinter
             case ExprBinary binaryExpr:
                 ret += PrettyExpr(binaryExpr.Left);
                 ret += " ";
-                ret += TokenValue(binaryExpr.OperatorToken);
+                ret += binaryExpr.OpType.ToSymbolString();
                 ret += " ";
                 ret += PrettyExpr(binaryExpr.Right);
                 break;
             case ExprUnary unaryExpr:
-                ret += TokenValue(unaryExpr.OperatorToken);
+                ret += unaryExpr.OpType.ToSymbolString();
                 ret += PrettyExpr(unaryExpr.Expr);
                 break;
             case ExprCall exprCall:
