@@ -133,12 +133,18 @@ public class Compiler
             Console.WriteLine("================================");
         }
 
+        sw.Restart();
+        Codegen codegen = new();
+        codegen.Run(irModule);
+        TimeSpan dtCodeGen = sw.Elapsed;
+
         _diag.Report();
 
         ReportTime("Lexer", dtLexer);
         ReportTime("Parser", dtParser);
         ReportTime("Sema", dtSema);
         ReportTime("IR", dtIRGen);
+        ReportTime("Codegen", dtCodeGen);
 
         return !_diag.HasErrors;
     }
