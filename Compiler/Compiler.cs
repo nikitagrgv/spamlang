@@ -122,7 +122,7 @@ public class Compiler
         }
 
         sw.Restart();
-        IRGen irGen = new(_code, _tokens, _diag);
+        IRGen irGen = new();
         IRModule irModule = irGen.Run(parserResult.CompilationUnit);
         TimeSpan dtIRGen = sw.Elapsed;
 

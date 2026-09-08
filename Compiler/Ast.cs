@@ -82,15 +82,14 @@ public abstract class Expr : Node
 
 public sealed class ExprBinary : Expr
 {
-    // TODO: Enum of operation instead of token
-    public required int OperatorToken { get; init; }
+    public required BinaryOp OpType { get; init; }
     public required Expr Left { get; set; }
     public required Expr Right { get; set; }
 }
 
 public sealed class ExprUnary : Expr
 {
-    public required int OperatorToken { get; init; }
+    public required UnaryOp Op { get; init; }
     public required Expr Expr { get; set; }
 }
 
