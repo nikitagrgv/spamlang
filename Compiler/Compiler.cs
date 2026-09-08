@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Compiler.printers;
 
 namespace Compiler;
 
@@ -60,14 +61,14 @@ public class Compiler
         if (_flags.DebugLexer)
         {
             Console.WriteLine("================================");
-            PrintTokens();
+            TokensPrinter.Print(_tokens, _code);
             Console.WriteLine("================================");
         }
 
         if (_flags.DebugLexerPretty)
         {
             Console.WriteLine("================================");
-            PrintTokensPretty();
+            TokensPrinter.PrintPretty(_tokens, _code);
             Console.WriteLine("================================");
         }
 
@@ -151,54 +152,6 @@ public class Compiler
         }
 
         Console.WriteLine($"{what} Time: {dt.Milliseconds}ms");
-    }
-
-    private void PrintTokens()
-    {
-        foreach (Token token in _tokens)
-        {
-            Console.WriteLine(token.ToString(_code));
-        }
-    }
-
-    private void PrintTokensPretty()
-    {
-        int curLine = 0;
-        int curColumn = 1;
-        foreach (Token token in _tokens)
-        {
-            while (curLine < token.Line)
-            {
-                curLine++;
-                curColumn = 1;
-                Console.WriteLine();
-                Console.Write($"{curLine,5}:  ");
-            }
-
-            if (curColumn >= token.Column)
-            {
-                Console.Write(" ");
-                curColumn = token.Column;
-            }
-
-            while (curColumn < token.Column)
-            {
-                Console.Write(" ");
-                curColumn++;
-            }
-
-            string str = token.Type.PrettyName();
-
-            if (token.Type.IsLiteral || token.Type == TokenType.Identifier)
-            {
-                str += token.Value(_code).ToString();
-            }
-
-            Console.Write(str);
-            curColumn += str.Length;
-        }
-
-        Console.WriteLine();
     }
 
     private void PrintAst(CompilationUnit unit)
