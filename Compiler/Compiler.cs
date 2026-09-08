@@ -72,7 +72,6 @@ public class Compiler
             Console.WriteLine("================================");
         }
 
-
         sw.Restart();
         Parser parser = new();
         Parser.Result parserResult = parser.Run(_code, _tokens, _diag);
@@ -130,7 +129,7 @@ public class Compiler
         if (_flags.DebugIR)
         {
             Console.WriteLine("================================");
-            PrintIR(irModule);
+            IRPrinter.Print(irModule);
             Console.WriteLine("================================");
         }
 
@@ -152,55 +151,5 @@ public class Compiler
         }
 
         Console.WriteLine($"{what} Time: {dt.Milliseconds}ms");
-    }
-
-    private void PrintIR(IRModule module)
-    {
-        foreach (IRFunction func in module.Functions)
-        {
-            PrintIR(func);
-            Console.WriteLine();
-        }
-    }
-
-    private void PrintIR(IRFunction func)
-    {
-        int counter = -1;
-        Console.Write($"fn @{func.Name}(");
-        for (int i = 0; i < func.Params.Count; i++)
-        {
-            IRParam param = func.Params[i];
-            if (i != 0)
-            {
-                Console.Write(", ");
-            }
-
-            param.Id = ++counter;
-            Console.Write($"{param.Type} %{param.Id}");
-        }
-
-        Console.Write($") -> {func.Signature.ReturnType}");
-        Console.WriteLine();
-        Console.WriteLine("{");
-        foreach (IRBasicBlock bb in func.BasicBlocks)
-        {
-            PrintIR(bb, ref counter);
-        }
-
-        Console.WriteLine("}");
-    }
-
-    private void PrintIR(IRBasicBlock bb, ref int counter)
-    {
-        Console.WriteLine($"{bb.Name}:");
-        foreach (IRInstruction inst in bb.Instructions)
-        {
-            if (inst.Type != BuiltinType.Void)
-            {
-                inst.Id = ++counter;
-            }
-
-            Console.WriteLine($"  {inst.PrintDefinition()}");
-        }
     }
 }
