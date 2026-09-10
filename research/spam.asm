@@ -51,3 +51,12 @@ print:
 	pop rbp
 	ret
 
+# count(str: ptr) -> i32
+count:
+	xor rax, rax
+count_iterate:
+	cmp byte ptr [rcx], 0
+	je count_end
+	sub rcx, 1
+count_end:
+	ret
