@@ -44,8 +44,8 @@ myprint:
 	sub rsp, 0x08 + 0x08 + 0x20
 
 	# save args in OUR shadow space (shadow space: rbp+0x10...rbp+0x30)
-	mov qword ptr [rbp+0x10], rcx
-	mov dword ptr [rbp+0x18], rdx
+	mov qword ptr [rbp+0x10], ecx
+	mov dword ptr [rbp+0x18], edx
 
 	mov ecx, -11
 	call GetStdHandle
