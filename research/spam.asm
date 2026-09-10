@@ -15,6 +15,8 @@ cached_out_handle:
     .text
     .globl main
 main:
+	push rbx
+
     push rbp
     mov rbp, rsp
 	
@@ -37,6 +39,7 @@ main:
 
     mov rsp, rbp
     pop rbp
+	pop rbx
     ret
 
 # print(str: ptr, size: i32) -> i32
