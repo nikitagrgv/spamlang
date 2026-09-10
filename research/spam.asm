@@ -19,10 +19,9 @@ main:
 	# save count in locals
 	mov dword ptr [rbp - 0x08], rax
 	
-	
-	#lea rcx, [rip + msg]
-	#mov rdx, 14
-	#call print
+	lea rcx, [rip + msg]
+	mov rdx, [rbp - 0x08]
+	call print
 
     mov rsp, rbp
     pop rbp
