@@ -1,9 +1,17 @@
     .intel_syntax noprefix
 
+########################################
 	.section .rdata,"dr"
 msg:
     .asciz "hello, world!\n"
 
+########################################
+	.bss
+	.balign 8
+cached_out_handle:
+	.zero 4
+
+########################################
     .text
     .globl main
 main:
