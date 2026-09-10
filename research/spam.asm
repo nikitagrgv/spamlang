@@ -15,7 +15,7 @@ cached_out_handle:
     .text
     .globl main
 main:
-	push rbx
+	push rbx # save non-volatile
 
     push rbp
     mov rbp, rsp
@@ -39,7 +39,7 @@ main:
 
     mov rsp, rbp
     pop rbp
-	pop rbx
+	pop rbx # restore non-volatile
     ret
 
 # print(str: ptr, size: i32) -> i32
