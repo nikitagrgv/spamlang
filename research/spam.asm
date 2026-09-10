@@ -26,10 +26,14 @@ main:
 
 	# save count in locals
 	mov dword ptr [rbp - 0x08], eax
-	
+
+	mov rbx, 5
+.Lmain_loop:
 	lea rcx, [rip + msg]
 	mov edx, dword ptr [rbp - 0x08]
 	call print
+	dec rbx
+	jnz .Lmain_loop
 
     mov rsp, rbp
     pop rbp
