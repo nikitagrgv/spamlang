@@ -1,6 +1,6 @@
     .intel_syntax noprefix
 
-    .data
+	.section .rdata,"dr"
 msg:
     .asciz "hello, world!\n"
 
