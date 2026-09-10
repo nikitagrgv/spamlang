@@ -57,7 +57,7 @@ print:
 
 	mov rax, [rip + cached_out_handle]
 	test rax, rax
-	jz .Lprint_after_handle
+	jnz .Lprint_after_handle
 	mov ecx, -11
 	call GetStdHandle
 .Lprint_after_handle:
