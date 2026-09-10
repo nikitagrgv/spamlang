@@ -15,14 +15,14 @@ main:
 	
 	lea rcx, [rip + msg]
 	mov rdx, 14
-	call myprint
+	call print
 
     mov rsp, rbp
     pop rbp
     ret
 
-# myprint(str: ptr, size: i32) -> i32
-myprint:
+# print(str: ptr, size: i32) -> i32
+print:
 	push rbp
 	mov rbp, rsp
 	
@@ -50,3 +50,4 @@ myprint:
 	mov rsp, rbp
 	pop rbp
 	ret
+
