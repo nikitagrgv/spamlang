@@ -60,6 +60,7 @@ print:
 	jnz .Lprint_after_handle
 	mov ecx, -11
 	call GetStdHandle
+	mov qword ptr [rip + cached_out_handle], rax
 .Lprint_after_handle:
 
 	mov rcx, rax
