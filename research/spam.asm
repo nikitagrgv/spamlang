@@ -40,7 +40,8 @@ myprint:
 	mov rdx, [rbp+0x10]
 	mov r8d, [rbp+0x18]
 	lea r9, [rbp+0x20]
-	mov qword ptr [rbp-0x10], 0
+	#mov qword ptr [rbp-0x10], 0
+	mov qword ptr [rsp+0x20], 0
 	call WriteConsoleA
 
 	# return num bytes written
