@@ -53,10 +53,13 @@ print:
 
 # count(str: ptr) -> i32
 count:
-	xor rax, rax
+	push rcx
+	mov rax, rcx
 count_iterate:
-	cmp byte ptr [rcx], 0
+	cmp byte ptr [rax], 0
 	je count_end
-	sub rcx, 1
+	add rax, 1
 count_end:
+	pop rcx
+	sub rax, rcx
 	ret
