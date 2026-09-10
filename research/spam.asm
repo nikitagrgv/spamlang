@@ -17,7 +17,7 @@ main:
 	call count
 
 	# save count in locals
-	mov dword ptr [rbp - 0x08], rax
+	mov dword ptr [rbp - 0x08], eax
 	
 	lea rcx, [rip + msg]
 	mov rdx, [rbp - 0x08]
