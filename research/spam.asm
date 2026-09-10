@@ -65,5 +65,4 @@ count_iterate:
 count_end:
 	pop rcx
 	sub rax, rcx
-	dec rax
 	ret
