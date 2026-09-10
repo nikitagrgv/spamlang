@@ -38,8 +38,8 @@ main:
 
 	mov rax, 0
 
+	lea rsp, [rbp - 0x08]
 	pop rbx # restore non-volatile
-	lea rsp, [rbp + 0x00]
     pop rbp
     ret
 
