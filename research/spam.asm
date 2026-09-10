@@ -58,8 +58,9 @@ print:
 count:
 	push rcx
 	mov rax, rcx
+	dec rax
 count_iterate:
-	add rax, 1
+	inc rax
 	cmp byte ptr [rax], 0
 	jne count_iterate
 count_end:
