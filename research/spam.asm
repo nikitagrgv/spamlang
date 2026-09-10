@@ -14,6 +14,8 @@ main:
 	sub rsp, 0x00 + 0x20
 	
 	lea rcx, [rip + msg]
+	mov rdx, 14
+	call myprint
 
     mov rsp, rbp
     pop rbp
