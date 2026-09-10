@@ -63,6 +63,6 @@ count:
 .Lcount_iterate:
 	inc rax
 	cmp byte ptr [rax], 0
-	jne count_iterate
+	jne .Lcount_iterate
 	sub rax, rcx
 	ret
