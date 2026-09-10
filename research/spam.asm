@@ -59,10 +59,11 @@ count:
 	push rcx
 	mov rax, rcx
 count_iterate:
-	cmp byte ptr [rax], 0
-	je count_end
 	add rax, 1
+	cmp byte ptr [rax], 0
+	jne count_iterate
 count_end:
 	pop rcx
 	sub rax, rcx
+	dec rax
 	ret
