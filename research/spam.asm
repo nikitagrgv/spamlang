@@ -40,8 +40,8 @@ myprint:
 	push rbp
 	mov rbp, rsp
 	
-	# align + shadow space for calls 
-	sub rsp, 0x00 + 0x20
+	# align + call's args + shadow space for calls 
+	sub rsp, 0x08 + 0x08 + 0x20
 
 	# save args in OUR shadow space (shadow space: rbp+0x10...rbp+0x30)
 	mov qword ptr [rbp+0x10], rcx
@@ -53,7 +53,12 @@ myprint:
 	mov rcx, rax
 	mov rdx, [rbp+0x10]
 	mov r8d, [rbp+0x18]
-	mov 
+	lea r9, [rbp+0x20]
+	mov qword ptr [rbp-0x08]
+	call WriteConsoleA
+
+	# return num bytes written
+	mov eax, [rbp+0x20]
 
 	mov rsp, rbp
 	pop rbp
