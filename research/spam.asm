@@ -56,8 +56,7 @@ print:
 
 # count(str: ptr) -> i32
 count:
-	mov rax, rcx
-	dec rax
+	lea rax, [rcx - 1]
 count_iterate:
 	inc rax
 	cmp byte ptr [rax], 0
