@@ -9,27 +9,11 @@ msg:
 main:
     push rbp
     mov rbp, rsp
-
-    # locals
-    sub rsp, 0x08
-    # arguments
-    sub rsp, 0x08
-    # align + shadow space
-    sub rsp, 0x00 + 0x20
-
-    # GetStdHandle
-    mov ecx, -11
-    call GetStdHandle
-
-    # WriteConsoleA
-    mov rcx, rax
-    lea rdx, [rip + msg]
-    mov r8d, 14
-    lea r9, [rbp-0x08]
-    mov qword ptr [rbp-0x10], 0
-    call WriteConsoleA
-
-    mov eax, [rbp-0x08]
+	
+	# align + shadow space
+	sub rsp, 0x00 + 0x20
+	
+	lea rcx, [rip + msg]
 
     mov rsp, rbp
     pop rbp
