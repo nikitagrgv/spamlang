@@ -56,10 +56,10 @@ print:
 	mov dword ptr [rbp+0x18], edx
 
 	mov rax, [rip + cached_out_handle]
-	jne .Lprint_after_handle
+	jnz .Lprint_after_handle
 	mov ecx, -11
 	call GetStdHandle
-.Lprint_after_handle
+.Lprint_after_handle:
 
 	mov rcx, rax
 	mov rdx, [rbp+0x10]
