@@ -16,23 +16,22 @@ cached_out_handle:
     .globl main
 main:
 	push rbx # save non-volatile
-
     push rbp
     mov rbp, rsp
 	
 	# align + locals + shadow space
-	sub rsp, 0x08 + 0x08 + 0x20
+	sub rsp, 0x00 + 0x08 + 0x20
 	
 	lea rcx, [rip + msg]
 	call count
 
 	# save count in locals
-	mov dword ptr [rbp - 0x08], eax
+	mov dword ptr [rbp - 0x10], eax
 
 	mov rbx, 5
 .Lmain_loop:
 	lea rcx, [rip + msg]
-	mov edx, dword ptr [rbp - 0x08]
+	mov edx, dword ptr [rbp - 0x10]
 	call print
 	dec rbx
 	jnz .Lmain_loop
