@@ -38,7 +38,7 @@ main:
 
 	mov rax, 0
 
-    mov rsp, rbp
+	lea rsp, [rbp + 0x00]
 	pop rbx # restore non-volatile
     pop rbp
     ret
@@ -76,7 +76,7 @@ print:
 	# return num bytes written
 	mov eax, [rbp+0x20]
 
-	mov rsp, rbp
+	lea rsp, [rbp + 0x00]
 	pop rbp
 	ret
 
