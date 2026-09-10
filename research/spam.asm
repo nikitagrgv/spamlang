@@ -61,6 +61,5 @@ count_iterate:
 	inc rax
 	cmp byte ptr [rax], 0
 	jne count_iterate
-count_end:
 	sub rax, rcx
 	ret
