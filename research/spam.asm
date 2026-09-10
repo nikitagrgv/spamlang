@@ -10,11 +10,15 @@ main:
     push rbp
     mov rbp, rsp
 	
-	# align + shadow space
-	sub rsp, 0x00 + 0x20
+	# align + locals + shadow space
+	sub rsp, 0x08 + 0x08 + 0x20
 	
 	lea rcx, [rip + msg]
 	call count
+
+	# save count in locals
+	mov dword ptr [rbp - 0x08], rax
+	
 	
 	#lea rcx, [rip + msg]
 	#mov rdx, 14
