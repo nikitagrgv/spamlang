@@ -36,7 +36,7 @@ main:
 	dec rbx
 	jnz .Lmain_loop
 
-	mov rax, 0
+	xor rax, rax
 
 	lea rsp, [rbp - 0x08]
 	pop rbx # restore non-volatile
