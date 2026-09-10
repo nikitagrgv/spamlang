@@ -9,7 +9,7 @@ msg:
 	.bss
 	.balign 8
 cached_out_handle:
-	.zero 4
+	.zero 8
 
 ########################################
     .text
@@ -26,12 +26,12 @@ main:
 	call count
 
 	# save count in locals
-	mov dword ptr [rbp - 0x10], eax
+	mov dword ptr [rbp - 0x08], eax
 
 	mov rbx, 5
 .Lmain_loop:
 	lea rcx, [rip + msg]
-	mov edx, dword ptr [rbp - 0x10]
+	mov edx, dword ptr [rbp - 0x08]
 	call print
 	dec rbx
 	jnz .Lmain_loop
