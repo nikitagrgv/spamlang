@@ -37,8 +37,8 @@ main:
 	jnz .Lmain_loop
 
     mov rsp, rbp
-    pop rbp
 	pop rbx # restore non-volatile
+    pop rbp
     ret
 
 # print(str: ptr, size: i32) -> i32
