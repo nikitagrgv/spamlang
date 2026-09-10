@@ -63,7 +63,7 @@ print:
 	mov qword ptr [rip + cached_out_handle], rax
 .Lprint_after_handle:
 
-	mov dword ptr [rbp+0x18], 0 
+	mov dword ptr [rbp+0x20], 0 
 
 	mov rcx, rax
 	mov rdx, [rbp+0x10]
