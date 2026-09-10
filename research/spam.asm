@@ -14,8 +14,11 @@ main:
 	sub rsp, 0x00 + 0x20
 	
 	lea rcx, [rip + msg]
-	mov rdx, 14
-	call print
+	call count
+	
+	#lea rcx, [rip + msg]
+	#mov rdx, 14
+	#call print
 
     mov rsp, rbp
     pop rbp
