@@ -15,8 +15,8 @@ cached_out_handle:
     .text
     .globl main
 main:
-	push rbx # save non-volatile
     push rbp
+	push rbx # save non-volatile
     mov rbp, rsp
 	
 	# align + locals + shadow space
@@ -26,12 +26,12 @@ main:
 	call count
 
 	# save count in locals
-	mov dword ptr [rbp - 0x08], eax
+	mov dword ptr [rbp - 0x10], eax
 
 	mov rbx, 5
 .Lmain_loop:
 	lea rcx, [rip + msg]
-	mov edx, dword ptr [rbp - 0x08]
+	mov edx, dword ptr [rbp - 0x10]
 	call print
 	dec rbx
 	jnz .Lmain_loop
