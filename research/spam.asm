@@ -57,7 +57,7 @@ print:
 # count(str: ptr) -> i32
 count:
 	lea rax, [rcx - 1]
-count_iterate:
+.Lcount_iterate:
 	inc rax
 	cmp byte ptr [rax], 0
 	jne count_iterate
