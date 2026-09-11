@@ -78,10 +78,8 @@ public class Codegen
         if (hasCalls)
         {
             frameSize += 0x20; // Shadow space
+            frameSize = AlignTo(frameSize, 16); // ABI requirement
         }
-
-        // TODO: Needs if no calls?
-        frameSize = AlignTo(frameSize, 16); // ABI requirement
 
         // frame prologue
         List<MInstr> prologueInstructions = new();
