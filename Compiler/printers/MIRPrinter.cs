@@ -2,7 +2,7 @@ namespace Compiler.printers;
 
 public class MIRPrinter
 {
-    private StringWriter _writer;
+    private readonly StringWriter _writer;
 
     private MIRPrinter(StringWriter writer)
     {
