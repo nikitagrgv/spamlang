@@ -16,6 +16,7 @@ public class MIRPrinter
         Console.WriteLine($"{func.Name}:");
         foreach (MBasicBlock bb in func.BasicBlocks)
         {
+            Print(bb);
         }
     }
 
