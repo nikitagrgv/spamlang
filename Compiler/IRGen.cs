@@ -445,7 +445,7 @@ public class IRGen
     {
         foreach (IRFunction func in module.Functions)
         {
-            int cur = 0;
+            int cur = -1;
             for (int i = 0; i < func.Params.Count; i++)
             {
                 IRParam param = func.Params[i];
