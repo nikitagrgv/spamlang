@@ -24,6 +24,7 @@ public class Codegen
         // TODO: Reuse lists
         // TODO: Don't spill params on stack?
 
+        // Spill params to stack
         int curOffset = 0;
         List<int> paramsOffsets = new();
         foreach (IRParam param in irfunc.Params)
