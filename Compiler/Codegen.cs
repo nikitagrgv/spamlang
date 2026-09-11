@@ -97,7 +97,7 @@ public class Codegen
         MBasicBlock prologue = new()
         {
             Instructions = prologueInstructions,
-            Name = "",
+            Name = null,
         };
         basicBlocks.Add(prologue);
 
