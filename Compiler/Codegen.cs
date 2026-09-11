@@ -2,14 +2,22 @@ namespace Compiler;
 
 public class Codegen
 {
-    public MModule Run(IRModule module)
+    public MModule Run(IRModule irmodule)
     {
         List<MFunction> functions = new();
 
-        MModule mmodule = new()
+        foreach (IRFunction func in irmodule.Functions)
+        {
+        }
+
+        MModule module = new()
         {
             Functions = functions
         };
-        return mmodule;
+        return module;
+    }
+
+    public MFunction GenFunction(IRFunction irfunc)
+    {
     }
 }
