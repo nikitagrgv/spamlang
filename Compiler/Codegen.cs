@@ -74,7 +74,6 @@ public class Codegen
             }
         }
 
-        // TODO: Do this only if calls exists!
         int frameSize = curOffset;
         if (hasCalls)
         {
