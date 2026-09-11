@@ -125,6 +125,7 @@ public class Codegen
                                 Offset = allocatedOffset,
                                 Size = 8
                             },
+                            Comment = alloca.PrintDefinition()
                         });
                         break;
                     case IRInstructionBinary binary:
