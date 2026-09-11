@@ -18,6 +18,7 @@ public class MIRPrinter
         {
             Print(bb);
         }
+        Console.WriteLine();
     }
 
     private static void Print(MBasicBlock bb)
