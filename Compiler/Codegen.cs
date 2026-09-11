@@ -22,7 +22,8 @@ public class Codegen
     private MFunction GenFunction(IRFunction irfunc)
     {
         // TODO: Consider alignment!
-        // TODO: Reuse lists 
+        // TODO: Reuse lists
+        // TODO: Don't spill params on stack?
 
         List<MBasicBlock> basicBlocks = new();
 
