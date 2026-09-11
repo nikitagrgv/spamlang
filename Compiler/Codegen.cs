@@ -33,13 +33,13 @@ public class Codegen
             paramsOffsets.Add(curOffset);
         }
 
-        // Collect allocates
+        // Collect alloca-s
         List<MBasicBlock> basicBlocks = new();
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
             foreach (IRInstruction instr in irbb.Instructions)
             {
-                
+                if (instr is not IRInstructionAlloca { } alloca)
             }
         }
 
