@@ -21,7 +21,18 @@ public class Codegen
 
     private MFunction GenFunction(IRFunction irfunc)
     {
+        // TODO: Calculate with alignment!
+        // TODO: Reuse lists 
+
         List<MBasicBlock> basicBlocks = new();
+
+        int curOffset = 4;
+        List<int> paramsOffsets = new();
+        foreach (IRParam param in irfunc.Params)
+        {
+            paramsOffsets.Add(curOffset);
+            curOffset += param.Type.Size;
+        }
 
         MFunction func = new()
         {
