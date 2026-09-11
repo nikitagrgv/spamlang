@@ -52,17 +52,7 @@ public class Codegen
             }
         }
 
-        Console.WriteLine($"{irfunc.Name}");
-        Console.WriteLine("PARAMS:");
-        foreach (int paramsOffset in paramsOffsets)
-        {
-            Console.WriteLine($"  {paramsOffset}");
-        }
-        Console.WriteLine("ALLOCAS:");
-        foreach (int allocatedOffset in allocatedOffsets)
-        {
-            Console.WriteLine($"  {allocatedOffset}");
-        }
+        // frame prologue
 
 
         MFunction func = new()
