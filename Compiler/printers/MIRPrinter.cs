@@ -15,7 +15,7 @@ public class MIRPrinter
         printer.Print(module);
     }
 
-    public void Print(MModule module)
+    private void Print(MModule module)
     {
         foreach (MFunction func in module.Functions)
         {
@@ -23,7 +23,7 @@ public class MIRPrinter
         }
     }
 
-    public void Print(MFunction func)
+    private void Print(MFunction func)
     {
         _writer.WriteLine("# -------------------------------------");
         _writer.WriteLine($"{func.Name}:");
