@@ -21,7 +21,6 @@ public class Codegen
 
     private MFunction GenFunction(IRFunction irfunc)
     {
-        // TODO: Consider alignment!
         // TODO: Reuse lists
         // TODO: Don't spill params on stack?
 
@@ -44,7 +43,7 @@ public class Codegen
         return func;
     }
 
-    private int AlignTo(int offset, int alignment)
+    private static int AlignTo(int offset, int alignment)
     {
         return (offset + alignment - 1) & ~(alignment - 1);
     }
