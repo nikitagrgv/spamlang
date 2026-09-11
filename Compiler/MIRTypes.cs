@@ -1,3 +1,5 @@
+using System.Xml;
+
 namespace Compiler;
 
 public abstract class MOperand;
@@ -19,3 +21,9 @@ public sealed class MOpMem : MOperand
     public required int Offset { get; init; }
     public required int Size { get; init; }
 }
+
+public sealed class MOpLabel : MOperand
+{
+    public required string Label { get; init; }
+}
+
