@@ -102,6 +102,7 @@ public class Codegen
         basicBlocks.Add(prologue);
 
         // blocks
+        int curAlloca = 0;
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
             List<MInstr> instructions = new();
@@ -111,6 +112,8 @@ public class Codegen
                 switch (instr)
                 {
                     case IRInstructionAlloca alloca:
+                        int offset = allocatedOffsets[curAlloca];
+                        ++curAlloca;
                         break;
                     case IRInstructionBinary binary:
                         break;
