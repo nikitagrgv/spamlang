@@ -24,7 +24,7 @@ public class MIRPrinter
 
     private static void Print(MBasicBlock bb)
     {
-        if (string.IsNullOrEmpty(bb.Name))
+        if (!string.IsNullOrEmpty(bb.Name))
         {
             Console.WriteLine($"{bb.Name}:");
         }
@@ -38,6 +38,26 @@ public class MIRPrinter
     private static void Print(MInstr instr)
     {
         Console.Write($"    {instr.Op.AsmName(),-5}");
-        
+        if (instr.Left != null)
+        {
+            Print(instr.Left);
+        }
+
+        if (instr.Right != null)
+        {
+            Console.Write(", ");
+            Print(instr.Right);
+        }
+
+        if (!string.IsNullOrEmpty(instr.Comment))
+        {
+            Console.Write($"              # {instr.Comment}");
+        }
+
+        Console.WriteLine();
+    }
+
+    private static void Print(MOperand op)
+    {
     }
 }
