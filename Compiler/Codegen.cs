@@ -101,6 +101,25 @@ public class Codegen
         };
         basicBlocks.Add(prologue);
 
+        // frame epilogue
+        List<MInstr> epilogueInstructions = new();
+        epilogueInstructions.Add(new MInstr
+        {
+            Op = MOpcode.Mov,
+            Left = MOpReg.Rsp,
+            Right = MOpReg.Rbp,
+        });
+        epilogueInstructions.Add(new MInstr
+        {
+            Op = MOpcode.Pop,
+            Left = MOpReg.Rbp,
+        });
+        epilogueInstructions.Add(new MInstr
+        {
+            Op = MOpcode.Ret,
+        });
+
+
         MFunction func = new()
         {
             BasicBlocks = basicBlocks,
