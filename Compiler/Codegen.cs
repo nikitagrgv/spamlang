@@ -58,6 +58,12 @@ public class Codegen
         {
             foreach (IRInstruction instr in irbb.Instructions)
             {
+                // TODO: Shit?
+                if (instr.Type.Size == 0)
+                {
+                    continue;
+                }
+
                 curOffset += instr.Type.Size;
                 curOffset = AlignTo(curOffset, instr.Type.Alignment);
                 instrIdToOffset.Add(instr.Id, curOffset);
