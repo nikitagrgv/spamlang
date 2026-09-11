@@ -19,6 +19,27 @@ public enum MOpcode
     Ret,
 }
 
+public static class MOpcodes
+{
+    public static string ToString(this MOpcode opcode)
+    {
+        return opcode switch
+        {
+            MOpcode.Mov => "mov",
+            MOpcode.Add => "add",
+            MOpcode.Sub => "sub",
+            MOpcode.Dec => "dec",
+            MOpcode.Inc => "inc",
+            MOpcode.Lea => "lea",
+            MOpcode.Push => "push",
+            MOpcode.Pop => "pop",
+            MOpcode.Call => "call",
+            MOpcode.Ret => "ret",
+            _ => throw new ArgumentOutOfRangeException(nameof(opcode), opcode, null)
+        };
+    }
+}
+
 public abstract class MOperand;
 
 public sealed class MOpReg : MOperand
