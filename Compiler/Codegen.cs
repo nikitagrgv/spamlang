@@ -76,7 +76,11 @@ public class Codegen
 
         // TODO: Do this only if calls exists!
         int frameSize = curOffset;
-        frameSize += 0x20; // Shadow space
+        if (hasCalls)
+        {
+            frameSize += 0x20; // Shadow space
+        }
+
         frameSize = AlignTo(frameSize, 16); // ABI requirement
 
         // frame prologue
