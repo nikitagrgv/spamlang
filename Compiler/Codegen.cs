@@ -161,6 +161,7 @@ public class Codegen
                 Instructions = instructions,
                 Name = $".L{irfunc.Name}_{irbb.Name}",
             };
+            basicBlocks.Add(block);
         }
 
         // frame epilogue
