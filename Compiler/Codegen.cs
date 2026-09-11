@@ -60,19 +60,19 @@ public class Codegen
             {
                 switch (instr)
                 {
-                    case IRInstructionAlloca irInstructionAlloca:
+                    case IRInstructionAlloca alloca:
                         break;
-                    case IRInstructionBinary irInstructionBinary:
+                    case IRInstructionBinary binary:
                         break;
-                    case IRInstructionCall irInstructionCall:
+                    case IRInstructionCall call:
                         break;
-                    case IRInstructionCast irInstructionCast:
+                    case IRInstructionCast cast:
                         break;
-                    case IRInstructionLoad irInstructionLoad:
+                    case IRInstructionLoad load:
                         break;
-                    case IRInstructionRet irInstructionRet:
+                    case IRInstructionRet ret:
                         break;
-                    case IRInstructionStore irInstructionStore:
+                    case IRInstructionStore store:
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(instr));
