@@ -74,7 +74,7 @@ public class Codegen
         prologueInstructions.Add(new MInstr
         {
             Op = MOpcode.Push,
-            Left = new MOpReg()
+            Left = new MOpReg
             {
                 Reg = Reg.Rbp,
                 Size = 8,
