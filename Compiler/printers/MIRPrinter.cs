@@ -37,6 +37,7 @@ public class MIRPrinter
 
     private static void Print(MInstr instr)
     {
-        Console.WriteLine($"{instr.Op.AsmName(),-5}");
+        Console.Write($"    {instr.Op.AsmName(),-5}");
+        
     }
 }
