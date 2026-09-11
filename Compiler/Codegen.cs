@@ -58,25 +58,9 @@ public class Codegen
         {
             foreach (IRInstruction instr in irbb.Instructions)
             {
-                switch (instr)
-                {
-                    case IRInstructionAlloca alloca:
-                        break;
-                    case IRInstructionBinary binary:
-                        break;
-                    case IRInstructionCall call:
-                        break;
-                    case IRInstructionCast cast:
-                        break;
-                    case IRInstructionLoad load:
-                        break;
-                    case IRInstructionRet ret:
-                        break;
-                    case IRInstructionStore store:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(instr));
-                }
+                curOffset += instr.Type.Size;
+                curOffset = AlignTo(curOffset, instr.Type.Alignment);
+                instrIdToOffset.Add(instr.Id, curOffset);
             }
         }
 
