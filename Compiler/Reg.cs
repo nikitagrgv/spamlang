@@ -45,7 +45,7 @@ public static class Regs
         ["r15", "r15d", "r15w", "r15b"],
     ];
 
-    public static string GetNawme(this Reg reg, int size)
+    public static string GetName(this Reg reg, int size)
     {
         int index = size switch
         {
