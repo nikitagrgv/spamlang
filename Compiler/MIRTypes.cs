@@ -55,6 +55,15 @@ public sealed class MOpReg : MOperand
     public static readonly MOpReg Rbp = new() { Reg = Reg.Rbp, Size = 8 };
     public static readonly MOpReg Rsi = new() { Reg = Reg.Rsi, Size = 8 };
     public static readonly MOpReg Rdi = new() { Reg = Reg.Rdi, Size = 8 };
+
+    public static readonly MOpReg Eax = new() { Reg = Reg.Rax, Size = 4 };
+    public static readonly MOpReg Ecx = new() { Reg = Reg.Rcx, Size = 4 };
+    public static readonly MOpReg Edx = new() { Reg = Reg.Rdx, Size = 4 };
+    public static readonly MOpReg Ebx = new() { Reg = Reg.Rbx, Size = 4 };
+    public static readonly MOpReg Esp = new() { Reg = Reg.Rsp, Size = 4 };
+    public static readonly MOpReg Ebp = new() { Reg = Reg.Rbp, Size = 4 };
+    public static readonly MOpReg Esi = new() { Reg = Reg.Rsi, Size = 4 };
+    public static readonly MOpReg Edi = new() { Reg = Reg.Rdi, Size = 4 };
 }
 
 public sealed class MOpImm : MOperand
