@@ -14,5 +14,16 @@ public class MIRPrinter
     {
         Console.WriteLine("# -------------------------------------");
         Console.WriteLine($"{func.Name}:");
+        foreach (MBasicBlock bb in func.BasicBlocks)
+        {
+        }
+    }
+
+    private static void Print(MBasicBlock bb)
+    {
+        if (string.IsNullOrEmpty(bb.Name))
+        {
+            Console.WriteLine($"{bb.Name}:");
+        }
     }
 }
