@@ -88,6 +88,12 @@ public class Codegen
             Left = MOpReg.Rbp,
             Right = MOpReg.Rsp,
         });
+        prologueInstructions.Add(new MInstr
+        {
+            Op = MOpcode.Sub,
+            Left = MOpReg.Rsp,
+            Right = new MOpImm { Value = frameSize },
+        });
         MBasicBlock prologue = new()
         {
             Instructions = prologueInstructions,
