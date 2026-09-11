@@ -61,16 +61,16 @@ public class Compiler
 
         if (_flags.DebugLexer)
         {
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
             TokensPrinter.Print(_tokens, _code);
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
         }
 
         if (_flags.DebugLexerPretty)
         {
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
             TokensPrinter.PrintPretty(_tokens, _code);
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
         }
 
         sw.Restart();
@@ -87,9 +87,9 @@ public class Compiler
         {
             if (_flags.DebugParser)
             {
-                Console.WriteLine("================================");
+                Console.WriteLine("================================================");
                 AstPrinter.Print(parserResult.CompilationUnit, _tokens, _code);
-                Console.WriteLine("================================");
+                Console.WriteLine("================================================");
             }
 
             _diag.Report();
@@ -107,9 +107,9 @@ public class Compiler
         // Print after sema to include sema info
         if (_flags.DebugParser)
         {
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
             AstPrinter.Print(parserResult.CompilationUnit, _tokens, _code);
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
         }
 
         if (_diag.HasErrors)
@@ -129,9 +129,9 @@ public class Compiler
 
         if (_flags.DebugIR)
         {
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
             IRPrinter.Print(irModule);
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
         }
 
         sw.Restart();
@@ -141,9 +141,9 @@ public class Compiler
 
         if (_flags.DebugMIR)
         {
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
             MIRPrinter.Print(mmodule, Console.Out);
-            Console.WriteLine("================================");
+            Console.WriteLine("================================================");
         }
 
         _diag.Report();
