@@ -123,6 +123,6 @@ public sealed class MFunction
 
 public sealed class MBasicBlock
 {
-    public required string Name { get; init; }
+    public required string? Name { get; init; }
     public required List<MInstr> Instructions { get; init; }
 }
