@@ -24,7 +24,7 @@ public readonly struct DiagnosticEntry
         {
             DiagnosticSeverity.Error => "error",
             DiagnosticSeverity.Warning => "warning",
-            _ => throw new NotImplementedException()
+            _ => throw new ArgumentOutOfRangeException(nameof(Severity))
         };
 
         return $"{sev} at {Line}:{Column}: {Message}";
