@@ -41,6 +41,7 @@ public sealed class FuncType : Type
     public Type ReturnType { get; }
 
     public override int Size => 8;
+    public override int Alignment => 8;
 
     public override string Name => $"({string.Join(", ", ParamTypes.Select(t => t.Name))}): {ReturnType.Name}";
 
