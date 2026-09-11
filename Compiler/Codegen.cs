@@ -115,6 +115,17 @@ public class Codegen
                         int allocatedOffset = allocatedOffsets[curAlloca];
                         int instrOffset = instrIdToOffset[instr.Id];
                         ++curAlloca;
+                        instructions.Add(new MInstr
+                        {
+                            Op = MOpcode.Lea,
+                            Left = MOpReg.Rax,
+                            Right = new MOpMem
+                            {
+                                Base = Reg.Rbx,
+                                Offset = allocatedOffset,
+                                Size = 8
+                            },
+                        });
                         break;
                     case IRInstructionBinary binary:
                         break;
