@@ -123,6 +123,7 @@ public class Codegen
             Instructions = epilogueInstructions,
             Name = $".L{irfunc.Name}_epi",
         };
+        basicBlocks.Add(epilogue);
 
 
         MFunction func = new()
