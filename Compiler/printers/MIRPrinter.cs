@@ -59,5 +59,22 @@ public class MIRPrinter
 
     private static void Print(MOperand op)
     {
+        switch (op)
+        {
+            case MOpImm mOpImm:
+                Console.Write(mOpImm.Value);
+                break;
+            case MOpLabel mOpLabel:
+                Console.Write(mOpLabel.Label);
+                break;
+            case MOpReg mOpReg:
+                Console.Write(mOpReg.Reg.GetName(mOpReg.Size));
+                break;
+            case MOpMem mOpMem:
+                Console.Write($"[{mOpMem.Base.GetName(mOpMem.Size)}{mOpMem.Offset}]");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(op));
+        }
     }
 }
