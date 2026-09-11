@@ -26,5 +26,14 @@ public class MIRPrinter
         {
             Console.WriteLine($"{bb.Name}:");
         }
+
+        foreach (MInstr instr in bb.Instructions)
+        {
+            Print(instr);
+        }
+    }
+
+    private static void Print(MInstr instr)
+    {
     }
 }
