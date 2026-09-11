@@ -101,6 +101,17 @@ public class Codegen
         };
         basicBlocks.Add(prologue);
 
+        // blocks
+        foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
+        {
+            List<MInstr> instructions = new();
+            MBasicBlock block = new()
+            {
+                Instructions = instructions,
+                Name = $".L{irfunc.Name}_{irbb.Name}",
+            };
+        }
+
         // frame epilogue
         List<MInstr> epilogueInstructions = new();
         epilogueInstructions.Add(new MInstr
