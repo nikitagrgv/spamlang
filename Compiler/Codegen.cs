@@ -47,7 +47,7 @@ public class Codegen
                     hasCalls = true;
                 }
 
-                if (instr is IRInstructionAlloca { } alloca)
+                if (instr is IRInstructionAlloca alloca)
                 {
                     curOffset += alloca.AllocatedType.Size;
                     curOffset = AlignTo(curOffset, alloca.AllocatedType.Alignment);
