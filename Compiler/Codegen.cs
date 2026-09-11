@@ -105,6 +105,12 @@ public class Codegen
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
             List<MInstr> instructions = new();
+
+            foreach (IRInstruction instr in irbb.Instructions)
+            {
+                
+            }
+
             MBasicBlock block = new()
             {
                 Instructions = instructions,
