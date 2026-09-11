@@ -118,6 +118,11 @@ public class Codegen
         {
             Op = MOpcode.Ret,
         });
+        MBasicBlock epilogue = new()
+        {
+            Instructions = epilogueInstructions,
+            Name = $".L{irfunc.Name}_epi",
+        };
 
 
         MFunction func = new()
