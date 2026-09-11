@@ -68,9 +68,9 @@ public sealed class MOpLabel : MOperand
 public sealed class MInstr
 {
     public required MOpcode Op { get; init; }
-    public required MOperand? Left { get; init; }
-    public required MOperand? Right { get; init; }
-    public required string? Comment { get; init; }
+    public MOperand? Left { get; init; } = null;
+    public MOperand? Right { get; init; } = null;
+    public string? Comment { get; init; } = null;
 }
 
 public sealed class MModule

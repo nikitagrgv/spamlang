@@ -70,6 +70,21 @@ public class Codegen
         frameSize = AlignTo(frameSize, 16); // ABI requirement
 
         // frame prologue
+        List<MInstr> prologueInstructions = new();
+        prologueInstructions.Add(new MInstr
+        {
+            Op = MOpcode.Push,
+            Left = new MOpReg()
+            {
+                Reg = Reg.Rbp,
+                Size = 8,
+            }
+        });
+        MBasicBlock prologue = new()
+        {
+            Instructions = prologueInstructions,
+            Name = "",
+        };
 
 
         MFunction func = new()
