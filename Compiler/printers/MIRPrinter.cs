@@ -25,7 +25,7 @@ public class MIRPrinter
 
     private void Print(MFunction func)
     {
-        _writer.WriteLine("# -------------------------------------");
+        _writer.WriteLine("# -------------");
         _writer.WriteLine($"{func.Name}:");
         foreach (MBasicBlock bb in func.BasicBlocks)
         {
