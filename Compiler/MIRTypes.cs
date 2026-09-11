@@ -21,7 +21,7 @@ public enum MOpcode
 
 public static class MOpcodes
 {
-    public static string ToString(this MOpcode opcode)
+    public static string AsmName(this MOpcode opcode)
     {
         return opcode switch
         {
