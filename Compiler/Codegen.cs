@@ -127,6 +127,17 @@ public class Codegen
                             },
                             Comment = alloca.PrintDefinition()
                         });
+                        instructions.Add(new MInstr
+                        {
+                            Op = MOpcode.Mov,
+                            Left = new MOpMem
+                            {
+                                Base = Reg.Rbp,
+                                Offset = instrOffset,
+                                Size = 8,
+                            },
+                            Right = MOpReg.Rax,
+                        });
                         break;
                     case IRInstructionBinary binary:
                         break;
