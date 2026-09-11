@@ -27,7 +27,7 @@ public class Codegen
 
         List<MBasicBlock> basicBlocks = new();
 
-        int curOffset = 4;
+        int curOffset = 0;
         List<int> paramsOffsets = new();
         foreach (IRParam param in irfunc.Params)
         {
