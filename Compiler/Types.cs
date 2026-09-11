@@ -4,6 +4,8 @@ namespace Compiler;
 public abstract class Type
 {
     public abstract string Name { get; }
+    public abstract int Size { get; }
+    // TODO: Alignment
 
     public override string ToString()
     {
@@ -14,19 +16,21 @@ public abstract class Type
 public sealed class BuiltinType : Type
 {
     public override string Name { get; }
+    public override int Size { get; }
 
-    private BuiltinType(string name)
+    private BuiltinType(string name, int size)
     {
         Name = name;
+        Size = size;
     }
 
-    public static readonly BuiltinType Void = new("void");
+    public static readonly BuiltinType Void = new("void", 0);
 
-    public static readonly BuiltinType Error = new("<error>");
+    public static readonly BuiltinType Error = new("<error>", 0);
 
-    public static readonly BuiltinType I32 = new("i32");
+    public static readonly BuiltinType I32 = new("i32", 4);
 
-    public static readonly BuiltinType Ptr = new("ptr");
+    public static readonly BuiltinType Ptr = new("ptr", 8);
 }
 
 public sealed class FuncType : Type
