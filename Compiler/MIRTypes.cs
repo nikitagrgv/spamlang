@@ -2,7 +2,7 @@ using System.Xml;
 
 namespace Compiler;
 
-enum MOpcode
+public enum MOpcode
 {
     Mov,
     Add,
