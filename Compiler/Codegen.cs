@@ -28,5 +28,6 @@ public class Codegen
             BasicBlocks = basicBlocks,
             Name = irfunc.Name
         };
+        return func;
     }
 }
