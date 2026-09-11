@@ -46,6 +46,15 @@ public sealed class MOpReg : MOperand
 {
     public required Reg Reg { get; init; }
     public required int Size { get; init; }
+
+    public static readonly MOpReg Rax = new() { Reg = Reg.Rax, Size = 8 };
+    public static readonly MOpReg Rcx = new() { Reg = Reg.Rcx, Size = 8 };
+    public static readonly MOpReg Rdx = new() { Reg = Reg.Rdx, Size = 8 };
+    public static readonly MOpReg Rbx = new() { Reg = Reg.Rbx, Size = 8 };
+    public static readonly MOpReg Rsp = new() { Reg = Reg.Rsp, Size = 8 };
+    public static readonly MOpReg Rbp = new() { Reg = Reg.Rbp, Size = 8 };
+    public static readonly MOpReg Rsi = new() { Reg = Reg.Rsi, Size = 8 };
+    public static readonly MOpReg Rdi = new() { Reg = Reg.Rdi, Size = 8 };
 }
 
 public sealed class MOpImm : MOperand
