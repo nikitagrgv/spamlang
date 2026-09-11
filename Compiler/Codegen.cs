@@ -116,14 +116,14 @@ public class Codegen
                         break;
                     case IRInstructionCall irInstructionCall:
                         break;
-                    case IRInstructionCast irInstructionCast:
-                        throw new NotImplementedException();
                     case IRInstructionLoad irInstructionLoad:
                         break;
                     case IRInstructionRet irInstructionRet:
                         break;
                     case IRInstructionStore irInstructionStore:
                         break;
+                    case IRInstructionCast irInstructionCast:
+                        throw new NotImplementedException();
                     default:
                         throw new ArgumentOutOfRangeException(nameof(instr));
                 }
