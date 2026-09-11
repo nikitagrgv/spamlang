@@ -13,7 +13,6 @@ public class IRPrinter
 
     private static void PrintIR(IRFunction func)
     {
-        int counter = -1;
         Console.Write($"fn @{func.Name}(");
         for (int i = 0; i < func.Params.Count; i++)
         {
@@ -23,7 +22,6 @@ public class IRPrinter
                 Console.Write(", ");
             }
 
-            param.Id = ++counter;
             Console.Write($"{param.Type} %{param.Id}");
         }
 
@@ -32,22 +30,17 @@ public class IRPrinter
         Console.WriteLine("{");
         foreach (IRBasicBlock bb in func.BasicBlocks)
         {
-            PrintIR(bb, ref counter);
+            PrintIR(bb);
         }
 
         Console.WriteLine("}");
     }
 
-    private static void PrintIR(IRBasicBlock bb, ref int counter)
+    private static void PrintIR(IRBasicBlock bb)
     {
         Console.WriteLine($"{bb.Name}:");
         foreach (IRInstruction inst in bb.Instructions)
         {
-            if (inst.Type != BuiltinType.Void)
-            {
-                inst.Id = ++counter;
-            }
-
             Console.WriteLine($"  {inst.PrintDefinition()}");
         }
     }

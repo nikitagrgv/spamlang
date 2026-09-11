@@ -23,6 +23,12 @@ public enum Reg
     R15,
 }
 
+public enum RegClass
+{
+    Int,
+    Float,
+}
+
 public static class Regs
 {
     private static readonly string[][] Names =

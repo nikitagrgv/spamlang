@@ -40,6 +40,9 @@ public class IRGen
         };
 
         _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
+
+        AllocateIds(module);
+
         return module;
     }
 
@@ -436,5 +439,29 @@ public class IRGen
         }
 
         return null;
+    }
+
+    private void AllocateIds(IRModule module)
+    {
+        foreach (IRFunction func in module.Functions)
+        {
+            int cur = 0;
+            for (int i = 0; i < func.Params.Count; i++)
+            {
+                IRParam param = func.Params[i];
+                param.Id = ++cur;
+            }
+
+            foreach (IRBasicBlock bb in func.BasicBlocks)
+            {
+                foreach (IRInstruction inst in bb.Instructions)
+                {
+                    if (inst.Type != BuiltinType.Void)
+                    {
+                        inst.Id = ++cur;
+                    }
+                }
+            }
+        }
     }
 }
