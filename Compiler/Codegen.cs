@@ -112,7 +112,8 @@ public class Codegen
                 switch (instr)
                 {
                     case IRInstructionAlloca alloca:
-                        int offset = allocatedOffsets[curAlloca];
+                        int allocatedOffset = allocatedOffsets[curAlloca];
+                        int instrOffset = instrIdToOffset[instr.Id];
                         ++curAlloca;
                         break;
                     case IRInstructionBinary binary:
