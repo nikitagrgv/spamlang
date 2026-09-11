@@ -49,6 +49,7 @@ public sealed class MOpReg : MOperand
 
     public string Name => Reg.GetName(Size);
 
+    // TODO: Shittttt
     public static readonly MOpReg Rax = new() { Reg = Reg.Rax, Size = 8 };
     public static readonly MOpReg Rcx = new() { Reg = Reg.Rcx, Size = 8 };
     public static readonly MOpReg Rdx = new() { Reg = Reg.Rdx, Size = 8 };
