@@ -7,13 +7,18 @@ public enum MOpcode
     Mov,
     Add,
     Sub,
-    Lea,
-    Push,
-    Pop,
-    Call,
-    Ret,
+
     Dec,
     Inc,
+
+    Lea,
+
+
+    Push,
+    Pop,
+
+    Call,
+    Ret,
 }
 
 public abstract class MOperand;
