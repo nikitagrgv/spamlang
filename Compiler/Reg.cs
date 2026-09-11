@@ -49,14 +49,26 @@ public static class Regs
     {
         int index = size switch
         {
-            64 => 0,
-            32 => 1,
-            16 => 2,
-            8 => 3,
+            8 => 0,
+            4 => 1,
+            2 => 2,
+            1 => 3,
             _ => throw new UnreachableException()
         };
 
         string name = Names[(int)reg][index];
         return name;
+    }
+
+    public static string MemPrefix(int size)
+    {
+        return size switch
+        {
+            8 => "qword ptr",
+            4 => "dword ptr",
+            2 => "word ptr",
+            1 => "byte ptr",
+            _ => throw new UnreachableException()
+        };
     }
 }
