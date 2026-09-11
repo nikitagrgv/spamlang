@@ -6,8 +6,10 @@ public class Codegen
     {
         List<MFunction> functions = new();
 
-        foreach (IRFunction func in irmodule.Functions)
+        foreach (IRFunction irfunc in irmodule.Functions)
         {
+            MFunction func = GenFunction(irfunc);
+            functions.Add(func);
         }
 
         MModule module = new()
@@ -19,5 +21,12 @@ public class Codegen
 
     public MFunction GenFunction(IRFunction irfunc)
     {
+        List<MBasicBlock> basicBlocks = new();
+
+        MFunction func = new()
+        {
+            BasicBlocks = basicBlocks,
+            Name = irfunc.Name
+        };
     }
 }
