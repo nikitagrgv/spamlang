@@ -12,6 +12,7 @@ public class Compiler
         public bool DebugParser = false;
         public bool DebugSema = false; // TODO: Unused, remove?
         public bool DebugIR = false;
+        public bool DebugMIR = false;
         public bool DebugTimer = false;
     }
 
@@ -135,8 +136,15 @@ public class Compiler
 
         sw.Restart();
         Codegen codegen = new();
-        codegen.Run(irModule);
+        MModule mmodule = codegen.Run(irModule);
         TimeSpan dtCodeGen = sw.Elapsed;
+
+        if (_flags.DebugMIR)
+        {
+            Console.WriteLine("================================");
+            MIRPrinter.Print(mmodule);
+            Console.WriteLine("================================");
+        }
 
         _diag.Report();
 
