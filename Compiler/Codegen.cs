@@ -52,6 +52,34 @@ public class Codegen
             }
         }
 
+        // TODO: Shitty, make list
+        Dictionary<int, int> instrIdToOffset = new();
+        foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
+        {
+            foreach (IRInstruction instr in irbb.Instructions)
+            {
+                switch (instr)
+                {
+                    case IRInstructionAlloca irInstructionAlloca:
+                        break;
+                    case IRInstructionBinary irInstructionBinary:
+                        break;
+                    case IRInstructionCall irInstructionCall:
+                        break;
+                    case IRInstructionCast irInstructionCast:
+                        break;
+                    case IRInstructionLoad irInstructionLoad:
+                        break;
+                    case IRInstructionRet irInstructionRet:
+                        break;
+                    case IRInstructionStore irInstructionStore:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(instr));
+                }
+            }
+        }
+
         // frame prologue
 
 
