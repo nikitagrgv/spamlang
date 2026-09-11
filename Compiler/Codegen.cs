@@ -37,18 +37,22 @@ public class Codegen
         // Allocate space for alloca instructions
         List<MBasicBlock> basicBlocks = new();
         List<int> allocatedOffsets = new();
+        bool hasCalls = false;
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
             foreach (IRInstruction instr in irbb.Instructions)
             {
-                if (instr is not IRInstructionAlloca { } alloca)
+                if (!hasCalls && instr is IRInstructionCall)
                 {
-                    continue;
+                    hasCalls = true;
                 }
 
-                curOffset += alloca.AllocatedType.Size;
-                curOffset = AlignTo(curOffset, alloca.AllocatedType.Alignment);
-                allocatedOffsets.Add(curOffset);
+                if (instr is IRInstructionAlloca { } alloca)
+                {
+                    curOffset += alloca.AllocatedType.Size;
+                    curOffset = AlignTo(curOffset, alloca.AllocatedType.Alignment);
+                    allocatedOffsets.Add(curOffset);
+                }
             }
         }
 
