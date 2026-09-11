@@ -74,25 +74,13 @@ public class Codegen
         prologueInstructions.Add(new MInstr
         {
             Op = MOpcode.Push,
-            Left = new MOpReg
-            {
-                Reg = Reg.Rbp,
-                Size = 8,
-            }
+            Left = MOpReg.Rbp,
         });
         prologueInstructions.Add(new MInstr
         {
             Op = MOpcode.Mov,
-            Left = new MOpReg
-            {
-                Reg = Reg.Rbp,
-                Size = 8,
-            },
-            Right = new MOpReg
-            {
-                Reg = Reg.Rsp,
-                Size = 8,
-            }
+            Left = MOpReg.Rbp,
+            Right = MOpReg.Rsp,
         });
         MBasicBlock prologue = new()
         {
