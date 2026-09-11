@@ -5,7 +5,7 @@ public abstract class Type
 {
     public abstract string Name { get; }
     public abstract int Size { get; }
-    // TODO: Alignment
+    public abstract int Alignment { get; }
 
     public override string ToString()
     {
@@ -17,20 +17,22 @@ public sealed class BuiltinType : Type
 {
     public override string Name { get; }
     public override int Size { get; }
+    public override int Alignment { get; }
 
-    private BuiltinType(string name, int size)
+    private BuiltinType(string name, int size, int alignment)
     {
         Name = name;
         Size = size;
+        Alignment = alignment;
     }
 
-    public static readonly BuiltinType Void = new("void", 0);
+    public static readonly BuiltinType Void = new("void", 0, 1);
 
-    public static readonly BuiltinType Error = new("<error>", 0);
+    public static readonly BuiltinType Error = new("<error>", 0, 1);
 
-    public static readonly BuiltinType I32 = new("i32", 4);
+    public static readonly BuiltinType I32 = new("i32", 4, 4);
 
-    public static readonly BuiltinType Ptr = new("ptr", 8);
+    public static readonly BuiltinType Ptr = new("ptr", 8, 8);
 }
 
 public sealed class FuncType : Type

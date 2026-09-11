@@ -32,6 +32,7 @@ public class Codegen
         foreach (IRParam param in irfunc.Params)
         {
             curOffset += param.Type.Size;
+            curOffset = AlignTo(curOffset, param.Type.)
             paramsOffsets.Add(curOffset);
         }
 
@@ -41,5 +42,10 @@ public class Codegen
             Name = irfunc.Name
         };
         return func;
+    }
+
+    private int AlignTo(int offset, int alignment)
+    {
+        return (offset + alignment - 1) & ~(alignment - 1);
     }
 }
