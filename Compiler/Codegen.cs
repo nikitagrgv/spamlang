@@ -36,7 +36,7 @@ public class Codegen
 
         // Collect alloca-s
         List<MBasicBlock> basicBlocks = new();
-        List<int> allocasOffsets = new();
+        List<int> allocatedOffsets = new();
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
             foreach (IRInstruction instr in irbb.Instructions)
@@ -45,6 +45,10 @@ public class Codegen
                 {
                     continue;
                 }
+
+                curOffset += alloca.AllocatedType.Size;
+                curOffset = AlignTo(curOffset, alloca.AllocatedType.Alignment);
+                allocatedOffsets.Add(curOffset);
             }
         }
 
