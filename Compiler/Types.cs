@@ -38,6 +38,8 @@ public sealed class FuncType : Type
     public IReadOnlyList<Type> ParamTypes { get; }
     public Type ReturnType { get; }
 
+    public override int Size => 8;
+
     public override string Name => $"({string.Join(", ", ParamTypes.Select(t => t.Name))}): {ReturnType.Name}";
 
     private FuncType(Type returnType, IReadOnlyList<Type> paramTypes)
