@@ -80,6 +80,20 @@ public class Codegen
                 Size = 8,
             }
         });
+        prologueInstructions.Add(new MInstr
+        {
+            Op = MOpcode.Mov,
+            Left = new MOpReg
+            {
+                Reg = Reg.Rbp,
+                Size = 8,
+            },
+            Right = new MOpReg
+            {
+                Reg = Reg.Rsp,
+                Size = 8,
+            }
+        });
         MBasicBlock prologue = new()
         {
             Instructions = prologueInstructions,
