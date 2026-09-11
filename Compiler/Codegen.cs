@@ -31,7 +31,7 @@ public class Codegen
         foreach (IRParam param in irfunc.Params)
         {
             paramsOffsets.Add(curOffset);
-            curOffset += param.Type;
+            curOffset += param.Type.Size;
         }
 
         MFunction func = new()
