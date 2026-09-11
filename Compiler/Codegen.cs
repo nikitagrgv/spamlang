@@ -34,7 +34,7 @@ public class Codegen
             paramsOffsets.Add(curOffset);
         }
 
-        // Collect alloca-s
+        // Allocate space for alloca instructions
         List<MBasicBlock> basicBlocks = new();
         List<int> allocatedOffsets = new();
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
@@ -50,6 +50,18 @@ public class Codegen
                 curOffset = AlignTo(curOffset, alloca.AllocatedType.Alignment);
                 allocatedOffsets.Add(curOffset);
             }
+        }
+
+        Console.WriteLine($"{irfunc.Name}");
+        Console.WriteLine("PARAMS:");
+        foreach (int paramsOffset in paramsOffsets)
+        {
+            Console.WriteLine($"  {paramsOffset}");
+        }
+        Console.WriteLine("ALLOCAS:");
+        foreach (int allocatedOffset in allocatedOffsets)
+        {
+            Console.WriteLine($"  {allocatedOffset}");
         }
 
 
