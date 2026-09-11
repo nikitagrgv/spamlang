@@ -2,14 +2,14 @@ namespace Compiler.printers;
 
 public class MIRPrinter
 {
-    private readonly StringWriter _writer;
+    private readonly TextWriter _writer;
 
-    private MIRPrinter(StringWriter writer)
+    private MIRPrinter(TextWriter writer)
     {
         _writer = writer;
     }
 
-    public static void Print(MModule module, StringWriter writer)
+    public static void Print(MModule module, TextWriter writer)
     {
         MIRPrinter printer = new(writer);
         printer.Print(module);

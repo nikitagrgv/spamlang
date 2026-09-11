@@ -142,7 +142,7 @@ public class Compiler
         if (_flags.DebugMIR)
         {
             Console.WriteLine("================================");
-            MIRPrinter.Print(mmodule);
+            MIRPrinter.Print(mmodule, Console.Out);
             Console.WriteLine("================================");
         }
 
