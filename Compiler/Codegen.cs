@@ -19,7 +19,7 @@ public class Codegen
         return module;
     }
 
-    public MFunction GenFunction(IRFunction irfunc)
+    private MFunction GenFunction(IRFunction irfunc)
     {
         List<MBasicBlock> basicBlocks = new();
 
