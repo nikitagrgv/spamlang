@@ -4,7 +4,7 @@ public class MIRPrinter
 {
     private StringWriter _writer;
 
-    public MIRPrinter(StringWriter writer)
+    private MIRPrinter(StringWriter writer)
     {
         _writer = writer;
     }
