@@ -40,6 +40,10 @@ public class Codegen
             foreach (IRInstruction instr in irbb.Instructions)
             {
                 if (instr is not IRInstructionAlloca { } alloca)
+                {
+                    continue;
+                }
+                
             }
         }
 
