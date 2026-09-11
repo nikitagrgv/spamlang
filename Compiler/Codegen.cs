@@ -32,7 +32,7 @@ public class Codegen
         foreach (IRParam param in irfunc.Params)
         {
             curOffset += param.Type.Size;
-            curOffset = AlignTo(curOffset, param.Type.)
+            curOffset = AlignTo(curOffset, param.Type.Alignment);
             paramsOffsets.Add(curOffset);
         }
 
