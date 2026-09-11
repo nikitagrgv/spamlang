@@ -2,6 +2,20 @@ using System.Xml;
 
 namespace Compiler;
 
+enum MOpcode
+{
+    Mov,
+    Add,
+    Sub,
+    Lea,
+    Push,
+    Pop,
+    Call,
+    Ret,
+    Dec,
+    Inc,
+}
+
 public abstract class MOperand;
 
 public sealed class MOpReg : MOperand
@@ -27,3 +41,9 @@ public sealed class MOpLabel : MOperand
     public required string Label { get; init; }
 }
 
+public sealed class MInstr
+{
+    public required MOpcode Op { get; init; }
+    public required MOperand? Left { get; init; }
+    public required MOperand? Right { get; init; }
+}
