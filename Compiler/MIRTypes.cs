@@ -51,3 +51,20 @@ public sealed class MInstr
     public required MOperand? Right { get; init; }
     public required string? Comment { get; init; }
 }
+
+public sealed class MModule
+{
+    public required List<MFunction> Functions { get; init; }
+}
+
+public sealed class MFunction
+{
+    public required string Name { get; init; }
+    public required List<MBasicBlock> BasicBlocks { get; init; }
+}
+
+public sealed class MBasicBlock
+{
+    public required string Name { get; init; }
+    public required List<MInstr> Instructions { get; init; }
+}
