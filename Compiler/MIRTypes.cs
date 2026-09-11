@@ -51,4 +51,5 @@ public sealed class MInstr
     public required MOpcode Op { get; init; }
     public required MOperand? Left { get; init; }
     public required MOperand? Right { get; init; }
+    public required string? Comment { get; init; }
 }
