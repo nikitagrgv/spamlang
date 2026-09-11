@@ -108,7 +108,25 @@ public class Codegen
 
             foreach (IRInstruction instr in irbb.Instructions)
             {
-                
+                switch (instr)
+                {
+                    case IRInstructionAlloca irInstructionAlloca:
+                        break;
+                    case IRInstructionBinary irInstructionBinary:
+                        break;
+                    case IRInstructionCall irInstructionCall:
+                        break;
+                    case IRInstructionCast irInstructionCast:
+                        throw new NotImplementedException();
+                    case IRInstructionLoad irInstructionLoad:
+                        break;
+                    case IRInstructionRet irInstructionRet:
+                        break;
+                    case IRInstructionStore irInstructionStore:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(instr));
+                }
             }
 
             MBasicBlock block = new()
