@@ -24,8 +24,6 @@ public class Codegen
         // TODO: Reuse lists
         // TODO: Don't spill params on stack?
 
-        List<MBasicBlock> basicBlocks = new();
-
         int curOffset = 0;
         List<int> paramsOffsets = new();
         foreach (IRParam param in irfunc.Params)
@@ -34,6 +32,17 @@ public class Codegen
             curOffset = AlignTo(curOffset, param.Type.Alignment);
             paramsOffsets.Add(curOffset);
         }
+
+        // Collect allocates
+        List<MBasicBlock> basicBlocks = new();
+        foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
+        {
+            foreach (IRInstruction instr in irbb.Instructions)
+            {
+                
+            }
+        }
+
 
         MFunction func = new()
         {
