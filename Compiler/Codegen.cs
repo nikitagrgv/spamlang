@@ -99,7 +99,7 @@ public class Codegen
             Instructions = prologueInstructions,
             Name = "",
         };
-
+        basicBlocks.Add(prologue);
 
         MFunction func = new()
         {
