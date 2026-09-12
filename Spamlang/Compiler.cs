@@ -18,16 +18,18 @@ public class Compiler
     private readonly IFileSystem _fs;
     private readonly Flags _flags;
     private readonly string _clangPath;
+    private readonly string _buildPath;
 
     private readonly Diagnostic _diag = new();
     private string _code = "";
     private List<Token> _tokens = [];
 
-    public Compiler(IFileSystem fs, Flags flags, string clangPath)
+    public Compiler(IFileSystem fs, Flags flags, string clangPath, string buildPath)
     {
         _fs = fs;
         _flags = flags;
         _clangPath = clangPath;
+        _buildPath = buildPath;
     }
 
     public bool Compile(string file, string? output)

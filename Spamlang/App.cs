@@ -87,8 +87,19 @@ class App
         }
 
         Compiler.Flags flags = GetFlags(arguments);
-        Compiler compiler = new(fs, flags, clangPath);
+        string buildPath = MadeBuildDir();
+
+        Compiler compiler = new(fs, flags, clangPath, buildPath);
         bool ok = compiler.Compile(arguments.Files[0], arguments.Output);
+
         return ok ? 0 : 1;
+    }
+
+    static string MadeBuildDir()
+    {
+        string dirName = $"spamlang-{Environment.ProcessId}-{Guid.NewGuid():N}";
+        string dirPath = Path.Combine(Path.GetTempPath(), dirName);
+        Directory.CreateDirectory(dirPath);
+        return dirPath;
     }
 }
