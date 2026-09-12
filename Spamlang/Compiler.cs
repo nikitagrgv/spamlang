@@ -40,21 +40,21 @@ public class Compiler
         TimeSpan? dtIRGen = null;
         TimeSpan? dtCodeGen = null;
 
-        void ReportTime(string what, TimeSpan? dt)
-        {
-            if (!dt.HasValue)
-            {
-                return;
-            }
-
-            Console.WriteLine($"{what} Time: {dt.Value.Milliseconds}ms");
-        }
-
         void ReportTimes()
         {
             if (!_flags.DebugTimer)
             {
                 return;
+            }
+
+            void ReportTime(string what, TimeSpan? dt)
+            {
+                if (!dt.HasValue)
+                {
+                    return;
+                }
+
+                Console.WriteLine($"{what} Time: {dt.Value.Milliseconds}ms");
             }
 
             ReportTime("Read", readTime);
