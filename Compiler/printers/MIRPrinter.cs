@@ -90,7 +90,12 @@ public class MIRPrinter
                 _writer.Write(mOpReg.Reg.GetName(mOpReg.Size));
                 break;
             case MOpMem mOpMem:
-                string prefix = Regs.MemPrefix(mOpMem.Size);
+                string? prefix = null;
+                if (mOpMem.Size != null)
+                {
+                    prefix = Regs.MemPrefix(mOpMem.Size.Value) + " ";
+                }
+
                 string name = mOpMem.Base.GetName(8);
                 int offset = mOpMem.Offset;
                 _writer.Write($"{prefix} [{name}{offset:+#;-#;+0}]");

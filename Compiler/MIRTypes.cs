@@ -63,7 +63,7 @@ public sealed class MOpMem : MOperand
 {
     public required Reg Base { get; init; }
     public required int Offset { get; init; }
-    public required int Size { get; init; }
+    public required int? Size { get; init; }
 }
 
 public sealed class MOpLabel : MOperand
