@@ -86,13 +86,12 @@ class App
             clangPath = "clang";
         }
 
+        string buildPath = MadeBuildDir();
+        Compiler.Flags flags = GetFlags(arguments);
+        Compiler compiler = new(fs, flags, clangPath, buildPath);
+
         try
         {
-            string buildPath = MadeBuildDir();
-            Compiler.Flags flags = GetFlags(arguments);
-
-            Compiler compiler = new(fs, flags, clangPath, buildPath);
-
             bool ok = compiler.Compile(arguments.Files[0], arguments.Output);
             Directory.Delete(buildPath, recursive: true);
             return ok ? 0 : 1;
