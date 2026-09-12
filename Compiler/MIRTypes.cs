@@ -50,41 +50,6 @@ public sealed class MOpReg : MOperand
     public required int Size { get; init; }
 
     public string Name => Reg.GetName(Size);
-
-    // TODO: Shittttt
-    public static readonly MOpReg Rax = new() { Reg = Reg.Rax, Size = 8 };
-    public static readonly MOpReg Rcx = new() { Reg = Reg.Rcx, Size = 8 };
-    public static readonly MOpReg Rdx = new() { Reg = Reg.Rdx, Size = 8 };
-    public static readonly MOpReg Rbx = new() { Reg = Reg.Rbx, Size = 8 };
-    public static readonly MOpReg Rsp = new() { Reg = Reg.Rsp, Size = 8 };
-    public static readonly MOpReg Rbp = new() { Reg = Reg.Rbp, Size = 8 };
-    public static readonly MOpReg Rsi = new() { Reg = Reg.Rsi, Size = 8 };
-    public static readonly MOpReg Rdi = new() { Reg = Reg.Rdi, Size = 8 };
-    public static readonly MOpReg R8 = new() { Reg = Reg.R8, Size = 8 };
-    public static readonly MOpReg R9 = new() { Reg = Reg.R9, Size = 8 };
-    public static readonly MOpReg R10 = new() { Reg = Reg.R10, Size = 8 };
-    public static readonly MOpReg R11 = new() { Reg = Reg.R11, Size = 8 };
-    public static readonly MOpReg R12 = new() { Reg = Reg.R12, Size = 8 };
-    public static readonly MOpReg R13 = new() { Reg = Reg.R13, Size = 8 };
-    public static readonly MOpReg R14 = new() { Reg = Reg.R14, Size = 8 };
-    public static readonly MOpReg R15 = new() { Reg = Reg.R15, Size = 8 };
-
-    public static readonly MOpReg Eax = new() { Reg = Reg.Rax, Size = 4 };
-    public static readonly MOpReg Ecx = new() { Reg = Reg.Rcx, Size = 4 };
-    public static readonly MOpReg Edx = new() { Reg = Reg.Rdx, Size = 4 };
-    public static readonly MOpReg Ebx = new() { Reg = Reg.Rbx, Size = 4 };
-    public static readonly MOpReg Esp = new() { Reg = Reg.Rsp, Size = 4 };
-    public static readonly MOpReg Ebp = new() { Reg = Reg.Rbp, Size = 4 };
-    public static readonly MOpReg Esi = new() { Reg = Reg.Rsi, Size = 4 };
-    public static readonly MOpReg Edi = new() { Reg = Reg.Rdi, Size = 4 };
-    public static readonly MOpReg R8d = new() { Reg = Reg.R8, Size = 4 };
-    public static readonly MOpReg R9d = new() { Reg = Reg.R9, Size = 4 };
-    public static readonly MOpReg R10d = new() { Reg = Reg.R10, Size = 4 };
-    public static readonly MOpReg R11d = new() { Reg = Reg.R11, Size = 4 };
-    public static readonly MOpReg R12d = new() { Reg = Reg.R12, Size = 4 };
-    public static readonly MOpReg R13d = new() { Reg = Reg.R13, Size = 4 };
-    public static readonly MOpReg R14d = new() { Reg = Reg.R14, Size = 4 };
-    public static readonly MOpReg R15d = new() { Reg = Reg.R15, Size = 4 };
 }
 
 public sealed class MOpImm : MOperand

@@ -83,23 +83,26 @@ public class Codegen
             frameSize = AlignTo(frameSize, 16); // ABI requirement
         }
 
+        MOpReg rbp = new() { Reg = Reg.Rbp, Size = 8 };
+        MOpReg rsp = new() { Reg = Reg.Rsp, Size = 8 };
+
         // frame prologue
         List<MInstr> prologueInstructions = new();
         prologueInstructions.Add(new MInstr
         {
             Op = MOpcode.Push,
-            Left = MOpReg.Rbp,
+            Left = rbp,
         });
         prologueInstructions.Add(new MInstr
         {
             Op = MOpcode.Mov,
-            Left = MOpReg.Rbp,
-            Right = MOpReg.Rsp,
+            Left = rbp,
+            Right = rsp,
         });
         prologueInstructions.Add(new MInstr
         {
             Op = MOpcode.Sub,
-            Left = MOpReg.Rsp,
+            Left = rsp,
             Right = new MOpImm { Value = frameSize },
         });
 
@@ -317,13 +320,13 @@ public class Codegen
         epilogueInstructions.Add(new MInstr
         {
             Op = MOpcode.Mov,
-            Left = MOpReg.Rsp,
-            Right = MOpReg.Rbp,
+            Left = rsp,
+            Right = rbp,
         });
         epilogueInstructions.Add(new MInstr
         {
             Op = MOpcode.Pop,
-            Left = MOpReg.Rbp,
+            Left = rbp,
         });
         epilogueInstructions.Add(new MInstr
         {
