@@ -6,7 +6,7 @@ public enum MOpcode
     Add,
     Sub,
 
-    IMul,
+    Imul,
 
     Dec,
     Inc,
@@ -30,6 +30,7 @@ public static class MOpcodes
             MOpcode.Mov => "mov",
             MOpcode.Add => "add",
             MOpcode.Sub => "sub",
+            MOpcode.IMul => "imul",
             MOpcode.Dec => "dec",
             MOpcode.Inc => "inc",
             MOpcode.Lea => "lea",
