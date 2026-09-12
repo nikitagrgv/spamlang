@@ -236,7 +236,7 @@ public class Codegen
                                     {
                                         Base = Reg.Rbp,
                                         Offset = -leftOffset,
-                                        Size = 8,
+                                        Size = typeSize,
                                     },
                                 });
                                 instructions.Add(new MInstr
@@ -247,7 +247,7 @@ public class Codegen
                                     {
                                         Base = Reg.Rbp,
                                         Offset = -rightOffset,
-                                        Size = 8,
+                                        Size = typeSize,
                                     },
                                 });
                                 MOpcode opcode = binary.Op == IRBinaryOp.Add ? MOpcode.Add : MOpcode.Sub;
