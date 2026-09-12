@@ -369,6 +369,11 @@ public class Codegen
                         // TODO: Correct ABI! SRet (in IR maybe)
                         if (call.Type.Size > 0)
                         {
+                            if (call.Type.Size > 8 || !IsPowerOrTwo(call.Type.Size))
+                            {
+                                throw new NotImplementedException();
+                            }
+
                             int instrOffset = instrIdToOffset[call.Id];
                             instructions.Add(new MInstr
                             {
@@ -434,6 +439,11 @@ public class Codegen
             Name = irfunc.Name,
         };
         return func;
+    }
+
+    private static bool IsPowerOrTwo(int number)
+    {
+        return number > 0 && (number & ~(number - 1)) == 0;
     }
 
     private static int AlignTo(int offset, int alignment)
