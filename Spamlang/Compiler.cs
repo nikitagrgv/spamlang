@@ -32,10 +32,12 @@ public class Compiler
         _buildPath = buildPath;
     }
 
-    public bool Compile(string file, string? output)
+    public bool Compile(string file, string output, bool toExe)
     {
+        // TODO: Linux!
+        string ext = toExe ? ".exe" : ".o";
         string fullPathFile = _fs.ResolveToFullPath(file);
-        string fullPathOutput = _fs.ResolveToFullPath(output ?? "output.o");
+        string fullPathOutput = _fs.ResolveToFullPath(output ?? "out" + ext);
 
         Console.WriteLine($"Compiling {fullPathFile} to {fullPathOutput}");
 
