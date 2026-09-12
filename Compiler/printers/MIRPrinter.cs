@@ -105,15 +105,30 @@ public class MIRPrinter
                 Write(mOpReg.Reg.GetName(mOpReg.Size));
                 break;
             case MOpMem mOpMem:
+                string name = mOpMem.Base.GetName(8);
+                int? offset = mOpMem.Offset;
                 string? prefix = null;
                 if (mOpMem.Size != null && mOpMem.Size.Value != 8)
                 {
                     prefix = Regs.MemPrefix(mOpMem.Size.Value) + " ";
                 }
 
-                string name = mOpMem.Base.GetName(8);
-                int offset = mOpMem.Offset;
-                Write($"{prefix}[{name}{offset:+#;-#;+0}]");
+                if (prefix != null)
+                {
+                    Write(prefix);
+                }
+
+                Write("[");
+
+                Write(name);
+
+                if (offset != null)
+                {
+                    Write($"{offset:+#;-#;+0}");
+                }
+
+                Write("]");
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(op));

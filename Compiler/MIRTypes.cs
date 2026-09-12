@@ -19,7 +19,7 @@ public enum MOpcode
 
     Call,
     Ret,
-    
+
     Jmp,
 }
 
@@ -66,7 +66,7 @@ public sealed class MOpImm : MOperand
 public sealed class MOpMem : MOperand
 {
     public required Reg Base { get; init; }
-    public required int Offset { get; init; }
+    public required int? Offset { get; init; }
     public required int? Size { get; init; }
 }
 
