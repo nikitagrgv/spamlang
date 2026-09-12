@@ -266,12 +266,12 @@ public class Codegen
                             case IRBinaryOp.Add:
                             case IRBinaryOp.Sub:
                             {
-                                MOpReg left = typedRax;
-                                MOpReg right = typedRcx;
+                                MOpReg leftReg = typedRax;
+                                MOpReg rightReg = typedRcx;
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = left,
+                                    Left = leftReg,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
@@ -282,7 +282,7 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = right,
+                                    Left = rightReg,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
@@ -293,13 +293,13 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = binary.Op == IRBinaryOp.Add ? MOpcode.Add : MOpcode.Sub,
-                                    Left = left,
-                                    Right = right,
+                                    Left = leftReg,
+                                    Right = rightReg,
                                 });
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = left,
+                                    Left = leftReg,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
