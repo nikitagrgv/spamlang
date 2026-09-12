@@ -6,6 +6,8 @@ public enum MOpcode
     Add,
     Sub,
 
+    IMul,
+
     Dec,
     Inc,
 
