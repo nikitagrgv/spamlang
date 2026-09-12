@@ -132,7 +132,6 @@ public class Codegen
                         Size = typeSize
                     };
                     return op;
-                    break;
                 }
                 case IRParam v:
                 {
