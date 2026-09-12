@@ -28,7 +28,7 @@ public class Compiler
         _buildPath = buildPath;
     }
 
-    private bool Compile(string file, string output, bool compileOnly)
+    public bool Compile(string file, string output, bool compileOnly)
     {
         Stopwatch sw = new();
 
