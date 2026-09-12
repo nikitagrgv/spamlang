@@ -483,7 +483,20 @@ public class Codegen
                     }
                     case IRInstructionLoad load:
                     {
+                        // [a] <- [b]
+                        // Load dst address into RCX.
                         int instrOffset = instrIdToOffset[load.Id];
+                        instructions.Add(new MInstr
+                        {
+                            Op = MOpcode.Mov,
+                            Left = new MOpReg
+                            {
+                                Reg = Reg.Rcx,
+                                Size = load.Address.Type.Size,
+                            },
+                            Right = ToOperand(load.Address),
+                            Comment = instr.PrintDefinition(),
+                        });
                         break;
                     }
                     case IRInstructionCast cast:
