@@ -24,7 +24,7 @@ public class Codegen
         // TODO: Reuse lists
         // TODO: Don't spill params on stack?
 
-        // Spill params to stack
+        // Allocate spilled params to stack
         int curOffset = 0;
         List<int> paramsOffsets = new();
         foreach (IRParam param in irfunc.Params)
@@ -100,6 +100,33 @@ public class Codegen
             Left = MOpReg.Rsp,
             Right = new MOpImm { Value = frameSize },
         });
+
+        // Spill params to stack
+        // TODO: Full ABI for params! stack/floats/structs
+        MOperand[] paramsOperands =
+        [
+            new MOpReg()
+        ];
+        foreach (IRParam param in irfunc.Params)
+        {
+            int offset = paramsOffsets[param.Index];
+            int size = param.Type.Size;
+            prologueInstructions.Add(new MInstr
+            {
+                Op = MOpcode.Mov,
+                Left = new MOpMem
+                {
+                    Base = Reg.Rbp,
+                    Offset = offset,
+                    Size = size
+                },
+                Right = new MOpReg
+                {
+                    Reg = 
+                }
+            });
+        }
+
         MBasicBlock prologue = new()
         {
             Instructions = prologueInstructions,
