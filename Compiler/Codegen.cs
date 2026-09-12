@@ -391,13 +391,10 @@ public class Codegen
                         break;
                     }
                     case IRInstructionLoad load:
-                        throw new NotImplementedException();
                         break;
                     case IRInstructionRet ret:
-                        throw new NotImplementedException();
                         break;
                     case IRInstructionStore store:
-                        throw new NotImplementedException();
                         break;
                     case IRInstructionCast cast:
                         throw new NotImplementedException();
@@ -447,9 +444,9 @@ public class Codegen
         return func;
     }
 
-    private static bool IsPowerOrTwo(int number)
+    private static bool IsPowerOrTwo(int n)
     {
-        return number > 0 && (number & ~(number - 1)) == 0;
+        return n > 0 && (n & (n - 1)) == 0;
     }
 
     private static int AlignTo(int offset, int alignment)
