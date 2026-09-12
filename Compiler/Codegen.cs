@@ -454,6 +454,7 @@ public class Codegen
                                 Size = store.Address.Type.Size,
                             },
                             Right = ToOperand(store.Address),
+                            Comment = instr.PrintDefinition(),
                         });
                         // Load value itself in rcx
                         instructions.Add(new MInstr
@@ -468,6 +469,18 @@ public class Codegen
                         });
                         instructions.Add(new MInstr
                         {
+                            Op = MOpcode.Mov,
+                            Left = new MOpMem
+                            {
+                                Base = Reg.Rcx,
+                                Offset = 0,
+                                Size = storedType.Size,
+                            },
+                            Right = new MOpReg
+                            {
+                                Reg = Reg.Rax,
+                                Size = storedType.Size,
+                            },
                         });
                         break;
                     case IRInstructionLoad load:
