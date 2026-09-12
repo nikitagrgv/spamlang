@@ -86,9 +86,8 @@ class App
             clangPath = "clang";
         }
 
-        Compiler.Flags flags = GetFlags(arguments);
         string buildPath = MadeBuildDir();
-
+        Compiler.Flags flags = GetFlags(arguments);
         Compiler compiler = new(fs, flags, clangPath, buildPath);
 
         try
