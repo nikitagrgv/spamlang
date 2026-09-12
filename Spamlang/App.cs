@@ -81,8 +81,13 @@ class App
             clangPath = Environment.GetEnvironmentVariable("SPAM_CLANG_PATH");
         }
 
+        if (string.IsNullOrEmpty(clangPath))
+        {
+            clangPath = "clang";
+        }
+
         Compiler.Flags flags = GetFlags(arguments);
-        Compiler compiler = new(fs, flags);
+        Compiler compiler = new(fs, flags, clangPath);
         bool ok = compiler.Compile(arguments.Files[0], arguments.Output);
         return ok ? 0 : 1;
     }
