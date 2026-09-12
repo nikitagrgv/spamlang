@@ -118,20 +118,22 @@ public class Codegen
                 throw new NotImplementedException();
             }
 
-            int offset = paramsOffsets[param.Index];
-            int size = param.Type.Size;
+            Reg paramReg = paramsRegs[param.Index];
+            int paramOffset = paramsOffsets[param.Index];
+            int typeSize = param.Type.Size;
             prologueInstructions.Add(new MInstr
             {
                 Op = MOpcode.Mov,
                 Left = new MOpMem
                 {
                     Base = Reg.Rbp,
-                    Offset = offset,
-                    Size = size
+                    Offset = paramOffset,
+                    Size = typeSize
                 },
                 Right = new MOpReg
                 {
-                    Reg = 
+                    Reg = paramReg,
+                    Size = typeSize
                 }
             });
         }
