@@ -98,7 +98,7 @@ public class MIRPrinter
 
                 string name = mOpMem.Base.GetName(8);
                 int offset = mOpMem.Offset;
-                _writer.Write($"{prefix} [{name}{offset:+#;-#;+0}]");
+                _writer.Write($"{prefix}[{name}{offset:+#;-#;+0}]");
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(op));
