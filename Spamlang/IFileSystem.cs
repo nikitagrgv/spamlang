@@ -10,4 +10,6 @@ public interface IFileSystem
     void CreateDir(string path);
     void RemoveDir(string path);
     string CreateTempDir(string name);
+
+    void CopyFile(string from, string too);
 }

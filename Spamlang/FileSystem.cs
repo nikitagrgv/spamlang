@@ -45,4 +45,9 @@ public class FileSystem : IFileSystem
         CreateDir(dirPath);
         return dirPath;
     }
+
+    public void CopyFile(string from, string too)
+    {
+        File.Copy(from, too);
+    }
 }

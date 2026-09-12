@@ -126,6 +126,7 @@ public class Compiler
 
         if (compileOnly)
         {
+            _fs.CopyFile(objPath, fullPathOutput);
             return true;
         }
 
