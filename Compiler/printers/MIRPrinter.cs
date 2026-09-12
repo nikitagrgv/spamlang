@@ -20,6 +20,7 @@ public class MIRPrinter
 
     private void Print(MModule module)
     {
+        _curPos = 0;
         foreach (MFunction func in module.Functions)
         {
             Print(func);
