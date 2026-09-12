@@ -111,23 +111,23 @@ public class Codegen
         {
             switch (value)
             {
-                case IRConstantInt irConstantInt:
+                case IRConstantInt v:
                 {
-                    MOpImm op = new() { Value = irConstantInt.Value, };
+                    MOpImm op = new() { Value = v.Value, };
                     return op;
                 }
-                case IRFunction irFunction:
+                case IRFunction v:
                 {
                     break;
                 }
-                case IRInstruction irInstruction:
+                case IRInstruction v:
                 {
                     break;
                 }
-                case IRParam irParam:
+                case IRParam v:
                 {
-                    int paramOffset = paramsOffsets[irParam.Index];
-                    int typeSize = irParam.Type.Size;
+                    int paramOffset = paramsOffsets[v.Index];
+                    int typeSize = v.Type.Size;
                     MOpMem op = new()
                     {
                         Base = Reg.Rbp,
