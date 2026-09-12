@@ -118,6 +118,21 @@ public class Codegen
                 throw new NotImplementedException();
             }
 
+            RegClass regClass;
+            if (param.Type == BuiltinType.I32 || param.Type == BuiltinType.Ptr)
+            {
+                regClass = RegClass.Int;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+
+            if (regClass != RegClass.Int)
+            {
+                throw new NotImplementedException();
+            }
+
             Reg paramReg = paramsRegs[param.Index];
             int paramOffset = paramsOffsets[param.Index];
             int typeSize = param.Type.Size;
@@ -156,6 +171,7 @@ public class Codegen
                 switch (instr)
                 {
                     case IRInstructionAlloca alloca:
+                    {
                         int allocatedOffset = allocatedOffsets[curAlloca];
                         int instrOffset = instrIdToOffset[instr.Id];
                         ++curAlloca;
@@ -183,8 +199,18 @@ public class Codegen
                             Right = MOpReg.Rax,
                         });
                         break;
+                    }
                     case IRInstructionBinary binary:
+                    {
+                        int leftId = binary.Left.Id;
+                        int rightId = binary.Right.Id;
+                        int instrId = binary.Id;
+                        int leftOffset = instrIdToOffset[leftId];
+                        int rightOffset = instrIdToOffset[rightId];
+                        int instrOffset = instrIdToOffset[instrId];
+                        binary.Op
                         break;
+                    }
                     case IRInstructionCall call:
                         break;
                     case IRInstructionLoad load:
