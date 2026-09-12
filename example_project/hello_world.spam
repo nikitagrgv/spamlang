@@ -1,24 +1,30 @@
 fn main(): i32
 {
-    // some comment
-    let x: i32 = -1 - (-2 + 3) * -4 * 5 - 6 * -(-7);
-    {
-        let xxx: i32 = -5;
-        x = xxx + 1;
-    }
-    let y = spam(0xabc * x, spam(-2 + 3, x));
-    spam(5 + 1 * -4, -4 + y);
+    let a: i32 = 123 - 23;
+    
     noop();
-    let z: i32 = 0b111110101 / 2;
-    return x + y * z;
+    noop2(1,2,3);
+
+    let b: i32 = 456 + sum(a, a);
+    {
+        let c: i32 = 8 * 1000;
+        b = c;
+    }
+    let result: i32 = sum(a, b);
+    
+    return result;
 }
 
 fn noop()
 {
+}
+
+fn noop2(a: i32, b: i32, c: i32)
+{
     return;
 }
 
-fn spam(a: i32, b: i32): i32
+fn sum(a: i32, b: i32): i32
 {
-    return a + b + 1;
+    return a + b;
 }

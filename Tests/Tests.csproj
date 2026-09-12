@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Compiler\Compiler.csproj" />
+      <ProjectReference Include="..\Spamlang\Spamlang.csproj" />
     </ItemGroup>
 
 </Project>
