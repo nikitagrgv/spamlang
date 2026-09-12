@@ -232,7 +232,7 @@ public class Codegen
                             Left = typedRax,
                             Right = new MOpMem
                             {
-                                Base = Reg.Rbx,
+                                Base = Reg.Rbp,
                                 Offset = -allocatedOffset,
                                 Size = typeSize,
                             },
