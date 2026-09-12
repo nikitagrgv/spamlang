@@ -436,6 +436,7 @@ public class Codegen
                         break;
                     }
                     case IRInstructionStore store:
+                        // TODO: WTF?
                         // Load dst address into RAX.
                         // NOTE: Not lea - Address is WHERE the address stored (address of address)
                         instructions.Add(new MInstr
