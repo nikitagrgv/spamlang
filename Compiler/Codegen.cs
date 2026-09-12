@@ -80,7 +80,7 @@ public class Codegen
         int frameSize = curOffset;
         if (hasCalls)
         {
-            frameSize += 0x20; // Shadow space
+            frameSize += 0x20; // Shadow space for functions calls (Windows ABI), NOT LINUX!
         }
 
         frameSize = AlignTo(frameSize, 16); // For functions calls ABI and SSE
