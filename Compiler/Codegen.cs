@@ -437,7 +437,7 @@ public class Codegen
                     }
                     case IRInstructionStore store:
                         Type storedType = store.Value.Type;
-                        if (storedType.Size <= 8 && IsPowerOrTwo(storedType.Size))
+                        if (storedType.Size > 8 && IsPowerOrTwo(storedType.Size))
                         {
                             throw new NotImplementedException();
                         }
