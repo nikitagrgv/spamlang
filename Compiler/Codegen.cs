@@ -215,9 +215,6 @@ public class Codegen
 
             foreach (IRInstruction instr in irbb.Instructions)
             {
-                MOpReg typedRax = new() { Reg = Reg.Rax, Size = instr.Type.Size };
-                MOpReg typedRcx = new() { Reg = Reg.Rcx, Size = instr.Type.Size };
-
                 switch (instr)
                 {
                     case IRInstructionAlloca alloca:
@@ -225,12 +222,15 @@ public class Codegen
                         // TODO: Use lea?
                         int allocatedOffset = allocatedOffsets[curAlloca];
                         int instrOffset = instrIdToOffset[instr.Id];
-                        int typeSize = alloca.Type.Size;
                         ++curAlloca;
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Lea,
-                            Left = typedRax,
+                            Left = new MOpReg
+                            {
+                                Reg = Reg.Rax,
+                                Size = alloca.Type.Size,
+                            },
                             Right = new MOpMem
                             {
                                 Base = Reg.Rbp,
@@ -246,9 +246,13 @@ public class Codegen
                             {
                                 Base = Reg.Rbp,
                                 Offset = -instrOffset,
-                                Size = typeSize,
+                                Size = alloca.Type.Size,
                             },
-                            Right = typedRax,
+                            Right = new MOpReg
+                            {
+                                Reg = Reg.Rax,
+                                Size = alloca.Type.Size,
+                            },
                         });
                         break;
                     }
