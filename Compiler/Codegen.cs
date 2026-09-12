@@ -204,7 +204,7 @@ public class Codegen
                     }
                     case IRInstructionBinary binary:
                     {
-                        Debug.Assert(binary.Left.Type.Size == binary.Right.Type.Size);
+                        Debug.Assert(binary.Left.Type == binary.Right.Type);
                         int typeSize = binary.Type.Size;
                         int leftId = binary.Left.Id;
                         int rightId = binary.Right.Id;
@@ -219,7 +219,11 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = MOpReg.Rax,
+                                    Left = new MOpReg
+                                    {
+                                        Reg = Reg.Rax,
+                                        Size = typeSize,
+                                    },
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
@@ -229,9 +233,39 @@ public class Codegen
                                 });
                                 instructions.Add(new MInstr
                                 {
+                                    Op = MOpcode.Mov,
+                                    Left = new MOpReg
+                                    {
+                                        Reg = Reg.Rcx,
+                                        Size = typeSize,
+                                    },
+                                    Right = new MOpMem
+                                    {
+                                        Base = Reg.Rbp,
+                                        Offset = -rightOffset,
+                                        Size = 8,
+                                    },
                                 });
                                 instructions.Add(new MInstr
                                 {
+                                    Op = MOpcode.Add,
+                                    Left = MOpReg.Rax,
+                                    Right = MOpReg.Rcx,
+                                });
+                                instructions.Add(new MInstr
+                                {
+                                    Op = MOpcode.Mov,
+                                    Left = new MOpReg
+                                    {
+                                        Reg = Reg.Rax,
+                                        Size = typeSize,
+                                    },
+                                    Right = new MOpMem
+                                    {
+                                        Base = Reg.Rbp,
+                                        Offset = -instrOffset,
+                                        Size = typeSize,
+                                    }
                                 });
                                 break;
                             }
