@@ -436,6 +436,12 @@ public class Codegen
                         break;
                     }
                     case IRInstructionStore store:
+                        instructions.Add(new MInstr
+                        {
+                            Op = MOpcode.Mov,
+                            Left = ToOperand(store.Address),
+                            Right = ToOperand(store.Value),
+                        });
                         break;
                     case IRInstructionLoad load:
                         break;
