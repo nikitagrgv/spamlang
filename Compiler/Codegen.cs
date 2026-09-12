@@ -127,7 +127,7 @@ public class Codegen
                 Left = new MOpMem
                 {
                     Base = Reg.Rbp,
-                    Offset = paramOffset,
+                    Offset = -paramOffset,
                     Size = typeSize
                 },
                 Right = new MOpReg
@@ -166,7 +166,7 @@ public class Codegen
                             Right = new MOpMem
                             {
                                 Base = Reg.Rbx,
-                                Offset = allocatedOffset,
+                                Offset = -allocatedOffset,
                                 Size = 8
                             },
                             Comment = alloca.PrintDefinition()
@@ -177,7 +177,7 @@ public class Codegen
                             Left = new MOpMem
                             {
                                 Base = Reg.Rbp,
-                                Offset = instrOffset,
+                                Offset = -instrOffset,
                                 Size = 8,
                             },
                             Right = MOpReg.Rax,
