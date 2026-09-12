@@ -5,6 +5,7 @@ namespace Compiler.printers;
 public class MIRPrinter
 {
     private readonly TextWriter _writer;
+    private int _curPos = 0;
 
     private MIRPrinter(TextWriter writer)
     {
@@ -106,8 +107,6 @@ public class MIRPrinter
                 throw new ArgumentOutOfRangeException(nameof(op));
         }
     }
-
-    private int _curPos = 0;
 
     private void WriteLine()
     {
