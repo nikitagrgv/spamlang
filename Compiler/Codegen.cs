@@ -106,7 +106,6 @@ public class Codegen
             Right = new MOpImm { Value = frameSize },
         });
 
-        // TODO: Too many allocations!
         MOperand ToOperand(IRValue value)
         {
             switch (value)
@@ -207,6 +206,7 @@ public class Codegen
         basicBlocks.Add(prologue);
 
         // blocks
+        // TODO: Too many allocations!
         int curAlloca = 0;
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
