@@ -461,7 +461,7 @@ public class Parser
         Expr left = ParseTerm();
         while (Check(TokenType.Plus) || Check(TokenType.Minus))
         {
-            int op = _cursor;
+            int opPos = _cursor;
             Advance();
 
             Expr right = ParseTerm();
@@ -473,7 +473,7 @@ public class Parser
                 EndToken = end,
                 Left = left,
                 Right = right,
-                OperatorToken = op
+                Op = Utils.ToBinaryOp(_tokens[opPos].Type),
             };
         }
 
@@ -488,7 +488,7 @@ public class Parser
                Check(TokenType.Slash) ||
                Check(TokenType.Percent))
         {
-            int op = _cursor;
+            int opPos = _cursor;
             Advance();
 
             Expr right = ParseUnary();
@@ -500,7 +500,7 @@ public class Parser
                 EndToken = end,
                 Left = left,
                 Right = right,
-                OperatorToken = op
+                Op = Utils.ToBinaryOp(_tokens[opPos].Type),
             };
         }
 
@@ -512,11 +512,13 @@ public class Parser
         int begin = _cursor;
         if (TryConsume(TokenType.Plus) || TryConsume(TokenType.Minus))
         {
-            int opToken = _cursor - 1;
+            int opPos = _cursor - 1;
+            TokenType opTokType = _tokens[opPos].Type;
+
             if (TryConsume(TokenType.LiteralInt))
             {
                 int literalToken = _cursor - 1;
-                bool negated = _tokens[opToken].Type == TokenType.Minus;
+                bool negated = opTokType == TokenType.Minus;
                 return new ExprInt
                 {
                     StartToken = begin,
@@ -531,8 +533,8 @@ public class Parser
             {
                 StartToken = begin,
                 EndToken = End(begin),
-                OperatorToken = opToken,
-                Expr = expr
+                Expr = expr,
+                Op = Utils.ToUnaryOp(opTokType),
             };
         }
 

@@ -22,6 +22,9 @@ class App
         [Argument("ir")]
         public bool DebugIR { get; set; }
 
+        [Argument("mir")]
+        public bool DebugMIR { get; set; }
+
         [Argument("timer")]
         public bool DebugTimer { get; set; }
 
@@ -38,6 +41,7 @@ class App
             DebugParser = arguments.DebugParser,
             DebugSema = arguments.DebugSema,
             DebugIR = arguments.DebugIR,
+            DebugMIR = arguments.DebugMIR,
             DebugTimer = arguments.DebugTimer,
         };
         return flags;

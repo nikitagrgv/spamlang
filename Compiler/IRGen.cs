@@ -4,17 +4,7 @@ namespace Compiler;
 
 public class IRGen
 {
-    private readonly string _code;
-    private readonly Diagnostic _diag;
-    private readonly IReadOnlyList<Token> _tokens;
     private readonly List<Dictionary<Symbol, IRValue>> _symbolScopes = new();
-
-    public IRGen(string code, List<Token> tokens, Diagnostic diag)
-    {
-        _code = code;
-        _diag = diag;
-        _tokens = tokens;
-    }
 
     public IRModule Run(CompilationUnit unit)
     {
@@ -50,6 +40,9 @@ public class IRGen
         };
 
         _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
+
+        AllocateIds(module);
+
         return module;
     }
 
@@ -212,26 +205,26 @@ public class IRGen
     {
         IRValue left = GenExprValue(block, expr.Left);
         IRValue right = GenExprValue(block, expr.Right);
-        TokenType opTokType = _tokens[expr.OperatorToken].Type;
-        return GenBinaryOp(block, left, right, opTokType);
+        return GenBinaryOp(block, left, right, expr.Op);
     }
 
     private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr)
     {
         IRValue operand = GenExprValue(block, expr.Expr);
-        TokenType opTokType = _tokens[expr.OperatorToken].Type;
-        switch (opTokType)
+        BinaryOp op;
+        switch (expr.Op)
         {
-            case TokenType.Minus:
-            case TokenType.Plus:
-                IRValue zero = MakeZeroInitialized(operand.Type);
-                return GenBinaryOp(block, zero, operand, opTokType);
+            case UnaryOp.Minus: op = BinaryOp.Minus; break;
+            case UnaryOp.Plus: op = BinaryOp.Plus; break;
             default:
                 throw new UnreachableException();
         }
+
+        IRValue zero = MakeZeroInitialized(operand.Type);
+        return GenBinaryOp(block, zero, operand, op);
     }
 
-    private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, TokenType tokenType)
+    private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
         Debug.Assert(left.Type == right.Type);
 
@@ -245,14 +238,14 @@ public class IRGen
             throw new UnreachableException();
         }
 
-        IRBinaryOp op;
-        switch (tokenType)
+        IRBinaryOp irOp;
+        switch (op)
         {
-            case TokenType.Plus: op = IRBinaryOp.Add; break;
-            case TokenType.Minus: op = IRBinaryOp.Sub; break;
-            case TokenType.Star: op = IRBinaryOp.Mul; break;
-            case TokenType.Slash: op = signed ? IRBinaryOp.SDiv : IRBinaryOp.UDiv; break;
-            case TokenType.Percent: op = signed ? IRBinaryOp.SRem : IRBinaryOp.URem; break;
+            case BinaryOp.Plus: irOp = IRBinaryOp.Add; break;
+            case BinaryOp.Minus: irOp = IRBinaryOp.Sub; break;
+            case BinaryOp.Mul: irOp = IRBinaryOp.Mul; break;
+            case BinaryOp.Div: irOp = signed ? IRBinaryOp.SDiv : IRBinaryOp.UDiv; break;
+            case BinaryOp.Rem: irOp = signed ? IRBinaryOp.SRem : IRBinaryOp.URem; break;
             default: throw new UnreachableException();
         }
 
@@ -260,7 +253,7 @@ public class IRGen
         {
             Left = left,
             Right = right,
-            Op = op,
+            Op = irOp,
         };
         block.Add(instr);
         return instr;
@@ -446,5 +439,29 @@ public class IRGen
         }
 
         return null;
+    }
+
+    private void AllocateIds(IRModule module)
+    {
+        foreach (IRFunction func in module.Functions)
+        {
+            int cur = -1;
+            for (int i = 0; i < func.Params.Count; i++)
+            {
+                IRParam param = func.Params[i];
+                param.Id = ++cur;
+            }
+
+            foreach (IRBasicBlock bb in func.BasicBlocks)
+            {
+                foreach (IRInstruction inst in bb.Instructions)
+                {
+                    if (inst.Type != BuiltinType.Void)
+                    {
+                        inst.Id = ++cur;
+                    }
+                }
+            }
+        }
     }
 }
