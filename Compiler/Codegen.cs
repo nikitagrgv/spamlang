@@ -217,14 +217,12 @@ public class Codegen
                             case IRBinaryOp.Add:
                             case IRBinaryOp.Sub:
                             {
+                                MOpReg left = new() { Reg = Reg.Rax, Size = typeSize };
+                                MOpReg right = new() { Reg = Reg.Rcx, Size = typeSize };
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = new MOpReg
-                                    {
-                                        Reg = Reg.Rax,
-                                        Size = typeSize,
-                                    },
+                                    Left = left,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
@@ -235,11 +233,7 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = new MOpReg
-                                    {
-                                        Reg = Reg.Rcx,
-                                        Size = typeSize,
-                                    },
+                                    Left = right,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
@@ -251,17 +245,13 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = opcode,
-                                    Left = MOpReg.Rax,
-                                    Right = MOpReg.Rcx,
+                                    Left = left,
+                                    Right = right,
                                 });
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = new MOpReg
-                                    {
-                                        Reg = Reg.Rax,
-                                        Size = typeSize,
-                                    },
+                                    Left = left,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
