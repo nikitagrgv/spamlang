@@ -113,12 +113,13 @@ public class Codegen
             {
                 case IRConstantInt v:
                 {
-                    MOpImm op = new() { Value = v.Value, };
+                    MOpImm op = new() { Value = v.Value };
                     return op;
                 }
                 case IRFunction v:
                 {
-                    break;
+                    MOpLabel op = new() { Label = v.Name };
+                    return op;
                 }
                 case IRInstruction v:
                 {
