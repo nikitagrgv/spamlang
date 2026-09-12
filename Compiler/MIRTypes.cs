@@ -40,6 +40,7 @@ public static class MOpcodes
             MOpcode.Pop => "pop",
             MOpcode.Call => "call",
             MOpcode.Ret => "ret",
+            MOpcode.Jmp => "jmp",
             _ => throw new ArgumentOutOfRangeException(nameof(opcode), opcode, null)
         };
     }
