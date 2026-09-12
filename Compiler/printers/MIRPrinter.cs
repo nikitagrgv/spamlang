@@ -91,7 +91,9 @@ public class MIRPrinter
                 break;
             case MOpMem mOpMem:
                 string prefix = Regs.MemPrefix(mOpMem.Size);
-                _writer.Write($"{prefix} [{mOpMem.Base.GetName(8)}{mOpMem.Offset:+#;-#;+0}]");
+                string name = mOpMem.Base.GetName(8);
+                int offset = mOpMem.Offset;
+                _writer.Write($"{prefix} [{name}{offset:+#;-#;+0}]");
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(op));
