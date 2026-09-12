@@ -511,7 +511,23 @@ public class Codegen
                                 Size = load.Type.Size,
                             },
                         });
+                        // Store the value on stack
                         int instrOffset = instrIdToOffset[load.Id];
+                        instructions.Add(new MInstr
+                        {
+                            Op = MOpcode.Mov,
+                            Left = new MOpMem
+                            {
+                                Base = Reg.Rbp,
+                                Offset = -instrOffset,
+                                Size = load.Type.Size,
+                            },
+                            Right = new MOpReg
+                            {
+                                Reg = Reg.Rax,
+                                Size = load.Type.Size,
+                            }
+                        });
 
                         break;
                     }
