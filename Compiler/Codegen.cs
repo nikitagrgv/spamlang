@@ -255,12 +255,7 @@ public class Codegen
                     {
                         Debug.Assert(binary.Left.Type == binary.Right.Type);
                         int typeSize = binary.Type.Size;
-                        int leftId = binary.Left.Id;
-                        int rightId = binary.Right.Id;
-                        int instrId = binary.Id;
-                        int leftOffset = instrIdToOffset[leftId];
-                        int rightOffset = instrIdToOffset[rightId];
-                        int instrOffset = instrIdToOffset[instrId];
+                        int instrOffset = instrIdToOffset[binary.Id];
                         switch (binary.Op)
                         {
                             case IRBinaryOp.Add:
@@ -272,23 +267,13 @@ public class Codegen
                                 {
                                     Op = MOpcode.Mov,
                                     Left = leftReg,
-                                    Right = new MOpMem
-                                    {
-                                        Base = Reg.Rbp,
-                                        Offset = -leftOffset,
-                                        Size = typeSize,
-                                    },
+                                    Right = ToOperand(binary.Left),
                                 });
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
                                     Left = rightReg,
-                                    Right = new MOpMem
-                                    {
-                                        Base = Reg.Rbp,
-                                        Offset = -rightOffset,
-                                        Size = typeSize,
-                                    },
+                                    Right = ToOperand(binary.Right),
                                 });
                                 instructions.Add(new MInstr
                                 {
