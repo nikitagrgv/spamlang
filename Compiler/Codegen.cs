@@ -436,21 +436,32 @@ public class Codegen
                         break;
                     }
                     case IRInstructionStore store:
+                        Type storedType = store.Value.Type;
+                        if (storedType.Size <= 8 && IsPowerOrTwo(storedType.Size))
+                        {
+                        }
+
                         // TODO: WTF?
-                        // Load dst address into RAX.
+                        // Load dst address into RCX.
                         // NOTE: Not lea - Address is WHERE the address stored (address of address)
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Mov,
                             Left = new MOpReg
                             {
-                                Reg = Reg.Rax,
+                                Reg = Reg.Rcx,
                                 Size = store.Address.Type.Size,
                             },
                             Right = ToOperand(store.Address),
                         });
+                        // Load value itself in rcx
                         instructions.Add(new MInstr
                         {
+                            Op = MOpcode.Mov,
+                            Left = new MOpReg
+                            {
+                                Reg = Reg.Rax,
+                            }
                         });
                         instructions.Add(new MInstr
                         {
