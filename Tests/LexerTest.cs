@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Compiler;
+using Spamlang;
 
 namespace Tests;
 
