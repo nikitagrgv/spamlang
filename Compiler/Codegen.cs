@@ -236,7 +236,7 @@ public class Codegen
                                 Offset = -allocatedOffset,
                                 Size = typeSize,
                             },
-                            Comment = alloca.PrintDefinition(),
+                            Comment = instr.PrintDefinition(),
                         });
                         instructions.Add(new MInstr
                         {
@@ -268,6 +268,7 @@ public class Codegen
                                     Op = MOpcode.Mov,
                                     Left = leftReg,
                                     Right = ToOperand(binary.Left),
+                                    Comment = instr.PrintDefinition(),
                                 });
                                 instructions.Add(new MInstr
                                 {
@@ -304,6 +305,7 @@ public class Codegen
                                     Op = MOpcode.Mov,
                                     Left = leftReg,
                                     Right = ToOperand(binary.Left),
+                                    Comment = instr.PrintDefinition(),
                                 });
                                 instructions.Add(new MInstr
                                 {
@@ -352,11 +354,18 @@ public class Codegen
                             IRValue arg = call.Args[i];
                             Reg argReg = paramsRegs[i];
                             int typeSize = arg.Type.Size;
+                            string? comment = null;
+                            if (i == 0)
+                            {
+                                comment = instr.PrintDefinition();
+                            }
+
                             instructions.Add(new MInstr
                             {
                                 Op = MOpcode.Mov,
                                 Left = new MOpReg { Reg = argReg, Size = typeSize },
                                 Right = ToOperand(arg),
+                                Comment = comment,
                             });
                         }
 
