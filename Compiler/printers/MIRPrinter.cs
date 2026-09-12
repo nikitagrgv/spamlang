@@ -4,8 +4,10 @@ namespace Compiler.printers;
 
 public class MIRPrinter
 {
+    private const int CommentPadding = 30;
+    private static readonly char[] _pad = Enumerable.Repeat(' ', CommentPadding).ToArray();
     private readonly TextWriter _writer;
-    private int _curPos = 0;
+    private int _curColumn = 0;
 
     private MIRPrinter(TextWriter writer)
     {
@@ -20,7 +22,7 @@ public class MIRPrinter
 
     private void Print(MModule module)
     {
-        _curPos = 0;
+        _curColumn = 0;
         foreach (MFunction func in module.Functions)
         {
             Print(func);
@@ -74,7 +76,14 @@ public class MIRPrinter
 
         if (hasComment)
         {
-            Write($"              # {instr.Comment}");
+            int numToPad = CommentPadding - _curColumn;
+            if (numToPad <= 0)
+            {
+                numToPad = 2;
+            }
+
+            Write(_pad.AsSpan(0, numToPad));
+            Write($"# {instr.Comment}");
         }
 
         WriteLine();
@@ -111,19 +120,19 @@ public class MIRPrinter
 
     private void WriteLine()
     {
-        _curPos = 0;
+        _curColumn = 0;
         _writer.WriteLine();
     }
 
-    private void WriteLine(string str)
+    private void WriteLine(ReadOnlySpan<char> str)
     {
-        _curPos = 0;
+        _curColumn = 0;
         _writer.WriteLine(str);
     }
 
-    private void Write(string str)
+    private void Write(ReadOnlySpan<char> str)
     {
         _writer.Write(str);
-        _curPos += str.Length;
+        _curColumn += str.Length;
     }
 }
