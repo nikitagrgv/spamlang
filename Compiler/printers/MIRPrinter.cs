@@ -84,7 +84,7 @@ public class MIRPrinter
                 _writer.Write(mOpReg.Reg.GetName(mOpReg.Size));
                 break;
             case MOpMem mOpMem:
-                _writer.Write($"[{mOpMem.Base.GetName(mOpMem.Size)}{mOpMem.Offset:+;-;+0}]");
+                _writer.Write($"[{mOpMem.Base.GetName(mOpMem.Size)}{mOpMem.Offset:+#;-#;+0}]");
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(op));
