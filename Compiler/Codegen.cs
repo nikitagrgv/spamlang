@@ -290,13 +290,13 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = leftReg,
-                                    Right = new MOpMem
+                                    Left = new MOpMem
                                     {
                                         Base = Reg.Rbp,
                                         Offset = -instrOffset,
                                         Size = typeSize,
                                     },
+                                    Right = leftReg,
                                 });
                                 break;
                             }
@@ -327,13 +327,13 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = leftReg,
-                                    Right = new MOpMem
+                                    Left = new MOpMem
                                     {
                                         Base = Reg.Rbp,
                                         Offset = -instrOffset,
                                         Size = typeSize,
                                     },
+                                    Right = leftReg,
                                 });
                                 break;
                             }
