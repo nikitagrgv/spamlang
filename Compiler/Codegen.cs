@@ -303,8 +303,8 @@ public class Codegen
                             case IRBinaryOp.Mul:
                             {
                                 // TODO: Copy pasted from add/sub
-                                MOpReg leftReg = typedRax;
-                                MOpReg rightReg = typedRcx;
+                                MOpReg leftReg = new() { Reg = Reg.Rax, Size = typeSize, };
+                                MOpReg rightReg = new() { Reg = Reg.Rcx, Size = typeSize, };
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
