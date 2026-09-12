@@ -105,7 +105,10 @@ public class Codegen
         // TODO: Full ABI for params! stack/floats/structs
         Reg[] paramsRegs =
         [
-            
+            Reg.Rcx,
+            Reg.Rdx,
+            Reg.R8,
+            Reg.R9,
         ];
         foreach (IRParam param in irfunc.Params)
         {
