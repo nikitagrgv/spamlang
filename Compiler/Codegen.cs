@@ -402,7 +402,21 @@ public class Codegen
                     case IRInstructionLoad load:
                         break;
                     case IRInstructionRet ret:
+                    {
+                        MOperand? retOperand = null;
+                        if (ret.Value != null)
+                        {
+                            retOperand = ToOperand(ret.Value);
+                        }
+
+                        instructions.Add(new MInstr
+                        {
+                            Op = MOpcode.Ret,
+                            Left = retOperand,
+                            Comment = instr.PrintDefinition(),
+                        });
                         break;
+                    }
                     case IRInstructionStore store:
                         break;
                     case IRInstructionCast cast:
