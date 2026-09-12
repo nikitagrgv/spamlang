@@ -92,7 +92,7 @@ class App
 
         try
         {
-            bool ok = compiler.Compile(arguments.Files[0], arguments.Output);
+            bool ok = compiler.Compile(arguments.Files[0], arguments.Output, arguments.CompileOnly);
             Directory.Delete(buildPath, recursive: true);
             return ok ? 0 : 1;
         }
