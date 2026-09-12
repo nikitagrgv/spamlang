@@ -7,6 +7,15 @@ class App
         [Argument("output", "o")]
         public string? Output { get; set; }
 
+        [Argument("verbose", "v")]
+        public bool Verbose { get; set; }
+
+        [Argument("compile-only", "c")]
+        public bool CompileOnly { get; set; }
+
+        [Argument("clang-path")]
+        public string? ClangPath { get; set; }
+
         [Argument("lexer")]
         public bool DebugLexer { get; set; }
 
@@ -69,6 +78,12 @@ class App
 
         string curDir = Directory.GetCurrentDirectory();
         FileSystem fs = new(curDir);
+
+        string? clangPath = arguments.ClangPath;
+        if (string.IsNullOrEmpty(clangPath))
+        {
+            clangPath = Environment.GetEnvironmentVariable("SPAM_CLANG_PATH");
+        }
 
         Compiler.Flags flags = GetFlags(arguments);
         Compiler compiler = new(fs, flags);
