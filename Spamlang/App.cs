@@ -102,6 +102,13 @@ class App
             Console.WriteLine("Unexpected exception: " + e.Message);
             Console.WriteLine("See build dir: " + buildPath);
         }
+        finally
+        {
+            if (ok)
+            {
+                Directory.Delete(buildPath, recursive: true);
+            }
+        }
 
         return ok ? 0 : 1;
     }
