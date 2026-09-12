@@ -106,6 +106,42 @@ public class Codegen
             Right = new MOpImm { Value = frameSize },
         });
 
+        // TODO: Too many allocations!
+        MOperand ToOperand(IRValue value)
+        {
+            switch (value)
+            {
+                case IRConstantInt irConstantInt:
+                {
+                    break;
+                }
+                case IRFunction irFunction:
+                {
+                    break;
+                }
+                case IRInstruction irInstruction:
+                {
+                    break;
+                }
+                case IRParam irParam:
+                {
+                    int paramOffset = paramsOffsets[irParam.Index];
+                    int typeSize = irParam.Type.Size;
+                    MOpMem op = new()
+                    {
+                        Base = Reg.Rbp,
+                        Offset = -paramOffset,
+                        Size = typeSize
+                    };
+                    return op;
+                }
+                default:
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value));
+                }
+            }
+        }
+
         // Spill params to stack
         // TODO: Full ABI for params! stack/floats/structs
         // TODO: SystemV ABI
@@ -139,17 +175,12 @@ public class Codegen
             }
 
             Reg paramReg = paramsRegs[param.Index];
-            int paramOffset = paramsOffsets[param.Index];
             int typeSize = param.Type.Size;
+            MOperand paramOperand = ToOperand(param);
             prologueInstructions.Add(new MInstr
             {
                 Op = MOpcode.Mov,
-                Left = new MOpMem
-                {
-                    Base = Reg.Rbp,
-                    Offset = -paramOffset,
-                    Size = typeSize
-                },
+                Left = paramOperand,
                 Right = new MOpReg
                 {
                     Reg = paramReg,
@@ -166,7 +197,6 @@ public class Codegen
         basicBlocks.Add(prologue);
 
         // blocks
-        // TODO: Too many allocations!
         int curAlloca = 0;
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
