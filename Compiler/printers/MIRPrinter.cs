@@ -91,7 +91,7 @@ public class MIRPrinter
                 break;
             case MOpMem mOpMem:
                 string? prefix = null;
-                if (mOpMem.Size != null)
+                if (mOpMem.Size != null && mOpMem.Size.Value != 8)
                 {
                     prefix = Regs.MemPrefix(mOpMem.Size.Value) + " ";
                 }
