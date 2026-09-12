@@ -436,11 +436,23 @@ public class Codegen
                         break;
                     }
                     case IRInstructionStore store:
+                        // Load dst address into RAX.
+                        // NOTE: Not lea - Address is WHERE the address stored (address of address)
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Mov,
-                            Left = ToOperand(store.Address),
-                            Right = ToOperand(store.Value),
+                            Left = new MOpReg
+                            {
+                                Reg = Reg.Rax,
+                                Size = store.Address.Type.Size,
+                            },
+                            Right = ToOperand(store.Address),
+                        });
+                        instructions.Add(new MInstr
+                        {
+                        });
+                        instructions.Add(new MInstr
+                        {
                         });
                         break;
                     case IRInstructionLoad load:
