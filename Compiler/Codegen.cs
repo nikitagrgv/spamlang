@@ -346,7 +346,28 @@ public class Codegen
                         break;
                     }
                     case IRInstructionCall call:
+                    {
+                        for (int i = 0; i < call.Args.Count; i++)
+                        {
+                            IRValue arg = call.Args[i];
+                            Reg argReg = paramsRegs[i];
+                            int typeSize = arg.Type.Size;
+                            instructions.Add(new MInstr
+                            {
+                                Op = MOpcode.Mov,
+                                Left = new MOpReg { Reg = argReg, Size = typeSize },
+                                Right = ToOperand(arg),
+                            });
+                        }
+
+                        instructions.Add(new MInstr
+                        {
+                            Op = MOpcode.Call,
+                            Left = ToOperand(call.Callee),
+                        });
+
                         break;
+                    }
                     case IRInstructionLoad load:
                         break;
                     case IRInstructionRet ret:
