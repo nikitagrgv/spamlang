@@ -86,7 +86,7 @@ class App
             clangPath = "clang";
         }
 
-        string buildPath = MadeBuildDir();
+        string buildPath = CreateBuildDir();
         Compiler.Flags flags = GetFlags(arguments);
         Compiler compiler = new(fs, flags, clangPath, buildPath);
 
@@ -105,7 +105,7 @@ class App
         }
     }
 
-    private static string MadeBuildDir()
+    private static string CreateBuildDir()
     {
         string dirName = $"spamlang-{Environment.ProcessId}-{Guid.NewGuid():N}";
         string dirPath = Path.Combine(Path.GetTempPath(), dirName);
