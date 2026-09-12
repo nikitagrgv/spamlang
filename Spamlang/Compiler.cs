@@ -30,21 +30,57 @@ public class Compiler
 
     public bool Compile(string file, string output, bool compileOnly)
     {
+        Stopwatch totalSw = Stopwatch.StartNew();
         Stopwatch sw = new();
+
+        TimeSpan? readTime = null;
+        TimeSpan? dtLexer = null;
+        TimeSpan? dtParser = null;
+        TimeSpan? dtSema = null;
+        TimeSpan? dtIRGen = null;
+        TimeSpan? dtCodeGen = null;
+
+        void ReportTime(string what, TimeSpan? dt)
+        {
+            if (!dt.HasValue)
+            {
+                return;
+            }
+
+            Console.WriteLine($"{what} Time: {dt.Value.Milliseconds}ms");
+        }
+
+        void ReportTimes()
+        {
+            if (!_flags.DebugTimer)
+            {
+                return;
+            }
+
+            ReportTime("Read", readTime);
+            ReportTime("Lexer", dtLexer);
+            ReportTime("Parser", dtParser);
+            ReportTime("Sema", dtSema);
+            ReportTime("IR", dtIRGen);
+            ReportTime("Codegen", dtCodeGen);
+            ReportTime("Total", totalSw.Elapsed);
+        }
 
         string fullPathFile = _fs.ResolveToFullPath(file);
         string fullPathOutput = _fs.ResolveToFullPath(output);
 
         Console.WriteLine($"Compiling {fullPathFile} to {fullPathOutput}");
 
+        sw.Restart();
         string code = _fs.ReadAllText(fullPathFile);
+        readTime = sw.Elapsed;
 
         Diagnostic diag = new();
 
         sw.Restart();
         Lexer lexer = new();
         Lexer.Result lexerResult = lexer.Run(code, diag);
-        TimeSpan dtLexer = sw.Elapsed;
+        dtLexer = sw.Elapsed;
 
         if (lexerResult.HasErrors)
         {
@@ -70,7 +106,7 @@ public class Compiler
         sw.Restart();
         Parser parser = new();
         Parser.Result parserResult = parser.Run(code, tokens, diag);
-        TimeSpan dtParser = sw.Elapsed;
+        dtParser = sw.Elapsed;
 
         if (parserResult.HasErrors)
         {
@@ -88,15 +124,14 @@ public class Compiler
 
             diag.Report();
 
-            ReportTime("Lexer", dtLexer);
-            ReportTime("Parser", dtParser);
+            ReportTimes();
             return false;
         }
 
         sw.Restart();
         Sema sema = new(code, tokens, diag);
         sema.Run(parserResult.CompilationUnit);
-        TimeSpan dtSema = sw.Elapsed;
+        dtSema = sw.Elapsed;
 
         // Print after sema to include sema info
         if (_flags.DebugParser)
@@ -110,16 +145,14 @@ public class Compiler
         {
             diag.Report();
             Console.WriteLine("Sema had errors");
-            ReportTime("Lexer", dtLexer);
-            ReportTime("Parser", dtParser);
-            ReportTime("Sema", dtSema);
+            ReportTimes();
             return false;
         }
 
         sw.Restart();
         IRGen irGen = new();
         IRModule irModule = irGen.Run(parserResult.CompilationUnit);
-        TimeSpan dtIRGen = sw.Elapsed;
+        dtIRGen = sw.Elapsed;
 
         if (_flags.DebugIR)
         {
@@ -131,7 +164,7 @@ public class Compiler
         sw.Restart();
         Codegen codegen = new();
         MModule mmodule = codegen.Run(irModule);
-        TimeSpan dtCodeGen = sw.Elapsed;
+        dtCodeGen = sw.Elapsed;
 
         if (_flags.DebugMIR)
         {
@@ -141,23 +174,8 @@ public class Compiler
         }
 
         diag.Report();
-
-        ReportTime("Lexer", dtLexer);
-        ReportTime("Parser", dtParser);
-        ReportTime("Sema", dtSema);
-        ReportTime("IR", dtIRGen);
-        ReportTime("Codegen", dtCodeGen);
+        ReportTimes();
 
         return !diag.HasErrors;
-    }
-
-    void ReportTime(string what, TimeSpan dt)
-    {
-        if (!_flags.DebugTimer)
-        {
-            return;
-        }
-
-        Console.WriteLine($"{what} Time: {dt.Milliseconds}ms");
     }
 }
