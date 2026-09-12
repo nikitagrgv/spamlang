@@ -90,7 +90,18 @@ class App
         string buildPath = MadeBuildDir();
 
         Compiler compiler = new(fs, flags, clangPath, buildPath);
-        bool ok = compiler.Compile(arguments.Files[0], arguments.Output);
+
+        bool ok = false;
+        try
+        {
+            ok = compiler.Compile(arguments.Files[0], arguments.Output);
+        }
+        catch (Exception e)
+        {
+            ok = false;
+            Console.WriteLine("Unexpected exception: " + e.Message);
+            Console.WriteLine("See build dir: " + buildPath);
+        }
 
         return ok ? 0 : 1;
     }
