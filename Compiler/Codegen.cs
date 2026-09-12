@@ -250,10 +250,9 @@ public class Codegen
                                         Size = typeSize,
                                     },
                                 });
-                                MOpcode opcode = binary.Op == IRBinaryOp.Add ? MOpcode.Add : MOpcode.Sub;
                                 instructions.Add(new MInstr
                                 {
-                                    Op = opcode,
+                                    Op = binary.Op == IRBinaryOp.Add ? MOpcode.Add : MOpcode.Sub,
                                     Left = left,
                                     Right = right,
                                 });
