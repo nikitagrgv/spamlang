@@ -177,18 +177,24 @@ public class Codegen
                 {
                     case IRInstructionAlloca alloca:
                     {
+                        // TODO: Use lea?
                         int allocatedOffset = allocatedOffsets[curAlloca];
                         int instrOffset = instrIdToOffset[instr.Id];
+                        int typeSize = alloca.Type.Size;
                         ++curAlloca;
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Lea,
-                            Left = MOpReg.Rax,
+                            Left = new MOpReg()
+                            {
+                                Reg = Reg.Rax,
+                                Size = typeSize
+                            },
                             Right = new MOpMem
                             {
                                 Base = Reg.Rbx,
                                 Offset = -allocatedOffset,
-                                Size = 8
+                                Size = typeSize
                             },
                             Comment = alloca.PrintDefinition()
                         });
@@ -199,9 +205,13 @@ public class Codegen
                             {
                                 Base = Reg.Rbp,
                                 Offset = -instrOffset,
-                                Size = 8,
+                                Size = typeSize,
                             },
-                            Right = MOpReg.Rax,
+                            Right = new MOpReg()
+                            {
+                                Reg = Reg.Rax,
+                                Size = typeSize
+                            },
                         });
                         break;
                     }
