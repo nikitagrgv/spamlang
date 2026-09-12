@@ -91,26 +91,19 @@ class App
 
         Compiler compiler = new(fs, flags, clangPath, buildPath);
 
-        bool ok = false;
         try
         {
-            ok = compiler.Compile(arguments.Files[0], arguments.Output);
+            bool ok = compiler.Compile(arguments.Files[0], arguments.Output);
+            Directory.Delete(buildPath, recursive: true);
+            return ok ? 0 : 1;
         }
         catch (Exception e)
         {
-            ok = false;
+            // NOTE: Leave the build dir for investigation 
             Console.WriteLine("Unexpected exception: " + e.Message);
             Console.WriteLine("See build dir: " + buildPath);
+            return 0;
         }
-        finally
-        {
-            if (ok)
-            {
-                Directory.Delete(buildPath, recursive: true);
-            }
-        }
-
-        return ok ? 0 : 1;
     }
 
     static string MadeBuildDir()
