@@ -439,7 +439,7 @@ public class Codegen
                     {
                         Type storedType = store.Value.Type;
                         // TODO: WTF?
-                        // Load dst address into RCX.
+                        // Load dst address into RCX
                         // NOTE: Not lea - Address is WHERE the address stored (address of address)
                         instructions.Add(new MInstr
                         {
@@ -452,7 +452,7 @@ public class Codegen
                             Right = ToOperand(store.Address),
                             Comment = instr.PrintDefinition(),
                         });
-                        // Load value itself in rcx
+                        // Load value itself in RAX
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Mov,
@@ -463,7 +463,7 @@ public class Codegen
                             },
                             Right = ToOperand(store.Value),
                         });
-                        // Store: ptr [rcx] <- rax
+                        // Store: ptr [RCX] <- RAX
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Mov,
@@ -483,9 +483,7 @@ public class Codegen
                     }
                     case IRInstructionLoad load:
                     {
-                        // [a] <- [b]
-                        // Load dst address into RCX.
-                        int instrOffset = instrIdToOffset[load.Id];
+                        // Load dst address into RCX
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Mov,
@@ -497,6 +495,24 @@ public class Codegen
                             Right = ToOperand(load.Address),
                             Comment = instr.PrintDefinition(),
                         });
+                        // Load value itself in RAX from address in RCX
+                        instructions.Add(new MInstr
+                        {
+                            Op = MOpcode.Mov,
+                            Left = new MOpReg
+                            {
+                                Reg = Reg.Rax,
+                                Size = load.Type.Size,
+                            },
+                            Right = new MOpMem
+                            {
+                                Base = Reg.Rcx,
+                                Offset = 0,
+                                Size = load.Type.Size,
+                            },
+                        });
+                        int instrOffset = instrIdToOffset[load.Id];
+
                         break;
                     }
                     case IRInstructionCast cast:
