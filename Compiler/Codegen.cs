@@ -378,7 +378,13 @@ public class Codegen
                             instructions.Add(new MInstr
                             {
                                 Op = MOpcode.Mov,
-                                Left = 
+                                Left = typedRax,
+                                Right = new MOpMem
+                                {
+                                    Base = Reg.Rbx,
+                                    Offset = -instrOffset,
+                                    Size = call.Type.Size,
+                                },
                             });
                         }
 
