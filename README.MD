@@ -16,7 +16,7 @@ spamlang <source file> -o <output file>
 - `-o <path>` - output file (optional, default is `out.exe`/`out.o`)
 - `-v` / `--verbose` - verbose output
 - `-c` / `--compile-only` - compile without linking
-- `--clang-path <path>` - path to clang executable (optional)
+- `--clang-path <path>` - path to clang executable (optional, default is `clang`)
 
 Debug compiler stages:
 
