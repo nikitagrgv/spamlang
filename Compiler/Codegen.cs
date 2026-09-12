@@ -462,7 +462,9 @@ public class Codegen
                             Left = new MOpReg
                             {
                                 Reg = Reg.Rax,
-                            }
+                                Size = storedType.Size,
+                            },
+                            Right = ToOperand(store.Value),
                         });
                         instructions.Add(new MInstr
                         {
