@@ -16,7 +16,7 @@ public class Codegen
 
         MModule module = new()
         {
-            Functions = functions
+            Functions = functions,
         };
         return module;
     }
@@ -129,7 +129,7 @@ public class Codegen
                     {
                         Base = Reg.Rbp,
                         Offset = -instrOffset,
-                        Size = typeSize
+                        Size = typeSize,
                     };
                     return op;
                 }
@@ -141,7 +141,7 @@ public class Codegen
                     {
                         Base = Reg.Rbp,
                         Offset = -paramOffset,
-                        Size = typeSize
+                        Size = typeSize,
                     };
                     return op;
                 }
@@ -194,8 +194,8 @@ public class Codegen
                 Right = new MOpReg
                 {
                     Reg = paramReg,
-                    Size = typeSize
-                }
+                    Size = typeSize,
+                },
             });
         }
 
@@ -234,9 +234,9 @@ public class Codegen
                             {
                                 Base = Reg.Rbx,
                                 Offset = -allocatedOffset,
-                                Size = typeSize
+                                Size = typeSize,
                             },
-                            Comment = alloca.PrintDefinition()
+                            Comment = alloca.PrintDefinition(),
                         });
                         instructions.Add(new MInstr
                         {
@@ -290,7 +290,7 @@ public class Codegen
                                         Base = Reg.Rbp,
                                         Offset = -instrOffset,
                                         Size = typeSize,
-                                    }
+                                    },
                                 });
                                 break;
                             }
@@ -373,7 +373,7 @@ public class Codegen
         MFunction func = new()
         {
             BasicBlocks = basicBlocks,
-            Name = irfunc.Name
+            Name = irfunc.Name,
         };
         return func;
     }
