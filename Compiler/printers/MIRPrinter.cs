@@ -4,7 +4,7 @@ namespace Compiler.printers;
 
 public class MIRPrinter
 {
-    private const int CommentPadding = 30;
+    private const int CommentPadding = 40;
     private static readonly char[] _pad = Enumerable.Repeat(' ', CommentPadding).ToArray();
     private readonly TextWriter _writer;
     private int _curColumn = 0;
