@@ -30,7 +30,7 @@ public static class MOpcodes
             MOpcode.Mov => "mov",
             MOpcode.Add => "add",
             MOpcode.Sub => "sub",
-            MOpcode.IMul => "imul",
+            MOpcode.Imul => "imul",
             MOpcode.Dec => "dec",
             MOpcode.Inc => "inc",
             MOpcode.Lea => "lea",
