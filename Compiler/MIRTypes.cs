@@ -52,6 +52,7 @@ public sealed class MOpReg : MOperand
     public string Name => Reg.GetName(Size);
 }
 
+// TODO: Float
 public sealed class MOpImm : MOperand
 {
     public required Int128 Value { get; init; }

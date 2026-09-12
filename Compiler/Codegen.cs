@@ -113,6 +113,7 @@ public class Codegen
             {
                 case IRConstantInt irConstantInt:
                 {
+                    MOpImm
                     break;
                 }
                 case IRFunction irFunction:
