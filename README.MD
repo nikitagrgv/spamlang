@@ -13,7 +13,7 @@ spamlang <source file> -o <output file>
 
 ### Compiler Flags
 
-- `-o <path>` - output file
+- `-o <path>` - output file (optional, default is `out.exe`/`out.o`)
 - `-v` / `--verbose` - verbose output
 - `-c` / `--compile-only` - compile without linking
 - `--clang-path <path>` - path to clang executable (optional)
@@ -39,6 +39,7 @@ Debug compiler stages:
 - [ ] System V ABI
 
 ## Supported Targets
+
 - [x] x86_64 Windows
 - [ ] x86_64 Linux
 
