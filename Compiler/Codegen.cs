@@ -463,6 +463,7 @@ public class Codegen
                             },
                             Right = ToOperand(store.Value),
                         });
+                        // Store [rcx] <- rax
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Mov,
