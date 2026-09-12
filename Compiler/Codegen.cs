@@ -123,6 +123,15 @@ public class Codegen
                 }
                 case IRInstruction v:
                 {
+                    int instrOffset = instrIdToOffset[v.Id];
+                    int typeSize = v.Type.Size;
+                    MOpMem op = new()
+                    {
+                        Base = Reg.Rbp,
+                        Offset = -instrOffset,
+                        Size = typeSize
+                    };
+                    return op;
                     break;
                 }
                 case IRParam v:
