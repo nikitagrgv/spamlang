@@ -50,6 +50,12 @@ public class MIRPrinter
 
     private void Print(MInstr instr)
     {
+        bool hasComment = !string.IsNullOrEmpty(instr.Comment);
+        if (hasComment)
+        {
+            Console.WriteLine();
+        }
+
         _writer.Write($"    {instr.Op.AsmName(),-5}");
         if (instr.Left != null)
         {
@@ -62,7 +68,7 @@ public class MIRPrinter
             Print(instr.Right);
         }
 
-        if (!string.IsNullOrEmpty(instr.Comment))
+        if (hasComment)
         {
             _writer.Write($"              # {instr.Comment}");
         }
