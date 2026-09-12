@@ -266,12 +266,10 @@ public class Codegen
                             case IRBinaryOp.Add:
                             case IRBinaryOp.Sub:
                             {
-                                MOpReg left = typedRax;
-                                MOpReg right = typedRcx;
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = left,
+                                    Left = typedRax,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
@@ -282,7 +280,7 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = right,
+                                    Left = typedRcx,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
@@ -293,13 +291,13 @@ public class Codegen
                                 instructions.Add(new MInstr
                                 {
                                     Op = binary.Op == IRBinaryOp.Add ? MOpcode.Add : MOpcode.Sub,
-                                    Left = left,
-                                    Right = right,
+                                    Left = typedRax,
+                                    Right = typedRcx,
                                 });
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
-                                    Left = left,
+                                    Left = typedRax,
                                     Right = new MOpMem
                                     {
                                         Base = Reg.Rbp,
