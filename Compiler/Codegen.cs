@@ -296,6 +296,7 @@ public class Codegen
                             }
                             case IRBinaryOp.Mul:
                             {
+                                // TODO: Copy pasted from add/sub
                                 MOpReg leftReg = typedRax;
                                 MOpReg rightReg = typedRcx;
                                 instructions.Add(new MInstr
