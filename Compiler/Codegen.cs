@@ -166,7 +166,7 @@ public class Codegen
         basicBlocks.Add(prologue);
 
         // blocks
-        // TODO: A lot of allocations!
+        // TODO: Too many allocations!
         int curAlloca = 0;
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
