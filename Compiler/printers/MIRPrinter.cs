@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Compiler.printers;
 
 public class MIRPrinter
@@ -25,21 +27,21 @@ public class MIRPrinter
 
     private void Print(MFunction func)
     {
-        _writer.WriteLine("# -------------");
-        _writer.WriteLine($"{func.Name}:");
+        WriteLine("# -------------");
+        WriteLine($"{func.Name}:");
         foreach (MBasicBlock bb in func.BasicBlocks)
         {
             Print(bb);
         }
 
-        _writer.WriteLine();
+        WriteLine();
     }
 
     private void Print(MBasicBlock bb)
     {
         if (!string.IsNullOrEmpty(bb.Name))
         {
-            _writer.WriteLine($"{bb.Name}:");
+            WriteLine($"{bb.Name}:");
         }
 
         foreach (MInstr instr in bb.Instructions)
@@ -56,7 +58,7 @@ public class MIRPrinter
             Console.WriteLine();
         }
 
-        _writer.Write($"    {instr.Op.AsmName(),-5}");
+        Write($"    {instr.Op.AsmName(),-5}");
         if (instr.Left != null)
         {
             Print(instr.Left);
@@ -64,16 +66,16 @@ public class MIRPrinter
 
         if (instr.Right != null)
         {
-            _writer.Write(", ");
+            Write(", ");
             Print(instr.Right);
         }
 
         if (hasComment)
         {
-            _writer.Write($"              # {instr.Comment}");
+            Write($"              # {instr.Comment}");
         }
 
-        _writer.WriteLine();
+        WriteLine();
     }
 
     private void Print(MOperand op)
@@ -81,13 +83,13 @@ public class MIRPrinter
         switch (op)
         {
             case MOpImm mOpImm:
-                _writer.Write(mOpImm.Value);
+                Write(mOpImm.Value.ToString());
                 break;
             case MOpLabel mOpLabel:
-                _writer.Write(mOpLabel.Label);
+                Write(mOpLabel.Label);
                 break;
             case MOpReg mOpReg:
-                _writer.Write(mOpReg.Reg.GetName(mOpReg.Size));
+                Write(mOpReg.Reg.GetName(mOpReg.Size));
                 break;
             case MOpMem mOpMem:
                 string? prefix = null;
@@ -98,10 +100,30 @@ public class MIRPrinter
 
                 string name = mOpMem.Base.GetName(8);
                 int offset = mOpMem.Offset;
-                _writer.Write($"{prefix}[{name}{offset:+#;-#;+0}]");
+                Write($"{prefix}[{name}{offset:+#;-#;+0}]");
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(op));
         }
+    }
+
+    private int _curPos = 0;
+
+    private void WriteLine()
+    {
+        _curPos = 0;
+        _writer.WriteLine();
+    }
+
+    private void WriteLine(string str)
+    {
+        _curPos = 0;
+        _writer.WriteLine(str);
+    }
+
+    private void Write(string str)
+    {
+        _writer.Write(str);
+        _curPos += str.Length;
     }
 }
