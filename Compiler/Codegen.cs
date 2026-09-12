@@ -208,28 +208,40 @@ public class Codegen
                         int leftOffset = instrIdToOffset[leftId];
                         int rightOffset = instrIdToOffset[rightId];
                         int instrOffset = instrIdToOffset[instrId];
-                        MOpcode opcode;
                         switch (binary.Op)
                         {
                             case IRBinaryOp.Add:
-                                opcode = MOpcode.Add;
+                            {
                                 break;
+                            }
                             case IRBinaryOp.Sub:
-                                opcode = MOpcode.Sub;
+                            {
                                 break;
+                            }
                             case IRBinaryOp.Mul:
-                                opcode = MOpcode.Mul;
+                            {
                                 break;
+                            }
                             case IRBinaryOp.SDiv:
+                            {
                                 throw new NotImplementedException();
+                            }
                             case IRBinaryOp.UDiv:
+                            {
                                 throw new NotImplementedException();
+                            }
                             case IRBinaryOp.SRem:
+                            {
                                 throw new NotImplementedException();
+                            }
                             case IRBinaryOp.URem:
+                            {
                                 throw new NotImplementedException();
+                            }
                             default:
+                            {
                                 throw new ArgumentOutOfRangeException();
+                            }
                         }
 
                         break;
