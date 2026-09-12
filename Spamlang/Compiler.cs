@@ -34,10 +34,8 @@ public class Compiler
 
     public bool Compile(string file, string output, bool compileOnly)
     {
-        // TODO: Linux!
-        string ext = compileOnly ? ".o" : ".exe";
         string fullPathFile = _fs.ResolveToFullPath(file);
-        string fullPathOutput = _fs.ResolveToFullPath(output ?? "out" + ext);
+        string fullPathOutput = _fs.ResolveToFullPath(output);
 
         Console.WriteLine($"Compiling {fullPathFile} to {fullPathOutput}");
 

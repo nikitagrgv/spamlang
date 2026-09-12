@@ -90,9 +90,18 @@ class App
         Compiler.Flags flags = GetFlags(arguments);
         Compiler compiler = new(fs, flags, clangPath, buildPath);
 
+        string? output = arguments.Output;
+        if (string.IsNullOrEmpty(output))
+        {
+            output = "out";
+        }
+
+        // TODO: Linux!
+        output += arguments.CompileOnly ? ".o" : ".exe";
+
         try
         {
-            bool ok = compiler.Compile(arguments.Files[0], arguments.Output, arguments.CompileOnly);
+            bool ok = compiler.Compile(arguments.Files[0], output, arguments.CompileOnly);
             Directory.Delete(buildPath, recursive: true);
             return ok ? 0 : 1;
         }
