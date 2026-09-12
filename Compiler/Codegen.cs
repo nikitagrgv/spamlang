@@ -81,8 +81,9 @@ public class Codegen
         if (hasCalls)
         {
             frameSize += 0x20; // Shadow space
-            frameSize = AlignTo(frameSize, 16); // ABI requirement
         }
+
+        frameSize = AlignTo(frameSize, 16); // For functions calls ABI and SSE
 
         MOpReg rbp = new() { Reg = Reg.Rbp, Size = 8 };
         MOpReg rsp = new() { Reg = Reg.Rsp, Size = 8 };
