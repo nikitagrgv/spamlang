@@ -366,6 +366,17 @@ public class Codegen
                             Left = ToOperand(call.Callee),
                         });
 
+                        // TODO: Correct ABI! SRet (in IR maybe)
+                        if (call.Type.Size > 0)
+                        {
+                            int instrOffset = instrIdToOffset[call.Id];
+                            instructions.Add(new MInstr
+                            {
+                                Op = MOpcode.Mov,
+                                Left = 
+                            });
+                        }
+
                         break;
                     }
                     case IRInstructionLoad load:
