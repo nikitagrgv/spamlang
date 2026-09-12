@@ -208,6 +208,7 @@ public class Codegen
 
         // blocks
         int curAlloca = 0;
+        string epilogueLabel = $".L{irfunc.Name}_epi";
         foreach (IRBasicBlock irbb in irfunc.BasicBlocks)
         {
             List<MInstr> instructions = new();
@@ -403,18 +404,24 @@ public class Codegen
                         break;
                     case IRInstructionRet ret:
                     {
-                        MOperand? retOperand = null;
                         if (ret.Value != null)
                         {
-                            retOperand = ToOperand(ret.Value);
+                            // TODO: Correct ABI! SRet (in IR maybe)
+                            instructions.Add(new MInstr
+                            {
+                                Op = MOpcode.Mov,
+                                Left = typedRax,
+                                Right = ToOperand(ret.Value),
+                                Comment = instr.PrintDefinition(),
+                            });
                         }
 
                         instructions.Add(new MInstr
                         {
-                            Op = MOpcode.Ret,
-                            Left = retOperand,
-                            Comment = instr.PrintDefinition(),
+                            Op = MOpcode.Jmp,
+                            Left = new MOpLabel { Label = epilogueLabel },
                         });
+
                         break;
                     }
                     case IRInstructionStore store:
@@ -454,7 +461,7 @@ public class Codegen
         MBasicBlock epilogue = new()
         {
             Instructions = epilogueInstructions,
-            Name = $".L{irfunc.Name}_epi",
+            Name = epilogueLabel,
         };
         basicBlocks.Add(epilogue);
 

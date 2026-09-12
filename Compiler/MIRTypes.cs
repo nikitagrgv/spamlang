@@ -19,6 +19,8 @@ public enum MOpcode
 
     Call,
     Ret,
+    
+    Jmp,
 }
 
 public static class MOpcodes
