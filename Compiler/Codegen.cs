@@ -483,6 +483,7 @@ public class Codegen
                     }
                     case IRInstructionLoad load:
                     {
+                        int instrOffset = instrIdToOffset[load.Id];
                         break;
                     }
                     case IRInstructionCast cast:
