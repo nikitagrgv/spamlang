@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Compiler;
 
 public class Codegen
@@ -202,6 +204,8 @@ public class Codegen
                     }
                     case IRInstructionBinary binary:
                     {
+                        Debug.Assert(binary.Left.Type.Size == binary.Right.Type.Size);
+                        int typeSize = binary.Type.Size;
                         int leftId = binary.Left.Id;
                         int rightId = binary.Right.Id;
                         int instrId = binary.Id;
@@ -212,6 +216,23 @@ public class Codegen
                         {
                             case IRBinaryOp.Add:
                             {
+                                instructions.Add(new MInstr
+                                {
+                                    Op = MOpcode.Mov,
+                                    Left = MOpReg.Rax,
+                                    Right = new MOpMem
+                                    {
+                                        Base = Reg.Rbp,
+                                        Offset = -leftOffset,
+                                        Size = 8,
+                                    },
+                                });
+                                instructions.Add(new MInstr
+                                {
+                                });
+                                instructions.Add(new MInstr
+                                {
+                                });
                                 break;
                             }
                             case IRBinaryOp.Sub:
