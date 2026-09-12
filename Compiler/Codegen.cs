@@ -266,8 +266,8 @@ public class Codegen
                             case IRBinaryOp.Add:
                             case IRBinaryOp.Sub:
                             {
-                                MOpReg leftReg = typedRax;
-                                MOpReg rightReg = typedRcx;
+                                MOpReg leftReg = new() { Reg = Reg.Rax, Size = typeSize, };
+                                MOpReg rightReg = new() { Reg = Reg.Rcx, Size = typeSize, };
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
