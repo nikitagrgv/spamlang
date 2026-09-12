@@ -215,6 +215,7 @@ public class Codegen
                         switch (binary.Op)
                         {
                             case IRBinaryOp.Add:
+                            case IRBinaryOp.Sub:
                             {
                                 instructions.Add(new MInstr
                                 {
@@ -246,9 +247,10 @@ public class Codegen
                                         Size = 8,
                                     },
                                 });
+                                MOpcode opcode = binary.Op == IRBinaryOp.Add ? MOpcode.Add : MOpcode.Sub;
                                 instructions.Add(new MInstr
                                 {
-                                    Op = MOpcode.Add,
+                                    Op = opcode,
                                     Left = MOpReg.Rax,
                                     Right = MOpReg.Rcx,
                                 });
@@ -267,10 +269,6 @@ public class Codegen
                                         Size = typeSize,
                                     }
                                 });
-                                break;
-                            }
-                            case IRBinaryOp.Sub:
-                            {
                                 break;
                             }
                             case IRBinaryOp.Mul:
