@@ -439,6 +439,7 @@ public class Codegen
                         Type storedType = store.Value.Type;
                         if (storedType.Size <= 8 && IsPowerOrTwo(storedType.Size))
                         {
+                            throw new NotImplementedException();
                         }
 
                         // TODO: WTF?
