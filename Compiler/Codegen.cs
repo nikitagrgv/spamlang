@@ -381,9 +381,10 @@ public class Codegen
                         });
 
                         // TODO: Correct ABI! SRet (in IR maybe)
-                        if (call.Type.Size > 0)
+                        Type returnType = call.Type;
+                        if (returnType.Size > 0)
                         {
-                            if (call.Type.Size > 8 || !IsPowerOrTwo(call.Type.Size))
+                            if (returnType.Size > 8 || !IsPowerOrTwo(returnType.Size))
                             {
                                 throw new NotImplementedException();
                             }
@@ -396,9 +397,13 @@ public class Codegen
                                 {
                                     Base = Reg.Rbp,
                                     Offset = -instrOffset,
-                                    Size = call.Type.Size,
+                                    Size = returnType.Size,
                                 },
-                                Right = typedRax,
+                                Right = new MOpReg
+                                {
+                                    Reg = Reg.Rax,
+                                    Size = returnType.Size,
+                                },
                             });
                         }
 
