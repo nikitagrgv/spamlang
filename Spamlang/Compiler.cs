@@ -20,10 +20,6 @@ public class Compiler
     private readonly string _clangPath;
     private readonly string _buildPath;
 
-    private readonly Diagnostic _diag = new();
-    private string _code = "";
-    private List<Token> _tokens = [];
-
     public Compiler(IFileSystem fs, Flags flags, string clangPath, string buildPath)
     {
         _fs = fs;
@@ -32,27 +28,22 @@ public class Compiler
         _buildPath = buildPath;
     }
 
-    public bool Compile(string file, string output, bool compileOnly)
+    private bool Compile(string file, string output, bool compileOnly)
     {
+        Stopwatch sw = new();
+
         string fullPathFile = _fs.ResolveToFullPath(file);
         string fullPathOutput = _fs.ResolveToFullPath(output);
 
         Console.WriteLine($"Compiling {fullPathFile} to {fullPathOutput}");
 
         string code = _fs.ReadAllText(fullPathFile);
-        return Compile(code);
-    }
 
-    private bool Compile(string code)
-    {
-        Stopwatch sw = new();
-
-        _code = code;
-        _diag.Clear();
+        Diagnostic diag = new();
 
         sw.Restart();
         Lexer lexer = new();
-        Lexer.Result lexerResult = lexer.Run(_code, _diag);
+        Lexer.Result lexerResult = lexer.Run(code, diag);
         TimeSpan dtLexer = sw.Elapsed;
 
         if (lexerResult.HasErrors)
@@ -60,25 +51,25 @@ public class Compiler
             Console.WriteLine("Lexer had errors");
         }
 
-        _tokens = lexerResult.Tokens;
+        List<Token> tokens = lexerResult.Tokens;
 
         if (_flags.DebugLexer)
         {
             Console.WriteLine("================================================");
-            TokensPrinter.Print(_tokens, _code);
+            TokensPrinter.Print(tokens, code);
             Console.WriteLine("================================================");
         }
 
         if (_flags.DebugLexerPretty)
         {
             Console.WriteLine("================================================");
-            TokensPrinter.PrintPretty(_tokens, _code);
+            TokensPrinter.PrintPretty(tokens, code);
             Console.WriteLine("================================================");
         }
 
         sw.Restart();
         Parser parser = new();
-        Parser.Result parserResult = parser.Run(_code, _tokens, _diag);
+        Parser.Result parserResult = parser.Run(code, tokens, diag);
         TimeSpan dtParser = sw.Elapsed;
 
         if (parserResult.HasErrors)
@@ -91,11 +82,11 @@ public class Compiler
             if (_flags.DebugParser)
             {
                 Console.WriteLine("================================================");
-                AstPrinter.Print(parserResult.CompilationUnit, _tokens, _code);
+                AstPrinter.Print(parserResult.CompilationUnit, tokens, code);
                 Console.WriteLine("================================================");
             }
 
-            _diag.Report();
+            diag.Report();
 
             ReportTime("Lexer", dtLexer);
             ReportTime("Parser", dtParser);
@@ -103,7 +94,7 @@ public class Compiler
         }
 
         sw.Restart();
-        Sema sema = new(_code, _tokens, _diag);
+        Sema sema = new(code, tokens, diag);
         sema.Run(parserResult.CompilationUnit);
         TimeSpan dtSema = sw.Elapsed;
 
@@ -111,13 +102,13 @@ public class Compiler
         if (_flags.DebugParser)
         {
             Console.WriteLine("================================================");
-            AstPrinter.Print(parserResult.CompilationUnit, _tokens, _code);
+            AstPrinter.Print(parserResult.CompilationUnit, tokens, code);
             Console.WriteLine("================================================");
         }
 
-        if (_diag.HasErrors)
+        if (diag.HasErrors)
         {
-            _diag.Report();
+            diag.Report();
             Console.WriteLine("Sema had errors");
             ReportTime("Lexer", dtLexer);
             ReportTime("Parser", dtParser);
@@ -149,7 +140,7 @@ public class Compiler
             Console.WriteLine("================================================");
         }
 
-        _diag.Report();
+        diag.Report();
 
         ReportTime("Lexer", dtLexer);
         ReportTime("Parser", dtParser);
@@ -157,7 +148,7 @@ public class Compiler
         ReportTime("IR", dtIRGen);
         ReportTime("Codegen", dtCodeGen);
 
-        return !_diag.HasErrors;
+        return !diag.HasErrors;
     }
 
     void ReportTime(string what, TimeSpan dt)
