@@ -112,6 +112,11 @@ public class Codegen
         ];
         foreach (IRParam param in irfunc.Params)
         {
+            if (param.Index >= paramsRegs.Length)
+            {
+                throw new NotImplementedException();
+            }
+
             int offset = paramsOffsets[param.Index];
             int size = param.Type.Size;
             prologueInstructions.Add(new MInstr
