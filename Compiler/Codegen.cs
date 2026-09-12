@@ -103,9 +103,9 @@ public class Codegen
 
         // Spill params to stack
         // TODO: Full ABI for params! stack/floats/structs
-        MOperand[] paramsOperands =
+        Reg[] paramsRegs =
         [
-            new MOpReg()
+            
         ];
         foreach (IRParam param in irfunc.Params)
         {
