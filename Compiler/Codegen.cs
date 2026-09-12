@@ -189,11 +189,7 @@ public class Codegen
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Lea,
-                            Left = new MOpReg
-                            {
-                                Reg = Reg.Rax,
-                                Size = typeSize
-                            },
+                            Left = typedRax,
                             Right = new MOpMem
                             {
                                 Base = Reg.Rbx,
@@ -211,11 +207,7 @@ public class Codegen
                                 Offset = -instrOffset,
                                 Size = typeSize,
                             },
-                            Right = new MOpReg
-                            {
-                                Reg = Reg.Rax,
-                                Size = typeSize
-                            },
+                            Right = typedRax,
                         });
                         break;
                     }
@@ -234,8 +226,8 @@ public class Codegen
                             case IRBinaryOp.Add:
                             case IRBinaryOp.Sub:
                             {
-                                MOpReg left = new() { Reg = Reg.Rax, Size = typeSize };
-                                MOpReg right = new() { Reg = Reg.Rcx, Size = typeSize };
+                                MOpReg left = typedRax;
+                                MOpReg right = typedRcx;
                                 instructions.Add(new MInstr
                                 {
                                     Op = MOpcode.Mov,
