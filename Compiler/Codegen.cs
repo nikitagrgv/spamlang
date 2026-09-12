@@ -419,7 +419,11 @@ public class Codegen
                             instructions.Add(new MInstr
                             {
                                 Op = MOpcode.Mov,
-                                Left = typedRax,
+                                Left = new MOpReg
+                                {
+                                    Reg = Reg.Rax,
+                                    Size = ret.Value.Type.Size,
+                                },
                                 Right = ToOperand(ret.Value),
                                 Comment = instr.PrintDefinition(),
                             });
