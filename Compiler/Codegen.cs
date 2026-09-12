@@ -175,7 +175,7 @@ public class Codegen
             foreach (IRInstruction instr in irbb.Instructions)
             {
                 MOpReg typedRax = new() { Reg = Reg.Rax, Size = instr.Type.Size };
-                MOpReg typedRcx = new() { Reg = Reg.Rax, Size = instr.Type.Size };
+                MOpReg typedRcx = new() { Reg = Reg.Rcx, Size = instr.Type.Size };
 
                 switch (instr)
                 {
