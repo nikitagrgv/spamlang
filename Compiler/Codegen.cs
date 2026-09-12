@@ -185,7 +185,7 @@ public class Codegen
                         instructions.Add(new MInstr
                         {
                             Op = MOpcode.Lea,
-                            Left = new MOpReg()
+                            Left = new MOpReg
                             {
                                 Reg = Reg.Rax,
                                 Size = typeSize
@@ -207,7 +207,7 @@ public class Codegen
                                 Offset = -instrOffset,
                                 Size = typeSize,
                             },
-                            Right = new MOpReg()
+                            Right = new MOpReg
                             {
                                 Reg = Reg.Rax,
                                 Size = typeSize
