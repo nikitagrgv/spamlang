@@ -106,7 +106,7 @@ class App
         }
     }
 
-    static string MadeBuildDir()
+    private static string MadeBuildDir()
     {
         string dirName = $"spamlang-{Environment.ProcessId}-{Guid.NewGuid():N}";
         string dirPath = Path.Combine(Path.GetTempPath(), dirName);
