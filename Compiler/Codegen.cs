@@ -354,23 +354,18 @@ public class Codegen
                     }
                     case IRInstructionCall call:
                     {
+                        string comment = instr.PrintDefinition();
                         for (int i = 0; i < call.Args.Count; i++)
                         {
                             IRValue arg = call.Args[i];
                             Reg argReg = paramsRegs[i];
                             int typeSize = arg.Type.Size;
-                            string? comment = null;
-                            if (i == 0)
-                            {
-                                comment = instr.PrintDefinition();
-                            }
-
                             instructions.Add(new MInstr
                             {
                                 Op = MOpcode.Mov,
                                 Left = new MOpReg { Reg = argReg, Size = typeSize },
                                 Right = ToOperand(arg),
-                                Comment = comment,
+                                Comment = i == 0 ? comment : null,
                             });
                         }
 
@@ -378,6 +373,7 @@ public class Codegen
                         {
                             Op = MOpcode.Call,
                             Left = ToOperand(call.Callee),
+                            Comment = call.Args.Count == 0 ? comment : null,
                         });
 
                         // TODO: Correct ABI! SRet (in IR maybe)
