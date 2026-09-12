@@ -409,8 +409,6 @@ public class Codegen
 
                         break;
                     }
-                    case IRInstructionLoad load:
-                        break;
                     case IRInstructionRet ret:
                     {
                         if (ret.Value != null)
@@ -438,6 +436,8 @@ public class Codegen
                         break;
                     }
                     case IRInstructionStore store:
+                        break;
+                    case IRInstructionLoad load:
                         break;
                     case IRInstructionCast cast:
                         throw new NotImplementedException();
