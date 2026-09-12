@@ -48,10 +48,12 @@ public class MIRPrinter
             WriteLine($"{bb.Name}:");
         }
 
-        foreach (MInstr instr in bb.Instructions)
+        for (int i = 0; i < bb.Instructions.Count; i++)
         {
-            bool hasComment = !string.IsNullOrEmpty(instr.Comment);
-            if (hasComment)
+            MInstr instr = bb.Instructions[i];
+
+            bool needNewline = i != 0 && !string.IsNullOrEmpty(instr.Comment);
+            if (needNewline)
             {
                 Console.WriteLine();
             }
