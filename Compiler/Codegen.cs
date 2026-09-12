@@ -369,10 +369,13 @@ public class Codegen
                         break;
                     }
                     case IRInstructionLoad load:
+                        throw new NotImplementedException();
                         break;
                     case IRInstructionRet ret:
+                        throw new NotImplementedException();
                         break;
                     case IRInstructionStore store:
+                        throw new NotImplementedException();
                         break;
                     case IRInstructionCast cast:
                         throw new NotImplementedException();
