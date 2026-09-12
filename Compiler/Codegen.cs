@@ -466,7 +466,7 @@ public class Codegen
                             Left = new MOpMem
                             {
                                 Base = Reg.Rcx,
-                                Offset = 0,
+                                Offset = null,
                                 Size = storedType.Size,
                             },
                             Right = new MOpReg
@@ -503,7 +503,7 @@ public class Codegen
                             Right = new MOpMem
                             {
                                 Base = Reg.Rcx,
-                                Offset = 0,
+                                Offset = null,
                                 Size = load.Type.Size,
                             },
                         });
