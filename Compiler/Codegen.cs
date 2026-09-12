@@ -436,6 +436,7 @@ public class Codegen
                         break;
                     }
                     case IRInstructionStore store:
+                    {
                         Type storedType = store.Value.Type;
                         // TODO: WTF?
                         // Load dst address into RCX.
@@ -478,12 +479,19 @@ public class Codegen
                             },
                         });
                         break;
+                    }
                     case IRInstructionLoad load:
+                    {
                         break;
+                    }
                     case IRInstructionCast cast:
+                    {
                         throw new NotImplementedException();
+                    }
                     default:
+                    {
                         throw new ArgumentOutOfRangeException(nameof(instr));
+                    }
                 }
             }
 
