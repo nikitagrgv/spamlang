@@ -234,7 +234,7 @@ public class Codegen
                             {
                                 Base = Reg.Rbp,
                                 Offset = -allocatedOffset,
-                                Size = typeSize,
+                                Size = null,
                             },
                             Comment = instr.PrintDefinition(),
                         });
