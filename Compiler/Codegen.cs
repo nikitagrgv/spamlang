@@ -437,11 +437,6 @@ public class Codegen
                     }
                     case IRInstructionStore store:
                         Type storedType = store.Value.Type;
-                        if (storedType.Size > 8 && !IsPowerOrTwo(storedType.Size))
-                        {
-                            throw new NotImplementedException();
-                        }
-
                         // TODO: WTF?
                         // Load dst address into RCX.
                         // NOTE: Not lea - Address is WHERE the address stored (address of address)
