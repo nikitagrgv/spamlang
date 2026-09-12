@@ -331,20 +331,43 @@ public class Codegen
                                 break;
                             }
                             case IRBinaryOp.SDiv:
-                            {
-                                throw new NotImplementedException();
-                            }
                             case IRBinaryOp.UDiv:
-                            {
-                                throw new NotImplementedException();
-                            }
                             case IRBinaryOp.SRem:
-                            {
-                                throw new NotImplementedException();
-                            }
                             case IRBinaryOp.URem:
                             {
-                                throw new NotImplementedException();
+                                // TODO: Copy pasted from add/sub
+                                MOpReg leftReg = typedRax;
+                                MOpReg rightReg = typedRcx;
+                                instructions.Add(new MInstr
+                                {
+                                    Op = MOpcode.Mov,
+                                    Left = leftReg,
+                                    Right = ToOperand(binary.Left),
+                                });
+                                instructions.Add(new MInstr
+                                {
+                                    Op = MOpcode.Mov,
+                                    Left = rightReg,
+                                    Right = ToOperand(binary.Right),
+                                });
+                                instructions.Add(new MInstr
+                                {
+                                    Op = MOpcode.Imul,
+                                    Left = leftReg,
+                                    Right = rightReg,
+                                });
+                                instructions.Add(new MInstr
+                                {
+                                    Op = MOpcode.Mov,
+                                    Left = leftReg,
+                                    Right = new MOpMem
+                                    {
+                                        Base = Reg.Rbp,
+                                        Offset = -instrOffset,
+                                        Size = typeSize,
+                                    },
+                                });
+                                break;
                             }
                             default:
                             {
