@@ -48,6 +48,6 @@ public class FileSystem : IFileSystem
 
     public void CopyFile(string from, string too)
     {
-        File.Copy(from, too);
+        File.Copy(from, too, overwrite: true);
     }
 }

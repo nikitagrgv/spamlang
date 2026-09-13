@@ -19,6 +19,9 @@ class App
         [Argument("clang-path")]
         public string? ClangPath { get; set; }
 
+        [Argument("emit-asm")]
+        public string? EmitAsmPath { get; set; }
+
         [Argument("lexer")]
         public bool DebugLexer { get; set; }
 
@@ -93,7 +96,7 @@ class App
 
         string buildPath = CreateBuildDir(fs);
         Compiler.Flags flags = GetFlags(arguments);
-        Compiler compiler = new(fs, flags, clangPath, buildPath);
+        Compiler compiler = new(fs, flags, clangPath, buildPath, arguments.EmitAsmPath);
 
         string? output = arguments.Output;
         if (string.IsNullOrEmpty(output))
@@ -114,7 +117,7 @@ class App
             // NOTE: Leave the build dir for investigation 
             Console.WriteLine("Unexpected exception: " + e);
             Console.WriteLine("See build dir: " + buildPath);
-            return 0;
+            return 1;
         }
     }
 

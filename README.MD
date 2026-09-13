@@ -18,6 +18,7 @@ spamlang <source file> -o <output file>
 - `-c` / `--compile-only` - compile without linking
 - `-g` / `--debug-info` - compile with debug info
 - `--clang-path <path>` - path to clang executable (optional, default is `clang`)
+- `--emit-asm <path>` - save generated assembly to specified path (optional)
 
 Debug compiler stages:
 

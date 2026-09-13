@@ -23,13 +23,15 @@ public class Compiler
     private readonly Flags _flags;
     private readonly string _clangPath;
     private readonly string _buildPath;
+    private readonly string? _emitAsmPath;
 
-    public Compiler(IFileSystem fs, Flags flags, string clangPath, string buildPath)
+    public Compiler(IFileSystem fs, Flags flags, string clangPath, string buildPath, string? emitAsmPath)
     {
         _fs = fs;
         _flags = flags;
         _clangPath = clangPath;
         _buildPath = buildPath;
+        _emitAsmPath = emitAsmPath;
     }
 
     public bool Compile(string file, string output, bool compileOnly)
@@ -46,7 +48,17 @@ public class Compiler
         }
 
         timers.RestartTimer();
-        string code = _fs.ReadAllText(fullPathInput);
+        string code;
+        try
+        {
+            code = _fs.ReadAllText(fullPathInput);
+        }
+        catch (Exception)
+        {
+            Console.Error.WriteLine($"Failed to read file {fullPathInput}");
+            return false;
+        }
+
         timers.FinishTimer("Read");
 
         Diagnostic diag = new();
@@ -113,6 +125,12 @@ public class Compiler
         timers.RestartTimer();
         string asmPath = SaveAsm(mmodule, fullPathInput);
         timers.FinishTimer("Save Asm");
+
+        if (_emitAsmPath != null)
+        {
+            string dst = _fs.ResolveToFullPath(_emitAsmPath);
+            _fs.CopyFile(asmPath, dst);
+        }
 
         timers.RestartTimer();
         string? objPath = CompileAsm(asmPath);
