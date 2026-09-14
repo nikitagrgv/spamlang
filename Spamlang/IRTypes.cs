@@ -8,9 +8,10 @@ public sealed class IRModule
 public sealed class IRFunction : IRValue
 {
     public required string Name { get; init; }
-    public required FuncType Signature { get; init; }
     public required List<IRParam> Params { get; init; }
     public required List<IRBasicBlock> BasicBlocks { get; init; }
+
+    public required FuncType LoweredSignature { get; init; }
 
     public override Type Type => BuiltinType.Ptr;
 
@@ -21,7 +22,7 @@ public sealed class IRFunction : IRValue
 
     public override string PrintDefinition()
     {
-        return $"{Signature} @{Name}";
+        return $"{LoweredSignature} @{Name}";
     }
 }
 
@@ -178,11 +179,10 @@ public sealed class IRInstructionBinary : IRInstruction
 public sealed class IRInstructionCall : IRInstruction
 {
     public required IRValue Callee { get; init; }
-    public required FuncType Signature { get; init; }
-
     public required List<IRValue> Args { get; init; }
+    public required FuncType LoweredSignature { get; init; }
 
-    public override Type Type => Signature.ReturnType;
+    public override Type Type => LoweredSignature.ReturnType;
 
     public override string PrintDefinition()
     {

@@ -1,30 +1,40 @@
-fn main(): i32
+fn main() -> i32
 {
-    let a: i32 = 123 - 23;
+    let ggs = getGetSub;
+    let gs = ggs();
+    let s: fn(i32, i32)->i32 = gs();
     
     noop();
-    noop2(1,2,3);
 
-    let b: i32 = 456 + sum(a, a);
-    {
-        let c: i32 = 8 * 1000;
-        b = c;
-    }
-    let result: i32 = sum(a, b);
-    
+    let a = s(10, 1); // 9
+    let b = sub(b: 10, a: 30); // 20
+    let c = apply(sub, b, a); // 11
+    let d = sub(a: c, 1); // 10
+
+    return d;
+}
+
+fn sub(a: i32, b: i32) -> i32
+{
+    return a - b;
+}
+
+fn getSub() -> fn(i32, i32) -> i32
+{
+    return sub;
+}
+
+fn getGetSub() -> fn() -> fn(i32, i32) -> i32
+{
+    return getSub;
+}
+
+fn apply(f: fn(i32,i32)->i32, a: i32, b: i32) -> i32
+{
+    let result = f(a, b);
     return result;
 }
 
 fn noop()
 {
-}
-
-fn noop2(a: i32, b: i32, c: i32)
-{
-    return;
-}
-
-fn sum(a: i32, b: i32): i32
-{
-    return a + b;
 }

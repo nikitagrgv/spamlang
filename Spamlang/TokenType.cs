@@ -28,6 +28,8 @@ public enum TokenType
 
     LiteralInt,
 
+    Arrow,
+
     Eof,
 }
 
@@ -63,6 +65,8 @@ public static class TokenTypeUtils
                 TokenType.Identifier => "$",
 
                 TokenType.LiteralInt => "i",
+
+                TokenType.Arrow => "->",
 
                 TokenType.Eof => "EOF",
 

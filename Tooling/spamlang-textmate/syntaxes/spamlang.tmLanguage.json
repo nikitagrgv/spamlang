@@ -1,0 +1,44 @@
+{
+  "scopeName": "source.spamlang",
+  "patterns": [
+    {
+      "name": "comment.line.double-slash.spamlang",
+      "match": "//.*$"
+    },
+    {
+      "match": "\\b(fn)\\s+([A-Za-z_]\\w*)",
+      "captures": {
+        "1": {
+          "name": "keyword.other.spamlang"
+        },
+        "2": {
+          "name": "entity.name.function.spamlang"
+        }
+      }
+    },
+    {
+      "name": "keyword.other.spamlang",
+      "match": "\\b(fn|let|return)\\b"
+    },
+    {
+      "name": "storage.type.spamlang",
+      "match": "\\b[iu](8|16|32|64)\\b"
+    },
+    {
+      "name": "constant.numeric.spamlang",
+      "match": "\\b(0[xX][0-9a-fA-F]+|0[bB][01]+|\\d+)\\b"
+    },
+    {
+      "name": "entity.name.function.call.spamlang",
+      "match": "\\b[A-Za-z_]\\w*(?=\\s*\\()"
+    },
+    {
+      "name": "keyword.operator.spamlang",
+      "match": "->|[-+*/%=]"
+    },
+    {
+      "name": "punctuation.spamlang",
+      "match": "[{}(),:;]"
+    }
+  ]
+}

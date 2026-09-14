@@ -17,7 +17,7 @@ public sealed class FuncDecl : Node
 {
     public required int NameToken { get; init; }
     public required List<Param> Params { get; init; }
-    public required TypeDecl? ReturnType { get; init; }
+    public required TypeNode? ReturnType { get; init; }
     public required Block Body { get; init; }
 
     public FuncSymbol? Symbol { get; set; }
@@ -26,15 +26,30 @@ public sealed class FuncDecl : Node
 public sealed class Param : Node
 {
     public required int NameToken { get; init; }
-    public required TypeDecl Type { get; init; }
+    public required TypeNode Type { get; init; }
 
     public ParamSymbol? Symbol { get; set; }
 }
 
-public sealed class TypeDecl : Node
+public abstract class TypeNode : Node
+{
+    public Type? ResolvedType { get; set; }
+}
+
+public sealed class FuncTypeNode : TypeNode
+{
+    public required List<TypeNode> Params { get; init; }
+    public required TypeNode? ReturnType { get; init; }
+}
+
+public sealed class IdentifierTypeNode : TypeNode
 {
     public required int TypeNameToken { get; init; }
-    public Type? ResolvedType { get; set; }
+}
+
+public sealed class PointerTypeNode : TypeNode
+{
+    public required TypeNode Pointee { get; init; }
 }
 
 public abstract class Stmt : Node
@@ -51,7 +66,7 @@ public sealed class Block : Stmt
 public sealed class StmtLet : Stmt
 {
     public required int NameToken { get; init; }
-    public required TypeDecl? TypeDecl { get; init; }
+    public required TypeNode? TypeDecl { get; init; }
     public required Expr? Expr { get; set; }
 
     public VariableSymbol? Symbol { get; set; }
@@ -112,10 +127,18 @@ public sealed class ExprIdentifier : ExprPrimary
     public Symbol? Symbol { get; set; }
 }
 
+public sealed class ExprCallArg : Node
+{
+    public required Expr Expr { get; set; }
+    public required int? ArgNameToken { get; init; }
+
+    public int? ParameterIndex { get; set; }
+}
+
 public sealed class ExprCall : ExprPrimary
 {
     public required Expr Callee { get; init; }
-    public required List<Expr> Args { get; init; }
+    public required List<ExprCallArg> Args { get; init; }
 }
 
 public abstract class ExprCast : Expr

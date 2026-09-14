@@ -25,7 +25,7 @@ public class IRPrinter
             Console.Write($"{param.Type} %{param.Id}");
         }
 
-        Console.Write($") -> {func.Signature.ReturnType}");
+        Console.Write($") -> {func.LoweredSignature.ReturnType}");
         Console.WriteLine();
         Console.WriteLine("{");
         foreach (IRBasicBlock bb in func.BasicBlocks)

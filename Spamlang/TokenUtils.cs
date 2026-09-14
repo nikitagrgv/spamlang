@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Spamlang;
 
-public static class Utils
+public static class TokenUtils
 {
     public static string ToString(this UnaryOp op)
     {

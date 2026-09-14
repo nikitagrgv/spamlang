@@ -1,0 +1,21 @@
+{
+  "name": "spamlang",
+  "contributes": {
+    "languages": [
+      {
+        "id": "spamlang",
+        "extensions": [
+          ".spam"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "spamlang",
+        "scopeName": "source.spamlang",
+        "path": "./syntaxes/spamlang.tmLanguage.json"
+      }
+    ]
+  }
+}

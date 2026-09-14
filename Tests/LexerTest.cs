@@ -25,6 +25,7 @@ public class LexerTest
         ("let", TokenType.KeywordLet),
         ("spam", TokenType.Identifier),
         ("123", TokenType.LiteralInt),
+        ("->", TokenType.Arrow),
     ];
 
     public static TheoryData<string, TokenType> AllTokensData = MakeData();
@@ -456,7 +457,7 @@ public class LexerTest
     [Fact]
     public void Lexer_ParsesSimpleProgram()
     {
-        string code = "fn main(): i32 { return 123 + 10 * x; }";
+        string code = "fn main() -> i32 { return 123 + 10 * x; }";
         Diagnostic diag = new();
         Lexer lexer = new();
         Lexer.Result result = lexer.Run(code, diag);
@@ -476,7 +477,7 @@ public class LexerTest
         CheckNext(TokenType.Identifier);
         CheckNext(TokenType.LPar);
         CheckNext(TokenType.RPar);
-        CheckNext(TokenType.Colon);
+        CheckNext(TokenType.Arrow);
         CheckNext(TokenType.Identifier);
         CheckNext(TokenType.LBrace);
         CheckNext(TokenType.KeywordReturn);

@@ -114,37 +114,32 @@ public class MIRPrinter
         WriteLine();
     }
 
-    private void Print(MOperand op)
+    private void Print(MOperand operand)
     {
-        switch (op)
+        switch (operand)
         {
-            case MOpImm mOpImm:
-                Write(mOpImm.Value.ToString());
+            case MOpImm op:
+                Write(op.Value.ToString());
                 break;
-            case MOpLabel mOpLabel:
-                Write(mOpLabel.Label);
+            case MOpLabel op:
+                Write(op.Label);
                 break;
-            case MOpReg mOpReg:
-                Write(mOpReg.Reg.GetName(mOpReg.Size));
+            case MOpReg op:
+                Write(op.Reg.GetName(op.Size));
                 break;
-            case MOpMem mOpMem:
-                string name = mOpMem.Base.GetName(8);
-                int? offset = mOpMem.Offset;
-                string? prefix = null;
-                if (mOpMem.Size != null && mOpMem.Size.Value != 8)
+            case MOpMem op:
+            {
+                if (op.Size != null && op.Size.Value != 8)
                 {
-                    prefix = Regs.MemPrefix(mOpMem.Size.Value) + " ";
-                }
-
-                if (prefix != null)
-                {
+                    string prefix = Regs.MemPrefix(op.Size.Value) + " ";
                     Write(prefix);
                 }
 
                 Write("[");
 
-                Write(name);
+                Write(op.Base.GetName());
 
+                int? offset = op.Offset;
                 if (offset != null)
                 {
                     Write($"{offset:+#;-#;+0}");
@@ -153,8 +148,22 @@ public class MIRPrinter
                 Write("]");
 
                 break;
+            }
+            case MOpMemLabel op:
+            {
+                if (op.Size != null && op.Size.Value != 8)
+                {
+                    string prefix = Regs.MemPrefix(op.Size.Value) + " ";
+                    Write(prefix);
+                }
+
+                string regName = op.Base.GetName();
+                Write($"[{regName} + {op.Label}]");
+
+                break;
+            }
             default:
-                throw new ArgumentOutOfRangeException(nameof(op));
+                throw new ArgumentOutOfRangeException(nameof(operand));
         }
     }
 

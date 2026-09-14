@@ -7,15 +7,16 @@ public class Sema
     private readonly string _code;
     private readonly Diagnostic _diag;
     private readonly IReadOnlyList<Token> _tokens;
-    private readonly TypeRegistry _typeRegistry = new();
     private readonly List<Scope> _scopes = new(); // TODO: Do we need list? Or just current scope?
     private readonly List<FuncSymbol> _funcStack = new();
+    private readonly TypeRegistry _typeRegistry;
 
-    public Sema(string code, IReadOnlyList<Token> tokens, Diagnostic diag)
+    public Sema(string code, IReadOnlyList<Token> tokens, Diagnostic diag, TypeRegistry typeRegistry)
     {
         _code = code;
         _diag = diag;
         _tokens = tokens;
+        _typeRegistry = typeRegistry;
     }
 
     public void Run(CompilationUnit unit)
@@ -52,7 +53,7 @@ public class Sema
         FuncSymbol? mainSym = sym as FuncSymbol;
         if (mainSym == null)
         {
-            Error($"\"main\" must be a function, got {sym.GetType().Name}", mainDecl);
+            Error($"\"main\" must be a function, got {sym.SymbolKindName}", mainDecl);
             return;
         }
 
@@ -83,6 +84,7 @@ public class Sema
     private void VisitFuncDecl(FuncDecl fd)
     {
         Debug.Assert(fd.Symbol != null, $"Must be registered in {nameof(RegisterFunctionSymbols)}");
+        Debug.Assert(fd.ReturnType == null || fd.ReturnType.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
 
         _funcStack.Add(fd.Symbol);
 
@@ -214,6 +216,7 @@ public class Sema
     private void VisitStmtLet(StmtLet stmt)
     {
         // NOTE: Uninit is ok, defaults to zero
+        // NOTE: Variable of function type can be uninitialized too, but we don't care
 
         Debug.Assert(stmt.Expr != null || stmt.TypeDecl != null, "Must be guaranteed by parser");
 
@@ -239,11 +242,6 @@ public class Sema
                 }
 
                 Error(message, stmt);
-            }
-            else if (exprType is FuncType)
-            {
-                // TODO: Allow that
-                Error($"Cannot assign function to variable \"{name}\"", stmt);
             }
             else if (declType != null)
             {
@@ -359,10 +357,10 @@ public class Sema
             return;
         }
 
-        Type? commonType = GetCommonType(leftType, rightType, expr.Op);
+        Type? commonType = GetBinaryResultType(leftType, rightType, expr.Op);
         if (commonType == null)
         {
-            Error($"Cannot use \"{Utils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
+            Error($"Cannot use \"{TokenUtils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
@@ -374,64 +372,160 @@ public class Sema
 
     private void VisitExprCall(ExprCall expr)
     {
+        // TODO: Support default parameters
+
         expr.ValueCategory = ValueCategory.RValue;
 
         VisitExpr(expr.Callee);
-        foreach (Expr arg in expr.Args)
+        foreach (ExprCallArg arg in expr.Args)
         {
-            VisitExpr(arg);
+            VisitExpr(arg.Expr);
         }
 
-        if (expr.Callee is not ExprIdentifier callee)
-        {
-            // TODO: Implement more complex callees, like `myfunc()[4]()`
-            Error("Only identifiers can be called", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
-        }
-
-        if (callee.Symbol == null)
+        if (expr.Callee.ResolvedType == BuiltinType.Error)
         {
             // Already reported
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
 
-        if (callee.Symbol is not FuncSymbol funcSym)
+        if (expr.Callee.ResolvedType is not FuncType funcType)
         {
-            Error($"Expected function, got \"{callee.Symbol.Name}\"({callee.Symbol.GetType().Name})", expr);
+            Error("Cannot call a non-function type", expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
 
-        Debug.Assert(funcSym.Type is FuncType);
-        FuncType funcType = (FuncType)funcSym.Type;
+        // Can be null if call is indirect (e.g. via variable or expr)
+        FuncDecl? funcDecl = null;
+        if (expr.Callee is ExprIdentifier callee)
+        {
+            Debug.Assert(callee.Symbol != null, "ResolvedType is OK, so symbol must be valid");
+
+            // NOTE: Callee identifier is not always a FuncSymbol! E.g. variable with a pointer to function
+            // Don't emit error for this!
+            if (callee.Symbol is FuncSymbol funcSym)
+            {
+                funcDecl = funcSym.Declaration;
+                Debug.Assert(funcDecl.Symbol == funcSym);
+            }
+        }
 
         IReadOnlyList<Type> funcParams = funcType.ParamTypes;
-        List<Expr> args = expr.Args;
-        if (funcParams.Count != args.Count)
+        List<ExprCallArg> args = expr.Args;
+        bool[] usedParams = new bool[funcParams.Count];
+        bool hasUnorderedNamedArgs = false;
+
+        if (args.Count > funcParams.Count)
         {
-            Error(
-                $"Function \"{funcSym.Name}\" takes {funcSym.Declaration.Params.Count} arguments, got {args.Count}",
-                expr);
+            string str = "Function ";
+            if (funcDecl != null)
+            {
+                str += $"\"{GetTokenValue(funcDecl.NameToken)}\" ";
+            }
+
+            str += $"accepts {funcParams.Count} arguments, got {args.Count}";
+            Error(str, expr);
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
-
 
         for (int i = 0; i < args.Count; ++i)
         {
-            Type paramType = funcParams[i];
-            Expr arg = args[i];
+            ExprCallArg arg = args[i];
+            if (hasUnorderedNamedArgs && arg.ArgNameToken == null)
+            {
+                Error("Cannot use positional arguments after named arguments in changed order", arg);
+                expr.ResolvedType = BuiltinType.Error;
+                return;
+            }
+
+            int paramIndex = i;
+            if (arg.ArgNameToken != null)
+            {
+                if (funcDecl == null)
+                {
+                    Error("Cannot use named arguments with indirect calls", arg);
+                    expr.ResolvedType = BuiltinType.Error;
+                    return;
+                }
+
+                ReadOnlySpan<char> argName = GetTokenValue(arg.ArgNameToken.Value);
+                paramIndex = FindParamIndexByName(funcDecl, argName);
+                if (paramIndex == -1)
+                {
+                    Error($"Function \"{funcDecl.Symbol!.Name}\" doesn't have parameter with name \"{argName}\"", arg);
+                    expr.ResolvedType = BuiltinType.Error;
+                    return;
+                }
+
+                hasUnorderedNamedArgs |= paramIndex != i;
+            }
+
+            if (usedParams[paramIndex])
+            {
+                string err = $"Parameter with index {paramIndex} ";
+                if (funcDecl != null)
+                {
+                    err += $"({GetTokenValue(funcDecl.Params[paramIndex].NameToken)}) ";
+                }
+
+                err += "is specified twice";
+
+                Error(err, arg);
+                expr.ResolvedType = BuiltinType.Error;
+                return;
+            }
+
+            usedParams[paramIndex] = true;
+
+            Type paramType = funcParams[paramIndex];
 
             Debug.Assert(paramType != null, "Must be already resolved");
-            Debug.Assert(arg.ResolvedType != null, "Must be resolved above");
+            Debug.Assert(arg.Expr.ResolvedType != null, "Must be resolved above");
 
-            Expr newArg = Adapt(arg, paramType);
-            args[i] = newArg;
+            arg.ParameterIndex = paramIndex;
+            arg.Expr = Adapt(arg.Expr, paramType);
+        }
+
+        for (int i = 0; i < usedParams.Length; i++)
+        {
+            bool parmUsed = usedParams[i];
+            if (parmUsed)
+            {
+                continue;
+            }
+
+            string err = $"Parameter with index {i} ";
+            if (funcDecl != null)
+            {
+                err += $"({GetTokenValue(funcDecl.Params[i].NameToken)}) ";
+            }
+
+            err += "is missing";
+
+            Error(err, expr);
+            expr.ResolvedType = BuiltinType.Error;
+            return;
         }
 
         expr.ResolvedType = funcType.ReturnType;
+    }
+
+    private int FindParamIndexByName(FuncDecl funcDecl, ReadOnlySpan<char> name)
+    {
+        for (int i = 0; i < funcDecl.Params.Count; i++)
+        {
+            Param param = funcDecl.Params[i];
+            ReadOnlySpan<char> paramName = GetTokenValue(param.NameToken);
+            bool match = name.SequenceEqual(paramName);
+            if (match)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private void VisitExprIdentifier(ExprIdentifier expr)
@@ -567,6 +661,13 @@ public class Sema
         VisitExpr(expr.Expr);
         Debug.Assert(expr.Expr.ResolvedType != null);
 
+        if (expr.Expr.ResolvedType == BuiltinType.Error)
+        {
+            // Already reported
+            expr.ResolvedType = BuiltinType.Error;
+            return;
+        }
+
         if (!CanUseUnary(expr.Expr.ResolvedType, expr.Op))
         {
             Error($"Cannot use unary operator \"{expr.Op}\" on type \"{expr.Expr.ResolvedType}\"", expr);
@@ -668,7 +769,7 @@ public class Sema
                     ErrorRedeclaration(symbol, rec);
                     return;
 
-                default: throw new Exception("Unknown symbol type: " + rec.GetType().Name);
+                default: throw new Exception("Unknown symbol type: " + rec.SymbolKindName);
             }
         }
 
@@ -676,29 +777,75 @@ public class Sema
         Debug.Assert(ok);
     }
 
-    private Type ResolveType(TypeDecl typeDecl)
+    private Type ResolveType(TypeNode node)
     {
-        Debug.Assert(typeDecl.ResolvedType == null);
+        Debug.Assert(node.ResolvedType == null);
+        switch (node)
+        {
+            case FuncTypeNode n:
+                return ResolveFuncType(n);
+            case IdentifierTypeNode n:
+                return ResolveIdentifierType(n);
+            case PointerTypeNode n:
+                return ResolvePointerType(n);
+            default:
+                throw new ArgumentOutOfRangeException(nameof(node));
+        }
+    }
 
-        ReadOnlySpan<char> name = GetTokenValue(typeDecl.TypeNameToken);
+    private Type ResolveIdentifierType(IdentifierTypeNode node)
+    {
+        ReadOnlySpan<char> name = GetTokenValue(node.TypeNameToken);
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
         {
-            Error($"Type not found: \"{name}\"", typeDecl);
-            typeDecl.ResolvedType = BuiltinType.Error;
-            return typeDecl.ResolvedType;
+            Error($"Type not found: \"{name}\"", node);
+            node.ResolvedType = BuiltinType.Error;
+            return node.ResolvedType;
         }
 
         TypeSymbol? typeSym = sym as TypeSymbol;
         if (typeSym == null)
         {
-            Error($"Type expected: \"{name}\". Given: \"{sym.GetType().Name}\"", typeDecl);
-            typeDecl.ResolvedType = BuiltinType.Error;
-            return typeDecl.ResolvedType;
+            Error($"Type expected: \"{name}\". Given: \"{sym.SymbolKindName}\"", node);
+            node.ResolvedType = BuiltinType.Error;
+            return node.ResolvedType;
         }
 
-        typeDecl.ResolvedType = typeSym.Type;
-        return typeDecl.ResolvedType;
+        node.ResolvedType = typeSym.Type;
+        return node.ResolvedType;
+    }
+
+    private Type ResolveFuncType(FuncTypeNode node)
+    {
+        // TODO: Duplicated with AddFunctionSymbol 
+
+        Type returnType = BuiltinType.Void;
+        if (node.ReturnType != null)
+        {
+            Type type = ResolveType(node.ReturnType);
+            returnType = type;
+        }
+
+        // TODO: Reuse list
+        List<Type> paramTypes = [];
+        foreach (TypeNode param in node.Params)
+        {
+            Type type = ResolveType(param);
+            paramTypes.Add(type);
+        }
+
+        FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
+        node.ResolvedType = funcType;
+        return funcType;
+    }
+
+    private Type ResolvePointerType(PointerTypeNode node)
+    {
+        // TODO: Support
+        node.ResolvedType = BuiltinType.Error;
+        Error("Pointer types are not supported yet", node);
+        return node.ResolvedType;
     }
 
     private Symbol? LookupRecursive(ReadOnlySpan<char> name)
@@ -756,14 +903,21 @@ public class Sema
         return expr;
     }
 
-    private Type? GetCommonType(Type a, Type b, BinaryOp op)
+    private Type? GetBinaryResultType(Type a, Type b, BinaryOp op)
     {
+        Debug.Assert(a != BuiltinType.Error && b != BuiltinType.Error);
+
+        if (a != BuiltinType.I32 || b != BuiltinType.I32)
+        {
+            return null;
+        }
+
+        // TODO: Consider op too
+
         if (a == b)
         {
             return a;
         }
-
-        // TODO: Consider op too
 
         if (CanImplicitlyCast(b, a))
         {

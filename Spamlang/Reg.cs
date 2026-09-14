@@ -21,6 +21,8 @@ public enum Reg
     R13,
     R14,
     R15,
+
+    Rip,
 }
 
 public enum RegClass
@@ -49,10 +51,13 @@ public static class Regs
         ["r13", "r13d", "r13w", "r13b"],
         ["r14", "r14d", "r14w", "r14b"],
         ["r15", "r15d", "r15w", "r15b"],
+        ["rip"],
     ];
 
     public static string GetName(this Reg reg, int size)
     {
+        Debug.Assert(reg != Reg.Rip || size == 8, "Can only use full RIP register");
+
         int index = size switch
         {
             8 => 0,
@@ -63,6 +68,12 @@ public static class Regs
         };
 
         string name = Names[(int)reg][index];
+        return name;
+    }
+
+    public static string GetName(this Reg reg)
+    {
+        string name = Names[(int)reg][0];
         return name;
     }
 

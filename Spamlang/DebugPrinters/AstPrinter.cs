@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Spamlang.DebugPrinters;
 
 public class AstPrinter
@@ -57,9 +59,22 @@ public class AstPrinter
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 PrintAst(depth + 1, n.Type);
                 break;
-            case TypeDecl n:
-                Console.WriteLine($"{fullPrefix}TypeDecl | Type {n.ResolvedType}");
+            case IdentifierTypeNode n:
+                Console.WriteLine($"{fullPrefix}IdentifierTypeNode | Type {n.ResolvedType}");
                 PrintAstToken(depth + 1, n.TypeNameToken, "Type");
+                break;
+            case FuncTypeNode n:
+                Console.WriteLine($"{fullPrefix}FuncTypeNode | Type {n.ResolvedType}");
+                n.Params.ForEach(p => PrintAst(depth + 1, p));
+                if (n.ReturnType != null)
+                {
+                    PrintAst(depth + 1, n.ReturnType);
+                }
+
+                break;
+            case PointerTypeNode n:
+                Console.WriteLine($"{fullPrefix}PointerTypeNode | Type {n.ResolvedType}");
+                PrintAst(depth + 1, n.Pointee);
                 break;
             case FuncDecl n:
                 Console.WriteLine($"{fullPrefix}FuncDecl");
@@ -123,7 +138,7 @@ public class AstPrinter
             case ExprCall n:
                 Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)} | Type = {n.ResolvedType}");
                 PrintAst(depth + 1, n.Callee);
-                n.Args.ForEach(arg => PrintAst(depth + 1, arg));
+                n.Args.ForEach(arg => PrintAst(depth + 1, arg.Expr));
                 break;
             case ExprInt n:
                 Console.WriteLine(
@@ -144,37 +159,45 @@ public class AstPrinter
 
     private string PrettyExpr(Expr expr)
     {
-        string ret = "(";
+        StringBuilder ret = new();
+        ret.Append('(');
         switch (expr)
         {
             case ExprBinary binaryExpr:
-                ret += PrettyExpr(binaryExpr.Left);
-                ret += " ";
-                ret += Utils.ToString(binaryExpr.Op);
-                ret += " ";
-                ret += PrettyExpr(binaryExpr.Right);
+                ret.Append(PrettyExpr(binaryExpr.Left));
+                ret.Append(' ');
+                ret.Append(TokenUtils.ToString(binaryExpr.Op));
+                ret.Append(' ');
+                ret.Append(PrettyExpr(binaryExpr.Right));
                 break;
             case ExprUnary unaryExpr:
-                ret += Utils.ToString(unaryExpr.Op);
-                ret += PrettyExpr(unaryExpr.Expr);
+                ret.Append(TokenUtils.ToString(unaryExpr.Op));
+                ret.Append(PrettyExpr(unaryExpr.Expr));
                 break;
             case ExprCall exprCall:
-                ret = "";
-                ret += PrettyExpr(exprCall.Callee);
-                ret += "(";
+                ret.Clear();
+                ret.Append(PrettyExpr(exprCall.Callee));
+                ret.Append('(');
                 for (int i = 0; i < exprCall.Args.Count; ++i)
                 {
                     if (i != 0)
                     {
-                        ret += ", ";
+                        ret.Append(", ");
                     }
 
-                    ret += PrettyExpr(exprCall.Args[i]);
+                    ExprCallArg arg = exprCall.Args[i];
+                    if (arg.ArgNameToken != null)
+                    {
+                        ret.Append(TokenValue(arg.ArgNameToken.Value));
+                        ret.Append(": ");
+                    }
+
+                    ret.Append(PrettyExpr(arg.Expr));
                 }
 
-                ret += ")";
+                ret.Append(')');
 
-                return ret;
+                return ret.ToString();
             case ExprInt exprInt:
                 return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
             case ExprIdentifier exprIdentifier:
@@ -182,8 +205,8 @@ public class AstPrinter
             default: throw new Exception("Unknown node type: " + expr.GetType().Name);
         }
 
-        ret += ")";
-        return ret;
+        ret.Append(')');
+        return ret.ToString();
     }
 
     private void PrintAstToken(int depth, int token, string name)

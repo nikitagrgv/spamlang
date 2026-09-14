@@ -159,6 +159,8 @@ public class Parser
 
     private FuncDecl ParseFuncDecl()
     {
+        // TODO: Recovery is far from perfect... But I don't care
+
         int begin = _cursor;
 
         Expect(TokenType.KeywordFunc);
@@ -188,11 +190,26 @@ public class Parser
                 catch (UnexpectedTokenException e)
                 {
                     ReportError(e);
-                    GoTo(prevCursor, TokenType.Comma, TokenType.RPar, TokenType.LBrace, TokenType.KeywordFunc);
-                    if (Check(TokenType.KeywordFunc))
+                    while (true)
                     {
-                        throw new UnexpectedTokenException(Peek(), null);
+                        prevCursor = _cursor;
+                        GoTo(prevCursor, TokenType.Comma, TokenType.RPar, TokenType.LBrace, TokenType.KeywordFunc);
+                        if (Check(TokenType.KeywordFunc))
+                        {
+                            if (Peek(-1).Type == TokenType.Colon)
+                            {
+                                // fn is used as type declaration, not function
+                                Advance();
+                                continue;
+                            }
+
+                            // Delegate recovery to ParseCompilationUnit(), it will recover to the next function    
+                            throw new UnexpectedTokenException(Peek(), null);
+                        }
+
+                        break;
                     }
+
 
                     if (Check(TokenType.LBrace))
                     {
@@ -212,12 +229,12 @@ public class Parser
         }
 
         prevCursor = _cursor;
-        TypeDecl? returnType = null;
+        TypeNode? returnType = null;
         try
         {
             Expect(TokenType.RPar);
 
-            if (TryConsume(TokenType.Colon))
+            if (TryConsume(TokenType.Arrow))
             {
                 prevCursor = _cursor;
                 returnType = ParseType();
@@ -262,27 +279,68 @@ public class Parser
         int begin = _cursor;
         int nameToken = Expect(TokenType.Identifier);
         Expect(TokenType.Colon);
-        TypeDecl typeDecl = ParseType();
+        TypeNode typeNode = ParseType();
         int end = End(begin);
         return new Param
         {
             StartToken = begin,
             EndToken = end,
             NameToken = nameToken,
-            Type = typeDecl,
+            Type = typeNode,
         };
     }
 
-    private TypeDecl ParseType()
+    private TypeNode ParseType()
     {
         int begin = _cursor;
-        int typeNameToken = Expect(TokenType.Identifier);
-        int end = End(begin);
-        return new TypeDecl
+
+        if (TryConsume(TokenType.KeywordFunc))
+        {
+            List<TypeNode> parameters = [];
+            Expect(TokenType.LPar);
+            if (!Check(TokenType.RPar))
+            {
+                do
+                {
+                    TypeNode type = ParseType();
+                    parameters.Add(type);
+                } while (TryConsume(TokenType.Comma));
+            }
+
+            Expect(TokenType.RPar);
+
+            TypeNode? returnType = null;
+            if (TryConsume(TokenType.Arrow))
+            {
+                returnType = ParseType();
+            }
+
+            return new FuncTypeNode
+            {
+                StartToken = begin,
+                EndToken = End(begin),
+                Params = parameters,
+                ReturnType = returnType,
+            };
+        }
+
+        if (TryConsume(TokenType.Star))
+        {
+            TypeNode pointee = ParseType();
+            return new PointerTypeNode
+            {
+                StartToken = begin,
+                EndToken = End(begin),
+                Pointee = pointee,
+            };
+        }
+
+        Expect(TokenType.Identifier);
+        return new IdentifierTypeNode
         {
             StartToken = begin,
-            EndToken = end,
-            TypeNameToken = typeNameToken,
+            EndToken = End(begin),
+            TypeNameToken = begin,
         };
     }
 
@@ -362,7 +420,7 @@ public class Parser
         Expect(TokenType.KeywordLet);
         int nameToken = Expect(TokenType.Identifier);
 
-        TypeDecl? typeDecl = null;
+        TypeNode? typeDecl = null;
         if (TryConsume(TokenType.Colon))
         {
             typeDecl = ParseType();
@@ -473,7 +531,7 @@ public class Parser
                 EndToken = end,
                 Left = left,
                 Right = right,
-                Op = Utils.ToBinaryOp(_tokens[opPos].Type),
+                Op = TokenUtils.ToBinaryOp(_tokens[opPos].Type),
             };
         }
 
@@ -500,7 +558,7 @@ public class Parser
                 EndToken = end,
                 Left = left,
                 Right = right,
-                Op = Utils.ToBinaryOp(_tokens[opPos].Type),
+                Op = TokenUtils.ToBinaryOp(_tokens[opPos].Type),
             };
         }
 
@@ -534,7 +592,7 @@ public class Parser
                 StartToken = begin,
                 EndToken = End(begin),
                 Expr = expr,
-                Op = Utils.ToUnaryOp(opTokType),
+                Op = TokenUtils.ToUnaryOp(opTokType),
             };
         }
 
@@ -548,13 +606,29 @@ public class Parser
 
         while (TryConsume(TokenType.LPar))
         {
-            List<Expr> args = [];
+            List<ExprCallArg> args = [];
             if (!Check(TokenType.RPar))
             {
                 do
                 {
+                    int argBegin = _cursor;
+                    int? argNameToken = null;
+                    // Named arg
+                    if (Peek(0).Type == TokenType.Identifier && Peek(1).Type == TokenType.Colon)
+                    {
+                        argNameToken = Expect(TokenType.Identifier);
+                        Expect(TokenType.Colon);
+                    }
+
                     Expr expr = ParseExpr();
-                    args.Add(expr);
+                    ExprCallArg arg = new()
+                    {
+                        StartToken = argBegin,
+                        EndToken = End(argBegin),
+                        Expr = expr,
+                        ArgNameToken = argNameToken,
+                    };
+                    args.Add(arg);
                 } while (TryConsume(TokenType.Comma));
             }
 

@@ -35,9 +35,10 @@ Debug compiler stages:
 
 ## Features
 
-- [x] Syntax is better (for compiling and for mental health) than C++
+- [x] Modern syntax optimized for faster parsing
+- [x] Named arguments syntax: `spam(a: 123, b: 345)`
 - [x] Builtin types: i32
-- [x] Windows ABI
+- [ ] Windows ABI (work in progress)
 - [ ] System V ABI
 
 ## Supported Targets

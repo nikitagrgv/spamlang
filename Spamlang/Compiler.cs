@@ -96,7 +96,8 @@ public class Compiler
         }
 
         timers.RestartTimer();
-        Sema sema = new(code, tokens, diag);
+        TypeRegistry typeRegistry = new();
+        Sema sema = new(code, tokens, diag, typeRegistry);
         sema.Run(parserResult.CompilationUnit);
         timers.FinishTimer("Sema");
         PrintParser(tokens, code, parserResult.CompilationUnit); // NOTE: Print after sema to include sema info
@@ -111,7 +112,7 @@ public class Compiler
         diag.Report();
 
         timers.RestartTimer();
-        IRGen irGen = new();
+        IRGen irGen = new(typeRegistry);
         IRModule irModule = irGen.Run(parserResult.CompilationUnit);
         timers.FinishTimer("IR");
         PrintIR(irModule);

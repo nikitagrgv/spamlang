@@ -5,6 +5,12 @@ namespace Spamlang;
 public class IRGen
 {
     private readonly List<Dictionary<Symbol, IRValue>> _symbolScopes = new();
+    private readonly TypeRegistry _typeRegistry;
+
+    public IRGen(TypeRegistry typeRegistry)
+    {
+        _typeRegistry = typeRegistry;
+    }
 
     public IRModule Run(CompilationUnit unit)
     {
@@ -15,13 +21,14 @@ public class IRGen
         foreach (FuncDecl funcDecl in unit.FuncDecls)
         {
             Debug.Assert(funcDecl.Symbol is { Type: FuncType });
-            FuncType funcType = (FuncType)funcDecl.Symbol.Type;
+            FuncType signature = (FuncType)funcDecl.Symbol.Type;
+            FuncType lowerSignature = IRUtils.ToLowerSignature(signature, _typeRegistry);
             IRFunction func = new()
             {
                 BasicBlocks = new List<IRBasicBlock>(),
                 Name = funcDecl.Symbol.Name,
                 Params = new List<IRParam>(),
-                Signature = funcType,
+                LoweredSignature = lowerSignature,
             };
             globalScope.Add(funcDecl.Symbol, func);
             functions.Add(func);
@@ -67,11 +74,11 @@ public class IRGen
 
         GenBlock(entry, funcDecl.Body);
 
-        if (function.Signature.ReturnType == BuiltinType.Void && entry.Terminator == null)
+        if (function.LoweredSignature.ReturnType == BuiltinType.Void && entry.Terminator == null)
         {
             IRInstructionRet ret = new()
             {
-                Value = null
+                Value = null,
             };
             entry.Add(ret);
         }
@@ -136,7 +143,8 @@ public class IRGen
         }
         else
         {
-            value = MakeZeroInitialized(stmtLet.Symbol.Type);
+            Type type = IRUtils.ToLowerType(stmtLet.Symbol.Type);
+            value = MakeZeroInitialized(type);
         }
 
         IRValue? addr = LookupValue(stmtLet.Symbol);
@@ -173,9 +181,10 @@ public class IRGen
         if (expr.ValueCategory == ValueCategory.LValue)
         {
             IRValue addr = GenExprAddr(block, expr);
+            Type type = IRUtils.ToLowerType(expr.ResolvedType);
             IRInstructionLoad load = new()
             {
-                LoadedType = expr.ResolvedType,
+                LoadedType = type,
                 Address = addr,
             };
             block.Add(load);
@@ -261,22 +270,36 @@ public class IRGen
 
     private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr)
     {
+        Debug.Assert(expr.Callee.ResolvedType is FuncType, "Must be ensured by sema");
+        FuncType funcType = (FuncType)expr.Callee.ResolvedType;
+
         IRValue callee = GenExprValue(block, expr.Callee);
 
-        List<IRValue> args = new();
-        foreach (Expr arg in expr.Args)
+        // NOTE: IR args are in order of FUNCTION PARAMETERS, not call expression args
+        List<IRValue?> args = new();
+        args.EnsureCapacity(funcType.ParamTypes.Count);
+        for (int i = 0; i < funcType.ParamTypes.Count; i++)
         {
-            IRValue argValue = GenExprValue(block, arg);
-            args.Add(argValue);
+            args.Add(null);
         }
 
-        Debug.Assert(expr.Callee.ResolvedType is FuncType);
+        foreach (ExprCallArg arg in expr.Args)
+        {
+            Debug.Assert(arg.ParameterIndex.HasValue, "Must be set by sema");
+            int paramIndex = arg.ParameterIndex.Value;
 
+            Debug.Assert(args[paramIndex] == null);
+            args[paramIndex] = GenExprValue(block, arg.Expr);
+        }
+
+        Debug.Assert(!args.Contains(null), "All args must be set");
+
+        FuncType lowerSignature = IRUtils.ToLowerSignature(funcType, _typeRegistry);
         IRInstructionCall call = new()
         {
-            Args = args,
+            Args = args!,
             Callee = callee,
-            Signature = (FuncType)expr.Callee.ResolvedType,
+            LoweredSignature = lowerSignature,
         };
         block.Add(call);
         return call;
@@ -285,10 +308,11 @@ public class IRGen
     private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr)
     {
         IRValue value = GenExprValue(block, expr.Operand);
+        Type type = IRUtils.ToLowerType(expr.Target);
         IRInstructionCast cast = new()
         {
             Value = value,
-            CastTo = expr.Target
+            CastTo = type,
         };
         block.Add(cast);
         return cast;
@@ -308,11 +332,11 @@ public class IRGen
     private IRValue GenExprIntValue(ExprInt expr)
     {
         Debug.Assert(expr.ResolvedType != null);
-
+        Type type = IRUtils.ToLowerType(expr.ResolvedType);
         IRConstantInt value = new()
         {
             Value = expr.Value,
-            IntType = expr.ResolvedType,
+            IntType = type,
         };
         return value;
     }
@@ -336,6 +360,8 @@ public class IRGen
 
     private IRValue MakeZeroInitialized(Type type)
     {
+        Debug.Assert(type is not FuncType);
+
         // TODO: Don't allocate, put in static fields
         if (type == BuiltinType.I32 || type == BuiltinType.Ptr)
         {
@@ -356,7 +382,7 @@ public class IRGen
             Debug.Assert(let.Symbol != null);
 
             Symbol sym = let.Symbol;
-            Type type = sym.Type;
+            Type type = IRUtils.ToLowerType(sym.Type);
 
             IRInstructionAlloca alloca = new()
             {
@@ -379,16 +405,17 @@ public class IRGen
             Debug.Assert(param.Symbol != null);
             Symbol sym = param.Symbol;
 
+            Type type = IRUtils.ToLowerType(sym.Type);
             IRParam irParam = new()
             {
-                ParamType = sym.Type,
+                ParamType = type,
                 Index = irParams.Count,
             };
             irParams.Add(irParam);
 
             IRInstructionAlloca alloca = new()
             {
-                AllocatedType = sym.Type,
+                AllocatedType = type,
             };
             entry.Add(alloca);
 

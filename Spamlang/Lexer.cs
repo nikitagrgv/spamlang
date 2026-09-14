@@ -73,19 +73,19 @@ public class Lexer
                 continue;
             }
 
-            if (TryParseSingleCharToken(c) is { } singleCharToken)
+            if (TryParseSymbolicalToken(_code.AsSpan(pos), out int symbolTokenLen) is { } symbolToken)
             {
                 Token token = new()
                 {
-                    Type = singleCharToken,
+                    Type = symbolToken,
                     Position = pos,
-                    Length = 1,
+                    Length = symbolTokenLen,
                     Line = line,
                     Column = column,
                 };
                 tokens.Add(token);
-                pos++;
-                column++;
+                pos += symbolTokenLen;
+                column += symbolTokenLen;
                 continue;
             }
 
@@ -277,24 +277,45 @@ public class Lexer
     private static bool IsWordStart(char c) => char.IsAsciiLetter(c) || c == '_';
     private static bool IsWordPart(char c) => char.IsAsciiLetterOrDigit(c) || c == '_';
 
-    private static TokenType? TryParseSingleCharToken(char c)
+    private static TokenType? TryParseSymbolicalToken(ReadOnlySpan<char> str, out int len)
     {
-        return c switch
+        len = 1;
+        switch (str[0])
         {
-            '(' => TokenType.LPar,
-            ')' => TokenType.RPar,
-            '{' => TokenType.LBrace,
-            '}' => TokenType.RBrace,
-            ':' => TokenType.Colon,
-            ';' => TokenType.Semicolon,
-            '=' => TokenType.Assign,
-            '+' => TokenType.Plus,
-            '-' => TokenType.Minus,
-            '*' => TokenType.Star,
-            '/' => TokenType.Slash,
-            '%' => TokenType.Percent,
-            ',' => TokenType.Comma,
-            _ => null
-        };
+            case '(':
+                return TokenType.LPar;
+            case ')':
+                return TokenType.RPar;
+            case '{':
+                return TokenType.LBrace;
+            case '}':
+                return TokenType.RBrace;
+            case ':':
+                return TokenType.Colon;
+            case ';':
+                return TokenType.Semicolon;
+            case '=':
+                return TokenType.Assign;
+            case '+':
+                return TokenType.Plus;
+            case '-':
+                if (str.Length > 1 && str[1] == '>')
+                {
+                    len = 2;
+                    return TokenType.Arrow;
+                }
+
+                return TokenType.Minus;
+            case '*':
+                return TokenType.Star;
+            case '/':
+                return TokenType.Slash;
+            case '%':
+                return TokenType.Percent;
+            case ',':
+                return TokenType.Comma;
+            default:
+                return null;
+        }
     }
 }

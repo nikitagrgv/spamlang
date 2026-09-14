@@ -70,6 +70,13 @@ public sealed class MOpMem : MOperand
     public required int? Size { get; init; }
 }
 
+public sealed class MOpMemLabel : MOperand
+{
+    public required Reg Base { get; init; }
+    public required string Label { get; init; }
+    public required int? Size { get; init; }
+}
+
 public sealed class MOpLabel : MOperand
 {
     public required string Label { get; init; }
