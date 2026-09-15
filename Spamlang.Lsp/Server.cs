@@ -9,6 +9,9 @@ public class Server
     private Stream _output;
     private bool _exit;
 
+    private const int InternalErrorCode = -32603;
+    private const int MethodNotFoundCode = -32601;
+
     public Server(Stream input, Stream output)
     {
         _input = input;
@@ -34,8 +37,7 @@ public class Server
                 Console.Error.WriteLine(e);
                 if (msg["id"] is { } id && msg["method"] != null)
                 {
-                    const int internalErrorCode = -32603;
-                    ReplyError(id.DeepClone(), internalErrorCode, e.Message);
+                    ReplyError(id.DeepClone(), InternalErrorCode, e.Message);
                 }
             }
         }
@@ -79,7 +81,27 @@ public class Server
 
     private void HandleMessage(JsonNode message)
     {
-        throw new Exception();
+        string? method = (string?)message["method"];
+        JsonNode? id = message["id"];
+        JsonNode? paramsNode = message["params"];
+
+        switch (method)
+        {
+            case "initialize":
+            case "textDocument/didOpen":
+            case "textDocument/didChange":
+            case "textDocument/didClose":
+            case "shutdown":
+            case "exit":
+                break;
+            default:
+                if (id != null && method != null)
+                {
+                    ReplyError(id.DeepClone(), MethodNotFoundCode, $"Method not found: {method}");
+                }
+
+                break;
+        }
     }
 
     private void Reply(JsonNode? id, JsonNode? result)
