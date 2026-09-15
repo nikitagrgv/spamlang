@@ -79,6 +79,7 @@ public class Server
 
     private void HandleMessage(JsonNode message)
     {
+        throw new Exception();
     }
 
     private void Reply(JsonNode? id, JsonNode? result)
