@@ -95,6 +95,8 @@ public class Server
                 };
                 Reply(idCopy, reply);
                 break;
+            case "initialized":
+                break;
             case "textDocument/didOpen":
             {
                 string uri = (string)paramsNode!["textDocument"]!["uri"]!;
