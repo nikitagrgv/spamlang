@@ -108,7 +108,7 @@ public class Server
             case "textDocument/didChange":
             {
                 string uri = (string)paramsNode!["textDocument"]!["uri"]!;
-                string text = (string)paramsNode!["textDocument"]!["contentChanges"]!.AsArray()[^1]!["text"]!;
+                string text = (string)paramsNode!["contentChanges"]!.AsArray()[^1]!["text"]!;
                 Analyze(uri, text);
                 break;
             }
@@ -150,8 +150,8 @@ public class Server
             {
                 ["range"] = new JsonObject
                 {
-                    ["start"] = new JsonObject { ["line"] = diag.Line, ["character"] = diag.Column - 1 },
-                    ["end"] = new JsonObject { ["line"] = diag.Line, ["character"] = diag.Column - 1 + diag.Length },
+                    ["start"] = new JsonObject { ["line"] = diag.Line - 1, ["character"] = diag.Column - 1 },
+                    ["end"] = new JsonObject { ["line"] = diag.Line - 1, ["character"] = diag.Column - 1 + diag.Length },
                 },
                 ["severity"] = diag.Severity == DiagnosticSeverity.Error ? 1 : 2,
                 ["source"] = "spamlang",
