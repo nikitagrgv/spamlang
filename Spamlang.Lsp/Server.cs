@@ -138,7 +138,6 @@ public class Server
 
         Frontend.Frontend.Result result = Frontend.Frontend.Run(text, reg, diag, timers: null);
 
-
         PublishDiagnostics(uri, diag.Entries);
     }
 
