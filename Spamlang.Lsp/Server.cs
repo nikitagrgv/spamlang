@@ -154,7 +154,6 @@ public class Server
                     ["end"] = new JsonObject { ["line"] = diag.Line - 1, ["character"] = diag.Column - 1 + diag.Length },
                 },
                 ["severity"] = diag.Severity == DiagnosticSeverity.Error ? 1 : 2,
-                ["source"] = "spamlang",
                 ["message"] = diag.Message,
             };
             diagsArray.Add(diagNode);
