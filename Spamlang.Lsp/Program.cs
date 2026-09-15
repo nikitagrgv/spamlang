@@ -13,8 +13,9 @@ public class App
         {
             server.Run();
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Console.Error.WriteLine(e);
             return 1;
         }
 
