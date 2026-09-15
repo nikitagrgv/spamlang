@@ -93,6 +93,7 @@ public class Server
             case "textDocument/didClose":
             case "shutdown":
             case "exit":
+                _exit = true;
                 break;
             default:
                 if (id != null && method != null)
