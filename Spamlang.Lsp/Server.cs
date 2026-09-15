@@ -133,7 +133,16 @@ public class Server
 
     private void Analyze(string uri, string text)
     {
-        PublishDiagnostics(uri, []);
+        DiagnosticEntry entry = new()
+        {
+            Line = 1,
+            Column = 1,
+            Length = text.Length,
+            Message = "Test",
+            Severity = DiagnosticSeverity.Error,
+            Position = 4,
+        };
+        PublishDiagnostics(uri, [entry]);
     }
 
     private void PublishDiagnostics(string uri, ReadOnlySpan<DiagnosticEntry> diags)
