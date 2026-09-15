@@ -82,23 +82,32 @@ public class Server
     private void HandleMessage(JsonNode message)
     {
         string? method = (string?)message["method"];
-        JsonNode? id = message["id"];
+        JsonNode? idCopy = message["id"]?.DeepClone();
         JsonNode? paramsNode = message["params"];
 
         switch (method)
         {
             case "initialize":
+                JsonObject reply = new()
+                {
+                    ["capabilities"] = new JsonObject { ["textDocumentSync"] = 1 },
+                    ["serverInfo"] = new JsonObject { ["name"] = "spamlang" },
+                };
+                Reply(idCopy, reply);
+                break;
             case "textDocument/didOpen":
             case "textDocument/didChange":
             case "textDocument/didClose":
             case "shutdown":
+                Reply(idCopy, null);
+                break;
             case "exit":
                 _exit = true;
                 break;
             default:
-                if (id != null && method != null)
+                if (idCopy != null && method != null)
                 {
-                    ReplyError(id.DeepClone(), MethodNotFoundCode, $"Method not found: {method}");
+                    ReplyError(idCopy.DeepClone(), MethodNotFoundCode, $"Method not found: {method}");
                 }
 
                 break;
@@ -113,6 +122,7 @@ public class Server
             ["id"] = id,
             ["result"] = result,
         };
+        Send(reply);
     }
 
     private void ReplyError(JsonNode id, int errorCode, string message)
