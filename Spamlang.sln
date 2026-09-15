@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spamlang", "Spamlang\Spamla
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{A6C76B26-40A0-4572-AF5A-F29CD1BBC64F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spamlang.Frontend", "Spamlang.Frontend\Spamlang.Frontend.csproj", "{7F75D03F-DE83-451D-9FCA-1059161F73F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spamlang.Backend", "Spamlang.Backend\Spamlang.Backend.csproj", "{06DA847B-448D-4447-A5CF-B8FFEE72F265}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{A6C76B26-40A0-4572-AF5A-F29CD1BBC64F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6C76B26-40A0-4572-AF5A-F29CD1BBC64F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6C76B26-40A0-4572-AF5A-F29CD1BBC64F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F75D03F-DE83-451D-9FCA-1059161F73F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F75D03F-DE83-451D-9FCA-1059161F73F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F75D03F-DE83-451D-9FCA-1059161F73F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F75D03F-DE83-451D-9FCA-1059161F73F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06DA847B-448D-4447-A5CF-B8FFEE72F265}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06DA847B-448D-4447-A5CF-B8FFEE72F265}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06DA847B-448D-4447-A5CF-B8FFEE72F265}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06DA847B-448D-4447-A5CF-B8FFEE72F265}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

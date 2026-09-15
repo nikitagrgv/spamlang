@@ -1,6 +1,6 @@
 ﻿namespace Spamlang;
 
-class App
+public static class App
 {
     struct Arguments
     {
@@ -60,7 +60,7 @@ class App
         return flags;
     }
 
-    static int Main(string[] args)
+    public static int Main(string[] args)
     {
         ArgumentsParser.Result<Arguments> result = ArgumentsParser.Parse<Arguments>(args);
         if (result.Errors.Count > 0)

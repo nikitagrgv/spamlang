@@ -1,18 +1,18 @@
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 // Helper class for interning types like FuncType
 public class TypeRegistry
 {
     private readonly struct FuncSignature : IEquatable<FuncSignature>
     {
-        public FuncSignature(Type returnType, IReadOnlyList<Type> paramTypes)
+        public FuncSignature(SpamType returnType, IReadOnlyList<SpamType> paramTypes)
         {
             ReturnType = returnType;
             ParamTypes = paramTypes;
         }
 
-        public readonly Type ReturnType;
-        public readonly IReadOnlyList<Type> ParamTypes;
+        public readonly SpamType ReturnType;
+        public readonly IReadOnlyList<SpamType> ParamTypes;
 
         public bool Equals(FuncSignature other)
         {
@@ -25,7 +25,7 @@ public class TypeRegistry
         {
             HashCode hc = new();
             hc.Add(ReturnType);
-            foreach (Type t in ParamTypes)
+            foreach (SpamType t in ParamTypes)
             {
                 hc.Add(t);
             }
@@ -36,7 +36,7 @@ public class TypeRegistry
 
     private readonly Dictionary<FuncSignature, FuncType> _funcTypes = new();
 
-    public FuncType GetFuncType(Type returnType, IReadOnlyList<Type> paramTypes)
+    public FuncType GetFuncType(SpamType returnType, IReadOnlyList<SpamType> paramTypes)
     {
         FuncSignature lookupSignature = new(returnType, paramTypes);
         if (_funcTypes.TryGetValue(lookupSignature, out FuncType? type))

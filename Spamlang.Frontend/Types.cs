@@ -1,7 +1,7 @@
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 // NOTE: Interning is used for types like FuncType. TypeRegistry provides that. Compare by reference
-public abstract class Type
+public abstract class SpamType
 {
     public abstract string Name { get; }
     public abstract int Size { get; }
@@ -13,7 +13,7 @@ public abstract class Type
     }
 }
 
-public sealed class BuiltinType : Type
+public sealed class BuiltinType : SpamType
 {
     public override string Name { get; }
     public override int Size { get; }
@@ -35,23 +35,23 @@ public sealed class BuiltinType : Type
     public static readonly BuiltinType Ptr = new("ptr", 8, 8);
 }
 
-public sealed class FuncType : Type
+public sealed class FuncType : SpamType
 {
-    public IReadOnlyList<Type> ParamTypes { get; }
-    public Type ReturnType { get; }
+    public IReadOnlyList<SpamType> ParamTypes { get; }
+    public SpamType ReturnType { get; }
 
     public override int Size => 8;
     public override int Alignment => 8;
 
     public override string Name => $"fn({string.Join(", ", ParamTypes.Select(t => t.Name))})->{ReturnType.Name}";
 
-    private FuncType(Type returnType, IReadOnlyList<Type> paramTypes)
+    private FuncType(SpamType returnType, IReadOnlyList<SpamType> paramTypes)
     {
         ParamTypes = paramTypes;
         ReturnType = returnType;
     }
 
-    internal static FuncType CreateInterned(Type returnType, IReadOnlyList<Type> paramTypes)
+    internal static FuncType CreateInterned(SpamType returnType, IReadOnlyList<SpamType> paramTypes)
     {
         return new FuncType(returnType, paramTypes);
     }

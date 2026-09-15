@@ -1,3 +1,5 @@
+using Spamlang.Frontend;
+
 namespace Spamlang.DebugPrinters;
 
 public class TokensPrinter

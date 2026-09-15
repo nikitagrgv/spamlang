@@ -1,4 +1,4 @@
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 public enum UnaryOp
 {

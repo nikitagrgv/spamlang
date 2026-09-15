@@ -1,23 +1,14 @@
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 public class Lexer
 {
     private string _code = "";
     private Diagnostic? _diag;
-    private bool _hasErrors = false;
 
-    public struct Result
-    {
-        public List<Token> Tokens;
-        public bool HasErrors;
-    }
-
-    // TODO: Make it lazy? NextToken()
-    public Result Run(string code, Diagnostic diag)
+    public List<Token> Run(string code, Diagnostic diag)
     {
         _code = code;
         _diag = diag;
-        _hasErrors = false;
 
         List<Token> tokens = [];
         int codeLen = _code.Length;
@@ -62,7 +53,6 @@ public class Lexer
                 _diag.AddError("Tab characters are forbidden", pos, 1, line, column);
                 pos++;
                 column++;
-                _hasErrors = true;
                 continue;
             }
 
@@ -103,7 +93,6 @@ public class Lexer
                 if (!valid)
                 {
                     token.Type = TokenType.Invalid;
-                    _hasErrors = true;
                     _diag.AddError("Invalid integer literal", token);
                 }
 
@@ -127,7 +116,6 @@ public class Lexer
                 tokens.Add(invalidToken);
                 pos += wordLen;
                 column += wordLen;
-                _hasErrors = true;
                 _diag.AddError("Invalid token", invalidToken);
                 continue;
             }
@@ -171,13 +159,7 @@ public class Lexer
             Column = column
         });
 
-        Result result = new()
-        {
-            Tokens = tokens,
-            HasErrors = _hasErrors,
-        };
-
-        return result;
+        return tokens;
     }
 
     private TokenType? TryParseKeyword(ReadOnlySpan<char> word)

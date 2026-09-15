@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 public class Sema
 {
@@ -95,7 +95,7 @@ public class Sema
         {
             Debug.Assert(param.Type.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
 
-            Type type = param.Type.ResolvedType;
+            SpamType type = param.Type.ResolvedType;
             ReadOnlySpan<char> name = GetTokenValue(param.NameToken);
 
             ParamSymbol sym = new()
@@ -196,8 +196,8 @@ public class Sema
             return;
         }
 
-        Type targetType = stmt.Target.ResolvedType;
-        Type valueType = stmt.Value.ResolvedType;
+        SpamType targetType = stmt.Target.ResolvedType;
+        SpamType valueType = stmt.Value.ResolvedType;
 
         if (valueType == BuiltinType.Error)
         {
@@ -222,7 +222,7 @@ public class Sema
 
         ReadOnlySpan<char> name = GetTokenValue(stmt.NameToken);
 
-        Type? declType = null;
+        SpamType? declType = null;
         if (stmt.TypeDecl != null)
         {
             declType = ResolveType(stmt.TypeDecl);
@@ -232,7 +232,7 @@ public class Sema
         {
             VisitExpr(stmt.Expr);
             Debug.Assert(stmt.Expr.ResolvedType != null);
-            Type exprType = stmt.Expr.ResolvedType;
+            SpamType exprType = stmt.Expr.ResolvedType;
             if (exprType == BuiltinType.Void)
             {
                 string message = $"Cannot assign variable \"{name}\" to void";
@@ -282,7 +282,7 @@ public class Sema
 
         FuncSymbol currentFunc = _funcStack[^1];
         FuncType funcType = (FuncType)currentFunc.Type;
-        Type returnType = funcType.ReturnType;
+        SpamType returnType = funcType.ReturnType;
 
         if (returnType == BuiltinType.Error)
         {
@@ -347,8 +347,8 @@ public class Sema
         Debug.Assert(expr.Left.ResolvedType != null);
         Debug.Assert(expr.Right.ResolvedType != null);
 
-        Type leftType = expr.Left.ResolvedType;
-        Type rightType = expr.Right.ResolvedType;
+        SpamType leftType = expr.Left.ResolvedType;
+        SpamType rightType = expr.Right.ResolvedType;
 
         if (leftType == BuiltinType.Error || rightType == BuiltinType.Error)
         {
@@ -357,7 +357,7 @@ public class Sema
             return;
         }
 
-        Type? commonType = GetBinaryResultType(leftType, rightType, expr.Op);
+        SpamType? commonType = GetBinaryResultType(leftType, rightType, expr.Op);
         if (commonType == null)
         {
             Error($"Cannot use \"{TokenUtils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
@@ -411,7 +411,7 @@ public class Sema
             }
         }
 
-        IReadOnlyList<Type> funcParams = funcType.ParamTypes;
+        IReadOnlyList<SpamType> funcParams = funcType.ParamTypes;
         List<ExprCallArg> args = expr.Args;
         bool[] usedParams = new bool[funcParams.Count];
         bool hasUnorderedNamedArgs = false;
@@ -479,7 +479,7 @@ public class Sema
 
             usedParams[paramIndex] = true;
 
-            Type paramType = funcParams[paramIndex];
+            SpamType paramType = funcParams[paramIndex];
 
             Debug.Assert(paramType != null, "Must be already resolved");
             Debug.Assert(arg.Expr.ResolvedType != null, "Must be resolved above");
@@ -680,7 +680,7 @@ public class Sema
 
     private void RegisterBuiltin(Scope scope)
     {
-        void Register(string name, Type type)
+        void Register(string name, SpamType type)
         {
             TypeSymbol symbol = new()
             {
@@ -706,18 +706,18 @@ public class Sema
 
     private void AddFunctionSymbol(FuncDecl fd)
     {
-        Type returnType = BuiltinType.Void;
+        SpamType returnType = BuiltinType.Void;
         if (fd.ReturnType != null)
         {
-            Type type = ResolveType(fd.ReturnType);
+            SpamType type = ResolveType(fd.ReturnType);
             returnType = type;
         }
 
         // TODO: Reuse list
-        List<Type> paramTypes = [];
+        List<SpamType> paramTypes = [];
         foreach (Param param in fd.Params)
         {
-            Type type = ResolveType(param.Type);
+            SpamType type = ResolveType(param.Type);
             paramTypes.Add(type);
         }
 
@@ -777,7 +777,7 @@ public class Sema
         Debug.Assert(ok);
     }
 
-    private Type ResolveType(TypeNode node)
+    private SpamType ResolveType(TypeNode node)
     {
         Debug.Assert(node.ResolvedType == null);
         switch (node)
@@ -793,7 +793,7 @@ public class Sema
         }
     }
 
-    private Type ResolveIdentifierType(IdentifierTypeNode node)
+    private SpamType ResolveIdentifierType(IdentifierTypeNode node)
     {
         ReadOnlySpan<char> name = GetTokenValue(node.TypeNameToken);
         Symbol? sym = LookupRecursive(name);
@@ -816,22 +816,22 @@ public class Sema
         return node.ResolvedType;
     }
 
-    private Type ResolveFuncType(FuncTypeNode node)
+    private SpamType ResolveFuncType(FuncTypeNode node)
     {
         // TODO: Duplicated with AddFunctionSymbol 
 
-        Type returnType = BuiltinType.Void;
+        SpamType returnType = BuiltinType.Void;
         if (node.ReturnType != null)
         {
-            Type type = ResolveType(node.ReturnType);
+            SpamType type = ResolveType(node.ReturnType);
             returnType = type;
         }
 
         // TODO: Reuse list
-        List<Type> paramTypes = [];
+        List<SpamType> paramTypes = [];
         foreach (TypeNode param in node.Params)
         {
-            Type type = ResolveType(param);
+            SpamType type = ResolveType(param);
             paramTypes.Add(type);
         }
 
@@ -840,7 +840,7 @@ public class Sema
         return funcType;
     }
 
-    private Type ResolvePointerType(PointerTypeNode node)
+    private SpamType ResolvePointerType(PointerTypeNode node)
     {
         // TODO: Support
         node.ResolvedType = BuiltinType.Error;
@@ -868,11 +868,11 @@ public class Sema
         return _scopes[^1];
     }
 
-    private Expr Adapt(Expr expr, Type targetType)
+    private Expr Adapt(Expr expr, SpamType targetType)
     {
         Debug.Assert(expr.ResolvedType != null, "Must be resolve before adapt");
 
-        Type type = expr.ResolvedType;
+        SpamType type = expr.ResolvedType;
         if (type == BuiltinType.Error || targetType == BuiltinType.Error)
         {
             // Already reported
@@ -903,7 +903,7 @@ public class Sema
         return expr;
     }
 
-    private Type? GetBinaryResultType(Type a, Type b, BinaryOp op)
+    private SpamType? GetBinaryResultType(SpamType a, SpamType b, BinaryOp op)
     {
         Debug.Assert(a != BuiltinType.Error && b != BuiltinType.Error);
 
@@ -932,7 +932,7 @@ public class Sema
         return null;
     }
 
-    private bool CanUseUnary(Type type, UnaryOp op)
+    private bool CanUseUnary(SpamType type, UnaryOp op)
     {
         // TODO: Put this info in type
 
@@ -944,7 +944,7 @@ public class Sema
         return false;
     }
 
-    private bool CanImplicitlyCast(Type from, Type to)
+    private bool CanImplicitlyCast(SpamType from, SpamType to)
     {
         Debug.Assert(from != to);
         // TODO: Implement

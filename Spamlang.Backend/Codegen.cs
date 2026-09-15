@@ -1,6 +1,7 @@
 using System.Diagnostics;
+using Spamlang.Frontend;
 
-namespace Spamlang;
+namespace Spamlang.Backend;
 
 public class Codegen
 {
@@ -285,7 +286,7 @@ public class Codegen
 
         EmitCall(ctx, instructions, instr.Callee, comment);
 
-        Type returnType = instr.Type;
+        SpamType returnType = instr.Type;
         if (returnType == BuiltinType.Void)
         {
             return;

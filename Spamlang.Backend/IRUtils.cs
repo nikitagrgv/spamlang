@@ -1,8 +1,10 @@
-namespace Spamlang;
+using Spamlang.Frontend;
+
+namespace Spamlang.Backend;
 
 public static class IRUtils
 {
-    public static Type ToLowerType(Type type)
+    public static SpamType ToLowerType(SpamType type)
     {
         if (type is FuncType)
         {
@@ -16,15 +18,15 @@ public static class IRUtils
     {
         // TODO: Cache!
 
-        List<Type> lowerParams = new();
+        List<SpamType> lowerParams = new();
         lowerParams.EnsureCapacity(funcType.ParamTypes.Count);
-        foreach (Type paramType in funcType.ParamTypes)
+        foreach (SpamType paramType in funcType.ParamTypes)
         {
-            Type lower = ToLowerType(paramType);
+            SpamType lower = ToLowerType(paramType);
             lowerParams.Add(lower);
         }
 
-        Type lowerRetType = ToLowerType(funcType.ReturnType);
+        SpamType lowerRetType = ToLowerType(funcType.ReturnType);
         return typeRegistry.GetFuncType(lowerRetType, lowerParams);
     }
 }

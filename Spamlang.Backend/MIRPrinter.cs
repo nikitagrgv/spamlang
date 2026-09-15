@@ -1,4 +1,4 @@
-namespace Spamlang;
+namespace Spamlang.Backend;
 
 public class MIRPrinter
 {

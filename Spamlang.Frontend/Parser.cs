@@ -1,12 +1,11 @@
 using System.Diagnostics;
 
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 public class Parser
 {
     private string _code = "";
     private Diagnostic? _diag;
-    private bool _hasErrors = false;
     private List<Token> _tokens = [];
     private int _cursor;
 
@@ -17,27 +16,15 @@ public class Parser
         public TokenType? Expected { get; init; } = expected;
     }
 
-    public struct Result
-    {
-        public CompilationUnit CompilationUnit;
-        public bool HasErrors;
-    }
-
-    public Result Run(string code, List<Token> tokens, Diagnostic diag)
+    public CompilationUnit Run(string code, List<Token> tokens, Diagnostic diag)
     {
         _code = code;
         _diag = diag;
         _tokens = tokens;
-        _hasErrors = false;
         _cursor = 0;
 
         CompilationUnit compilationUnit = ParseCompilationUnit();
-        Result result = new()
-        {
-            CompilationUnit = compilationUnit,
-            HasErrors = _hasErrors,
-        };
-        return result;
+        return compilationUnit;
     }
 
     private Token Peek(int n = 0)
@@ -698,7 +685,6 @@ public class Parser
 
     private void ReportError(Token given, TokenType? expected = null)
     {
-        _hasErrors = true;
         string message = UnexpectedTokenMessage(given, expected);
         _diag?.AddError(message, given);
     }

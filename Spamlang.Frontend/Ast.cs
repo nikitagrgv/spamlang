@@ -1,4 +1,4 @@
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 public abstract class Node
 {
@@ -33,7 +33,7 @@ public sealed class Param : Node
 
 public abstract class TypeNode : Node
 {
-    public Type? ResolvedType { get; set; }
+    public SpamType? ResolvedType { get; set; }
 }
 
 public sealed class FuncTypeNode : TypeNode
@@ -91,7 +91,7 @@ public sealed class StmtExpr : Stmt
 
 public abstract class Expr : Node
 {
-    public Type? ResolvedType { get; set; }
+    public SpamType? ResolvedType { get; set; }
     public ValueCategory? ValueCategory { get; set; }
 }
 
@@ -144,7 +144,7 @@ public sealed class ExprCall : ExprPrimary
 public abstract class ExprCast : Expr
 {
     public required Expr Operand { get; init; }
-    public required Type Target { get; init; }
+    public required SpamType Target { get; init; }
 }
 
 public sealed class ExprImplicitCast : ExprCast

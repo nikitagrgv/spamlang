@@ -1,6 +1,7 @@
 using System.Diagnostics;
+using Spamlang.Frontend;
 
-namespace Spamlang;
+namespace Spamlang.Backend;
 
 public class IRGen
 {
@@ -143,7 +144,7 @@ public class IRGen
         }
         else
         {
-            Type type = IRUtils.ToLowerType(stmtLet.Symbol.Type);
+            SpamType type = IRUtils.ToLowerType(stmtLet.Symbol.Type);
             value = MakeZeroInitialized(type);
         }
 
@@ -181,7 +182,7 @@ public class IRGen
         if (expr.ValueCategory == ValueCategory.LValue)
         {
             IRValue addr = GenExprAddr(block, expr);
-            Type type = IRUtils.ToLowerType(expr.ResolvedType);
+            SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
             IRInstructionLoad load = new()
             {
                 LoadedType = type,
@@ -308,7 +309,7 @@ public class IRGen
     private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr)
     {
         IRValue value = GenExprValue(block, expr.Operand);
-        Type type = IRUtils.ToLowerType(expr.Target);
+        SpamType type = IRUtils.ToLowerType(expr.Target);
         IRInstructionCast cast = new()
         {
             Value = value,
@@ -332,7 +333,7 @@ public class IRGen
     private IRValue GenExprIntValue(ExprInt expr)
     {
         Debug.Assert(expr.ResolvedType != null);
-        Type type = IRUtils.ToLowerType(expr.ResolvedType);
+        SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
         IRConstantInt value = new()
         {
             Value = expr.Value,
@@ -358,7 +359,7 @@ public class IRGen
         }
     }
 
-    private IRValue MakeZeroInitialized(Type type)
+    private IRValue MakeZeroInitialized(SpamType type)
     {
         Debug.Assert(type is not FuncType);
 
@@ -382,7 +383,7 @@ public class IRGen
             Debug.Assert(let.Symbol != null);
 
             Symbol sym = let.Symbol;
-            Type type = IRUtils.ToLowerType(sym.Type);
+            SpamType type = IRUtils.ToLowerType(sym.Type);
 
             IRInstructionAlloca alloca = new()
             {
@@ -405,7 +406,7 @@ public class IRGen
             Debug.Assert(param.Symbol != null);
             Symbol sym = param.Symbol;
 
-            Type type = IRUtils.ToLowerType(sym.Type);
+            SpamType type = IRUtils.ToLowerType(sym.Type);
             IRParam irParam = new()
             {
                 ParamType = type,

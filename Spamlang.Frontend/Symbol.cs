@@ -1,11 +1,11 @@
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 // TODO: Merge subtypes to single Symbol class?
 public abstract class Symbol
 {
     public required string Name { get; init; }
     public required Scope DeclaringScope { get; init; }
-    public required Type Type { get; init; }
+    public required SpamType Type { get; init; }
 
     public abstract Node? DeclaringNode { get; }
 

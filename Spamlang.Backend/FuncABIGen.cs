@@ -1,4 +1,6 @@
-namespace Spamlang;
+using Spamlang.Frontend;
+
+namespace Spamlang.Backend;
 
 public class FuncABI
 {
@@ -18,7 +20,7 @@ public sealed class FuncABIGen
         MValueLocation? retLoc = null;
         List<MValueLocation> paramsLocs = new();
 
-        Type retType = IRUtils.ToLowerType(signature.ReturnType);
+        SpamType retType = IRUtils.ToLowerType(signature.ReturnType);
         if (retType != BuiltinType.Void)
         {
             if (retType.Size > 8 || !IsPowerOrTwo(retType.Size) || GetClass(retType) != RegClass.Int)
@@ -36,7 +38,7 @@ public sealed class FuncABIGen
                 throw new NotImplementedException();
             }
 
-            Type paramType = IRUtils.ToLowerType(signature.ParamTypes[i]);
+            SpamType paramType = IRUtils.ToLowerType(signature.ParamTypes[i]);
             if (paramType.Size > 8 || !IsPowerOrTwo(paramType.Size) || GetClass(paramType) != RegClass.Int)
             {
                 throw new NotImplementedException();
@@ -53,7 +55,7 @@ public sealed class FuncABIGen
         };
     }
 
-    private static RegClass GetClass(Type type)
+    private static RegClass GetClass(SpamType type)
     {
         if (type == BuiltinType.I32 || type == BuiltinType.Ptr)
         {

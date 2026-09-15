@@ -1,4 +1,6 @@
-namespace Spamlang;
+using Spamlang.Frontend;
+
+namespace Spamlang.Backend;
 
 public sealed class IRModule
 {
@@ -13,7 +15,7 @@ public sealed class IRFunction : IRValue
 
     public required FuncType LoweredSignature { get; init; }
 
-    public override Type Type => BuiltinType.Ptr;
+    public override SpamType Type => BuiltinType.Ptr;
 
     public override string PrintOperand()
     {
@@ -59,7 +61,7 @@ public sealed class IRBasicBlock
 
 public abstract class IRValue
 {
-    public abstract Type Type { get; }
+    public abstract SpamType Type { get; }
     public int Id { get; set; } = -1;
 
     public virtual string PrintOperand()
@@ -75,10 +77,10 @@ public abstract class IRValue
 
 public sealed class IRConstantInt : IRValue
 {
-    public required Type IntType { get; init; }
+    public required SpamType IntType { get; init; }
     public required Int128 Value { get; init; }
 
-    public override Type Type => IntType;
+    public override SpamType Type => IntType;
 
     public override string PrintOperand()
     {
@@ -88,10 +90,10 @@ public sealed class IRConstantInt : IRValue
 
 public sealed class IRParam : IRValue
 {
-    public required Type ParamType { get; init; }
+    public required SpamType ParamType { get; init; }
     public required int Index { get; init; }
 
-    public override Type Type => ParamType;
+    public override SpamType Type => ParamType;
 }
 
 public abstract class IRInstruction : IRValue
@@ -103,7 +105,7 @@ public abstract class IRInstruction : IRValue
 public sealed class IRInstructionRet : IRInstruction
 {
     public required IRValue? Value { get; init; }
-    public override Type Type => BuiltinType.Void;
+    public override SpamType Type => BuiltinType.Void;
     public override bool IsTerminator => true;
 
     public override string PrintDefinition()
@@ -119,8 +121,8 @@ public sealed class IRInstructionRet : IRInstruction
 
 public sealed class IRInstructionAlloca : IRInstruction
 {
-    public required Type AllocatedType { get; init; }
-    public override Type Type => BuiltinType.Ptr;
+    public required SpamType AllocatedType { get; init; }
+    public override SpamType Type => BuiltinType.Ptr;
 
     public override string PrintDefinition()
     {
@@ -130,9 +132,9 @@ public sealed class IRInstructionAlloca : IRInstruction
 
 public sealed class IRInstructionLoad : IRInstruction
 {
-    public required Type LoadedType { get; init; }
+    public required SpamType LoadedType { get; init; }
     public required IRValue Address { get; init; }
-    public override Type Type => LoadedType;
+    public override SpamType Type => LoadedType;
 
     public override string PrintDefinition()
     {
@@ -144,7 +146,7 @@ public sealed class IRInstructionStore : IRInstruction
 {
     public required IRValue Value { get; init; }
     public required IRValue Address { get; init; }
-    public override Type Type => BuiltinType.Void;
+    public override SpamType Type => BuiltinType.Void;
 
     public override string PrintDefinition()
     {
@@ -168,7 +170,7 @@ public sealed class IRInstructionBinary : IRInstruction
     public required IRBinaryOp Op { get; init; }
     public required IRValue Left { get; init; }
     public required IRValue Right { get; init; }
-    public override Type Type => Left.Type;
+    public override SpamType Type => Left.Type;
 
     public override string PrintDefinition()
     {
@@ -182,7 +184,7 @@ public sealed class IRInstructionCall : IRInstruction
     public required List<IRValue> Args { get; init; }
     public required FuncType LoweredSignature { get; init; }
 
-    public override Type Type => LoweredSignature.ReturnType;
+    public override SpamType Type => LoweredSignature.ReturnType;
 
     public override string PrintDefinition()
     {
@@ -210,8 +212,8 @@ public sealed class IRInstructionCall : IRInstruction
 public sealed class IRInstructionCast : IRInstruction
 {
     public required IRValue Value { get; init; }
-    public required Type CastTo { get; init; }
-    public override Type Type => CastTo;
+    public required SpamType CastTo { get; init; }
+    public override SpamType Type => CastTo;
 
     public override string PrintDefinition()
     {

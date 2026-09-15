@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Spamlang;
+namespace Spamlang.Frontend;
 
 public static class TokenUtils
 {

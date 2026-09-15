@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Spamlang;
+using Spamlang.Frontend;
 
 namespace Tests;
 
@@ -48,12 +49,12 @@ public class LexerTest
         string code = token;
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.Equal(expected, result.Tokens[0].Type);
-        Assert.Equal(token, result.Tokens[0].Value(code));
+        Assert.False(diag.HasErrors);
+        Assert.Equal(expected, tokens[0].Type);
+        Assert.Equal(token, tokens[0].Value(code));
     }
 
     [Theory]
@@ -63,12 +64,12 @@ public class LexerTest
         string code = token;
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.NotEmpty(result.Tokens);
-        Assert.Equal(TokenType.Eof, result.Tokens.Last().Type);
+        Assert.False(diag.HasErrors);
+        Assert.NotEmpty(tokens);
+        Assert.Equal(TokenType.Eof, tokens.Last().Type);
     }
 
     [Fact]
@@ -76,12 +77,12 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run("", diag);
+        List<Token> tokens = lexer.Run("", diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.Single(result.Tokens);
-        Assert.Equal(TokenType.Eof, result.Tokens.Last().Type);
+        Assert.False(diag.HasErrors);
+        Assert.Single(tokens);
+        Assert.Equal(TokenType.Eof, tokens.Last().Type);
     }
 
     [Fact]
@@ -89,9 +90,9 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run("123", diag);
+        List<Token> tokens = lexer.Run("123", diag);
 
-        Assert.Equal(1, result.Tokens[0].Column);
+        Assert.Equal(1, tokens[0].Column);
     }
 
     [Theory]
@@ -111,9 +112,9 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.Equal(expectedColumn, result.Tokens[0].Column);
+        Assert.Equal(expectedColumn, tokens[0].Column);
     }
 
     [Fact]
@@ -121,9 +122,9 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run("123", diag);
+        List<Token> tokens = lexer.Run("123", diag);
 
-        Assert.Equal(1, result.Tokens[0].Line);
+        Assert.Equal(1, tokens[0].Line);
     }
 
     [Theory]
@@ -141,9 +142,9 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.Equal(expectedLine, result.Tokens[0].Line);
+        Assert.Equal(expectedLine, tokens[0].Line);
     }
 
     [Theory]
@@ -161,9 +162,9 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.Equal(expectedLine, result.Tokens[0].Line);
+        Assert.Equal(expectedLine, tokens[0].Line);
     }
 
     // This language is a tab hater. Sorry...
@@ -175,9 +176,8 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.True(result.HasErrors);
         Assert.True(diag.HasErrors);
         Assert.Single(diag.Entries);
 
@@ -187,7 +187,7 @@ public class LexerTest
         Assert.Equal(tabPos + 1, diag.Entries[0].Column);
 
         // Tab doesn't count as a token. All tokens must be valid
-        Assert.DoesNotContain(result.Tokens, t => t.IsInvalid());
+        Assert.DoesNotContain(tokens, t => t.IsInvalid());
     }
 
     [Fact]
@@ -196,16 +196,16 @@ public class LexerTest
         string code = "123 // \t\n123";
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.False(result.HasErrors);
+        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
         Assert.Empty(diag.Entries);
 
-        Assert.Equal(3, result.Tokens.Count);
-        Assert.Equal(TokenType.LiteralInt, result.Tokens[0].Type);
-        Assert.Equal(TokenType.LiteralInt, result.Tokens[1].Type);
-        Assert.Equal(TokenType.Eof, result.Tokens[2].Type);
+        Assert.Equal(3, tokens.Count);
+        Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
+        Assert.Equal(TokenType.LiteralInt, tokens[1].Type);
+        Assert.Equal(TokenType.Eof, tokens[2].Type);
     }
 
     [Theory]
@@ -219,12 +219,12 @@ public class LexerTest
         string code = str;
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.Equal(2, result.Tokens.Count);
-        Assert.Equal(TokenType.LiteralInt, result.Tokens[0].Type);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
     }
 
     [Theory]
@@ -240,12 +240,12 @@ public class LexerTest
         string code = str;
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.Equal(2, result.Tokens.Count);
-        Assert.Equal(TokenType.LiteralInt, result.Tokens[0].Type);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
     }
 
     [Theory]
@@ -261,12 +261,12 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(str, diag);
+        List<Token> tokens = lexer.Run(str, diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.Equal(2, result.Tokens.Count);
-        Assert.Equal(TokenType.LiteralInt, result.Tokens[0].Type);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
     }
 
     [Theory]
@@ -277,12 +277,11 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(str, diag);
+        List<Token> tokens = lexer.Run(str, diag);
 
-        Assert.True(result.HasErrors);
         Assert.True(diag.HasErrors);
         Assert.Single(diag.Entries);
-        Assert.Equal(TokenType.Invalid, result.Tokens[0].Type);
+        Assert.Equal(TokenType.Invalid, tokens[0].Type);
         Assert.Equal(0, diag.Entries[0].Position);
         Assert.Equal(str.Length, diag.Entries[0].Length);
     }
@@ -300,14 +299,14 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(str, diag);
+        List<Token> tokens = lexer.Run(str, diag);
 
-        Assert.False(result.HasErrors);
+        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
         Assert.Empty(diag.Entries);
 
-        Assert.Equal(count + 1, result.Tokens.Count); // + eof
-        Assert.DoesNotContain(result.Tokens, t => t.IsInvalid());
+        Assert.Equal(count + 1, tokens.Count); // + eof
+        Assert.DoesNotContain(tokens, t => t.IsInvalid());
     }
 
     [Theory]
@@ -329,12 +328,12 @@ public class LexerTest
         string code = str;
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.Equal(2, result.Tokens.Count);
-        Assert.Equal(TokenType.Identifier, result.Tokens[0].Type);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.Identifier, tokens[0].Type);
     }
 
     [Theory]
@@ -348,12 +347,12 @@ public class LexerTest
         string code = str;
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.Equal(2, result.Tokens.Count);
-        Assert.Equal(TokenType.Identifier, result.Tokens[0].Type);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.Identifier, tokens[0].Type);
     }
 
     [Theory]
@@ -368,9 +367,8 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(str, diag);
+        List<Token> tokens = lexer.Run(str, diag);
 
-        Assert.True(result.HasErrors);
         Assert.True(diag.HasErrors);
 
         Assert.Equal(numErrors, diag.Entries.Count);
@@ -385,9 +383,8 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(str, diag);
+        List<Token> tokens = lexer.Run(str, diag);
 
-        Assert.True(result.HasErrors);
         Assert.True(diag.HasErrors);
 
         Assert.Single(diag.Entries);
@@ -405,18 +402,17 @@ public class LexerTest
     {
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(str, diag);
+        List<Token> tokens = lexer.Run(str, diag);
 
-        Assert.True(result.HasErrors);
         Assert.True(diag.HasErrors);
         Assert.Single(diag.Entries);
 
-        Assert.Equal(4, result.Tokens.Count);
+        Assert.Equal(4, tokens.Count);
 
-        Assert.Equal(left, result.Tokens[0].Type);
-        Assert.Equal(TokenType.Invalid, result.Tokens[1].Type);
-        Assert.Equal(right, result.Tokens[2].Type);
-        Assert.Equal(TokenType.Eof, result.Tokens[3].Type);
+        Assert.Equal(left, tokens[0].Type);
+        Assert.Equal(TokenType.Invalid, tokens[1].Type);
+        Assert.Equal(right, tokens[2].Type);
+        Assert.Equal(TokenType.Eof, tokens[3].Type);
     }
 
     [Theory]
@@ -440,18 +436,18 @@ public class LexerTest
 
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(codeBuilder.ToString(), diag);
+        List<Token> tokens = lexer.Run(codeBuilder.ToString(), diag);
 
-        Assert.False(result.HasErrors);
         Assert.False(diag.HasErrors);
-        Assert.Equal(AllTokens.Length + 1, result.Tokens.Count);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(AllTokens.Length + 1, tokens.Count);
 
         for (int i = 0; i < AllTokens.Length; i++)
         {
-            Assert.Equal(AllTokens[i].Type, result.Tokens[i].Type);
+            Assert.Equal(AllTokens[i].Type, tokens[i].Type);
         }
 
-        Assert.Equal(TokenType.Eof, result.Tokens.Last().Type);
+        Assert.Equal(TokenType.Eof, tokens.Last().Type);
     }
 
     [Fact]
@@ -460,16 +456,16 @@ public class LexerTest
         string code = "fn main() -> i32 { return 123 + 10 * x; }";
         Diagnostic diag = new();
         Lexer lexer = new();
-        Lexer.Result result = lexer.Run(code, diag);
+        List<Token> tokens = lexer.Run(code, diag);
 
-        Assert.False(result.HasErrors);
+        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
 
         int cur = 0;
 
         void CheckNext(TokenType expected)
         {
-            Assert.Equal(expected, result.Tokens[cur].Type);
+            Assert.Equal(expected, tokens[cur].Type);
             ++cur;
         }
 
@@ -492,6 +488,6 @@ public class LexerTest
 
         int expectedCount = 16;
         Assert.Equal(expectedCount, cur);
-        Assert.Equal(expectedCount, result.Tokens.Count);
+        Assert.Equal(expectedCount, tokens.Count);
     }
 }

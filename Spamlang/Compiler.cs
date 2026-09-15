@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
+using Spamlang.Backend;
 using Spamlang.DebugPrinters;
+using Spamlang.Frontend;
 
 namespace Spamlang;
 
@@ -36,7 +38,7 @@ public class Compiler
 
     public bool Compile(string file, string output, bool compileOnly)
     {
-        using Timers timers = new(needReport: _flags.DebugTimer);
+        using Timers timers = new(_flags.DebugTimer ? Console.Out : null);
 
         string fullPathInput = _fs.ResolveToFullPath(file);
         string fullPathOutput = _fs.ResolveToFullPath(output);
@@ -62,69 +64,29 @@ public class Compiler
         timers.FinishTimer("Read");
 
         Diagnostic diag = new();
-
-        timers.RestartTimer();
-        Lexer lexer = new();
-        Lexer.Result lexerResult = lexer.Run(code, diag);
-        timers.FinishTimer("Lexer");
-
-        if (lexerResult.HasErrors)
-        {
-            Console.Error.WriteLine("Lexer had errors");
-        }
-
-        List<Token> tokens = lexerResult.Tokens;
-
-        PrintLexer(tokens, code);
-        PrintLexerPretty(tokens, code);
-
-        timers.RestartTimer();
-        Parser parser = new();
-        Parser.Result parserResult = parser.Run(code, tokens, diag);
-        timers.FinishTimer("Parser");
-
-        if (parserResult.HasErrors)
-        {
-            Console.Error.WriteLine("Parser had errors");
-        }
-
-        if (parserResult.HasErrors)
-        {
-            PrintParser(tokens, code, parserResult.CompilationUnit);
-            diag.Report();
-            return false;
-        }
-
-        timers.RestartTimer();
         TypeRegistry typeRegistry = new();
-        Sema sema = new(code, tokens, diag, typeRegistry);
-        sema.Run(parserResult.CompilationUnit);
-        timers.FinishTimer("Sema");
-        PrintParser(tokens, code, parserResult.CompilationUnit); // NOTE: Print after sema to include sema info
+
+        Frontend.Frontend.Result frontendResult = Frontend.Frontend.Run(code, typeRegistry, diag, timers);
+
+        PrintLexer(frontendResult.Tokens, code);
+        PrintLexerPretty(frontendResult.Tokens, code);
+        PrintAst(frontendResult.Tokens, code, frontendResult.CompilationUnit);
 
         if (diag.HasErrors)
         {
-            diag.Report();
-            Console.Error.WriteLine("Sema had errors");
+            ReportDiag(diag);
             return false;
         }
 
-        diag.Report();
+        Backend.Backend.Result backendResult = Backend.Backend.Run(frontendResult.CompilationUnit, typeRegistry, timers);
+
+        PrintIR(backendResult.IRModule);
+        PrintMIR(backendResult.MModule);
+
+        ReportDiag(diag);
 
         timers.RestartTimer();
-        IRGen irGen = new(typeRegistry);
-        IRModule irModule = irGen.Run(parserResult.CompilationUnit);
-        timers.FinishTimer("IR");
-        PrintIR(irModule);
-
-        timers.RestartTimer();
-        Codegen codegen = new();
-        MModule mmodule = codegen.Run(irModule);
-        timers.FinishTimer("MIR");
-        PrintMIR(mmodule);
-
-        timers.RestartTimer();
-        string asmPath = SaveAsm(mmodule, fullPathInput);
+        string asmPath = SaveAsm(backendResult.MModule, fullPathInput);
         timers.FinishTimer("Save Asm");
 
         if (_emitAsmPath != null)
@@ -134,7 +96,9 @@ public class Compiler
         }
 
         timers.RestartTimer();
-        string? objPath = CompileAsm(asmPath);
+        // Only one target is supported for now
+        string target = "x86_64-pc-windows-msvc";
+        string? objPath = CompileAsm(asmPath, target);
         timers.FinishTimer("Compile Asm");
 
         if (objPath == null)
@@ -182,8 +146,7 @@ public class Compiler
         return path;
     }
 
-    // TODO: Target
-    private string? CompileAsm(string asmPath)
+    private string? CompileAsm(string asmPath, string target)
     {
         List<string> args = new();
 
@@ -197,7 +160,7 @@ public class Compiler
 
         args.Add("-c");
 
-        args.Add("--target=x86_64-pc-windows-msvc");
+        args.Add($"--target={target}");
 
         args.Add("-x");
         args.Add("assembler");
@@ -207,7 +170,7 @@ public class Compiler
         args.Add("-o");
         args.Add(outPath);
 
-        int code = Run(_clangPath, args, _flags.Verbose);
+        int code = RunApp(_clangPath, args, _flags.Verbose);
         if (code != 0)
         {
             return null;
@@ -230,12 +193,12 @@ public class Compiler
         args.Add("-o");
         args.Add(outputPath);
 
-        int code = Run(_clangPath, args, _flags.Verbose);
+        int code = RunApp(_clangPath, args, _flags.Verbose);
         return code == 0;
     }
 
 
-    private static int Run(string exe, IReadOnlyList<string> args, bool verbose)
+    private static int RunApp(string exe, IReadOnlyList<string> args, bool verbose)
     {
         if (verbose)
         {
@@ -297,6 +260,13 @@ public class Compiler
         }
     }
 
+    private void ReportDiag(Diagnostic diag)
+    {
+        foreach (DiagnosticEntry entry in diag.Entries)
+        {
+            Console.Error.WriteLine(entry.PrettyString());
+        }
+    }
 
     private void PrintLexer(List<Token> tokens, string code)
     {
@@ -318,7 +288,7 @@ public class Compiler
         }
     }
 
-    private void PrintParser(List<Token> tokens, string code, CompilationUnit compilationUnit)
+    private void PrintAst(List<Token> tokens, string code, CompilationUnit compilationUnit)
     {
         if (_flags.DebugParser)
         {

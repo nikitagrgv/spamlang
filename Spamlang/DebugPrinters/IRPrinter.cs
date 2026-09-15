@@ -1,3 +1,5 @@
+using Spamlang.Backend;
+
 namespace Spamlang.DebugPrinters;
 
 public class IRPrinter
