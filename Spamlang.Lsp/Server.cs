@@ -128,7 +128,7 @@ public class Server
         }
     }
 
-    public void Analyze(string uri, string text)
+    private void Analyze(string uri, string text)
     {
         PublishDiagnostics(uri, []);
     }
