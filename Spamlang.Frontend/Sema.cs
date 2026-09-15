@@ -137,7 +137,7 @@ public class Sema
             {
                 unreachableReported = true;
                 Token termTok = _tokens[terminator.StartToken];
-                Error($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt);
+                Warning($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt);
             }
 
             switch (stmt)
@@ -965,6 +965,11 @@ public class Sema
     private void Error(string message, Node node)
     {
         _diag.AddError(message, _tokens[node.StartToken]);
+    }
+
+    private void Warning(string message, Node node)
+    {
+        _diag.AddWarning(message, _tokens[node.StartToken]);
     }
 
     private void ErrorOutOfRange(bool negative, ReadOnlySpan<char> str, Node node)
