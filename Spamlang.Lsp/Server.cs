@@ -43,6 +43,11 @@ public class Server
 
     private JsonNode? ReadMessage()
     {
+        int length = -1;
+        while (true)
+        {
+            string? line = ReadHeaderLine();
+        }
     }
 
     private void HandleMessage(JsonNode message)
@@ -72,6 +77,33 @@ public class Server
             },
         };
         Send(reply);
+    }
+
+    private string? ReadHeaderLine()
+    {
+        StringBuilder sb = new();
+        while (true)
+        {
+            int b = _input.ReadByte();
+            if (b == -1)
+            {
+                // Closed
+                return null;
+            }
+
+            if (b == '\n')
+            {
+                string line = sb.ToString();
+                return line;
+            }
+
+            if (b == '\r')
+            {
+                continue;
+            }
+
+            sb.Append((char)b);
+        }
     }
 
     private void Send(JsonNode message)
