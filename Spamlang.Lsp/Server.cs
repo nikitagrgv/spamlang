@@ -46,8 +46,35 @@ public class Server
         int length = -1;
         while (true)
         {
-            string? line = ReadHeaderLine();
+            string? line = ReadLine(_input);
+            if (line == null)
+            {
+                // Closed
+                return null;
+            }
+
+            if (line.Length == 0)
+            {
+                // Empty line = header end
+                break;
+            }
+
+            string contentLength = "Content-Length:";
+            if (line.StartsWith(contentLength, StringComparison.OrdinalIgnoreCase))
+            {
+                length = int.Parse(line.AsSpan(contentLength.Length).Trim());
+            }
         }
+
+        if (length == -1)
+        {
+            return null;
+        }
+
+        byte[] body = new byte[length];
+        _input.ReadExactly(body);
+        JsonNode? node = JsonNode.Parse(body);
+        return node;
     }
 
     private void HandleMessage(JsonNode message)
@@ -79,12 +106,12 @@ public class Server
         Send(reply);
     }
 
-    private string? ReadHeaderLine()
+    private static string? ReadLine(Stream stream)
     {
         StringBuilder sb = new();
         while (true)
         {
-            int b = _input.ReadByte();
+            int b = stream.ReadByte();
             if (b == -1)
             {
                 // Closed
