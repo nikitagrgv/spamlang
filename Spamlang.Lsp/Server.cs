@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json.Nodes;
+using Spamlang.Frontend;
 
 namespace Spamlang.Lsp;
 
@@ -135,8 +136,25 @@ public class Server
         PublishDiagnostics(uri, []);
     }
 
-    private void PublishDiagnostics(string uri, JsonArray diagnostics)
+    private void PublishDiagnostics(string uri, ReadOnlySpan<DiagnosticEntry> diags)
     {
+        JsonArray diagsArray = new();
+        foreach (DiagnosticEntry diag in diags)
+        {
+            JsonObject diagNode = new()
+            {
+                ["range"] = new JsonObject
+                {
+                    ["start"] = new JsonObject { ["line"] = diag.Line, ["character"] = diag.Column - 1 },
+                    ["end"] = new JsonObject { ["line"] = diag.Line, ["character"] = diag.Column - 1 + diag.Length },
+                },
+                ["severity"] = diag.Severity == DiagnosticSeverity.Error ? 1 : 2,
+                ["source"] = "spamlang",
+                ["message"] = diag.Message,
+            };
+            diagsArray.Add(diagNode);
+        }
+
         JsonObject reply = new()
         {
             ["jsonrpc"] = "2.0",
@@ -144,7 +162,7 @@ public class Server
             ["params"] = new JsonObject
             {
                 ["uri"] = uri,
-                ["diagnostics"] = diagnostics,
+                ["diagnostics"] = diagsArray,
             },
         };
         Send(reply);
