@@ -134,6 +134,9 @@ public class Server
     private void Analyze(string uri, string text)
     {
         Diagnostic diag = new();
+        TypeRegistry reg = new();
+        
+        Frontend.Frontend.Run(text, reg, diag, null)
         
         
         PublishDiagnostics(uri, diag.Entries);
