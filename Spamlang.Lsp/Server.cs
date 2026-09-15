@@ -133,19 +133,13 @@ public class Server
 
     private void Analyze(string uri, string text)
     {
-        DiagnosticEntry entry = new()
-        {
-            Line = 1,
-            Column = 1,
-            Length = text.Length,
-            Message = "Test",
-            Severity = DiagnosticSeverity.Error,
-            Position = 4,
-        };
-        PublishDiagnostics(uri, [entry]);
+        Diagnostic diag = new();
+        
+        
+        PublishDiagnostics(uri, diag.Entries);
     }
 
-    private void PublishDiagnostics(string uri, ReadOnlySpan<DiagnosticEntry> diags)
+    private void PublishDiagnostics(string uri, IReadOnlyList<DiagnosticEntry> diags)
     {
         JsonArray diagsArray = new();
         foreach (DiagnosticEntry diag in diags)
