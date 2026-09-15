@@ -99,15 +99,18 @@ public class Server
             {
                 string uri = (string)paramsNode!["textDocument"]!["uri"]!;
                 string text = (string)paramsNode!["textDocument"]!["text"]!;
+                Analyze(uri, text);
                 break;
             }
             case "textDocument/didChange":
             {
                 string uri = (string)paramsNode!["textDocument"]!["uri"]!;
                 string text = (string)paramsNode!["textDocument"]!["contentChanges"]!.AsArray()[^1]!["text"]!;
+                Analyze(uri, text);
                 break;
             }
             case "textDocument/didClose":
+                PublishDiagnostics((string)paramsNode!["textDocument"]!["uri"]!, []);
                 break;
             case "shutdown":
                 Reply(idCopy, null);
@@ -123,6 +126,26 @@ public class Server
 
                 break;
         }
+    }
+
+    public void Analyze(string uri, string text)
+    {
+        PublishDiagnostics(uri, []);
+    }
+
+    private void PublishDiagnostics(string uri, JsonArray diagnostics)
+    {
+        JsonObject reply = new()
+        {
+            ["jsonrpc"] = "2.0",
+            ["method"] = "textDocument/publishDiagnostics",
+            ["params"] = new JsonObject
+            {
+                ["uri"] = uri,
+                ["diagnostics"] = diagnostics,
+            },
+        };
+        Send(reply);
     }
 
     private void Reply(JsonNode? id, JsonNode? result)
