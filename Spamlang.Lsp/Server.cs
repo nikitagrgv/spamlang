@@ -96,8 +96,19 @@ public class Server
                 Reply(idCopy, reply);
                 break;
             case "textDocument/didOpen":
+            {
+                string uri = (string)paramsNode!["textDocument"]!["uri"]!;
+                string text = (string)paramsNode!["textDocument"]!["text"]!;
+                break;
+            }
             case "textDocument/didChange":
+            {
+                string uri = (string)paramsNode!["textDocument"]!["uri"]!;
+                string text = (string)paramsNode!["textDocument"]!["contentChanges"]!.AsArray()[^1]!["text"]!;
+                break;
+            }
             case "textDocument/didClose":
+                break;
             case "shutdown":
                 Reply(idCopy, null);
                 break;
