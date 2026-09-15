@@ -41,6 +41,24 @@ public class Server
         }
     }
 
+    private JsonNode? ReadMessage()
+    {
+    }
+
+    private void HandleMessage(JsonNode message)
+    {
+    }
+
+    private void Reply(JsonNode? id, JsonNode? result)
+    {
+        JsonObject reply = new()
+        {
+            ["jsonrpc"] = "2.0",
+            ["id"] = id,
+            ["result"] = result,
+        };
+    }
+
     private void ReplyError(JsonNode id, int errorCode, string message)
     {
         JsonObject reply = new()
@@ -56,29 +74,11 @@ public class Server
         Send(reply);
     }
 
-    private void Reply(JsonNode? id, JsonNode? result)
-    {
-        JsonObject reply = new()
-        {
-            ["jsonrpc"] = "2.0",
-            ["id"] = id,
-            ["result"] = result,
-        };
-    }
-
     private void Send(JsonNode message)
     {
         byte[] body = Encoding.UTF8.GetBytes(message.ToJsonString());
         _output.Write(Encoding.ASCII.GetBytes($"Content-Length: {body.Length}\r\n\r\n"));
         _output.Write(body);
         _output.Flush();
-    }
-
-    private JsonNode? ReadMessage()
-    {
-    }
-
-    private void HandleMessage(JsonNode message)
-    {
     }
 }
