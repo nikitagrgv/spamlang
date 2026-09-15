@@ -135,10 +135,10 @@ public class Server
     {
         Diagnostic diag = new();
         TypeRegistry reg = new();
-        
-        Frontend.Frontend.Run(text, reg, diag, null)
-        
-        
+
+        Frontend.Frontend.Result result = Frontend.Frontend.Run(text, reg, diag, timers: null);
+
+
         PublishDiagnostics(uri, diag.Entries);
     }
 
