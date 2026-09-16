@@ -315,6 +315,12 @@ public class Server
 
     private static int GetTokenIndexByPos(List<Token> valueTokens, int cursorPos)
     {
+        int left = 0;
+        int right = valueTokens.Count;
+        while (true)
+        {
+            int middle = left + (right - left) / 2;
+        }
     }
 
     private static Data RunFrontend(string code)
