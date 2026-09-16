@@ -209,7 +209,7 @@ public class Server
             return;
         }
 
-        string description = GetSymbolDescription(symbol);
+        string description = GetSymbolDescription(symbol, data.Tokens);
 
         JsonObject result = new()
         {
@@ -337,7 +337,7 @@ public class Server
         return (string)paramsNode["textDocument"]!["uri"]!;
     }
 
-    private static string GetSymbolDescription(Symbol symbol)
+    private static string GetSymbolDescription(Symbol symbol, List<Token> tokens)
     {
         StringBuilder sb = new();
         switch (symbol)
@@ -362,7 +362,10 @@ public class Server
                     sb.Append($" -> {sym.Declaration.ReturnType.ResolvedType}");
                 }
 
-                sb.Append("\n```");
+                sb.Append("\n```\n\n---\n\n");
+
+                Token declarationToken = tokens[sym.Declaration.NameToken];
+                sb.Append($"Declared at line {declarationToken.Line}");
 
                 break;
             case ParamSymbol sym:
