@@ -203,14 +203,19 @@ public class Server
         }
 
         Token token = data.Tokens[tokenIndex];
+        if (!data.TokenToSymbol.TryGetValue(tokenIndex, out Symbol? symbol))
+        {
+            Reply(idCopy, null);
+            return;
+        }
 
-        string value = "";
+        string description = GetSymbolDescription(symbol);
 
         JsonObject result = new()
         {
             ["contents"] = new JsonObject
             {
-                ["value"] = value,
+                ["value"] = description,
                 ["kind"] = "markdown",
             },
             ["range"] = new JsonObject
@@ -330,6 +335,23 @@ public class Server
     private static string ExtractUri(JsonNode paramsNode)
     {
         return (string)paramsNode["textDocument"]!["uri"]!;
+    }
+
+    private static string GetSymbolDescription(Symbol symbol)
+    {
+        switch (symbol)
+        {
+            case FuncSymbol sym:
+                break;
+            case ParamSymbol sym:
+                break;
+            case TypeSymbol sym:
+                break;
+            case VariableSymbol sym:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(symbol));
+        }
     }
 
     private static int GetTokenIndexByPos(List<Token> tokens, int line, int column)
