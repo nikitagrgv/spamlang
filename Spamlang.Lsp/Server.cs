@@ -195,7 +195,13 @@ public class Server
             throw new Exception($"URI not found: {uri}");
         }
 
-        int tokenPos = data.LineOffsets[line] + character;
+        int cursorPos = data.LineOffsets[line] + character;
+        int tokenIndex = GetTokenIndexByPos(data.Tokens, cursorPos);
+        if (tokenIndex == -1)
+        {
+            Reply(idCopy, null);
+            throw new Exception($"Token not found at {line}:{character}");
+        }
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
