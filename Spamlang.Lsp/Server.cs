@@ -192,7 +192,7 @@ public class Server
 
         if (!_uriToData.TryGetValue(uri, out Data data))
         {
-            throw new Exception($"URI not found: {uri}");
+            Reply(idCopy, null);
         }
 
         int tokenIndex = GetTokenIndexByPos(data.Tokens, line + 1, character + 1);
