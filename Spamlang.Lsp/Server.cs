@@ -201,6 +201,26 @@ public class Server
             Reply(idCopy, null);
             return;
         }
+
+        Token token = data.Tokens[tokenIndex];
+
+        string value = "";
+
+        JsonObject result = new()
+        {
+            ["contents"] = new JsonObject
+            {
+                ["value"] = value,
+                ["kind"] = "markdown",
+            },
+            ["range"] = new JsonObject
+            {
+                ["start"] = new JsonObject { ["line"] = token.Line - 1, ["character"] = token.Column - 1 },
+                ["end"] = new JsonObject { ["line"] = token.Line - 1, ["character"] = token.Column + token.Length - 1 },
+            },
+        };
+
+        Reply(idCopy, result);
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
