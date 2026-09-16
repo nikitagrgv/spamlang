@@ -339,9 +339,22 @@ public class Server
 
     private static string GetSymbolDescription(Symbol symbol)
     {
+        StringBuilder sb = new();
         switch (symbol)
         {
             case FuncSymbol sym:
+                sb.Append($"function **{sym.Name}**: fn(");
+                for (int i = 0; i < sym.Declaration.Params.Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        sb.Append(", ");
+                    }
+
+                    Param param = sym.Declaration.Params[i];
+                    sb.Append($"{param.Symbol!.Name}: {param.Symbol.Type}");
+                }
+
                 break;
             case ParamSymbol sym:
                 break;
@@ -352,6 +365,8 @@ public class Server
             default:
                 throw new ArgumentOutOfRangeException(nameof(symbol));
         }
+
+        return sb.ToString();
     }
 
     private static int GetTokenIndexByPos(List<Token> tokens, int line, int column)
