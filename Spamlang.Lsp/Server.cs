@@ -115,6 +115,9 @@ public class Server
             case "textDocument/didClose":
                 HandleDidClose(idCopy, paramsNode);
                 break;
+            case "textDocument/hover":
+                HandleHover(idCopy, paramsNode);
+                break;
             case "shutdown":
                 HandleShutdown(idCopy, paramsNode);
                 break;
@@ -151,7 +154,7 @@ public class Server
 
     private void HandleDidOpen(JsonNode? idCopy, JsonNode? paramsNode)
     {
-        string uri = ExtractUri(paramsNode);
+        string uri = ExtractUri(paramsNode!);
         string text = (string)paramsNode!["textDocument"]!["text"]!;
 
         Data data = RunFrontend(text);
@@ -162,7 +165,7 @@ public class Server
 
     private void HandleDidChange(JsonNode? idCopy, JsonNode? paramsNode)
     {
-        string uri = ExtractUri(paramsNode);
+        string uri = ExtractUri(paramsNode!);
         string text = (string)paramsNode!["contentChanges"]!.AsArray()[^1]!["text"]!;
 
         Data data = RunFrontend(text);
@@ -173,11 +176,17 @@ public class Server
 
     private void HandleDidClose(JsonNode? idCopy, JsonNode? paramsNode)
     {
-        string uri = ExtractUri(paramsNode);
+        string uri = ExtractUri(paramsNode!);
 
         _uriToData.Remove(uri);
 
         PublishDiagnostics(uri, []);
+    }
+
+    private void HandleHover(JsonNode? idCopy, JsonNode? paramsNode)
+    {
+        string uri = ExtractUri(paramsNode!);
+        JsonNode? positionNode = paramsNode!["position"];
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
@@ -284,9 +293,9 @@ public class Server
         _output.Flush();
     }
 
-    private static string ExtractUri(JsonNode? paramsNode)
+    private static string ExtractUri(JsonNode paramsNode)
     {
-        return (string)paramsNode!["textDocument"]!["uri"]!;
+        return (string)paramsNode["textDocument"]!["uri"]!;
     }
 
     private static Data RunFrontend(string code)
