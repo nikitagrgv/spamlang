@@ -11,6 +11,9 @@ public class Sema
     private readonly List<FuncSymbol> _funcStack = new();
     private readonly TypeRegistry _typeRegistry;
 
+    // Optional, for LSP Server
+    private Dictionary<int, Symbol>? _tokenToSymbol = null;
+
     public Sema(string code, IReadOnlyList<Token> tokens, Diagnostic diag, TypeRegistry typeRegistry)
     {
         _code = code;
@@ -19,8 +22,10 @@ public class Sema
         _typeRegistry = typeRegistry;
     }
 
-    public void Run(CompilationUnit unit)
+    public void Run(CompilationUnit unit, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
+        _tokenToSymbol = outTokenToSymbol;
+
         Scope scope = new(null);
         unit.Scope = scope;
         PushScope(scope);
@@ -32,6 +37,8 @@ public class Sema
         VisitCompilationUnit(unit);
 
         CheckMain(unit);
+
+        _tokenToSymbol = null;
     }
 
     private void CheckMain(CompilationUnit unit)
@@ -103,11 +110,12 @@ public class Sema
                 Declaration = param,
                 DeclaringScope = scope,
                 Type = type,
-                Name = name.ToString()
+                Name = name.ToString(),
             };
 
             param.Symbol = sym;
             RegisterSymbol(sym);
+            RegisterTokenAsSymbol(param.NameToken, sym);
         }
 
         fd.Body.Scope = scope;
@@ -137,7 +145,7 @@ public class Sema
             {
                 unreachableReported = true;
                 Token termTok = _tokens[terminator.StartToken];
-                Error($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt);
+                Warning($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt);
             }
 
             switch (stmt)
@@ -264,11 +272,12 @@ public class Sema
             Declaration = stmt,
             Name = name.ToString(),
             DeclaringScope = CurrentScope(),
-            Type = declType
+            Type = declType,
         };
 
         stmt.Symbol = sym;
         RegisterSymbol(sym);
+        RegisterTokenAsSymbol(stmt.NameToken, sym);
     }
 
     private void VisitStmtReturn(StmtReturn stmt)
@@ -464,7 +473,7 @@ public class Sema
 
             if (usedParams[paramIndex])
             {
-                string err = $"Parameter with index {paramIndex} ";
+                string err = $"Parameter {paramIndex + 1} ";
                 if (funcDecl != null)
                 {
                     err += $"({GetTokenValue(funcDecl.Params[paramIndex].NameToken)}) ";
@@ -496,7 +505,7 @@ public class Sema
                 continue;
             }
 
-            string err = $"Parameter with index {i} ";
+            string err = $"Parameter {i + 1} ";
             if (funcDecl != null)
             {
                 err += $"({GetTokenValue(funcDecl.Params[i].NameToken)}) ";
@@ -540,6 +549,8 @@ public class Sema
             expr.ResolvedType = BuiltinType.Error;
             return;
         }
+
+        RegisterTokenAsSymbol(expr.IdentifierToken, sym);
 
         switch (sym)
         {
@@ -730,7 +741,7 @@ public class Sema
             Declaration = fd,
             DeclaringScope = scope,
             Type = funcType,
-            Name = name.ToString()
+            Name = name.ToString(),
         };
 
         fd.Symbol = sym;
@@ -738,6 +749,7 @@ public class Sema
         // NOTE: Create symbol even if it's a redeclaration
 
         RegisterSymbol(sym);
+        RegisterTokenAsSymbol(fd.NameToken, sym);
     }
 
     private void RegisterSymbol(Symbol symbol)
@@ -777,6 +789,17 @@ public class Sema
         Debug.Assert(ok);
     }
 
+    private void RegisterTokenAsSymbol(int tokenIndex, Symbol symbol)
+    {
+        if (_tokenToSymbol == null)
+        {
+            return;
+        }
+
+        Debug.Assert(!_tokenToSymbol.ContainsKey(tokenIndex));
+        _tokenToSymbol[tokenIndex] = symbol;
+    }
+
     private SpamType ResolveType(TypeNode node)
     {
         Debug.Assert(node.ResolvedType == null);
@@ -803,6 +826,8 @@ public class Sema
             node.ResolvedType = BuiltinType.Error;
             return node.ResolvedType;
         }
+
+        RegisterTokenAsSymbol(node.TypeNameToken, sym);
 
         TypeSymbol? typeSym = sym as TypeSymbol;
         if (typeSym == null)
@@ -951,20 +976,19 @@ public class Sema
         return false;
     }
 
-
     private ReadOnlySpan<char> GetTokenValue(int tokenIndex)
     {
         return _tokens[tokenIndex].Value(_code);
     }
 
-    private TokenType GetTokenType(int tokenIndex)
-    {
-        return _tokens[tokenIndex].Type;
-    }
-
     private void Error(string message, Node node)
     {
         _diag.AddError(message, _tokens[node.StartToken]);
+    }
+
+    private void Warning(string message, Node node)
+    {
+        _diag.AddWarning(message, _tokens[node.StartToken]);
     }
 
     private void ErrorOutOfRange(bool negative, ReadOnlySpan<char> str, Node node)

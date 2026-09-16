@@ -10,17 +10,17 @@ public class Backend
         public MModule MModule { get; init; }
     }
 
-    public static Result Run(CompilationUnit compilationUnit, TypeRegistry typeRegistry, Timers timers)
+    public static Result Run(CompilationUnit compilationUnit, TypeRegistry typeRegistry, Timers? timers)
     {
-        timers.RestartTimer();
+        timers?.RestartTimer();
         IRGen irGen = new(typeRegistry);
         IRModule irModule = irGen.Run(compilationUnit);
-        timers.FinishTimer("IR");
+        timers?.FinishTimer("IR");
 
-        timers.RestartTimer();
+        timers?.RestartTimer();
         Codegen codegen = new();
         MModule mmodule = codegen.Run(irModule);
-        timers.FinishTimer("MIR");
+        timers?.FinishTimer("MIR");
 
         return new Result
         {

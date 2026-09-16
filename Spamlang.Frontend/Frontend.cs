@@ -8,22 +8,22 @@ public class Frontend
         public CompilationUnit CompilationUnit { get; init; }
     }
 
-    public static Result Run(string code, TypeRegistry typeRegistry, Diagnostic diag, Timers timers)
+    public static Result Run(string code, TypeRegistry typeRegistry, Diagnostic diag, Timers? timers, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
-        timers.RestartTimer();
+        timers?.RestartTimer();
         Lexer lexer = new();
         List<Token> tokens = lexer.Run(code, diag);
-        timers.FinishTimer("Lexer");
+        timers?.FinishTimer("Lexer");
 
-        timers.RestartTimer();
+        timers?.RestartTimer();
         Parser parser = new();
         CompilationUnit compilationUnit = parser.Run(code, tokens, diag);
-        timers.FinishTimer("Parser");
+        timers?.FinishTimer("Parser");
 
-        timers.RestartTimer();
+        timers?.RestartTimer();
         Sema sema = new(code, tokens, diag, typeRegistry);
-        sema.Run(compilationUnit);
-        timers.FinishTimer("Sema");
+        sema.Run(compilationUnit, outTokenToSymbol);
+        timers?.FinishTimer("Sema");
 
         return new Result
         {

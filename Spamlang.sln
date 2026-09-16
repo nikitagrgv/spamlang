@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spamlang.Frontend", "Spamla
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spamlang.Backend", "Spamlang.Backend\Spamlang.Backend.csproj", "{06DA847B-448D-4447-A5CF-B8FFEE72F265}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spamlang.Lsp", "Spamlang.Lsp\Spamlang.Lsp.csproj", "{DDF42B85-2724-4BDB-B5E5-2CB1035F49DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{06DA847B-448D-4447-A5CF-B8FFEE72F265}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06DA847B-448D-4447-A5CF-B8FFEE72F265}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06DA847B-448D-4447-A5CF-B8FFEE72F265}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDF42B85-2724-4BDB-B5E5-2CB1035F49DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDF42B85-2724-4BDB-B5E5-2CB1035F49DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDF42B85-2724-4BDB-B5E5-2CB1035F49DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDF42B85-2724-4BDB-B5E5-2CB1035F49DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
