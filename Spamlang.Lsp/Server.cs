@@ -370,16 +370,6 @@ public class Server
 
                 break;
             }
-            case ParamSymbol sym:
-            {
-                sb.Append("```spamlang\n");
-                sb.Append($"{sym.Name}: {sym.Type}");
-                sb.Append("\n```\n\n---\n\n");
-
-                Token declarationToken = tokens[sym.Declaration.NameToken];
-                sb.Append($"Declared at line {declarationToken.Line}");
-                break;
-            }
             case TypeSymbol sym:
             {
                 sb.Append("```spamlang\n");
@@ -392,6 +382,16 @@ public class Server
                     sb.Append($"Declared at line {declarationToken.Line}");
                 }
 
+                break;
+            }
+            case ParamSymbol sym:
+            {
+                sb.Append("```spamlang\n");
+                sb.Append($"{sym.Name}: {sym.Type}");
+                sb.Append("\n```\n\n---\n\n");
+
+                Token declarationToken = tokens[sym.Declaration.NameToken];
+                sb.Append($"Declared at line {declarationToken.Line}");
                 break;
             }
             case VariableSymbol sym:
