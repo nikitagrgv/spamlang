@@ -186,6 +186,11 @@ public class Server
     private void HandleHover(JsonNode? idCopy, JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode!);
+        if (!_uriToData.TryGetValue(uri, out Data data))
+        {
+            throw new Exception($"No such URI registered: {uri}");
+        }
+
         JsonNode positionNode = paramsNode!["position"]!;
         int line = (int)positionNode["line"]!;
         int character = (int)positionNode["character"]!;
