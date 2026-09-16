@@ -275,6 +275,7 @@ public class Server
             },
             ["uri"] = uri,
         };
+        Reply(idCopy, result);
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
