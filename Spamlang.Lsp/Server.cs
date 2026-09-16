@@ -195,8 +195,7 @@ public class Server
             throw new Exception($"URI not found: {uri}");
         }
 
-        int cursorPos = data.LineOffsets[line] + character;
-        int tokenIndex = GetTokenIndexByPos(data.Tokens, cursorPos);
+        int tokenIndex = GetTokenIndexByPos(data.Tokens, line + 1, character + 1);
         if (tokenIndex == -1)
         {
             Reply(idCopy, null);
@@ -313,15 +312,26 @@ public class Server
         return (string)paramsNode["textDocument"]!["uri"]!;
     }
 
-    private static int GetTokenIndexByPos(List<Token> tokens, int cursorPos)
+    private static int GetTokenIndexByPos(List<Token> tokens, int line, int column)
     {
         int left = 0;
         int right = tokens.Count;
-        while (true)
+        while (right - left > 1)
         {
             int middle = left + (right - left) / 2;
             Token token = tokens[middle];
+            bool greater = token.Line > line || (token.Line == line && token.Column > column);
+            if (greater)
+            {
+                right = middle;
+            }
+            else
+            {
+                left = middle;
+            }
         }
+
+        return left;
     }
 
     private static Data RunFrontend(string code)
