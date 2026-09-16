@@ -11,6 +11,9 @@ public class Sema
     private readonly List<FuncSymbol> _funcStack = new();
     private readonly TypeRegistry _typeRegistry;
 
+    // Optional, for LSP Server
+    private Dictionary<int, Symbol>? _tokenToSymbol = null;
+
     public Sema(string code, IReadOnlyList<Token> tokens, Diagnostic diag, TypeRegistry typeRegistry)
     {
         _code = code;
@@ -19,8 +22,10 @@ public class Sema
         _typeRegistry = typeRegistry;
     }
 
-    public void Run(CompilationUnit unit)
+    public void Run(CompilationUnit unit, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
+        _tokenToSymbol = outTokenToSymbol;
+
         Scope scope = new(null);
         unit.Scope = scope;
         PushScope(scope);
@@ -32,6 +37,8 @@ public class Sema
         VisitCompilationUnit(unit);
 
         CheckMain(unit);
+
+        _tokenToSymbol = null;
     }
 
     private void CheckMain(CompilationUnit unit)
@@ -541,6 +548,7 @@ public class Sema
             return;
         }
 
+
         switch (sym)
         {
             case ParamSymbol:
@@ -803,6 +811,7 @@ public class Sema
             node.ResolvedType = BuiltinType.Error;
             return node.ResolvedType;
         }
+
 
         TypeSymbol? typeSym = sym as TypeSymbol;
         if (typeSym == null)
