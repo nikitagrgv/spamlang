@@ -252,14 +252,29 @@ public class Server
             return;
         }
 
-        Token token = data.Tokens[tokenIndex];
         if (!data.TokenToSymbol.TryGetValue(tokenIndex, out Symbol? symbol))
         {
             Reply(idCopy, null);
             return;
         }
-        
-        
+
+        if (symbol.DeclaringNode == null)
+        {
+            Reply(idCopy, null);
+            return;
+        }
+
+        Token start = data.Tokens[symbol.DeclaringNode.StartToken];
+        Token end = data.Tokens[symbol.DeclaringNode.EndToken];
+        JsonObject result = new()
+        {
+            ["range"] = new JsonObject
+            {
+                ["start"] = new JsonObject { ["line"] = start.Line - 1, ["character"] = start.Column - 1 },
+                ["end"] = new JsonObject { ["line"] = end.Line - 1, ["character"] = end.Column - 1 + end.Length },
+            },
+            ["uri"] = uri,
+        };
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
