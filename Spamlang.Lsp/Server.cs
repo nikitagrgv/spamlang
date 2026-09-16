@@ -186,7 +186,9 @@ public class Server
     private void HandleHover(JsonNode? idCopy, JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode!);
-        JsonNode? positionNode = paramsNode!["position"];
+        JsonNode positionNode = paramsNode!["position"]!;
+        int line = (int)positionNode["line"]!;
+        int character = (int)positionNode["character"]!;
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
