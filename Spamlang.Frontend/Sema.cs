@@ -110,7 +110,7 @@ public class Sema
                 Declaration = param,
                 DeclaringScope = scope,
                 Type = type,
-                Name = name.ToString()
+                Name = name.ToString(),
             };
 
             param.Symbol = sym;
@@ -271,7 +271,7 @@ public class Sema
             Declaration = stmt,
             Name = name.ToString(),
             DeclaringScope = CurrentScope(),
-            Type = declType
+            Type = declType,
         };
 
         stmt.Symbol = sym;
@@ -548,6 +548,11 @@ public class Sema
             return;
         }
 
+        if (_tokenToSymbol != null)
+        {
+            Debug.Assert(!_tokenToSymbol.ContainsKey(expr.IdentifierToken));
+            _tokenToSymbol[expr.IdentifierToken] = sym;
+        }
 
         switch (sym)
         {
@@ -738,7 +743,7 @@ public class Sema
             Declaration = fd,
             DeclaringScope = scope,
             Type = funcType,
-            Name = name.ToString()
+            Name = name.ToString(),
         };
 
         fd.Symbol = sym;
