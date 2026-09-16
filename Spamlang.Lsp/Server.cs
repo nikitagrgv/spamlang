@@ -343,6 +343,7 @@ public class Server
         switch (symbol)
         {
             case FuncSymbol sym:
+            {
                 sb.Append("```spamlang\n");
                 sb.Append($"fn {sym.Name}(");
                 for (int i = 0; i < sym.Declaration.Params.Count; i++)
@@ -353,7 +354,7 @@ public class Server
                     }
 
                     Param param = sym.Declaration.Params[i];
-                    sb.Append($"{param.Symbol!.Name}: {param.Symbol.Type}");
+                    sb.Append($"{param.Symbol!.Name}: {param.Symbol!.Type}");
                 }
 
                 sb.Append(")");
@@ -368,8 +369,17 @@ public class Server
                 sb.Append($"Declared at line {declarationToken.Line}");
 
                 break;
+            }
             case ParamSymbol sym:
+            {
+                sb.Append("```spamlang\n");
+                sb.Append($"{sym.Name}: {sym.Type}");
+                sb.Append("\n```\n\n---\n\n");
+
+                Token declarationToken = tokens[sym.Declaration.NameToken];
+                sb.Append($"Declared at line {declarationToken.Line}");
                 break;
+            }
             case TypeSymbol sym:
                 break;
             case VariableSymbol sym:
