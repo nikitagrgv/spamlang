@@ -148,14 +148,20 @@ public class Server
     {
         string uri = ExtractUri(paramsNode);
         string text = (string)paramsNode!["textDocument"]!["text"]!;
-        Analyze(uri, text);
+
+        Data data = RunFrontend(text);
+        _uriToData[uri] = data;
+        PublishDiagnostics(uri, data.Diagnostics);
     }
 
     private void HandleDidChange(JsonNode? idCopy, JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode);
         string text = (string)paramsNode!["contentChanges"]!.AsArray()[^1]!["text"]!;
-        Analyze(uri, text);
+
+        Data data = RunFrontend(text);
+        _uriToData[uri] = data;
+        PublishDiagnostics(uri, data.Diagnostics);
     }
 
     private void HandleDidClose(JsonNode? idCopy, JsonNode? paramsNode)
@@ -172,13 +178,6 @@ public class Server
     private void HandleExit(JsonNode? idCopy, JsonNode? paramsNode)
     {
         _exit = true;
-    }
-
-    private void Analyze(string uri, string text)
-    {
-        Data data = RunFrontend(text);
-
-        PublishDiagnostics(uri, data.Diagnostics);
     }
 
     private void PublishDiagnostics(string uri, IReadOnlyList<DiagnosticEntry> diags)
