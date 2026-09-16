@@ -313,6 +313,10 @@ public class Server
         return (string)paramsNode["textDocument"]!["uri"]!;
     }
 
+    private static int GetTokenIndexByPos(List<Token> valueTokens, int cursorPos)
+    {
+    }
+
     private static Data RunFrontend(string code)
     {
         Diagnostic diag = new();
