@@ -101,19 +101,19 @@ public class Server
         switch (method)
         {
             case "initialize":
-                HandleInitialize(idCopy, paramsNode);
+                HandleInitialize(idCopy);
                 break;
             case "initialized":
-                HandleInitialized(idCopy, paramsNode);
+                HandleInitialized();
                 break;
             case "textDocument/didOpen":
-                HandleDidOpen(idCopy, paramsNode);
+                HandleDidOpen(paramsNode);
                 break;
             case "textDocument/didChange":
-                HandleDidChange(idCopy, paramsNode);
+                HandleDidChange(paramsNode);
                 break;
             case "textDocument/didClose":
-                HandleDidClose(idCopy, paramsNode);
+                HandleDidClose(paramsNode);
                 break;
             case "textDocument/hover":
                 HandleHover(idCopy, paramsNode);
@@ -122,10 +122,10 @@ public class Server
                 HandleDefinition(idCopy, paramsNode);
                 break;
             case "shutdown":
-                HandleShutdown(idCopy, paramsNode);
+                HandleShutdown(idCopy);
                 break;
             case "exit":
-                HandleExit(idCopy, paramsNode);
+                HandleExit();
                 break;
             default:
                 if (idCopy != null && method != null)
@@ -137,7 +137,7 @@ public class Server
         }
     }
 
-    private void HandleInitialize(JsonNode? idCopy, JsonNode? paramsNode)
+    private void HandleInitialize(JsonNode? idCopy)
     {
         JsonObject reply = new()
         {
@@ -152,11 +152,11 @@ public class Server
         Reply(idCopy, reply);
     }
 
-    private void HandleInitialized(JsonNode? idCopy, JsonNode? paramsNode)
+    private void HandleInitialized()
     {
     }
 
-    private void HandleDidOpen(JsonNode? idCopy, JsonNode? paramsNode)
+    private void HandleDidOpen(JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode!);
         string text = (string)paramsNode!["textDocument"]!["text"]!;
@@ -167,7 +167,7 @@ public class Server
         PublishDiagnostics(uri, data.Diagnostics);
     }
 
-    private void HandleDidChange(JsonNode? idCopy, JsonNode? paramsNode)
+    private void HandleDidChange(JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode!);
         string text = (string)paramsNode!["contentChanges"]!.AsArray()[^1]!["text"]!;
@@ -178,7 +178,7 @@ public class Server
         PublishDiagnostics(uri, data.Diagnostics);
     }
 
-    private void HandleDidClose(JsonNode? idCopy, JsonNode? paramsNode)
+    private void HandleDidClose(JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode!);
 
@@ -278,14 +278,14 @@ public class Server
         Reply(idCopy, result);
     }
 
-    private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
+    private void HandleShutdown(JsonNode? idCopy)
     {
         _uriToData.Clear();
 
         Reply(idCopy, null);
     }
 
-    private void HandleExit(JsonNode? idCopy, JsonNode? paramsNode)
+    private void HandleExit()
     {
         _exit = true;
     }
