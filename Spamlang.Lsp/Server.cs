@@ -355,10 +355,10 @@ public class Server
                     sb.Append($"{param.Symbol!.Name}: {param.Symbol.Type}");
                 }
 
-                sb.Append(")->");
+                sb.Append(")");
                 if (sym.Declaration.ReturnType != null)
                 {
-                    sb.Append($"{sym.Declaration.ReturnType.ResolvedType}");
+                    sb.Append($" -> {sym.Declaration.ReturnType.ResolvedType}");
                 }
                 else
                 {
