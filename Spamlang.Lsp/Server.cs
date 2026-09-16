@@ -188,7 +188,7 @@ public class Server
         string uri = ExtractUri(paramsNode!);
         if (!_uriToData.TryGetValue(uri, out Data data))
         {
-            throw new Exception($"No such URI registered: {uri}");
+            throw new Exception($"URI not found: {uri}");
         }
 
         JsonNode positionNode = paramsNode!["position"]!;
