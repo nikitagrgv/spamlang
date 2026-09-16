@@ -11,11 +11,12 @@ public class Server
 
     private struct Data
     {
-        public string Code { get; init; }
-        public List<int> LineOffsets { get; init; }
-        public List<Token> Tokens { get; init; }
-        public CompilationUnit CompilationUnit { get; init; }
-        public IReadOnlyList<DiagnosticEntry> Diagnostics { get; init; }
+        public required string Code { get; init; }
+        public required List<int> LineOffsets { get; init; }
+        public required List<Token> Tokens { get; init; }
+        public required CompilationUnit CompilationUnit { get; init; }
+        public required Dictionary<int, Symbol> TokenToSymbol { get; init; }
+        public required IReadOnlyList<DiagnosticEntry> Diagnostics { get; init; }
     }
 
     private Stream _input;
@@ -288,7 +289,8 @@ public class Server
     {
         Diagnostic diag = new();
         TypeRegistry reg = new();
-        Frontend.Frontend.Result result = Frontend.Frontend.Run(code, reg, diag, timers: null);
+        Dictionary<int, Symbol> tokenToSymbol = new();
+        Frontend.Frontend.Result result = Frontend.Frontend.Run(code, reg, diag, timers: null, tokenToSymbol);
         List<int> lineOffsets = CalcLineOffsets(code);
         return new Data
         {
@@ -296,6 +298,7 @@ public class Server
             LineOffsets = lineOffsets,
             Tokens = result.Tokens,
             CompilationUnit = result.CompilationUnit,
+            TokenToSymbol = tokenToSymbol,
             Diagnostics = diag.Entries,
         };
     }
