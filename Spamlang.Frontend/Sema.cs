@@ -808,6 +808,17 @@ public class Sema
         Debug.Assert(ok);
     }
 
+    private void RegisterTokenAsSymbol(int tokenIndex, Symbol symbol)
+    {
+        if (_tokenToSymbol == null)
+        {
+            return;
+        }
+
+        Debug.Assert(!_tokenToSymbol.ContainsKey(tokenIndex));
+        _tokenToSymbol[tokenIndex] = symbol;
+    }
+
     private SpamType ResolveType(TypeNode node)
     {
         Debug.Assert(node.ResolvedType == null);
@@ -988,15 +999,9 @@ public class Sema
         return false;
     }
 
-
     private ReadOnlySpan<char> GetTokenValue(int tokenIndex)
     {
         return _tokens[tokenIndex].Value(_code);
-    }
-
-    private TokenType GetTokenType(int tokenIndex)
-    {
-        return _tokens[tokenIndex].Type;
     }
 
     private void Error(string message, Node node)
