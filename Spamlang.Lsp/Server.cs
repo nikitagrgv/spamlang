@@ -381,9 +381,29 @@ public class Server
                 break;
             }
             case TypeSymbol sym:
+            {
+                sb.Append("```spamlang\n");
+                sb.Append($"{sym.Type}");
+
+                if (sym.DeclaringNode != null)
+                {
+                    sb.Append("\n```\n\n---\n\n");
+                    Token declarationToken = tokens[sym.DeclaringNode.StartToken];
+                    sb.Append($"Declared at line {declarationToken.Line}");
+                }
+
                 break;
+            }
             case VariableSymbol sym:
+            {
+                sb.Append("```spamlang\n");
+                sb.Append($"{sym.Name}: {sym.Type}");
+                sb.Append("\n```\n\n---\n\n");
+
+                Token declarationToken = tokens[sym.Declaration.NameToken];
+                sb.Append($"Declared at line {declarationToken.Line}");
                 break;
+            }
             default:
                 throw new ArgumentOutOfRangeException(nameof(symbol));
         }
