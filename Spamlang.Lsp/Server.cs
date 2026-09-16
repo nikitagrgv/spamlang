@@ -199,7 +199,7 @@ public class Server
         if (tokenIndex == -1)
         {
             Reply(idCopy, null);
-            throw new Exception($"Token not found at {line}:{character}");
+            return;
         }
     }
 
@@ -337,7 +337,7 @@ public class Server
             return -1;
         }
 
-        if (column < found.Column || column > found.Column + found.Length)
+        if (column < found.Column || column >= found.Column + found.Length)
         {
             return -1;
         }
