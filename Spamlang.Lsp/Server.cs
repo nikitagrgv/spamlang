@@ -177,6 +177,8 @@ public class Server
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
     {
+        _uriToData.Clear();
+
         Reply(idCopy, null);
     }
 
