@@ -331,6 +331,17 @@ public class Server
             }
         }
 
+        Token found = tokens[left];
+        if (found.Line != line)
+        {
+            return -1;
+        }
+
+        if (column < found.Column || column > found.Column + found.Length)
+        {
+            return -1;
+        }
+
         return left;
     }
 
