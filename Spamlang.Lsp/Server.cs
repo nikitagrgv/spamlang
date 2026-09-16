@@ -146,21 +146,22 @@ public class Server
 
     private void HandleDidOpen(JsonNode? idCopy, JsonNode? paramsNode)
     {
-        string uri = (string)paramsNode!["textDocument"]!["uri"]!;
+        string uri = ExtractUri(paramsNode);
         string text = (string)paramsNode!["textDocument"]!["text"]!;
         Analyze(uri, text);
     }
 
     private void HandleDidChange(JsonNode? idCopy, JsonNode? paramsNode)
     {
-        string uri = (string)paramsNode!["textDocument"]!["uri"]!;
+        string uri = ExtractUri(paramsNode);
         string text = (string)paramsNode!["contentChanges"]!.AsArray()[^1]!["text"]!;
         Analyze(uri, text);
     }
 
     private void HandleDidClose(JsonNode? idCopy, JsonNode? paramsNode)
     {
-        PublishDiagnostics((string)paramsNode!["textDocument"]!["uri"]!, []);
+        string uri = ExtractUri(paramsNode);
+        PublishDiagnostics(uri, []);
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
@@ -270,6 +271,11 @@ public class Server
         _output.Write(Encoding.ASCII.GetBytes($"Content-Length: {body.Length}\r\n\r\n"));
         _output.Write(body);
         _output.Flush();
+    }
+
+    private static string ExtractUri(JsonNode? paramsNode)
+    {
+        return (string)paramsNode!["textDocument"]!["uri"]!;
     }
 
     private static Data RunFrontend(string code)
