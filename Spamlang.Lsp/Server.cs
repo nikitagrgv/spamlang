@@ -343,7 +343,8 @@ public class Server
         switch (symbol)
         {
             case FuncSymbol sym:
-                sb.Append($"function **{sym.Name}**: fn(");
+                sb.Append("```spamlang\n");
+                sb.Append($"fn {sym.Name}(");
                 for (int i = 0; i < sym.Declaration.Params.Count; i++)
                 {
                     if (i != 0)
@@ -360,10 +361,8 @@ public class Server
                 {
                     sb.Append($" -> {sym.Declaration.ReturnType.ResolvedType}");
                 }
-                else
-                {
-                    sb.Append("void");
-                }
+
+                sb.Append("\n```");
 
                 break;
             case ParamSymbol sym:
