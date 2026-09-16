@@ -115,12 +115,7 @@ public class Sema
 
             param.Symbol = sym;
             RegisterSymbol(sym);
-
-            if (_tokenToSymbol != null)
-            {
-                Debug.Assert(!_tokenToSymbol.ContainsKey(param.NameToken));
-                _tokenToSymbol[param.NameToken] = sym;
-            }
+            RegisterTokenAsSymbol(param.NameToken, sym);
         }
 
         fd.Body.Scope = scope;
@@ -282,12 +277,7 @@ public class Sema
 
         stmt.Symbol = sym;
         RegisterSymbol(sym);
-
-        if (_tokenToSymbol != null)
-        {
-            Debug.Assert(!_tokenToSymbol.ContainsKey(stmt.NameToken));
-            _tokenToSymbol[stmt.NameToken] = sym;
-        }
+        RegisterTokenAsSymbol(stmt.NameToken, sym);
     }
 
     private void VisitStmtReturn(StmtReturn stmt)
@@ -560,11 +550,7 @@ public class Sema
             return;
         }
 
-        if (_tokenToSymbol != null)
-        {
-            Debug.Assert(!_tokenToSymbol.ContainsKey(expr.IdentifierToken));
-            _tokenToSymbol[expr.IdentifierToken] = sym;
-        }
+        RegisterTokenAsSymbol(expr.IdentifierToken, sym);
 
         switch (sym)
         {
@@ -763,12 +749,7 @@ public class Sema
         // NOTE: Create symbol even if it's a redeclaration
 
         RegisterSymbol(sym);
-
-        if (_tokenToSymbol != null)
-        {
-            Debug.Assert(!_tokenToSymbol.ContainsKey(fd.NameToken));
-            _tokenToSymbol[fd.NameToken] = sym;
-        }
+        RegisterTokenAsSymbol(fd.NameToken, sym);
     }
 
     private void RegisterSymbol(Symbol symbol)
@@ -846,11 +827,7 @@ public class Sema
             return node.ResolvedType;
         }
 
-        if (_tokenToSymbol != null)
-        {
-            Debug.Assert(!_tokenToSymbol.ContainsKey(node.TypeNameToken));
-            _tokenToSymbol[node.TypeNameToken] = sym;
-        }
+        RegisterTokenAsSymbol(node.TypeNameToken, sym);
 
         TypeSymbol? typeSym = sym as TypeSymbol;
         if (typeSym == null)
