@@ -8,7 +8,7 @@ public class Frontend
         public CompilationUnit CompilationUnit { get; init; }
     }
 
-    public static Result Run(string code, TypeRegistry typeRegistry, Diagnostic diag, Timers? timers)
+    public static Result Run(string code, TypeRegistry typeRegistry, Diagnostic diag, Timers? timers, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
         timers?.RestartTimer();
         Lexer lexer = new();
@@ -22,7 +22,7 @@ public class Frontend
 
         timers?.RestartTimer();
         Sema sema = new(code, tokens, diag, typeRegistry);
-        sema.Run(compilationUnit);
+        sema.Run(compilationUnit, outTokenToSymbol);
         timers?.FinishTimer("Sema");
 
         return new Result
