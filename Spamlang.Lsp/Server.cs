@@ -169,6 +169,9 @@ public class Server
     private void HandleDidClose(JsonNode? idCopy, JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode);
+
+        _uriToData.Remove(uri);
+
         PublishDiagnostics(uri, []);
     }
 
