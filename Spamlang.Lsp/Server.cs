@@ -190,9 +190,7 @@ public class Server
     private void HandleHover(JsonNode? idCopy, JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode!);
-        JsonNode positionNode = paramsNode!["position"]!;
-        int line = (int)positionNode["line"]!;
-        int character = (int)positionNode["character"]!;
+        ExtractPosition(paramsNode!, out int line, out int character);
 
         if (!_uriToData.TryGetValue(uri, out Data data))
         {
@@ -348,6 +346,13 @@ public class Server
     private static string ExtractUri(JsonNode paramsNode)
     {
         return (string)paramsNode["textDocument"]!["uri"]!;
+    }
+
+    private static void ExtractPosition(JsonNode paramsNode, out int line, out int character)
+    {
+        JsonNode positionNode = paramsNode!["position"]!;
+        line = (int)positionNode["line"]!;
+        character = (int)positionNode["character"]!;
     }
 
     private static string? GetSymbolDescription(Symbol symbol, List<Token> tokens)
