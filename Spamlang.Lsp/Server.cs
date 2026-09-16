@@ -237,6 +237,29 @@ public class Server
 
     private void HandleDefinition(JsonNode? idCopy, JsonNode? paramsNode)
     {
+        string uri = ExtractUri(paramsNode!);
+        ExtractPosition(paramsNode!, out int line, out int character);
+
+        if (!_uriToData.TryGetValue(uri, out Data data))
+        {
+            Reply(idCopy, null);
+        }
+
+        int tokenIndex = GetTokenIndexByPos(data.Tokens, line + 1, character + 1);
+        if (tokenIndex == -1)
+        {
+            Reply(idCopy, null);
+            return;
+        }
+
+        Token token = data.Tokens[tokenIndex];
+        if (!data.TokenToSymbol.TryGetValue(tokenIndex, out Symbol? symbol))
+        {
+            Reply(idCopy, null);
+            return;
+        }
+        
+        
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
