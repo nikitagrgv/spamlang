@@ -142,6 +142,7 @@ public class Server
             {
                 ["textDocumentSync"] = 1,
                 ["hoverProvider"] = true,
+                ["definitionProvider"] = true,
             },
             ["serverInfo"] = new JsonObject { ["name"] = "spamlang" },
         };
