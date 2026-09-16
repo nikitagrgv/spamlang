@@ -131,6 +131,31 @@ public class Server
         }
     }
 
+    struct Data
+    {
+        public string Code { get; init; }
+        public List<int> LineOffsets { get; init; }
+        public List<Token> Tokens { get; init; }
+        public CompilationUnit CompilationUnit { get; init; }
+        public IReadOnlyList<DiagnosticEntry> Diagnostics { get; init; }
+    }
+
+    private Data Analyze(string code)
+    {
+        Diagnostic diag = new();
+        TypeRegistry reg = new();
+        Frontend.Frontend.Result result = Frontend.Frontend.Run(code, reg, diag, timers: null);
+        List<int> lineOffsets = CalcLineOffsets(code);
+        return new Data
+        {
+            Code = code,
+            LineOffsets = lineOffsets,
+            Tokens = result.Tokens,
+            CompilationUnit = result.CompilationUnit,
+            Diagnostics = diag.Entries,
+        };
+    }
+
     private void Analyze(string uri, string text)
     {
         Diagnostic diag = new();
@@ -231,5 +256,23 @@ public class Server
         _output.Write(Encoding.ASCII.GetBytes($"Content-Length: {body.Length}\r\n\r\n"));
         _output.Write(body);
         _output.Flush();
+    }
+
+
+    private static List<int> CalcLineOffsets(string code)
+    {
+        List<int> result = new();
+        result.Add(0);
+
+        for (int i = 0; i < code.Length; i++)
+        {
+            char ch = code[i];
+            if (ch == '\n')
+            {
+                result.Add(i + 1);
+            }
+        }
+
+        return result;
     }
 }
