@@ -194,6 +194,9 @@ public class Server
         {
             throw new Exception($"URI not found: {uri}");
         }
+
+        int offset = data.LineOffsets[line] + character;
+        
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
