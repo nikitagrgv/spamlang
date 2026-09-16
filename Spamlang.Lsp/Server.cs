@@ -151,6 +151,7 @@ public class Server
 
         Data data = RunFrontend(text);
         _uriToData[uri] = data;
+
         PublishDiagnostics(uri, data.Diagnostics);
     }
 
@@ -161,6 +162,7 @@ public class Server
 
         Data data = RunFrontend(text);
         _uriToData[uri] = data;
+
         PublishDiagnostics(uri, data.Diagnostics);
     }
 
