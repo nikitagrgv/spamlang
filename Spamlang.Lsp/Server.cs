@@ -118,6 +118,9 @@ public class Server
             case "textDocument/hover":
                 HandleHover(idCopy, paramsNode);
                 break;
+            case "textDocument/definition":
+                HandleDefinition(idCopy, paramsNode);
+                break;
             case "shutdown":
                 HandleShutdown(idCopy, paramsNode);
                 break;
@@ -232,6 +235,10 @@ public class Server
         };
 
         Reply(idCopy, result);
+    }
+
+    private void HandleDefinition(JsonNode? idCopy, JsonNode? paramsNode)
+    {
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
