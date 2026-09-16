@@ -186,14 +186,14 @@ public class Server
     private void HandleHover(JsonNode? idCopy, JsonNode? paramsNode)
     {
         string uri = ExtractUri(paramsNode!);
+        JsonNode positionNode = paramsNode!["position"]!;
+        int line = (int)positionNode["line"]!;
+        int character = (int)positionNode["character"]!;
+
         if (!_uriToData.TryGetValue(uri, out Data data))
         {
             throw new Exception($"URI not found: {uri}");
         }
-
-        JsonNode positionNode = paramsNode!["position"]!;
-        int line = (int)positionNode["line"]!;
-        int character = (int)positionNode["character"]!;
     }
 
     private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
