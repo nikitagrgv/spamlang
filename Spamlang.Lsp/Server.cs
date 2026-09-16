@@ -135,7 +135,11 @@ public class Server
     {
         JsonObject reply = new()
         {
-            ["capabilities"] = new JsonObject { ["textDocumentSync"] = 1 },
+            ["capabilities"] = new JsonObject
+            {
+                ["textDocumentSync"] = 1,
+                ["hoverProvider"] = true,
+            },
             ["serverInfo"] = new JsonObject { ["name"] = "spamlang" },
         };
         Reply(idCopy, reply);
