@@ -6,12 +6,23 @@ namespace Spamlang.Lsp;
 
 public class Server
 {
+    private const int InternalErrorCode = -32603;
+    private const int MethodNotFoundCode = -32601;
+
+    private struct Data
+    {
+        public string Code { get; init; }
+        public List<int> LineOffsets { get; init; }
+        public List<Token> Tokens { get; init; }
+        public CompilationUnit CompilationUnit { get; init; }
+        public IReadOnlyList<DiagnosticEntry> Diagnostics { get; init; }
+    }
+
     private Stream _input;
     private Stream _output;
     private bool _exit;
 
-    private const int InternalErrorCode = -32603;
-    private const int MethodNotFoundCode = -32601;
+    private Dictionary<string, Data> _uriToData = new();
 
     public Server(Stream input, Stream output)
     {
@@ -89,37 +100,25 @@ public class Server
         switch (method)
         {
             case "initialize":
-                JsonObject reply = new()
-                {
-                    ["capabilities"] = new JsonObject { ["textDocumentSync"] = 1 },
-                    ["serverInfo"] = new JsonObject { ["name"] = "spamlang" },
-                };
-                Reply(idCopy, reply);
+                HandleInitialize(idCopy, paramsNode);
                 break;
             case "initialized":
+                HandleInitialized(idCopy, paramsNode);
                 break;
             case "textDocument/didOpen":
-            {
-                string uri = (string)paramsNode!["textDocument"]!["uri"]!;
-                string text = (string)paramsNode!["textDocument"]!["text"]!;
-                Analyze(uri, text);
+                HandleDidOpen(idCopy, paramsNode);
                 break;
-            }
             case "textDocument/didChange":
-            {
-                string uri = (string)paramsNode!["textDocument"]!["uri"]!;
-                string text = (string)paramsNode!["contentChanges"]!.AsArray()[^1]!["text"]!;
-                Analyze(uri, text);
+                HandleDidChange(idCopy, paramsNode);
                 break;
-            }
             case "textDocument/didClose":
-                PublishDiagnostics((string)paramsNode!["textDocument"]!["uri"]!, []);
+                HandleDidClose(idCopy, paramsNode);
                 break;
             case "shutdown":
-                Reply(idCopy, null);
+                HandleShutdown(idCopy, paramsNode);
                 break;
             case "exit":
-                _exit = true;
+                HandleExit(idCopy, paramsNode);
                 break;
             default:
                 if (idCopy != null && method != null)
@@ -131,39 +130,54 @@ public class Server
         }
     }
 
-    struct Data
+    private void HandleInitialize(JsonNode? idCopy, JsonNode? paramsNode)
     {
-        public string Code { get; init; }
-        public List<int> LineOffsets { get; init; }
-        public List<Token> Tokens { get; init; }
-        public CompilationUnit CompilationUnit { get; init; }
-        public IReadOnlyList<DiagnosticEntry> Diagnostics { get; init; }
+        JsonObject reply = new()
+        {
+            ["capabilities"] = new JsonObject { ["textDocumentSync"] = 1 },
+            ["serverInfo"] = new JsonObject { ["name"] = "spamlang" },
+        };
+        Reply(idCopy, reply);
     }
 
-    private Data Analyze(string code)
+    private void HandleInitialized(JsonNode? idCopy, JsonNode? paramsNode)
     {
-        Diagnostic diag = new();
-        TypeRegistry reg = new();
-        Frontend.Frontend.Result result = Frontend.Frontend.Run(code, reg, diag, timers: null);
-        List<int> lineOffsets = CalcLineOffsets(code);
-        return new Data
-        {
-            Code = code,
-            LineOffsets = lineOffsets,
-            Tokens = result.Tokens,
-            CompilationUnit = result.CompilationUnit,
-            Diagnostics = diag.Entries,
-        };
+    }
+
+    private void HandleDidOpen(JsonNode? idCopy, JsonNode? paramsNode)
+    {
+        string uri = (string)paramsNode!["textDocument"]!["uri"]!;
+        string text = (string)paramsNode!["textDocument"]!["text"]!;
+        Analyze(uri, text);
+    }
+
+    private void HandleDidChange(JsonNode? idCopy, JsonNode? paramsNode)
+    {
+        string uri = (string)paramsNode!["textDocument"]!["uri"]!;
+        string text = (string)paramsNode!["contentChanges"]!.AsArray()[^1]!["text"]!;
+        Analyze(uri, text);
+    }
+
+    private void HandleDidClose(JsonNode? idCopy, JsonNode? paramsNode)
+    {
+        PublishDiagnostics((string)paramsNode!["textDocument"]!["uri"]!, []);
+    }
+
+    private void HandleShutdown(JsonNode? idCopy, JsonNode? paramsNode)
+    {
+        Reply(idCopy, null);
+    }
+
+    private void HandleExit(JsonNode? idCopy, JsonNode? paramsNode)
+    {
+        _exit = true;
     }
 
     private void Analyze(string uri, string text)
     {
-        Diagnostic diag = new();
-        TypeRegistry reg = new();
+        Data data = RunFrontend(text);
 
-        Frontend.Frontend.Result result = Frontend.Frontend.Run(text, reg, diag, timers: null);
-
-        PublishDiagnostics(uri, diag.Entries);
+        PublishDiagnostics(uri, data.Diagnostics);
     }
 
     private void PublishDiagnostics(string uri, IReadOnlyList<DiagnosticEntry> diags)
@@ -258,6 +272,21 @@ public class Server
         _output.Flush();
     }
 
+    private static Data RunFrontend(string code)
+    {
+        Diagnostic diag = new();
+        TypeRegistry reg = new();
+        Frontend.Frontend.Result result = Frontend.Frontend.Run(code, reg, diag, timers: null);
+        List<int> lineOffsets = CalcLineOffsets(code);
+        return new Data
+        {
+            Code = code,
+            LineOffsets = lineOffsets,
+            Tokens = result.Tokens,
+            CompilationUnit = result.CompilationUnit,
+            Diagnostics = diag.Entries,
+        };
+    }
 
     private static List<int> CalcLineOffsets(string code)
     {
