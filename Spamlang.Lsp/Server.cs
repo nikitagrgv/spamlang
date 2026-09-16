@@ -355,6 +355,16 @@ public class Server
                     sb.Append($"{param.Symbol!.Name}: {param.Symbol.Type}");
                 }
 
+                sb.Append(")->");
+                if (sym.Declaration.ReturnType != null)
+                {
+                    sb.Append($"{sym.Declaration.ReturnType.ResolvedType}");
+                }
+                else
+                {
+                    sb.Append("void");
+                }
+
                 break;
             case ParamSymbol sym:
                 break;
