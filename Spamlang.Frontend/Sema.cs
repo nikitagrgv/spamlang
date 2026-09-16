@@ -464,7 +464,7 @@ public class Sema
 
             if (usedParams[paramIndex])
             {
-                string err = $"Parameter with index {paramIndex} ";
+                string err = $"Parameter {paramIndex + 1} ";
                 if (funcDecl != null)
                 {
                     err += $"({GetTokenValue(funcDecl.Params[paramIndex].NameToken)}) ";
@@ -496,7 +496,7 @@ public class Sema
                 continue;
             }
 
-            string err = $"Parameter with index {i} ";
+            string err = $"Parameter {i + 1} ";
             if (funcDecl != null)
             {
                 err += $"({GetTokenValue(funcDecl.Params[i].NameToken)}) ";
