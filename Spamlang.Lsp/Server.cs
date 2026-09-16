@@ -209,7 +209,12 @@ public class Server
             return;
         }
 
-        string description = GetSymbolDescription(symbol, data.Tokens);
+        string? description = GetSymbolDescription(symbol, data.Tokens);
+        if (description == null)
+        {
+            Reply(idCopy, null);
+            return;
+        }
 
         JsonObject result = new()
         {
@@ -337,7 +342,7 @@ public class Server
         return (string)paramsNode["textDocument"]!["uri"]!;
     }
 
-    private static string GetSymbolDescription(Symbol symbol, List<Token> tokens)
+    private static string? GetSymbolDescription(Symbol symbol, List<Token> tokens)
     {
         StringBuilder sb = new();
         switch (symbol)
@@ -372,6 +377,12 @@ public class Server
             }
             case TypeSymbol sym:
             {
+                if (sym.Type is BuiltinType)
+                {
+                    // Nothing interesting to show
+                    return null;
+                }
+
                 sb.Append("```spamlang\n");
                 sb.Append($"{sym.Type}");
 
