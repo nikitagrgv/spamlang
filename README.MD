@@ -38,7 +38,8 @@ Debug compiler stages:
 - [x] Modern syntax optimized for faster parsing
 - [x] Named arguments syntax: `spam(a: 123, b: 345)`
 - [x] Builtin types: i32
-- [ ] Windows ABI (work in progress)
+- [x] LSP Server (work in progress)
+- [x] Windows ABI (work in progress)
 - [ ] System V ABI
 
 ## Supported Targets
