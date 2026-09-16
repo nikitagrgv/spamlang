@@ -313,13 +313,14 @@ public class Server
         return (string)paramsNode["textDocument"]!["uri"]!;
     }
 
-    private static int GetTokenIndexByPos(List<Token> valueTokens, int cursorPos)
+    private static int GetTokenIndexByPos(List<Token> tokens, int cursorPos)
     {
         int left = 0;
-        int right = valueTokens.Count;
+        int right = tokens.Count;
         while (true)
         {
             int middle = left + (right - left) / 2;
+            Token token = tokens[middle];
         }
     }
 
