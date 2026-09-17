@@ -205,6 +205,9 @@ public class Sema
     {
         terminator = null;
         bool unreachableReported = false;
+
+        List<TypedStmt> stmts = new();
+        List<VariableSymbol> variables = new();
         foreach (Stmt stmt in block.Stmts)
         {
             if (terminator != null && !unreachableReported)
@@ -216,18 +219,20 @@ public class Sema
 
             switch (stmt)
             {
-                case Block b:
+                case Block stmtBlock:
                     Scope scope = new(CurrentScope());
-                    b.Scope = scope;
                     PushScope(scope);
-                    VisitBlock(b, out Stmt? innerTerminator);
+
+                    TypedBlock tb = VisitBlock(stmtBlock, allVariables, out Stmt? innerTerminator);
+                    stmts.Add(tb);
+
+                    PopScope();
 
                     if (innerTerminator != null)
                     {
                         terminator = innerTerminator;
                     }
 
-                    PopScope();
                     break;
                 case StmtAssign stmtAssign:
                     VisitStmtAssign(stmtAssign);
@@ -246,9 +251,18 @@ public class Sema
                     throw new ArgumentOutOfRangeException(nameof(stmt));
             }
         }
+
+        allVariables.AddRange(variables);
+        return new TypedBlock
+        {
+            Variables = variables,
+            Syntax = block,
+            IsSynthesized = false,
+            Stmts = stmts,
+        };
     }
 
-    private void VisitStmtAssign(StmtAssign stmt)
+    private TypedStmtAssign VisitStmtAssign(StmtAssign stmt)
     {
         // TODO: Add assignable check (const), make functions lvalue
 
@@ -282,12 +296,12 @@ public class Sema
         stmt.Value = Adapt(stmt.Value, targetType);
     }
 
-    private void VisitStmtExpr(StmtExpr stmt)
+    private TypedStmtExpr VisitStmtExpr(StmtExpr stmt)
     {
         VisitExpr(stmt.Expr);
     }
 
-    private void VisitStmtLet(StmtLet stmt)
+    private TypedStmtLet VisitStmtLet(StmtLet stmt)
     {
         // NOTE: Uninit is ok, defaults to zero
         // NOTE: Variable of function type can be uninitialized too, but we don't care
@@ -346,7 +360,7 @@ public class Sema
         RegisterTokenAsSymbol(stmt.NameToken, sym);
     }
 
-    private void VisitStmtReturn(StmtReturn stmt)
+    private TypedStmtReturn VisitStmtReturn(StmtReturn stmt)
     {
         if (stmt.Expr != null)
         {
@@ -383,7 +397,7 @@ public class Sema
         stmt.Expr = Adapt(stmt.Expr, returnType);
     }
 
-    private void VisitExpr(Expr expr)
+    private TypedExpr VisitExpr(Expr expr)
     {
         switch (expr)
         {
@@ -410,7 +424,7 @@ public class Sema
         Debug.Assert(expr.ValueCategory != null);
     }
 
-    private void VisitExprBinary(ExprBinary expr)
+    private TypedBinary VisitExprBinary(ExprBinary expr)
     {
         expr.ValueCategory = ValueCategory.RValue;
 
@@ -443,7 +457,7 @@ public class Sema
         expr.ResolvedType = commonType;
     }
 
-    private void VisitExprCall(ExprCall expr)
+    private TypedCall VisitExprCall(ExprCall expr)
     {
         // TODO: Support default parameters
 
@@ -637,7 +651,7 @@ public class Sema
         expr.ResolvedType = sym.Type;
     }
 
-    private void VisitExprInt(ExprInt expr)
+    private TypedIntConst VisitExprInt(ExprInt expr)
     {
         // TODO: Refactor, handle negation in lexer and make it a part of the literal?
         // TODO: Overflows checks
@@ -729,7 +743,7 @@ public class Sema
         return value;
     }
 
-    private void VisitExprUnary(ExprUnary expr)
+    private TypedUnary VisitExprUnary(ExprUnary expr)
     {
         expr.ValueCategory = ValueCategory.RValue;
 

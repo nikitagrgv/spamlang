@@ -18,7 +18,7 @@ public class TypedFuncDecl : TypedNode
     public required TypedBlock Body { get; init; }
 }
 
-public abstract class TypedBlock : TypedStmt
+public class TypedBlock : TypedStmt
 {
     public required IReadOnlyList<VariableSymbol> Variables { get; init; }
     public required IReadOnlyList<TypedStmt> Stmts { get; init; }
@@ -28,24 +28,24 @@ public abstract class TypedStmt : TypedNode
 {
 }
 
-public class TypedLetStmt : TypedStmt
+public class TypedStmtLet : TypedStmt
 {
     public required VariableSymbol Variable { get; init; }
     public required TypedExpr Init { get; init; }
 }
 
-public class TypedAssignStmt : TypedStmt
+public class TypedStmtAssign : TypedStmt
 {
     public required TypedExpr Target { get; init; }
     public required TypedExpr Value { get; init; }
 }
 
-public class TypedReturnStmt : TypedStmt
+public class TypedStmtReturn : TypedStmt
 {
     public required TypedExpr? Value { get; init; }
 }
 
-public class TypedExprStmt : TypedStmt
+public class TypedStmtExpr : TypedStmt
 {
     public required TypedExpr Expr { get; init; }
 }
