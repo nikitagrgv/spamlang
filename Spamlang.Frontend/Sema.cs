@@ -568,19 +568,10 @@ public class Sema
 
             usedParams[paramIndex] = true;
 
+            SpamType paramType = funcParams[paramIndex];
             TypedExpr argExpr = VisitExpr(arg.Expr);
             argExpr = ToRValue(argExpr);
-
-            SpamType? paramType = null;
-            if (funcParams != null)
-            {
-                paramType = funcParams?[paramIndex];
-            }
-
-            if (paramType != null)
-            {
-                argExpr = Adapt(argExpr, paramType);
-            }
+            argExpr = Adapt(argExpr, paramType);
 
             TypedArg typedArg = new()
             {
