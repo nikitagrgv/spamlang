@@ -174,9 +174,8 @@ public class Sema
 
     private TypedFuncDecl VisitFuncDecl(FuncDecl fd, FuncSymbol funcSym)
     {
-        _funcStack.Add(funcSym);
-
         Scope scope = new(CurrentScope());
+        PushFunc(funcSym);
         PushScope(scope);
 
         foreach (Param param in fd.Params)
@@ -202,16 +201,14 @@ public class Sema
         fd.Body.Scope = scope;
         VisitBlock(fd.Body, out Stmt? terminator);
 
-        FuncType funcType = (FuncType)fd.Symbol.Type;
+        FuncType funcType = funcSym.FuncType;
         if (funcType.ReturnType != BuiltinType.Void && terminator == null)
         {
             _diag.AddError($"No return statement on the end of function \"{fd.Symbol.Name}\"", _tokens[fd.EndToken]);
         }
 
         PopScope();
-
-        Debug.Assert(_funcStack[^1] == fd.Symbol);
-        _funcStack.RemoveAt(_funcStack.Count - 1);
+        PopFunc();
     }
 
     private void VisitBlock(Block block, out Stmt? terminator)
@@ -363,14 +360,12 @@ public class Sema
 
     private void VisitStmtReturn(StmtReturn stmt)
     {
-        Debug.Assert(_funcStack.Count > 0);
-
         if (stmt.Expr != null)
         {
             VisitExpr(stmt.Expr);
         }
 
-        FuncSymbol currentFunc = _funcStack[^1];
+        FuncSymbol currentFunc = CurrentFunc();
         FuncType funcType = (FuncType)currentFunc.Type;
         SpamType returnType = funcType.ReturnType;
 
@@ -906,6 +901,21 @@ public class Sema
     private Scope CurrentScope()
     {
         return _scopes[^1];
+    }
+
+    private void PushFunc(FuncSymbol func)
+    {
+        _funcStack.Add(func);
+    }
+
+    private void PopFunc()
+    {
+        _scopes.RemoveAt(_funcStack.Count - 1);
+    }
+
+    private FuncSymbol CurrentFunc()
+    {
+        return _funcStack[^1];
     }
 
     private Expr Adapt(Expr expr, SpamType targetType)
