@@ -64,14 +64,14 @@ public class Sema
         List<FuncSymbol> symbols = new();
         foreach (FuncDecl fd in unit.FuncDecls)
         {
-            FuncSymbol sym = AddFunctionSymbol(fd);
+            FuncSymbol sym = RegisterFunctionSymbol(fd);
             symbols.Add(sym);
         }
 
         return symbols;
     }
 
-    private FuncSymbol AddFunctionSymbol(FuncDecl fd)
+    private FuncSymbol RegisterFunctionSymbol(FuncDecl fd)
     {
         SpamType returnType = BuiltinType.Void;
         if (fd.ReturnType != null)
@@ -82,22 +82,31 @@ public class Sema
 
         // TODO: Reuse list
         List<SpamType> paramTypes = new();
+        List<ParamSymbol> paramSymbols = new();
         foreach (Param param in fd.Params)
         {
             SpamType type = ResolveType(param.Type);
+            ReadOnlySpan<char> name = GetTokenValue(param.NameToken);
+            ParamSymbol sym = new()
+            {
+                Declaration = param,
+                Name = name.ToString(),
+                ParamType = type,
+            };
+            RegisterSymbol(sym);
             paramTypes.Add(type);
+            paramSymbols.Add(sym);
         }
 
-        Scope scope = CurrentScope();
-        ReadOnlySpan<char> name = GetTokenValue(fd.NameToken);
+        ReadOnlySpan<char> funcName = GetTokenValue(fd.NameToken);
 
         FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
-        FuncSymbol sym = new()
+        FuncSymbol funcSym = new()
         {
             Declaration = fd,
             FuncType = funcType,
-            Name = name.ToString(),
-            Params = 
+            Name = funcName.ToString(),
+            Params = paramSymbols,
         };
 
         fd.Symbol = sym;
@@ -772,32 +781,30 @@ public class Sema
     {
         // TODO: Lookup once
 
-        Scope scope = symbol.DeclaringScope;
+        Scope scope = CurrentScope();
 
         string name = symbol.Name;
-        Symbol? loc = scope.LookupLocal(name);
-        if (loc != null)
+        Symbol? existing = scope.LookupAny(name, out bool isLocal);
+        if (existing != null)
         {
-            ErrorRedeclaration(symbol, loc);
-            return;
-        }
+            if (isLocal)
+            {
+                ErrorRedeclaration(symbol, existing);
+                return;
+            }
 
-        Symbol? rec = scope.LookupRecursive(name);
-        if (rec != null)
-        {
-            switch (rec)
+            switch (existing)
             {
                 case ParamSymbol:
                 case VariableSymbol:
-                    WarningShadow(symbol, rec);
+                    WarningShadow(symbol, existing);
                     break;
                 case FuncSymbol:
                 case TypeSymbol:
                     // Only variables/params can be shadowed
-                    ErrorRedeclaration(symbol, rec);
+                    ErrorRedeclaration(symbol, existing);
                     return;
-
-                default: throw new Exception("Unknown symbol type: " + rec.SymbolKindName);
+                default: throw new UnreachableException();
             }
         }
 
