@@ -630,12 +630,9 @@ public class Sema
         };
     }
 
-    private TypedErrorExpr ErrorCall(ExprCall expr)
+    private TypedErrorExpr ErrorCall(ExprCall expr, TypedExpr callee)
     {
         List<TypedExpr> children = new();
-
-        TypedExpr callee = VisitExpr(expr.Callee);
-        callee = ToRValue(callee);
         children.Add(callee);
         foreach (ExprCallArg arg in expr.Args)
         {
