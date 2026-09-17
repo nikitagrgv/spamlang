@@ -32,22 +32,24 @@ public class Sema
         RegisterBuiltin();
         RegisterFunctionSymbols(unit);
 
-        VisitCompilationUnit(unit);
+        TypedCompilationUnit compUnit = VisitCompilationUnit(unit);
 
         CheckMain(unit);
 
         PopScope();
         _tokenToSymbol = null;
+
+        return compUnit;
     }
 
-    private void CheckMain(CompilationUnit unit)
+    private void CheckMain(Node reportNode)
     {
         // TODO: Make it optional
 
         Symbol? sym = CurrentScope().LookupLocal("main");
         if (sym == null)
         {
-            Error("\"main\" function not found", unit);
+            Error("\"main\" function not found", reportNode);
             return;
         }
 
@@ -77,7 +79,7 @@ public class Sema
         }
     }
 
-    private void VisitCompilationUnit(CompilationUnit unit)
+    private TypedCompilationUnit VisitCompilationUnit(CompilationUnit unit)
     {
         foreach (FuncDecl fd in unit.FuncDecls)
         {
