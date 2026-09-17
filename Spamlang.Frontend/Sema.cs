@@ -600,6 +600,7 @@ public class Sema
             err += "is missing";
 
             Error(err, expr);
+            return ErrorCall(expr, callee, typedArgs);
         }
 
         return new TypedCall
