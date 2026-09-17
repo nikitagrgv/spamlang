@@ -540,12 +540,11 @@ public class Sema
                 if (funcSymbol == null)
                 {
                     Error("Cannot use named arguments with indirect calls", arg);
-                    expr.ResolvedType = BuiltinType.Error;
                 }
                 else
                 {
                     ReadOnlySpan<char> argName = GetTokenValue(arg.ArgNameToken.Value);
-                    paramIndex = FindParamIndexByName(funcDecl, argName);
+                    paramIndex = FindParamIndexByName(funcSymbol, argName);
                     if (paramIndex == -1)
                     {
                         Error($"Function \"{funcDecl.Symbol!.Name}\" doesn't have parameter with name \"{argName}\"", arg);
@@ -617,13 +616,12 @@ public class Sema
         };
     }
 
-    private int FindParamIndexByName(FuncDecl funcDecl, ReadOnlySpan<char> name)
+    private int FindParamIndexByName(FuncSymbol symbol, ReadOnlySpan<char> name)
     {
-        for (int i = 0; i < funcDecl.Params.Count; i++)
+        for (int i = 0; i < symbol.Params.Count; i++)
         {
-            Param param = funcDecl.Params[i];
-            ReadOnlySpan<char> paramName = GetTokenValue(param.NameToken);
-            bool match = name.SequenceEqual(paramName);
+            ParamSymbol param = symbol.Params[i];
+            bool match = name.SequenceEqual(param.Name);
             if (match)
             {
                 return i;
