@@ -112,3 +112,9 @@ public class TypedArg : TypedNode
     public required TypedExpr Value { get; init; }
     public required int ParameterIndex { get; init; }
 }
+
+public class TypedErrorExpr : TypedExpr
+{
+    public required IReadOnlyList<TypedExpr> Children { get; init; }
+    public override bool IsLValue => false;
+}

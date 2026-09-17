@@ -630,6 +630,29 @@ public class Sema
         };
     }
 
+    private TypedErrorExpr ErrorCall(ExprCall expr)
+    {
+        List<TypedExpr> children = new();
+
+        TypedExpr callee = VisitExpr(expr.Callee);
+        callee = ToRValue(callee);
+        children.Add(callee);
+        foreach (ExprCallArg arg in expr.Args)
+        {
+            TypedExpr child = VisitExpr(arg.Expr);
+            child = ToRValue(child);
+            children.Add(child);
+        }
+
+        return new TypedErrorExpr
+        {
+            Children = children,
+            Type = BuiltinType.Error,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
+    }
+
     private static int FindParamIndexByName(FuncSymbol symbol, ReadOnlySpan<char> name)
     {
         for (int i = 0; i < symbol.Params.Count; i++)
