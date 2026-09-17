@@ -503,7 +503,7 @@ public class Sema
 
         // Can be null if call is indirect (e.g. via variable or expr)
         FuncSymbol? funcSymbol = null;
-        if (expr.Callee is ExprIdentifier identifierCalee)
+        if (expr.Callee is ExprIdentifier identifierCallee)
         {
             Debug.Assert(callee.Symbol != null, "ResolvedType is OK, so symbol must be valid");
 
