@@ -555,7 +555,7 @@ public class Sema
             if (usedParams != null && usedParams[paramIndex])
             {
                 string err = $"Parameter {paramIndex + 1} ";
-                if (funcSymbol != null && paramIndex < funcSymbol.Params.Count)
+                if (funcSymbol != null)
                 {
                     err += $"({funcSymbol.Params[paramIndex].Name}) ";
                 }
@@ -574,7 +574,7 @@ public class Sema
             argExpr = ToRValue(argExpr);
 
             SpamType? paramType = null;
-            if (funcParams != null && paramIndex < funcParams.Count)
+            if (funcParams != null)
             {
                 paramType = funcParams?[paramIndex];
             }
