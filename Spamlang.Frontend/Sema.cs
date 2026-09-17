@@ -34,7 +34,6 @@ public class Sema
         RegisterBuiltin();
         List<FuncSymbol> funcSymbols = RegisterFunctionSymbols(unit);
         TypedCompilationUnit compUnit = VisitCompilationUnit(unit, funcSymbols);
-
         CheckMain();
 
         PopScope();
