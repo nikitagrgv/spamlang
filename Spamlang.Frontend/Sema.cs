@@ -633,6 +633,7 @@ public class Sema
     private TypedErrorExpr ErrorCall(ExprCall expr, TypedExpr callee)
     {
         List<TypedExpr> children = new();
+        children.EnsureCapacity(1 + expr.Args.Count);
         children.Add(callee);
         foreach (ExprCallArg arg in expr.Args)
         {
