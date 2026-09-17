@@ -38,8 +38,8 @@ public class Sema
         CheckMain();
 
         PopScope();
-        _tokenToSymbol = null;
 
+        _tokenToSymbol = null;
         return compUnit;
     }
 
