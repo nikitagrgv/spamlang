@@ -270,36 +270,32 @@ public class Sema
 
     private TypedStmtAssign VisitStmtAssign(StmtAssign stmt)
     {
-        // TODO: Add assignable check (const), make functions lvalue
-
         TypedExpr target = VisitExpr(stmt.Target);
         TypedExpr value = VisitExpr(stmt.Value);
 
-        Debug.Assert(stmt.Target.ResolvedType != null);
-        Debug.Assert(stmt.Value.ResolvedType != null);
-
-        if (stmt.Target.ResolvedType == BuiltinType.Error)
-        {
-            // Already reported
-            return;
-        }
-
-        if (stmt.Target.ValueCategory != ValueCategory.LValue)
+        if (target.Type != BuiltinType.Error && !target.IsLValue)
         {
             Error("Only lvalue can be used as assignment target", stmt.Target);
-            return;
         }
 
-        SpamType targetType = stmt.Target.ResolvedType;
-        SpamType valueType = stmt.Value.ResolvedType;
-
-        if (valueType == BuiltinType.Error)
+        TypedExpr adaptedValue;
+        if (target.Type == BuiltinType.Error || value.Type == BuiltinType.Error)
         {
-            // Already reported
-            return;
+            adaptedValue = value;
+        }
+        else
+        {
+            TypedExpr rvalue = ToRValue(value);
+            adaptedValue = Adapt(rvalue, target.Type);
         }
 
-        stmt.Value = Adapt(stmt.Value, targetType);
+        return new TypedStmtAssign
+        {
+            Target = target,
+            Value = adaptedValue,
+            Syntax = stmt,
+            IsSynthesized = false,
+        };
     }
 
     private TypedStmtExpr VisitStmtExpr(StmtExpr stmt)
@@ -926,7 +922,7 @@ public class Sema
         return _funcStack[^1];
     }
 
-    private Expr Adapt(Expr expr, SpamType targetType)
+    private TypedExpr Adapt(TypedExpr expr, SpamType targetType)
     {
         Debug.Assert(expr.ResolvedType != null, "Must be resolve before adapt");
 
