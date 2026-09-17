@@ -509,9 +509,7 @@ public class Sema
         }
 
         IReadOnlyList<SpamType>? funcParams = funcType?.ParamTypes;
-        bool[]? usedParams = funcParams != null ? new bool[funcParams.Count] : null;
         IReadOnlyList<ExprCallArg> args = expr.Args;
-        bool hasUnorderedNamedArgs = false;
 
         if (funcParams != null && args.Count > funcParams.Count)
         {
@@ -525,6 +523,8 @@ public class Sema
             Error(str, expr);
         }
 
+        bool[]? usedParams = funcParams != null ? new bool[funcParams.Count] : null;
+        bool hasUnorderedNamedArgs = false;
         List<TypedArg> typedArgs = new();
         for (int i = 0; i < args.Count; ++i)
         {
