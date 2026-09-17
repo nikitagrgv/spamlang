@@ -626,18 +626,22 @@ public class Sema
         };
     }
 
-    private TypedErrorExpr ErrorCall(ExprCall expr, TypedExpr callee)
+    private TypedErrorExpr ErrorCall(ExprCall expr, TypedExpr callee, List<TypedArg> typedArgs)
     {
         List<TypedExpr> children = new();
         children.EnsureCapacity(1 + expr.Args.Count);
         children.Add(callee);
-        foreach (ExprCallArg arg in expr.Args)
+
+        // Visit remaining args to emit errors for them too
+        for (int i = typedArgs.Count; i < expr.Args.Count; i++)
         {
+            ExprCallArg arg = expr.Args[i];
             TypedExpr child = VisitExpr(arg.Expr);
             child = ToRValue(child);
             children.Add(child);
         }
 
+        Debug.Assert(children.Count == expr.Args.Count);
         return new TypedErrorExpr
         {
             Children = children,
