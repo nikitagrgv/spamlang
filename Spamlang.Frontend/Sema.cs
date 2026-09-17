@@ -619,9 +619,9 @@ public class Sema
         children.EnsureCapacity(1 + expr.Args.Count);
         children.Add(callee);
 
-        foreach (TypedArg typedArg in typedArgs)
+        foreach (TypedArg arg in typedArgs)
         {
-            children.Add(typedArg.Value);
+            children.Add(arg.Value);
         }
 
         // Visit remaining args to emit errors for them too
