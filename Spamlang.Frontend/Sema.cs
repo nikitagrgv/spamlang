@@ -569,7 +569,10 @@ public class Sema
                 Error(err, arg);
             }
 
-            usedParams[paramIndex] = true;
+            if (usedParams != null)
+            {
+                usedParams[paramIndex] = true;
+            }
 
             SpamType paramType = funcParams[paramIndex];
 
