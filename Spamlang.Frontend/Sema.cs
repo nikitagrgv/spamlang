@@ -529,6 +529,7 @@ public class Sema
             if (hasUnorderedNamedArgs && arg.ArgNameToken == null)
             {
                 Error("Cannot use positional arguments after named arguments in changed order", arg);
+                return ErrorCall(expr, callee, typedArgs);
             }
 
             int paramIndex = i;
