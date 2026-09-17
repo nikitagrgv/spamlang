@@ -29,8 +29,7 @@ public class Sema
         Scope scope = new(parent: null);
         PushScope(scope);
 
-        RegisterBuiltin(scope);
-
+        RegisterBuiltin();
         RegisterFunctionSymbols(unit);
 
         VisitCompilationUnit(unit);
@@ -45,9 +44,7 @@ public class Sema
     {
         // TODO: Make it optional
 
-        Debug.Assert(unit.Scope != null);
-
-        Symbol? sym = unit.Scope.LookupLocal("main");
+        Symbol? sym = CurrentScope().LookupLocal("main");
         if (sym == null)
         {
             Error("\"main\" function not found", unit);
@@ -689,22 +686,21 @@ public class Sema
         expr.ResolvedType = expr.Expr.ResolvedType;
     }
 
-    private void RegisterBuiltin(Scope scope)
+    private void RegisterBuiltin()
     {
         void Register(string name, SpamType type)
         {
             TypeSymbol symbol = new()
             {
                 Name = name,
-                DeclaringScope = scope,
-                Type = type,
+                SymbolType = type,
             };
-            bool added = scope.TryDeclare(symbol);
+            bool added = CurrentScope().TryDeclare(symbol);
             Debug.Assert(added);
         }
 
-        // NOTE: Don't register void because it's not supposed to be used by user
         Register("i32", BuiltinType.I32);
+        Register("void", BuiltinType.Void);
     }
 
     private void RegisterFunctionSymbols(CompilationUnit unit)
