@@ -32,7 +32,7 @@ public class Sema
         PushScope(scope);
 
         RegisterBuiltinTypeSymbols();
-        List<FuncSymbol> funcSymbols = RegisterFunctionSymbols(unit.FuncDecls);
+        List<FuncSymbol> funcSymbols = RegisterFunctionSymbols(unit);
         TypedCompilationUnit compUnit = VisitCompilationUnit(unit, funcSymbols);
         CheckMain();
 
@@ -59,10 +59,10 @@ public class Sema
         Register("void", BuiltinType.Void);
     }
 
-    private List<FuncSymbol> RegisterFunctionSymbols(IReadOnlyList<FuncDecl> funcDecls)
+    private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
     {
         List<FuncSymbol> symbols = new();
-        foreach (FuncDecl fd in funcDecls)
+        foreach (FuncDecl fd in unit.FuncDecls)
         {
             FuncSymbol sym = RegisterFunctionSymbol(fd);
             symbols.Add(sym);
