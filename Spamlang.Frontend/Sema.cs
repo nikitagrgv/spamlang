@@ -174,10 +174,7 @@ public class Sema
 
     private TypedFuncDecl VisitFuncDecl(FuncDecl fd, FuncSymbol funcSym)
     {
-        Debug.Assert(fd.Symbol != null, $"Must be registered in {nameof(RegisterFunctionSymbols)}");
-        Debug.Assert(fd.ReturnType == null || fd.ReturnType.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
-
-        _funcStack.Add(fd.Symbol);
+        _funcStack.Add(funcSym);
 
         Scope scope = new(CurrentScope());
         PushScope(scope);
