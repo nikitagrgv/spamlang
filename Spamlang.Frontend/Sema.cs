@@ -244,8 +244,8 @@ public class Sema
                     break;
                 case StmtLet stmtLet:
                     TypedStmtLet tsl = VisitStmtLet(stmtLet);
-                    variables.Add(tsl.VariableSymbol);
                     stmts.Add(tsl);
+                    variables.Add(tsl.VariableSymbol);
                     break;
                 case StmtReturn stmtReturn:
                     TypedStmtReturn tsr = VisitStmtReturn(stmtReturn);
