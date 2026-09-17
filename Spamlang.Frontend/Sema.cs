@@ -322,12 +322,12 @@ public class Sema
             declType = ResolveType(stmt.TypeDecl);
         }
 
-        TypedExpr expr;
+        TypedExpr init;
         if (stmt.Expr != null)
         {
-            expr = VisitExpr(stmt.Expr);
-            expr = ToRValue(expr);
-            if (expr.Type == BuiltinType.Void)
+            init = VisitExpr(stmt.Expr);
+            init = ToRValue(init);
+            if (init.Type == BuiltinType.Void)
             {
                 string message = $"Cannot assign variable \"{name}\" to void";
                 if (declType != null)
@@ -339,11 +339,11 @@ public class Sema
             }
             else if (declType != null)
             {
-                expr = Adapt(expr, declType);
+                init = Adapt(init, declType);
             }
             else
             {
-                declType = expr.Type;
+                declType = init.Type;
             }
         }
         else
@@ -353,7 +353,7 @@ public class Sema
                 declType = BuiltinType.Error;
             }
 
-            expr = new TypedZeroInit
+            init = new TypedZeroInit
             {
                 Type = declType,
                 Syntax = stmt,
@@ -379,7 +379,7 @@ public class Sema
 
         return new TypedStmtLet
         {
-            Init = 
+            Init = init,
         };
     }
 
