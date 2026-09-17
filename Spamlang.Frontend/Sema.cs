@@ -546,11 +546,10 @@ public class Sema
                 if (paramIndex == -1)
                 {
                     Error($"Function \"{funcSymbol.Name}\" doesn't have parameter with name \"{argName}\"", arg);
+                    return ErrorCall(expr, callee, typedArgs);
                 }
-                else
-                {
-                    hasUnorderedNamedArgs |= paramIndex != i;
-                }
+
+                hasUnorderedNamedArgs |= paramIndex != i;
             }
 
             if (usedParams != null && usedParams[paramIndex])
