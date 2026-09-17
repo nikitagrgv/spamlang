@@ -574,10 +574,7 @@ public class Sema
                 usedParams[paramIndex] = true;
             }
 
-            SpamType paramType = funcParams[paramIndex];
-
-            Debug.Assert(paramType != null, "Must be already resolved");
-            Debug.Assert(arg.Expr.ResolvedType != null, "Must be resolved above");
+            SpamType? paramType = funcParams?[paramIndex];
 
             arg.ParameterIndex = paramIndex;
             arg.Expr = Adapt(arg.Expr, paramType);
