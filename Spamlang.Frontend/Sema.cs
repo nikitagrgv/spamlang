@@ -483,18 +483,20 @@ public class Sema
     {
         // TODO: Support default parameters
 
+        List<TypedArg> typedArgs = new();
+
         TypedExpr callee = VisitExpr(expr.Callee);
         callee = ToRValue(callee);
 
         if (callee.Type == BuiltinType.Error)
         {
-            return ErrorCall(expr, callee);
+            return ErrorCall(expr, callee, typedArgs);
         }
 
         if (callee.Type is not FuncType funcType)
         {
             Error("Cannot call a non-function type", expr);
-            return ErrorCall(expr, callee);
+            return ErrorCall(expr, callee, typedArgs);
         }
 
         // Can be null if the call is indirect (via variable or expr)
@@ -516,12 +518,11 @@ public class Sema
 
             str += $"accepts {funcParams.Count} arguments, got {args.Count}";
             Error(str, expr);
-            return ErrorCall(expr, callee);
+            return ErrorCall(expr, callee, typedArgs);
         }
 
         bool[] usedParams = new bool[funcParams.Count];
         bool hasUnorderedNamedArgs = false;
-        List<TypedArg> typedArgs = new();
         for (int i = 0; i < args.Count; ++i)
         {
             ExprCallArg arg = args[i];
