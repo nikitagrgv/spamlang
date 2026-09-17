@@ -26,8 +26,7 @@ public class Sema
     {
         _tokenToSymbol = outTokenToSymbol;
 
-        Scope scope = new(null);
-        unit.Scope = scope;
+        Scope scope = new(parent: null);
         PushScope(scope);
 
         RegisterBuiltin(scope);
