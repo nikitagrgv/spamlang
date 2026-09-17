@@ -818,7 +818,6 @@ public class Sema
 
     private SpamType ResolveType(TypeNode node)
     {
-        Debug.Assert(node.ResolvedType == null);
         switch (node)
         {
             case FuncTypeNode n:
