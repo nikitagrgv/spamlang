@@ -843,8 +843,7 @@ public class Sema
         if (sym == null)
         {
             Error($"Type not found: \"{name}\"", node);
-            node.ResolvedType = BuiltinType.Error;
-            return node.ResolvedType;
+            return BuiltinType.Error;
         }
 
         RegisterTokenAsSymbol(node.TypeNameToken, sym);
@@ -853,12 +852,10 @@ public class Sema
         if (typeSym == null)
         {
             Error($"Type expected: \"{name}\". Given: \"{sym.SymbolKindName}\"", node);
-            node.ResolvedType = BuiltinType.Error;
-            return node.ResolvedType;
+            return BuiltinType.Error;
         }
 
-        node.ResolvedType = typeSym.Type;
-        return node.ResolvedType;
+        return typeSym.Type;
     }
 
     private SpamType ResolveFuncType(FuncTypeNode node)
