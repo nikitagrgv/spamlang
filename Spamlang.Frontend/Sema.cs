@@ -31,7 +31,7 @@ public class Sema
         Scope scope = new(parent: null);
         PushScope(scope);
 
-        RegisterBuiltin();
+        RegisterBuiltinTypeSymbols();
         List<FuncSymbol> funcSymbols = RegisterFunctionSymbols(unit);
         TypedCompilationUnit compUnit = VisitCompilationUnit(unit, funcSymbols);
         CheckMain();
@@ -42,7 +42,7 @@ public class Sema
         return compUnit;
     }
 
-    private void RegisterBuiltin()
+    private void RegisterBuiltinTypeSymbols()
     {
         void Register(string name, SpamType type)
         {
