@@ -178,43 +178,32 @@ public class Sema
         PushFunc(funcSym);
         PushScope(scope);
 
-        foreach (Param param in fd.Params)
-        {
-            Debug.Assert(param.Type.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
+        // NOTE: Params are already registered
 
-            SpamType type = param.Type.ResolvedType;
-            ReadOnlySpan<char> name = GetTokenValue(param.NameToken);
-
-            ParamSymbol sym = new()
-            {
-                Declaration = param,
-                DeclaringScope = scope,
-                Type = type,
-                Name = name.ToString(),
-            };
-
-            param.Symbol = sym;
-            RegisterSymbol(sym);
-            RegisterTokenAsSymbol(param.NameToken, sym);
-        }
-
-        fd.Body.Scope = scope;
-        VisitBlock(fd.Body, out Stmt? terminator);
+        List<VariableSymbol> allVariables = new();
+        TypedBlock body = VisitBlock(fd.Body, allVariables, out Stmt? terminator);
 
         FuncType funcType = funcSym.FuncType;
         if (funcType.ReturnType != BuiltinType.Void && terminator == null)
         {
-            _diag.AddError($"No return statement on the end of function \"{fd.Symbol.Name}\"", _tokens[fd.EndToken]);
+            Error($"No return statement at the end of function \"{funcSym.Name}\"", fd.EndToken);
         }
 
         PopScope();
         PopFunc();
+
+        return new TypedFuncDecl
+        {
+            Body = body,
+            Symbol = funcSym,
+            Variables = allVariables,
+            Syntax = fd,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitBlock(Block block, out Stmt? terminator)
+    private TypedBlock VisitBlock(Block block, List<VariableSymbol> allVariables, out Stmt? terminator)
     {
-        Debug.Assert(block.Scope != null, "Block scope must be set from outside");
-
         terminator = null;
         bool unreachableReported = false;
         foreach (Stmt stmt in block.Stmts)
@@ -1009,6 +998,11 @@ public class Sema
     private void Error(string message)
     {
         _diag.AddError(message, _tokens[^1]);
+    }
+
+    private void Error(string message, int tokenIndex)
+    {
+        _diag.AddError(message, _tokens[tokenIndex]);
     }
 
     private void Error(string message, Node node)
