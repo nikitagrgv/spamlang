@@ -556,19 +556,17 @@ public class Sema
                 }
             }
 
-            if (usedParams[paramIndex])
+            if (usedParams != null && usedParams[paramIndex])
             {
                 string err = $"Parameter {paramIndex + 1} ";
-                if (funcDecl != null)
+                if (funcSymbol != null)
                 {
-                    err += $"({GetTokenValue(funcDecl.Params[paramIndex].NameToken)}) ";
+                    err += $"({funcSymbol.Params[paramIndex].Name}) ";
                 }
 
                 err += "is already specified";
 
                 Error(err, arg);
-                expr.ResolvedType = BuiltinType.Error;
-                return;
             }
 
             usedParams[paramIndex] = true;
