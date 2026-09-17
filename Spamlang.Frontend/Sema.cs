@@ -585,8 +585,8 @@ public class Sema
 
         for (int i = 0; i < usedParams.Length; i++)
         {
-            bool parmUsed = usedParams[i];
-            if (parmUsed)
+            bool paramUsed = usedParams[i];
+            if (paramUsed)
             {
                 continue;
             }
