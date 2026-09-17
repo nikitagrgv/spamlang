@@ -8,8 +8,12 @@ public class Sema
     private readonly Diagnostic _diag;
     private readonly IReadOnlyList<Token> _tokens;
     private readonly List<Scope> _scopes = new(); // TODO: Do we need list? Or just current scope?
-    private readonly List<FuncSymbol> _funcStack = new();
     private readonly TypeRegistry _typeRegistry;
+
+    // For local functions (declared inside functions)
+    private readonly List<FuncSymbol> _funcStack = new();
+
+    private readonly Dictionary<FuncDecl, FuncSymbol> _funcDeclToSymbol = new();
 
     // Optional, for LSP Server
     private Dictionary<int, Symbol>? _tokenToSymbol = null;
@@ -30,9 +34,8 @@ public class Sema
         PushScope(scope);
 
         RegisterBuiltin();
-        RegisterFunctionSymbols(unit);
-
-        TypedCompilationUnit compUnit = VisitCompilationUnit(unit);
+        List<FuncSymbol> funcSymbols = RegisterFunctionSymbols(unit);
+        TypedCompilationUnit compUnit = VisitCompilationUnit(unit, funcSymbols);
 
         CheckMain();
 
@@ -80,12 +83,16 @@ public class Sema
         }
     }
 
-    private TypedCompilationUnit VisitCompilationUnit(CompilationUnit unit)
+    private TypedCompilationUnit VisitCompilationUnit(CompilationUnit unit, List<FuncSymbol> funcSymbols)
     {
+        Debug.Assert(funcSymbols.Count == unit.FuncDecls.Count);
+
         List<TypedFuncDecl> functions = new();
-        foreach (FuncDecl fd in unit.FuncDecls)
+        for (int i = 0; i < unit.FuncDecls.Count; i++)
         {
-            TypedFuncDecl tfd = VisitFuncDecl(fd);
+            FuncDecl fd = unit.FuncDecls[i];
+            FuncSymbol funcSym = funcSymbols[i];
+            TypedFuncDecl tfd = VisitFuncDecl(fd, funcSym);
             functions.Add(tfd);
         }
 
@@ -97,7 +104,7 @@ public class Sema
         };
     }
 
-    private TypedFuncDecl VisitFuncDecl(FuncDecl fd)
+    private TypedFuncDecl VisitFuncDecl(FuncDecl fd, FuncSymbol funcSym)
     {
         Debug.Assert(fd.Symbol != null, $"Must be registered in {nameof(RegisterFunctionSymbols)}");
         Debug.Assert(fd.ReturnType == null || fd.ReturnType.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
@@ -715,7 +722,7 @@ public class Sema
         Register("void", BuiltinType.Void);
     }
 
-    private void RegisterFunctionSymbols(CompilationUnit unit)
+    private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
     {
         foreach (FuncDecl fd in unit.FuncDecls)
         {
@@ -749,6 +756,7 @@ public class Sema
             Declaration = fd,
             FuncType = funcType,
             Name = name.ToString(),
+            Params = 
         };
 
         fd.Symbol = sym;
