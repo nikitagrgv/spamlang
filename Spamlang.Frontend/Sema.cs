@@ -183,8 +183,7 @@ public class Sema
         List<VariableSymbol> allVariables = new();
         TypedBlock body = VisitBlock(fd.Body, allVariables, out Stmt? terminator);
 
-        FuncType funcType = funcSym.FuncType;
-        if (funcType.ReturnType != BuiltinType.Void && terminator == null)
+        if (funcSym.FuncType.ReturnType != BuiltinType.Void && terminator == null)
         {
             Error($"No return statement at the end of function \"{funcSym.Name}\"", fd.EndToken);
         }
