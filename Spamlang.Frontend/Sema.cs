@@ -863,8 +863,6 @@ public class Sema
 
     private SpamType ResolveFuncType(FuncTypeNode node)
     {
-        // TODO: Duplicated with AddFunctionSymbol 
-
         SpamType returnType = BuiltinType.Void;
         if (node.ReturnType != null)
         {
@@ -881,7 +879,6 @@ public class Sema
         }
 
         FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
-        node.ResolvedType = funcType;
         return funcType;
     }
 
