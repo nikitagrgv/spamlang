@@ -497,7 +497,7 @@ public class Sema
             return ErrorCall(expr, callee);
         }
 
-        // Can be null if the call is indirect (e.g. via variable or expr)
+        // Can be null if the call is indirect (via variable or expr)
         FuncSymbol? funcSymbol = null;
         if (callee is TypedFuncRef funcRef)
         {
