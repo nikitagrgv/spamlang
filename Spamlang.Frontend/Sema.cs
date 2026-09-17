@@ -501,38 +501,28 @@ public class Sema
             funcType = null;
         }
 
-        // Can be null if call is indirect (e.g. via variable or expr)
+        // Can be null if the call is indirect (e.g. via variable or expr)
         FuncSymbol? funcSymbol = null;
-        if (expr.Callee is ExprIdentifier identifierCallee)
+        if (callee is TypedFuncRef funcRef)
         {
-            Debug.Assert(callee.Symbol != null, "ResolvedType is OK, so symbol must be valid");
-
-            // NOTE: Callee identifier is not always a FuncSymbol! E.g. variable with a pointer to function
-            // Don't emit error for this!
-            if (callee.Symbol is FuncSymbol funcSym)
-            {
-                funcDecl = funcSym.Declaration;
-                Debug.Assert(funcDecl.Symbol == funcSym);
-            }
+            funcSymbol = funcRef.Symbol;
         }
 
-        IReadOnlyList<SpamType> funcParams = funcType.ParamTypes;
-        List<ExprCallArg> args = expr.Args;
-        bool[] usedParams = new bool[funcParams.Count];
+        IReadOnlyList<SpamType>? funcParams = funcType?.ParamTypes;
+        bool[]? usedParams = funcParams != null ? new bool[funcParams.Count] : null;
+        IReadOnlyList<ExprCallArg> args = expr.Args;
         bool hasUnorderedNamedArgs = false;
 
-        if (args.Count > funcParams.Count)
+        if (funcParams != null && args.Count > funcParams.Count)
         {
             string str = "Function ";
-            if (funcDecl != null)
+            if (funcSymbol != null)
             {
-                str += $"\"{GetTokenValue(funcDecl.NameToken)}\" ";
+                str += $"\"{funcSymbol.Name}\" ";
             }
 
             str += $"accepts {funcParams.Count} arguments, got {args.Count}";
             Error(str, expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
         }
 
         for (int i = 0; i < args.Count; ++i)
