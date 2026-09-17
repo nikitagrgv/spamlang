@@ -634,9 +634,9 @@ public class Sema
         for (int i = typedArgs.Count; i < expr.Args.Count; i++)
         {
             ExprCallArg arg = expr.Args[i];
-            TypedExpr child = VisitExpr(arg.Expr);
-            child = ToRValue(child);
-            children.Add(child);
+            TypedExpr typedArg = VisitExpr(arg.Expr);
+            typedArg = ToRValue(typedArg);
+            children.Add(typedArg);
         }
 
         Debug.Assert(children.Count == expr.Args.Count);
