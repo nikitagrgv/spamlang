@@ -583,26 +583,23 @@ public class Sema
             typedArgs.Add(typedArg);
         }
 
-        if (usedParams != null)
+        for (int i = 0; i < usedParams.Length; i++)
         {
-            for (int i = 0; i < usedParams.Length; i++)
+            bool parmUsed = usedParams[i];
+            if (parmUsed)
             {
-                bool parmUsed = usedParams[i];
-                if (parmUsed)
-                {
-                    continue;
-                }
-
-                string err = $"Parameter {i + 1} ";
-                if (funcSymbol != null)
-                {
-                    err += $"({funcSymbol.Params[i].Name}) ";
-                }
-
-                err += "is missing";
-
-                Error(err, expr);
+                continue;
             }
+
+            string err = $"Parameter {i + 1} ";
+            if (funcSymbol != null)
+            {
+                err += $"({funcSymbol.Params[i].Name}) ";
+            }
+
+            err += "is missing";
+
+            Error(err, expr);
         }
 
         return new TypedCall
