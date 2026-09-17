@@ -30,7 +30,7 @@ public abstract class TypedStmt : TypedNode
 
 public class TypedStmtLet : TypedStmt
 {
-    public required VariableSymbol Variable { get; init; }
+    public required VariableSymbol VariableSymbol { get; init; }
     public required TypedExpr Init { get; init; }
 }
 

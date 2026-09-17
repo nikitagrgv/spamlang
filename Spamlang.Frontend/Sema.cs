@@ -235,16 +235,21 @@ public class Sema
 
                     break;
                 case StmtAssign stmtAssign:
-                    VisitStmtAssign(stmtAssign);
+                    TypedStmtAssign tsa = VisitStmtAssign(stmtAssign);
+                    stmts.Add(tsa);
                     break;
                 case StmtExpr stmtExpr:
-                    VisitStmtExpr(stmtExpr);
+                    TypedStmtExpr tse = VisitStmtExpr(stmtExpr);
+                    stmts.Add(tse);
                     break;
                 case StmtLet stmtLet:
-                    VisitStmtLet(stmtLet);
+                    TypedStmtLet tsl = VisitStmtLet(stmtLet);
+                    variables.Add(tsl.VariableSymbol);
+                    stmts.Add(tsl);
                     break;
                 case StmtReturn stmtReturn:
-                    VisitStmtReturn(stmtReturn);
+                    TypedStmtReturn tsr = VisitStmtReturn(stmtReturn);
+                    stmts.Add(tsr);
                     terminator = stmtReturn;
                     break;
                 default:
