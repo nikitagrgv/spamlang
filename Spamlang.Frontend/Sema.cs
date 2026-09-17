@@ -46,10 +46,11 @@ public class Sema
     {
         // TODO: Make it optional
 
+        string main = "main";
         Symbol? sym = CurrentScope().LookupLocal("main");
         if (sym == null)
         {
-            Error("\"main\" function not found");
+            Error($"\"{main}\" function not found");
             return;
         }
 
@@ -59,7 +60,7 @@ public class Sema
         FuncSymbol? mainSym = sym as FuncSymbol;
         if (mainSym == null)
         {
-            Error($"\"main\" must be a function, got {sym.SymbolKindName}", mainDecl);
+            Error($"\"{main}\" must be a function, got {sym.SymbolKindName}", mainDecl);
             return;
         }
 
@@ -67,14 +68,14 @@ public class Sema
         if (mainFunc.ReturnType != BuiltinType.I32)
         {
             // TODO: Allow void
-            Error($"\"main\" must return i32, got {mainFunc.ReturnType}", mainDecl);
+            Error($"\"{main}\" must return i32, got {mainFunc.ReturnType}", mainDecl);
             return;
         }
 
         if (mainFunc.ParamTypes.Count > 0)
         {
             // TODO: Implement argc,argv
-            Error($"\"main\" must have 0 params, got {mainFunc.ParamTypes.Count}", mainDecl);
+            Error($"\"{main}\" must have 0 params, got {mainFunc.ParamTypes.Count}", mainDecl);
             return;
         }
     }
