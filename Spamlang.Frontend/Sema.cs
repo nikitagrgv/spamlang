@@ -22,7 +22,7 @@ public class Sema
         _typeRegistry = typeRegistry;
     }
 
-    public void Run(CompilationUnit unit, Dictionary<int, Symbol>? outTokenToSymbol = null)
+    public TypedCompilationUnit Run(CompilationUnit unit, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
         _tokenToSymbol = outTokenToSymbol;
 
