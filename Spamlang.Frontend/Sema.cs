@@ -426,26 +426,18 @@ public class Sema
         switch (expr)
         {
             case ExprBinary exprBinary:
-                VisitExprBinary(exprBinary);
-                break;
+                return VisitExprBinary(exprBinary);
             case ExprCall exprCall:
-                VisitExprCall(exprCall);
-                break;
+                return VisitExprCall(exprCall);
             case ExprIdentifier exprIdentifier:
-                VisitExprIdentifier(exprIdentifier);
-                break;
+                return VisitExprIdentifier(exprIdentifier);
             case ExprInt exprInt:
-                VisitExprInt(exprInt);
-                break;
+                return VisitExprInt(exprInt);
             case ExprUnary exprUnary:
-                VisitExprUnary(exprUnary);
-                break;
+                return VisitExprUnary(exprUnary);
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
-
-        Debug.Assert(expr.ResolvedType != null);
-        Debug.Assert(expr.ValueCategory != null);
     }
 
     private TypedBinary VisitExprBinary(ExprBinary expr)
@@ -639,7 +631,7 @@ public class Sema
         return -1;
     }
 
-    private void VisitExprIdentifier(ExprIdentifier expr)
+    private TypedExpr VisitExprIdentifier(ExprIdentifier expr)
     {
         expr.ValueCategory = ValueCategory.RValue;
 
