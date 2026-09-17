@@ -34,7 +34,7 @@ public class Sema
 
         TypedCompilationUnit compUnit = VisitCompilationUnit(unit);
 
-        CheckMain(unit);
+        CheckMain();
 
         PopScope();
         _tokenToSymbol = null;
@@ -42,14 +42,14 @@ public class Sema
         return compUnit;
     }
 
-    private void CheckMain(Node reportNode)
+    private void CheckMain()
     {
         // TODO: Make it optional
 
         Symbol? sym = CurrentScope().LookupLocal("main");
         if (sym == null)
         {
-            Error("\"main\" function not found", reportNode);
+            Error("\"main\" function not found");
             return;
         }
 
@@ -977,6 +977,11 @@ public class Sema
     private ReadOnlySpan<char> GetTokenValue(int tokenIndex)
     {
         return _tokens[tokenIndex].Value(_code);
+    }
+
+    private void Error(string message)
+    {
+        _diag.AddError(message, _tokens[^1]);
     }
 
     private void Error(string message, Node node)
