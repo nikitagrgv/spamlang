@@ -38,6 +38,8 @@ public class Sema
         CheckMain(unit);
 
         _tokenToSymbol = null;
+
+        PopScope();
     }
 
     private void CheckMain(CompilationUnit unit)
