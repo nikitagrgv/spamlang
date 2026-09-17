@@ -525,14 +525,13 @@ public class Sema
             Error(str, expr);
         }
 
+        List<TypedArg> typedArgs = new();
         for (int i = 0; i < args.Count; ++i)
         {
             ExprCallArg arg = args[i];
             if (hasUnorderedNamedArgs && arg.ArgNameToken == null)
             {
                 Error("Cannot use positional arguments after named arguments in changed order", arg);
-                expr.ResolvedType = BuiltinType.Error;
-                return;
             }
 
             int paramIndex = i;
@@ -583,28 +582,36 @@ public class Sema
             arg.Expr = Adapt(arg.Expr, paramType);
         }
 
-        for (int i = 0; i < usedParams.Length; i++)
+        if (usedParams != null)
         {
-            bool parmUsed = usedParams[i];
-            if (parmUsed)
+            for (int i = 0; i < usedParams.Length; i++)
             {
-                continue;
+                bool parmUsed = usedParams[i];
+                if (parmUsed)
+                {
+                    continue;
+                }
+
+                string err = $"Parameter {i + 1} ";
+                if (funcSymbol != null)
+                {
+                    err += $"({funcSymbol.Params[i].Name}) ";
+                }
+
+                err += "is missing";
+
+                Error(err, expr);
             }
-
-            string err = $"Parameter {i + 1} ";
-            if (funcDecl != null)
-            {
-                err += $"({GetTokenValue(funcDecl.Params[i].NameToken)}) ";
-            }
-
-            err += "is missing";
-
-            Error(err, expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
         }
 
-        expr.ResolvedType = funcType.ReturnType;
+        return new TypedCall
+        {
+            Callee = callee,
+            Args = typedArgs,
+            Type = funcType?.ReturnType ?? BuiltinType.Error,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
     private int FindParamIndexByName(FuncDecl funcDecl, ReadOnlySpan<char> name)
