@@ -82,13 +82,22 @@ public class Sema
 
     private TypedCompilationUnit VisitCompilationUnit(CompilationUnit unit)
     {
+        List<TypedFuncDecl> functions = new();
         foreach (FuncDecl fd in unit.FuncDecls)
         {
-            VisitFuncDecl(fd);
+            TypedFuncDecl tfd = VisitFuncDecl(fd);
+            functions.Add(tfd);
         }
+
+        return new TypedCompilationUnit
+        {
+            FuncDecls = functions,
+            Syntax = unit,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitFuncDecl(FuncDecl fd)
+    private TypedFuncDecl VisitFuncDecl(FuncDecl fd)
     {
         Debug.Assert(fd.Symbol != null, $"Must be registered in {nameof(RegisterFunctionSymbols)}");
         Debug.Assert(fd.ReturnType == null || fd.ReturnType.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
