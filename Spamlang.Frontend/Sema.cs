@@ -547,9 +547,7 @@ public class Sema
                     paramIndex = FindParamIndexByName(funcSymbol, argName);
                     if (paramIndex == -1)
                     {
-                        Error($"Function \"{funcDecl.Symbol!.Name}\" doesn't have parameter with name \"{argName}\"", arg);
-                        expr.ResolvedType = BuiltinType.Error;
-                        return;
+                        Error($"Function \"{funcSymbol.Name}\" doesn't have parameter with name \"{argName}\"", arg);
                     }
                     else
                     {
