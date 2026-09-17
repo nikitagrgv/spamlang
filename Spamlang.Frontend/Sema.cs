@@ -516,6 +516,7 @@ public class Sema
 
             str += $"accepts {funcParams.Count} arguments, got {args.Count}";
             Error(str, expr);
+            return ErrorCall(expr, callee);
         }
 
         bool[] usedParams = new bool[funcParams.Count];
