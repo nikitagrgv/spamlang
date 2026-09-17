@@ -882,9 +882,8 @@ public class Sema
     private SpamType ResolvePointerType(PointerTypeNode node)
     {
         // TODO: Support
-        node.ResolvedType = BuiltinType.Error;
         Error("Pointer types are not supported yet", node);
-        return node.ResolvedType;
+        return BuiltinType.Error;
     }
 
     private Symbol? LookupRecursive(ReadOnlySpan<char> name)
