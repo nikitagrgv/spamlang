@@ -253,7 +253,7 @@ public class Sema
                     terminator = stmtReturn;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(stmt));
+                    throw new UnreachableException();
             }
         }
 
