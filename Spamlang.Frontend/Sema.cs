@@ -388,39 +388,37 @@ public class Sema
 
     private TypedStmtReturn VisitStmtReturn(StmtReturn stmt)
     {
-        if (stmt.Expr != null)
-        {
-            VisitExpr(stmt.Expr);
-        }
-
         FuncSymbol currentFunc = CurrentFunc();
-        FuncType funcType = (FuncType)currentFunc.Type;
+        FuncType funcType = currentFunc.FuncType;
         SpamType returnType = funcType.ReturnType;
 
-        if (returnType == BuiltinType.Error)
+        if (returnType == BuiltinType.Void && stmt.Expr != null)
         {
-            // Already reported
-            return;
+            Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" returns void", stmt);
         }
 
-        if (returnType == BuiltinType.Void)
-        {
-            if (stmt.Expr != null)
-            {
-                Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" returns void",
-                    stmt);
-            }
-
-            return;
-        }
-
-        if (stmt.Expr == null)
+        if (returnType != BuiltinType.Void && stmt.Expr == null)
         {
             Error($"Function \"{currentFunc.Name}\" must return value", stmt);
-            return;
         }
 
-        stmt.Expr = Adapt(stmt.Expr, returnType);
+        TypedExpr? expr = null;
+        if (stmt.Expr != null)
+        {
+            expr = VisitExpr(stmt.Expr);
+            expr = ToRValue(expr);
+            if (returnType != BuiltinType.Void)
+            {
+                expr = Adapt(expr, returnType);
+            }
+        }
+
+        return new TypedStmtReturn
+        {
+            Value = expr,
+            Syntax = stmt,
+            IsSynthesized = false,
+        };
     }
 
     private TypedExpr VisitExpr(Expr expr)
@@ -976,7 +974,7 @@ public class Sema
 
     private TypedExpr ToRValue(TypedExpr expr)
     {
-        if (!expr.IsLValue)
+        if (!expr.IsLValue || expr.Type == BuiltinType.Error)
         {
             return expr;
         }
