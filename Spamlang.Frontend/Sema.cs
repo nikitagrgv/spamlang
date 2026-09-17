@@ -86,11 +86,10 @@ public class Sema
         foreach (Param param in fd.Params)
         {
             SpamType type = ResolveType(param.Type);
-            ReadOnlySpan<char> name = GetTokenValue(param.NameToken);
             ParamSymbol sym = new()
             {
                 Declaration = param,
-                Name = name.ToString(),
+                Name = GetTokenValue(param.NameToken).ToString(),
                 ParamType = type,
             };
             RegisterSymbol(sym);
@@ -99,14 +98,12 @@ public class Sema
             paramSymbols.Add(sym);
         }
 
-        ReadOnlySpan<char> funcName = GetTokenValue(fd.NameToken);
-
         FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
         FuncSymbol funcSym = new()
         {
             Declaration = fd,
             FuncType = funcType,
-            Name = funcName.ToString(),
+            Name = GetTokenValue(fd.NameToken).ToString(),
             Params = paramSymbols,
         };
 
