@@ -552,7 +552,7 @@ public class Sema
                 hasUnorderedNamedArgs |= paramIndex != i;
             }
 
-            if (usedParams != null && usedParams[paramIndex])
+            if (usedParams[paramIndex])
             {
                 string err = $"Parameter {paramIndex + 1} ";
                 if (funcSymbol != null)
@@ -563,12 +563,10 @@ public class Sema
                 err += "is already specified";
 
                 Error(err, arg);
+                return ErrorCall(expr, callee, typedArgs);
             }
 
-            if (usedParams != null)
-            {
-                usedParams[paramIndex] = true;
-            }
+            usedParams[paramIndex] = true;
 
             TypedExpr argExpr = VisitExpr(arg.Expr);
             argExpr = ToRValue(argExpr);
