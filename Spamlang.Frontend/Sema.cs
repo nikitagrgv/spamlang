@@ -608,7 +608,7 @@ public class Sema
         {
             Callee = callee,
             Args = typedArgs,
-            Type = funcType?.ReturnType ?? BuiltinType.Error,
+            Type = funcType.ReturnType,
             Syntax = expr,
             IsSynthesized = false,
         };
