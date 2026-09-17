@@ -272,6 +272,7 @@ public class Sema
     {
         TypedExpr target = VisitExpr(stmt.Target);
         TypedExpr value = VisitExpr(stmt.Value);
+        value = ToRValue(value);
 
         if (target.Type != BuiltinType.Error && !target.IsLValue)
         {
