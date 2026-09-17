@@ -442,35 +442,41 @@ public class Sema
 
     private TypedBinary VisitExprBinary(ExprBinary expr)
     {
-        expr.ValueCategory = ValueCategory.RValue;
+        TypedExpr left = VisitExpr(expr.Left);
+        TypedExpr right = VisitExpr(expr.Right);
 
-        VisitExpr(expr.Left);
-        VisitExpr(expr.Right);
+        left = ToRValue(left);
+        right = ToRValue(right);
 
-        Debug.Assert(expr.Left.ResolvedType != null);
-        Debug.Assert(expr.Right.ResolvedType != null);
+        SpamType leftType = left.Type;
+        SpamType rightType = right.Type;
 
-        SpamType leftType = expr.Left.ResolvedType;
-        SpamType rightType = expr.Right.ResolvedType;
-
+        SpamType? commonType;
         if (leftType == BuiltinType.Error || rightType == BuiltinType.Error)
         {
-            // Already reported
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            commonType = BuiltinType.Error;
         }
-
-        SpamType? commonType = GetBinaryResultType(leftType, rightType, expr.Op);
-        if (commonType == null)
+        else
         {
-            Error($"Cannot use \"{TokenUtils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            commonType = GetBinaryResultType(leftType, rightType, expr.Op);
+            if (commonType == null)
+            {
+                Error($"Cannot use \"{TokenUtils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
+                commonType = BuiltinType.Error;
+            }
         }
 
-        expr.Left = Adapt(expr.Left, commonType);
-        expr.Right = Adapt(expr.Right, commonType);
-        expr.ResolvedType = commonType;
+        left = Adapt(left, commonType);
+        right = Adapt(right, commonType);
+        return new TypedBinary
+        {
+            Left = left,
+            Right = right,
+            Op = expr.Op,
+            Type = commonType,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
     private TypedCall VisitExprCall(ExprCall expr)
