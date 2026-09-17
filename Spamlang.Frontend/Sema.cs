@@ -483,26 +483,22 @@ public class Sema
     {
         // TODO: Support default parameters
 
-        expr.ValueCategory = ValueCategory.RValue;
+        TypedExpr callee = VisitExpr(expr.Callee);
+        callee = ToRValue(callee);
 
-        VisitExpr(expr.Callee);
-        foreach (ExprCallArg arg in expr.Args)
+        FuncType? funcType;
+        if (callee.Type == BuiltinType.Error)
         {
-            VisitExpr(arg.Expr);
+            funcType = null;
         }
-
-        if (expr.Callee.ResolvedType == BuiltinType.Error)
+        else if (callee.Type is FuncType ft)
         {
-            // Already reported
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            funcType = ft;
         }
-
-        if (expr.Callee.ResolvedType is not FuncType funcType)
+        else
         {
             Error("Cannot call a non-function type", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            funcType = null;
         }
 
         // Can be null if call is indirect (e.g. via variable or expr)
