@@ -619,6 +619,11 @@ public class Sema
         children.EnsureCapacity(1 + expr.Args.Count);
         children.Add(callee);
 
+        foreach (TypedArg typedArg in typedArgs)
+        {
+            children.Add(typedArg.Value);
+        }
+
         // Visit remaining args to emit errors for them too
         for (int i = typedArgs.Count; i < expr.Args.Count; i++)
         {
@@ -628,7 +633,7 @@ public class Sema
             children.Add(typedArg);
         }
 
-        Debug.Assert(children.Count == expr.Args.Count);
+        Debug.Assert(children.Count == expr.Args.Count + 1);
         return new TypedErrorExpr
         {
             Children = children,
