@@ -13,8 +13,6 @@ public class Sema
     // For local functions (declared inside functions)
     private readonly List<FuncSymbol> _funcStack = new();
 
-    private readonly Dictionary<FuncDecl, FuncSymbol> _funcDeclToSymbol = new();
-
     // Optional, for LSP Server
     private Dictionary<int, Symbol>? _tokenToSymbol = null;
 
@@ -43,6 +41,68 @@ public class Sema
         _tokenToSymbol = null;
 
         return compUnit;
+    }
+
+    private void RegisterBuiltin()
+    {
+        void Register(string name, SpamType type)
+        {
+            TypeSymbol symbol = new()
+            {
+                Name = name,
+                SymbolType = type,
+            };
+            bool added = CurrentScope().TryDeclare(symbol);
+            Debug.Assert(added);
+        }
+
+        Register("i32", BuiltinType.I32);
+        Register("void", BuiltinType.Void);
+    }
+
+    private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
+    {
+        foreach (FuncDecl fd in unit.FuncDecls)
+        {
+            AddFunctionSymbol(fd);
+        }
+    }
+
+    private void AddFunctionSymbol(FuncDecl fd)
+    {
+        SpamType returnType = BuiltinType.Void;
+        if (fd.ReturnType != null)
+        {
+            SpamType type = ResolveType(fd.ReturnType);
+            returnType = type;
+        }
+
+        // TODO: Reuse list
+        List<SpamType> paramTypes = [];
+        foreach (Param param in fd.Params)
+        {
+            SpamType type = ResolveType(param.Type);
+            paramTypes.Add(type);
+        }
+
+        Scope scope = CurrentScope();
+        ReadOnlySpan<char> name = GetTokenValue(fd.NameToken);
+
+        FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
+        FuncSymbol sym = new()
+        {
+            Declaration = fd,
+            FuncType = funcType,
+            Name = name.ToString(),
+            Params = 
+        };
+
+        fd.Symbol = sym;
+
+        // NOTE: Create symbol even if it's a redeclaration
+
+        RegisterSymbol(sym);
+        RegisterTokenAsSymbol(fd.NameToken, sym);
     }
 
     private void CheckMain()
@@ -703,68 +763,6 @@ public class Sema
         }
 
         expr.ResolvedType = expr.Expr.ResolvedType;
-    }
-
-    private void RegisterBuiltin()
-    {
-        void Register(string name, SpamType type)
-        {
-            TypeSymbol symbol = new()
-            {
-                Name = name,
-                SymbolType = type,
-            };
-            bool added = CurrentScope().TryDeclare(symbol);
-            Debug.Assert(added);
-        }
-
-        Register("i32", BuiltinType.I32);
-        Register("void", BuiltinType.Void);
-    }
-
-    private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
-    {
-        foreach (FuncDecl fd in unit.FuncDecls)
-        {
-            AddFunctionSymbol(fd);
-        }
-    }
-
-    private void AddFunctionSymbol(FuncDecl fd)
-    {
-        SpamType returnType = BuiltinType.Void;
-        if (fd.ReturnType != null)
-        {
-            SpamType type = ResolveType(fd.ReturnType);
-            returnType = type;
-        }
-
-        // TODO: Reuse list
-        List<SpamType> paramTypes = [];
-        foreach (Param param in fd.Params)
-        {
-            SpamType type = ResolveType(param.Type);
-            paramTypes.Add(type);
-        }
-
-        Scope scope = CurrentScope();
-        ReadOnlySpan<char> name = GetTokenValue(fd.NameToken);
-
-        FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
-        FuncSymbol sym = new()
-        {
-            Declaration = fd,
-            FuncType = funcType,
-            Name = name.ToString(),
-            Params = 
-        };
-
-        fd.Symbol = sym;
-
-        // NOTE: Create symbol even if it's a redeclaration
-
-        RegisterSymbol(sym);
-        RegisterTokenAsSymbol(fd.NameToken, sym);
     }
 
     private void RegisterSymbol(Symbol symbol)
