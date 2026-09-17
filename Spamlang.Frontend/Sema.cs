@@ -533,24 +533,23 @@ public class Sema
             }
 
             int paramIndex = i;
-            if (arg.ArgNameToken != null && funcType != null)
+            if (arg.ArgNameToken != null)
             {
                 if (funcSymbol == null)
                 {
                     Error("Cannot use named arguments with indirect calls", arg);
+                    return ErrorCall(expr, callee, typedArgs);
+                }
+
+                ReadOnlySpan<char> argName = GetTokenValue(arg.ArgNameToken.Value);
+                paramIndex = FindParamIndexByName(funcSymbol, argName);
+                if (paramIndex == -1)
+                {
+                    Error($"Function \"{funcSymbol.Name}\" doesn't have parameter with name \"{argName}\"", arg);
                 }
                 else
                 {
-                    ReadOnlySpan<char> argName = GetTokenValue(arg.ArgNameToken.Value);
-                    paramIndex = FindParamIndexByName(funcSymbol, argName);
-                    if (paramIndex == -1)
-                    {
-                        Error($"Function \"{funcSymbol.Name}\" doesn't have parameter with name \"{argName}\"", arg);
-                    }
-                    else
-                    {
-                        hasUnorderedNamedArgs |= paramIndex != i;
-                    }
+                    hasUnorderedNamedArgs |= paramIndex != i;
                 }
             }
 
