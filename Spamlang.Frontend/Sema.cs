@@ -94,6 +94,7 @@ public class Sema
                 ParamType = type,
             };
             RegisterSymbol(sym);
+            RegisterTokenAsSymbol(param.NameToken, sym);
             paramTypes.Add(type);
             paramSymbols.Add(sym);
         }
@@ -109,12 +110,10 @@ public class Sema
             Params = paramSymbols,
         };
 
-        fd.Symbol = sym;
+        RegisterSymbol(funcSym);
+        RegisterTokenAsSymbol(fd.NameToken, funcSym);
 
-        // NOTE: Create symbol even if it's a redeclaration
-
-        RegisterSymbol(sym);
-        RegisterTokenAsSymbol(fd.NameToken, sym);
+        return funcSym;
     }
 
     private void CheckMain()
