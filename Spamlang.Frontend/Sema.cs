@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
 namespace Spamlang.Frontend;
@@ -261,9 +262,9 @@ public class Sema
         return new TypedBlock
         {
             Variables = variables,
+            Stmts = stmts,
             Syntax = block,
             IsSynthesized = false,
-            Stmts = stmts,
         };
     }
 
@@ -271,8 +272,8 @@ public class Sema
     {
         // TODO: Add assignable check (const), make functions lvalue
 
-        VisitExpr(stmt.Target);
-        VisitExpr(stmt.Value);
+        TypedExpr target = VisitExpr(stmt.Target);
+        TypedExpr value = VisitExpr(stmt.Value);
 
         Debug.Assert(stmt.Target.ResolvedType != null);
         Debug.Assert(stmt.Value.ResolvedType != null);
@@ -958,6 +959,22 @@ public class Sema
 
         Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr);
         return expr;
+    }
+
+    private TypedExpr ToRValue(TypedExpr expr)
+    {
+        if (!expr.IsLValue)
+        {
+            return expr;
+        }
+
+        return new TypedLoad
+        {
+            Address = expr,
+            Type = expr.Type,
+            Syntax = expr.Syntax,
+            IsSynthesized = true,
+        };
     }
 
     private SpamType? GetBinaryResultType(SpamType a, SpamType b, BinaryOp op)
