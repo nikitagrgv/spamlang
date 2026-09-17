@@ -312,9 +312,7 @@ public class Sema
     private TypedStmtLet VisitStmtLet(StmtLet stmt)
     {
         // NOTE: Uninit is ok, defaults to zero
-        // NOTE: Variable of function type can be uninitialized too, but we don't care
-
-        Debug.Assert(stmt.Expr != null || stmt.TypeDecl != null, "Must be guaranteed by parser");
+        // TODO: Variable of function type can be uninitialized, bad
 
         ReadOnlySpan<char> name = GetTokenValue(stmt.NameToken);
 
@@ -324,12 +322,12 @@ public class Sema
             declType = ResolveType(stmt.TypeDecl);
         }
 
+        TypedExpr expr;
         if (stmt.Expr != null)
         {
-            VisitExpr(stmt.Expr);
-            Debug.Assert(stmt.Expr.ResolvedType != null);
-            SpamType exprType = stmt.Expr.ResolvedType;
-            if (exprType == BuiltinType.Void)
+            expr = VisitExpr(stmt.Expr);
+            expr = ToRValue(expr);
+            if (expr.Type == BuiltinType.Void)
             {
                 string message = $"Cannot assign variable \"{name}\" to void";
                 if (declType != null)
@@ -341,17 +339,31 @@ public class Sema
             }
             else if (declType != null)
             {
-                stmt.Expr = Adapt(stmt.Expr, declType);
+                expr = Adapt(expr, declType);
             }
             else
             {
-                declType = exprType;
+                declType = expr.Type;
             }
+        }
+        else
+        {
+            if (declType == null)
+            {
+                declType = BuiltinType.I32;
+            }
+
+            expr = new TypedZeroInit
+            {
+                Type = declType,
+                Syntax = stmt,
+                IsSynthesized = true,
+            };
         }
 
         if (declType == null)
         {
-            // Already reported above
+            // Already reported
             declType = BuiltinType.Error;
         }
 
@@ -359,13 +371,16 @@ public class Sema
         {
             Declaration = stmt,
             Name = name.ToString(),
-            DeclaringScope = CurrentScope(),
-            Type = declType,
+            VariableType = declType,
         };
 
-        stmt.Symbol = sym;
         RegisterSymbol(sym);
         RegisterTokenAsSymbol(stmt.NameToken, sym);
+
+        return new TypedStmtLet
+        {
+            Init = 
+        };
     }
 
     private TypedStmtReturn VisitStmtReturn(StmtReturn stmt)
