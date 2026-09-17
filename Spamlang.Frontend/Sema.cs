@@ -279,21 +279,15 @@ public class Sema
             Error("Only lvalue can be used as assignment target", stmt.Target);
         }
 
-        TypedExpr adaptedValue;
-        if (target.Type == BuiltinType.Error || value.Type == BuiltinType.Error)
+        if (target.Type != BuiltinType.Error && value.Type != BuiltinType.Error)
         {
-            adaptedValue = value;
-        }
-        else
-        {
-            TypedExpr rvalue = ToRValue(value);
-            adaptedValue = Adapt(rvalue, target.Type);
+            value = Adapt(value, target.Type);
         }
 
         return new TypedStmtAssign
         {
             Target = target,
-            Value = adaptedValue,
+            Value = value,
             Syntax = stmt,
             IsSynthesized = false,
         };
