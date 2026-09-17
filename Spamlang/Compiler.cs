@@ -78,7 +78,7 @@ public class Compiler
             return false;
         }
 
-        Backend.Backend.Result backendResult = Backend.Backend.Run(frontendResult.CompilationUnit, typeRegistry, timers);
+        Backend.Backend.Result backendResult = Backend.Backend.Run(frontendResult.TypedCompilationUnit, typeRegistry, timers);
 
         PrintIR(backendResult.IRModule);
         PrintMIR(backendResult.MModule);
