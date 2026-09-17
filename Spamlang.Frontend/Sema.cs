@@ -574,10 +574,23 @@ public class Sema
                 usedParams[paramIndex] = true;
             }
 
-            SpamType? paramType = funcParams?[paramIndex];
+            TypedExpr argExpr = VisitExpr(arg.Expr);
+            argExpr = ToRValue(argExpr);
 
-            arg.ParameterIndex = paramIndex;
-            arg.Expr = Adapt(arg.Expr, paramType);
+            SpamType? paramType = funcParams?[paramIndex];
+            if (paramType != null)
+            {
+                argExpr = Adapt(argExpr, paramType);
+            }
+
+            TypedArg typedArg = new()
+            {
+                Value = argExpr,
+                ParameterIndex = paramIndex,
+                Syntax = arg,
+                IsSynthesized = false,
+            };
+            typedArgs.Add(typedArg);
         }
 
         if (usedParams != null)
