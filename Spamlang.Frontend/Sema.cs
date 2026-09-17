@@ -300,7 +300,13 @@ public class Sema
 
     private TypedStmtExpr VisitStmtExpr(StmtExpr stmt)
     {
-        VisitExpr(stmt.Expr);
+        TypedExpr expr = VisitExpr(stmt.Expr);
+        return new TypedStmtExpr
+        {
+            Expr = expr,
+            Syntax = stmt,
+            IsSynthesized = false,
+        };
     }
 
     private TypedStmtLet VisitStmtLet(StmtLet stmt)
