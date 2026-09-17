@@ -535,9 +535,9 @@ public class Sema
             }
 
             int paramIndex = i;
-            if (arg.ArgNameToken != null)
+            if (arg.ArgNameToken != null && funcType != null)
             {
-                if (funcDecl == null)
+                if (funcSymbol == null)
                 {
                     Error("Cannot use named arguments with indirect calls", arg);
                     expr.ResolvedType = BuiltinType.Error;
@@ -564,7 +564,7 @@ public class Sema
                     err += $"({GetTokenValue(funcDecl.Params[paramIndex].NameToken)}) ";
                 }
 
-                err += "is specified twice";
+                err += "is already specified";
 
                 Error(err, arg);
                 expr.ResolvedType = BuiltinType.Error;
