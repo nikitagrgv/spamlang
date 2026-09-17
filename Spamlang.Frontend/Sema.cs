@@ -271,14 +271,14 @@ public class Sema
     private TypedStmtAssign VisitStmtAssign(StmtAssign stmt)
     {
         TypedExpr target = VisitExpr(stmt.Target);
-        TypedExpr value = VisitExpr(stmt.Value);
-        value = ToRValue(value);
-        value = Adapt(value, target.Type);
-
         if (target.Type != BuiltinType.Error && !target.IsLValue)
         {
             Error("Only lvalue can be used as assignment target", stmt.Target);
         }
+
+        TypedExpr value = VisitExpr(stmt.Value);
+        value = ToRValue(value);
+        value = Adapt(value, target.Type);
 
         return new TypedStmtAssign
         {
