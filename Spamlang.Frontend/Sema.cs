@@ -505,6 +505,7 @@ public class Sema
         if (callee is TypedFuncRef funcRef)
         {
             funcSymbol = funcRef.Symbol;
+            Debug.Assert(funcSymbol.Params.Count == funcType.ParamTypes.Count);
         }
 
         IReadOnlyList<SpamType> funcParams = funcType.ParamTypes;
