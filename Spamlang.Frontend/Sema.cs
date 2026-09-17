@@ -338,7 +338,7 @@ public class Sema
 
                 Error(message, stmt);
             }
-            else if (declType != null && declType != BuiltinType.Error)
+            else if (declType != null)
             {
                 init = Adapt(init, declType);
             }
