@@ -61,13 +61,17 @@ public class Sema
 
     private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
     {
+        List<FuncSymbol> symbols = new();
         foreach (FuncDecl fd in unit.FuncDecls)
         {
-            AddFunctionSymbol(fd);
+            FuncSymbol sym = AddFunctionSymbol(fd);
+            symbols.Add(sym);
         }
+
+        return symbols;
     }
 
-    private void AddFunctionSymbol(FuncDecl fd)
+    private FuncSymbol AddFunctionSymbol(FuncDecl fd)
     {
         SpamType returnType = BuiltinType.Void;
         if (fd.ReturnType != null)
