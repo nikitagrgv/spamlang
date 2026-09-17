@@ -616,7 +616,7 @@ public class Sema
         };
     }
 
-    private int FindParamIndexByName(FuncSymbol symbol, ReadOnlySpan<char> name)
+    private static int FindParamIndexByName(FuncSymbol symbol, ReadOnlySpan<char> name)
     {
         for (int i = 0; i < symbol.Params.Count; i++)
         {
