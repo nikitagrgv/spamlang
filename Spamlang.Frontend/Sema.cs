@@ -81,7 +81,7 @@ public class Sema
         }
 
         // TODO: Reuse list
-        List<SpamType> paramTypes = [];
+        List<SpamType> paramTypes = new();
         foreach (Param param in fd.Params)
         {
             SpamType type = ResolveType(param.Type);
@@ -868,7 +868,7 @@ public class Sema
         }
 
         // TODO: Reuse list
-        List<SpamType> paramTypes = [];
+        List<SpamType> paramTypes = new();
         foreach (TypeNode param in node.Params)
         {
             SpamType type = ResolveType(param);
