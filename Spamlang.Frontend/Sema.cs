@@ -647,8 +647,6 @@ public class Sema
 
     private TypedExpr VisitExprIdentifier(ExprIdentifier expr)
     {
-        expr.ValueCategory = ValueCategory.RValue;
-
         ReadOnlySpan<char> name = GetTokenValue(expr.IdentifierToken);
         Symbol? sym = LookupRecursive(name);
         if (sym == null)

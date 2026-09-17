@@ -59,7 +59,7 @@ public abstract class TypedExpr : TypedNode
 public class TypedLocalRef : TypedExpr
 {
     public required LocalSymbol Symbol { get; init; }
-    public override bool IsLValue => true;
+    public override bool IsLValue => false;
 }
 
 public class TypedFuncRef : TypedExpr
