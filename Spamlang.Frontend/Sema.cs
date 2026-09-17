@@ -747,8 +747,7 @@ public class Sema
         FuncSymbol sym = new()
         {
             Declaration = fd,
-            DeclaringScope = scope,
-            Type = funcType,
+            FuncType = funcType,
             Name = name.ToString(),
         };
 
