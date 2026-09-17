@@ -577,7 +577,12 @@ public class Sema
             TypedExpr argExpr = VisitExpr(arg.Expr);
             argExpr = ToRValue(argExpr);
 
-            SpamType? paramType = funcParams?[paramIndex];
+            SpamType? paramType = null;
+            if (funcParams != null && paramIndex <= funcParams.Count)
+            {
+                paramType = funcParams?[paramIndex];
+            }
+
             if (paramType != null)
             {
                 argExpr = Adapt(argExpr, paramType);
