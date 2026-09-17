@@ -479,26 +479,22 @@ public class Sema
         };
     }
 
-    private TypedCall VisitExprCall(ExprCall expr)
+    private TypedExpr VisitExprCall(ExprCall expr)
     {
         // TODO: Support default parameters
 
         TypedExpr callee = VisitExpr(expr.Callee);
         callee = ToRValue(callee);
 
-        FuncType? funcType;
         if (callee.Type == BuiltinType.Error)
         {
-            funcType = null;
+            return ErrorCall(expr, callee);
         }
-        else if (callee.Type is FuncType ft)
-        {
-            funcType = ft;
-        }
-        else
+
+        if (callee.Type is not FuncType funcType)
         {
             Error("Cannot call a non-function type", expr);
-            funcType = null;
+            return ErrorCall(expr, callee);
         }
 
         // Can be null if the call is indirect (e.g. via variable or expr)
