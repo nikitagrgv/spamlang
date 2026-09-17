@@ -504,10 +504,9 @@ public class Sema
             funcSymbol = funcRef.Symbol;
         }
 
-        IReadOnlyList<SpamType>? funcParams = funcType?.ParamTypes;
+        IReadOnlyList<SpamType> funcParams = funcType.ParamTypes;
         IReadOnlyList<ExprCallArg> args = expr.Args;
-
-        if (funcParams != null && args.Count > funcParams.Count)
+        if (args.Count > funcParams.Count)
         {
             string str = "Function ";
             if (funcSymbol != null)
@@ -519,7 +518,7 @@ public class Sema
             Error(str, expr);
         }
 
-        bool[]? usedParams = funcParams != null ? new bool[funcParams.Count] : null;
+        bool[] usedParams = new bool[funcParams.Count];
         bool hasUnorderedNamedArgs = false;
         List<TypedArg> typedArgs = new();
         for (int i = 0; i < args.Count; ++i)
