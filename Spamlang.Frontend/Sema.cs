@@ -379,7 +379,10 @@ public class Sema
 
         return new TypedStmtLet
         {
+            VariableSymbol = sym,
             Init = init,
+            Syntax = stmt,
+            IsSynthesized = false,
         };
     }
 
