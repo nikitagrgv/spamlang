@@ -350,7 +350,7 @@ public class Sema
         {
             if (declType == null)
             {
-                declType = BuiltinType.I32;
+                declType = BuiltinType.Error;
             }
 
             expr = new TypedZeroInit
