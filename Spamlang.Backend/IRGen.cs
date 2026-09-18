@@ -19,7 +19,7 @@ public class IRGen
         _symbolScopes.Add(globalScope);
 
         List<IRFunction> functions = new();
-        foreach (FuncDecl funcDecl in unit.FuncDecls)
+        foreach (HIRFuncDecl funcDecl in unit.FuncDecls)
         {
             Debug.Assert(funcDecl.Symbol is { Type: FuncType });
             FuncType signature = (FuncType)funcDecl.Symbol.Type;
@@ -37,7 +37,7 @@ public class IRGen
 
         for (int i = 0; i < unit.FuncDecls.Count; i++)
         {
-            FuncDecl funcDecl = unit.FuncDecls[i];
+            HIRFuncDecl funcDecl = unit.FuncDecls[i];
             IRFunction function = functions[i];
             GenFunction(funcDecl, function);
         }
@@ -54,7 +54,7 @@ public class IRGen
         return module;
     }
 
-    private void GenFunction(FuncDecl funcDecl, IRFunction function)
+    private void GenFunction(HIRFuncDecl funcDecl, IRFunction function)
     {
         // TODO: Reuse lists/dicts
         List<StmtLet> locals = new();
