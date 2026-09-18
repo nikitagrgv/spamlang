@@ -180,7 +180,7 @@ public class HIRPrinter
                     }
 
                     HIRCallArg arg = exprCall.Args[i];
-                    ret.Append(PrettyExpr(arg.Expr));
+                    ret.Append(PrettyExpr(arg.Value));
                     ret.Append($" (index={TokenValue(arg.ParameterIndex)})");
                 }
 

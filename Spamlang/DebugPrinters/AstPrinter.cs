@@ -133,8 +133,8 @@ public class AstPrinter
                     nameInfo = $" ({TokenValue(exprCallArg.ArgNameToken.Value)})";
                 }
 
-                Console.WriteLine($"{fullPrefix}ExprCallArg{nameInfo}: {PrettyExpr(exprCallArg.Expr)}");
-                PrintAst(depth + 1, exprCallArg.Expr);
+                Console.WriteLine($"{fullPrefix}ExprCallArg{nameInfo}: {PrettyExpr(exprCallArg.Value)}");
+                PrintAst(depth + 1, exprCallArg.Value);
                 break;
             case ExprIntConst n:
                 Console.WriteLine(
@@ -197,7 +197,7 @@ public class AstPrinter
                         ret.Append(": ");
                     }
 
-                    ret.Append(PrettyExpr(arg.Expr));
+                    ret.Append(PrettyExpr(arg.Value));
                 }
 
                 ret.Append(')');

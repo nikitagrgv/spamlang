@@ -564,7 +564,7 @@ public class Sema
             usedParams[paramIndex] = true;
 
             SpamType paramType = funcParams[paramIndex];
-            HIRExpr argExpr = VisitExpr(arg.Expr);
+            HIRExpr argExpr = VisitExpr(arg.Value);
             argExpr = ToRValue(argExpr);
             argExpr = Adapt(argExpr, paramType);
 
@@ -623,7 +623,7 @@ public class Sema
         for (int i = visitedArgs.Count; i < expr.Args.Count; i++)
         {
             CallArg arg = expr.Args[i];
-            HIRExpr hirArg = VisitExpr(arg.Expr);
+            HIRExpr hirArg = VisitExpr(arg.Value);
             hirArg = ToRValue(hirArg);
             children.Add(hirArg);
         }

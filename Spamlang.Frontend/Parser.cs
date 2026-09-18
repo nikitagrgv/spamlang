@@ -612,7 +612,7 @@ public class Parser
                     {
                         StartToken = argBegin,
                         EndToken = End(argBegin),
-                        Expr = expr,
+                        Value = expr,
                         ArgNameToken = argNameToken,
                     };
                     args.Add(arg);

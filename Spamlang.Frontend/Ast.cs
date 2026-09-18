@@ -112,7 +112,7 @@ public sealed class ExprIdentifier : ExprPrimary
 
 public sealed class CallArg : Node
 {
-    public required Expr Expr { get; init; }
+    public required Expr Value { get; init; }
     public required int? ArgNameToken { get; init; }
 }
 
