@@ -199,24 +199,6 @@ public class IRGen
             default:
                 throw new UnreachableException();
         }
-
-        switch (expr)
-        {
-            case ExprBinary exprBinary:
-                return GenExprBinaryValue(block, exprBinary);
-            case ExprCall exprCall:
-                return GenExprCallValue(block, exprCall);
-            case ExprImplicitCast exprImplicitCast:
-                return GenExprImplicitCastValue(block, exprImplicitCast);
-            case ExprIdentifier exprIdentifier:
-                return GenExprIdentifierValue(exprIdentifier);
-            case ExprInt exprInt:
-                return GenExprIntValue(exprInt);
-            case ExprUnary exprUnary:
-                return GenExprUnaryValue(block, exprUnary);
-            default:
-                throw new ArgumentOutOfRangeException(nameof(expr));
-        }
     }
 
     private IRValue GenExprLoadValue(IRBasicBlock block, HIRExprLoad expr)
