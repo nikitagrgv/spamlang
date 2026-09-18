@@ -980,23 +980,28 @@ public class Sema
             return expr;
         }
 
-        if (CanImplicitlyCast(type, targetType))
+        if (!CanImplicitlyCast(type, targetType))
         {
-            Debug.Assert(expr.ResolvedType != targetType, "Don't need cast");
-            ExprCast cast = new ExprImplicitCast
+            Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr.Syntax);
+            return new TypedErrorExpr
             {
-                StartToken = expr.StartToken,
-                EndToken = expr.EndToken,
-                Operand = expr,
-                Target = targetType,
-                ResolvedType = targetType,
-                ValueCategory = ValueCategory.RValue,
+                Children = [expr],
+                Type = BuiltinType.Error,
+                Syntax = expr.Syntax,
+                IsSynthesized = false,
             };
-            return cast;
         }
 
-        Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr);
-        return expr;
+        ExprCast cast = new ExprImplicitCast
+        {
+            StartToken = expr.StartToken,
+            EndToken = expr.EndToken,
+            Operand = expr,
+            Target = targetType,
+            ResolvedType = targetType,
+            ValueCategory = ValueCategory.RValue,
+        };
+        return cast;
     }
 
     private TypedExpr ToRValue(TypedExpr expr)
