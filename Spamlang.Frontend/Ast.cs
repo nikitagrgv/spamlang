@@ -92,7 +92,7 @@ public sealed class ExprBinary : Expr
 public sealed class ExprUnary : Expr
 {
     public required UnaryOp Op { get; init; }
-    public required Expr Expr { get; init; }
+    public required Expr Operand { get; init; }
 }
 
 public abstract class ExprPrimary : Expr

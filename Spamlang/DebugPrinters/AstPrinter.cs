@@ -134,7 +134,7 @@ public class AstPrinter
                 break;
             case ExprUnary n:
                 Console.WriteLine($"{fullPrefix}UnaryExpr({n.Op}): {PrettyExpr(n)} | Type = {n.ResolvedType}");
-                PrintAst(depth + 1, n.Expr);
+                PrintAst(depth + 1, n.Operand);
                 break;
             case ExprCall n:
                 Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)} | Type = {n.ResolvedType}");
@@ -173,7 +173,7 @@ public class AstPrinter
                 break;
             case ExprUnary unaryExpr:
                 ret.Append(TokenUtils.ToString(unaryExpr.Op));
-                ret.Append(PrettyExpr(unaryExpr.Expr));
+                ret.Append(PrettyExpr(unaryExpr.Operand));
                 break;
             case ExprCall exprCall:
                 ret.Clear();

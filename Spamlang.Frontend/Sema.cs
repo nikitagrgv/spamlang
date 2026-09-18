@@ -795,26 +795,31 @@ public class Sema
 
     private TypedUnary VisitExprUnary(ExprUnary expr)
     {
-        expr.ValueCategory = ValueCategory.RValue;
+        TypedExpr operand = VisitExpr(expr.Operand);
 
-        VisitExpr(expr.Expr);
-        Debug.Assert(expr.Expr.ResolvedType != null);
-
-        if (expr.Expr.ResolvedType == BuiltinType.Error)
+        SpamType type;
+        if (operand.Type == BuiltinType.Error)
         {
-            // Already reported
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            type = BuiltinType.Error;
+        }
+        else if (!CanUseUnary(operand.Type, expr.Op))
+        {
+            Error($"Cannot use unary operator \"{expr.Op}\" on type \"{operand.Type}\"", expr);
+            type = BuiltinType.Error;
+        }
+        else
+        {
+            type = operand.Type;
         }
 
-        if (!CanUseUnary(expr.Expr.ResolvedType, expr.Op))
+        return new TypedUnary
         {
-            Error($"Cannot use unary operator \"{expr.Op}\" on type \"{expr.Expr.ResolvedType}\"", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
-        }
-
-        expr.ResolvedType = expr.Expr.ResolvedType;
+            Op = expr.Op,
+            Operand = operand,
+            Type = type,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
     private void RegisterSymbol(Symbol symbol)

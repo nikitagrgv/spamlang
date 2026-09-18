@@ -220,7 +220,7 @@ public class IRGen
 
     private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr)
     {
-        IRValue operand = GenExprValue(block, expr.Expr);
+        IRValue operand = GenExprValue(block, expr.Operand);
         BinaryOp op;
         switch (expr.Op)
         {
