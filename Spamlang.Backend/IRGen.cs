@@ -21,8 +21,7 @@ public class IRGen
         List<IRFunction> functions = new();
         foreach (HIRFuncDecl funcDecl in unit.FuncDecls)
         {
-            Debug.Assert(funcDecl.Symbol is { Type: FuncType });
-            FuncType signature = (FuncType)funcDecl.Symbol.Type;
+            FuncType signature = funcDecl.Symbol.FuncType;
             FuncType lowerSignature = IRUtils.ToLowerSignature(signature, _typeRegistry);
             IRFunction func = new()
             {
