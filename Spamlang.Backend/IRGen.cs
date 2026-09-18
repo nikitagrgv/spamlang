@@ -307,8 +307,8 @@ public class IRGen
 
     private IRValue GenExprCastValue(IRBasicBlock block, HIRExprCast expr)
     {
-        IRValue value = GenExprValue(block, expr.Operand);
-        SpamType type = IRUtils.ToLowerType(expr.Target);
+        IRValue value = GenExprValue(block, expr.Value);
+        SpamType type = IRUtils.ToLowerType(expr.Type);
         IRInstructionCast cast = new()
         {
             Value = value,
