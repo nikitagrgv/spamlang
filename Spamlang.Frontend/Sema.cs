@@ -968,9 +968,7 @@ public class Sema
 
     private TypedExpr Adapt(TypedExpr expr, SpamType targetType)
     {
-        Debug.Assert(expr.ResolvedType != null, "Must be resolve before adapt");
-
-        SpamType type = expr.ResolvedType;
+        SpamType type = expr.Type;
         if (type == BuiltinType.Error || targetType == BuiltinType.Error)
         {
             // Already reported
