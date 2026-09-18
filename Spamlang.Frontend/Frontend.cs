@@ -23,14 +23,14 @@ public class Frontend
 
         timers?.RestartTimer();
         Sema sema = new(code, tokens, diag, typeRegistry);
-        HIRCompilationUnit typedCompilationUnit = sema.Run(compilationUnit, outTokenToSymbol);
+        HIRCompilationUnit hirCompilationUnit = sema.Run(compilationUnit, outTokenToSymbol);
         timers?.FinishTimer("Sema");
 
         return new Result
         {
             Tokens = tokens,
             CompilationUnit = compilationUnit,
-            HIRCompilationUnit = typedCompilationUnit,
+            HIRCompilationUnit = hirCompilationUnit,
         };
     }
 }
