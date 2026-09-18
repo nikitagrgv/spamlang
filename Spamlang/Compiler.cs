@@ -14,6 +14,7 @@ public class Compiler
         public required bool DebugLexer = false;
         public required bool DebugLexerPretty = false;
         public required bool DebugParser = false;
+        public required bool DebugHIR = false;
         public required bool DebugIR = false;
         public required bool DebugMIR = false;
         public required bool DebugTimer = false;

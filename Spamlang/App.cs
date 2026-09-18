@@ -31,6 +31,9 @@ public static class App
         [Argument("parser")]
         public bool DebugParser { get; set; }
 
+        [Argument("hir")]
+        public bool DebugHIR { get; set; }
+
         [Argument("ir")]
         public bool DebugIR { get; set; }
 
@@ -51,6 +54,7 @@ public static class App
             DebugLexer = arguments.DebugLexer,
             DebugLexerPretty = arguments.DebugLexerPretty,
             DebugParser = arguments.DebugParser,
+            DebugHIR = arguments.DebugHIR,
             DebugIR = arguments.DebugIR,
             DebugMIR = arguments.DebugMIR,
             DebugTimer = arguments.DebugTimer,
