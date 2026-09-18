@@ -146,9 +146,9 @@ public class IRGen
     private void GenStmtReturn(IRBasicBlock block, HIRStmtReturn stmtReturn)
     {
         IRValue? value = null;
-        if (stmtReturn.Expr != null)
+        if (stmtReturn.Value != null)
         {
-            value = GenExprValue(block, stmtReturn.Expr);
+            value = GenExprValue(block, stmtReturn.Value);
         }
 
         IRInstructionRet ret = new()
