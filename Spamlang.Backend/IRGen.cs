@@ -175,6 +175,32 @@ public class IRGen
         Debug.Assert(expr.IsLValue);
         switch (expr)
         {
+            case HIRExprBinary hirExprBinary:
+                break;
+            case HIRExprCall hirExprCall:
+                break;
+            case HIRExprCast hirExprCast:
+                break;
+            case HIRExprError hirExprError:
+                break;
+            case HIRExprFuncRef hirExprFuncRef:
+                break;
+            case HIRExprIntConst hirExprIntConst:
+                break;
+            case HIRExprLoad hirExprLoad:
+                break;
+            case HIRExprLocalRef hirExprLocalRef:
+                break;
+            case HIRExprUnary hirExprUnary:
+                break;
+            case HIRExprZeroInit hirExprZeroInit:
+                break;
+            default:
+                throw new UnreachableException();
+        }
+
+        switch (expr)
+        {
             case ExprBinary exprBinary:
                 return GenExprBinaryValue(block, exprBinary);
             case ExprCall exprCall:
