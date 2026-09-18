@@ -958,7 +958,7 @@ public class Sema
 
     private void PopFunc()
     {
-        _scopes.RemoveAt(_funcStack.Count - 1);
+        _funcStack.RemoveAt(_funcStack.Count - 1);
     }
 
     private FuncSymbol CurrentFunc()
