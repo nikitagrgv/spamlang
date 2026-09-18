@@ -57,7 +57,6 @@ public class Sema
         }
 
         Register("i32", BuiltinType.I32);
-        Register("void", BuiltinType.Void);
     }
 
     private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
