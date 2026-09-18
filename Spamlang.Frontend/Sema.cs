@@ -842,8 +842,7 @@ public class Sema
 
             switch (existing)
             {
-                case ParamSymbol:
-                case VariableSymbol:
+                case LocalSymbol:
                     WarningShadow(symbol, existing);
                     break;
                 case FuncSymbol:
