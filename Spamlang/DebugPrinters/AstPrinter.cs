@@ -112,7 +112,6 @@ public class AstPrinter
                 PrintAst(depth + 1, n.Expr);
 
                 break;
-
             case StmtAssign n:
                 Console.WriteLine(
                     $"{fullPrefix}StmtAssign: {PrettyExpr(n.Target)} = {PrettyExpr(n.Value)}");
@@ -138,6 +137,15 @@ public class AstPrinter
                 PrintAst(depth + 1, n.Callee);
                 PrintChildrenAst(depth + 1, n.Args);
                 break;
+            case ExprCallArg exprCallArg:
+                string nameInfo = "";
+                if (exprCallArg.ArgNameToken != null)
+                {
+                    nameInfo = $" ({TokenValue(exprCallArg.ArgNameToken.Value)})";
+                }
+
+                Console.WriteLine($"{fullPrefix}ExprCallArg{nameInfo}: {PrettyExpr(exprCallArg.Expr)}");
+                break;
             case ExprInt n:
                 Console.WriteLine(
                     $"{fullPrefix}ExprInt: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
@@ -146,6 +154,7 @@ public class AstPrinter
                 Console.WriteLine(
                     $"{fullPrefix}ExprIdentifier: {TokenValue(n.IdentifierToken)}");
                 break;
+
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
     }
