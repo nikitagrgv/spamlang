@@ -703,11 +703,6 @@ public class Sema
 
     private TypedIntConst VisitExprInt(ExprInt expr)
     {
-        // TODO: Refactor, handle negation in lexer and make it a part of the literal?
-        // TODO: Overflows checks
-
-        expr.ValueCategory = ValueCategory.RValue;
-
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
         Int128 value = 0;
@@ -730,8 +725,13 @@ public class Sema
             ErrorOutOfRange(expr.IsNegative, str, expr);
         }
 
-        expr.Value = value;
-        expr.ResolvedType = BuiltinType.I32;
+        return new TypedIntConst
+        {
+            Value = value,
+            Type = BuiltinType.I32,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
     private static Int128 ParseIntLiteralValue(ReadOnlySpan<char> str, bool negative)
