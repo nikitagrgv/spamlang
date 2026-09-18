@@ -176,25 +176,26 @@ public class IRGen
         switch (expr)
         {
             case HIRExprBinary hirExprBinary:
-                break;
+                return GenExprBinaryValue(block, hirExprBinary);
             case HIRExprCall hirExprCall:
-                break;
+                return GenExprCallValue(block, hirExprCall);
             case HIRExprCast hirExprCast:
-                break;
-            case HIRExprError hirExprError:
-                break;
+                return GenExprCastValue(block, hirExprCast);
             case HIRExprFuncRef hirExprFuncRef:
-                break;
+                return GenExprFuncRefValue(block, hirExprFuncRef);
             case HIRExprIntConst hirExprIntConst:
-                break;
+                return GenExprIntValue(hirExprIntConst);
             case HIRExprLoad hirExprLoad:
-                break;
+                return GenExprLoadValue(block, hirExprLoad);
             case HIRExprLocalRef hirExprLocalRef:
-                break;
+                return GenExprLocalRefValue(hirExprLocalRef);
             case HIRExprUnary hirExprUnary:
-                break;
+                return GenExprUnaryValue(block, hirExprUnary);
             case HIRExprZeroInit hirExprZeroInit:
-                break;
+                return GenExprZeroInitValue(hirExprZeroInit);
+            case HIRExprError:
+                // Backend mustn't be run on errors
+                throw new UnreachableException();
             default:
                 throw new UnreachableException();
         }
@@ -218,7 +219,7 @@ public class IRGen
         }
     }
 
-    private IRValue GenExprLoad(IRBasicBlock block, HIRExprLoad expr)
+    private IRValue GenExprLoadValue(IRBasicBlock block, HIRExprLoad expr)
     {
         Debug.Assert(expr.IsLValue);
         IRValue addr = GenExprAddr(block, expr);
@@ -351,7 +352,7 @@ public class IRGen
         return value;
     }
 
-    private IRValue GenExprFuncRef(HIRExprFuncRef expr)
+    private IRValue GenExprFuncRefValue(IRBasicBlock block, HIRExprFuncRef expr)
     {
     }
 
@@ -365,6 +366,10 @@ public class IRGen
             IntType = type,
         };
         return value;
+    }
+
+    private IRValue GenExprZeroInitValue(HIRExprZeroInit expr)
+    {
     }
 
     private IRValue GenExprAddr(IRBasicBlock block, HIRExpr expr)
