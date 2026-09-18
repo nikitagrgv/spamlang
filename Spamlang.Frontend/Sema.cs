@@ -657,31 +657,48 @@ public class Sema
         if (sym == null)
         {
             Error($"Symbol not found: \"{name}\"", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            return new TypedErrorExpr
+            {
+                Children = [],
+                Type = BuiltinType.Error,
+                Syntax = expr,
+                IsSynthesized = false,
+            };
         }
 
         RegisterTokenAsSymbol(expr.IdentifierToken, sym);
 
         switch (sym)
         {
-            case ParamSymbol:
-            case VariableSymbol:
-                expr.ValueCategory = ValueCategory.LValue;
-                break;
-            case FuncSymbol:
-                break;
+            case LocalSymbol localSym:
+                return new TypedLocalRef
+                {
+                    Symbol = localSym,
+                    Type = localSym.Type,
+                    Syntax = expr,
+                    IsSynthesized = false,
+                };
+            case FuncSymbol funcSym:
+                return new TypedFuncRef
+                {
+                    Symbol = funcSym,
+                    Type = funcSym.FuncType,
+                    Syntax = expr,
+                    IsSynthesized = false,
+                };
             case TypeSymbol:
-                // TODO: Allow that, for e.g. `i32.TypeSize`
+                // TODO: Allow that, for e.g. `i32.TypeSize()`
                 Error($"Type cannot be used as an identifier: \"{name}\"", expr);
-                expr.ResolvedType = BuiltinType.Error;
-                return;
+                return new TypedErrorExpr
+                {
+                    Children = [],
+                    Type = BuiltinType.Error,
+                    Syntax = expr,
+                    IsSynthesized = false,
+                };
             default:
-                throw new ArgumentOutOfRangeException(nameof(sym));
+                throw new UnreachableException();
         }
-
-        expr.Symbol = sym;
-        expr.ResolvedType = sym.Type;
     }
 
     private TypedIntConst VisitExprInt(ExprInt expr)
