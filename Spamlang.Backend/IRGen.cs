@@ -172,22 +172,7 @@ public class IRGen
 
     private IRValue GenExprValue(IRBasicBlock block, HIRExpr expr)
     {
-        Debug.Assert(expr.ResolvedType != null);
-        Debug.Assert(expr.ValueCategory != null);
-
-        if (expr.ValueCategory == ValueCategory.LValue)
-        {
-            IRValue addr = GenExprAddr(block, expr);
-            SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
-            IRInstructionLoad load = new()
-            {
-                LoadedType = type,
-                Address = addr,
-            };
-            block.Add(load);
-            return load;
-        }
-
+        Debug.Assert(expr.IsLValue);
         switch (expr)
         {
             case ExprBinary exprBinary:
@@ -205,6 +190,20 @@ public class IRGen
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
+    }
+
+    private IRValue GenExprLoad(IRBasicBlock block, HIRExprLoad expr)
+    {
+        Debug.Assert(expr.IsLValue);
+        IRValue addr = GenExprAddr(block, expr);
+        SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
+        IRInstructionLoad load = new()
+        {
+            LoadedType = type,
+            Address = addr,
+        };
+        block.Add(load);
+        return load;
     }
 
     private IRValue GenExprBinaryValue(IRBasicBlock block, HIRExprBinary expr)
