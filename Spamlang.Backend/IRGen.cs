@@ -131,20 +131,8 @@ public class IRGen
 
     private void GenStmtLet(IRBasicBlock block, HIRStmtLet stmtLet)
     {
-        Debug.Assert(stmtLet.Symbol != null);
-
-        IRValue value;
-        if (stmtLet.Expr != null)
-        {
-            value = GenExprValue(block, stmtLet.Expr);
-        }
-        else
-        {
-            SpamType type = IRUtils.ToLowerType(stmtLet.Symbol.Type);
-            value = MakeZeroInitialized(type);
-        }
-
-        IRValue? addr = LookupValue(stmtLet.Symbol);
+        IRValue value = GenExprValue(block, stmtLet.Init);
+        IRValue? addr = LookupValue(stmtLet.VariableSymbol);
         Debug.Assert(addr != null);
 
         IRInstructionStore store = new()
