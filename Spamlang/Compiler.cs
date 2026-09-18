@@ -72,6 +72,7 @@ public class Compiler
         PrintLexer(frontendResult.Tokens, code);
         PrintLexerPretty(frontendResult.Tokens, code);
         PrintAst(frontendResult.Tokens, code, frontendResult.CompilationUnit);
+        PrintHIR(frontendResult.Tokens, code, frontendResult.HIRCompilationUnit);
 
         if (diag.HasErrors)
         {
@@ -299,7 +300,7 @@ public class Compiler
         }
     }
 
-    private void PrintIR(List<Token> tokens, string code, HIRCompilationUnit compilationUnit)
+    private void PrintHIR(List<Token> tokens, string code, HIRCompilationUnit compilationUnit)
     {
         if (_flags.DebugHIR)
         {
