@@ -118,7 +118,7 @@ public class Sema
         // TODO: Make it optional
 
         string main = "main";
-        Symbol? sym = CurrentScope().LookupLocal("main");
+        Symbol? sym = CurrentScope().LookupLocal(main);
         if (sym == null)
         {
             Error($"\"{main}\" function not found");
