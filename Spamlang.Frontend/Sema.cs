@@ -292,6 +292,7 @@ public class Sema
     private TypedStmtExpr VisitStmtExpr(StmtExpr stmt)
     {
         TypedExpr expr = VisitExpr(stmt.Expr);
+        expr = ToRValue(expr);
         return new TypedStmtExpr
         {
             Expr = expr,
