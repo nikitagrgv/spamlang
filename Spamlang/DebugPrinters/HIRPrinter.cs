@@ -44,48 +44,48 @@ public class HIRPrinter
                 break;
             case Param n:
                 Console.WriteLine($"{fullPrefix}Param");
-                PrintAstToken(depth + 1, n.NameToken, "Name");
-                PrintAst(depth + 1, n.Type);
+                PrintHIRToken(depth + 1, n.NameToken, "Name");
+                PrintHIR(depth + 1, n.Type);
                 break;
             case IdentifierTypeNode n:
                 Console.WriteLine($"{fullPrefix}IdentifierTypeNode");
-                PrintAstToken(depth + 1, n.TypeNameToken, "Type");
+                PrintHIRToken(depth + 1, n.TypeNameToken, "Type");
                 break;
             case FuncTypeNode n:
                 Console.WriteLine($"{fullPrefix}FuncTypeNode");
                 PrintChildrenAst(depth + 1, n.Params);
                 if (n.ReturnType != null)
                 {
-                    PrintAst(depth + 1, n.ReturnType);
+                    PrintHIR(depth + 1, n.ReturnType);
                 }
 
                 break;
             case PointerTypeNode n:
                 Console.WriteLine($"{fullPrefix}PointerTypeNode");
-                PrintAst(depth + 1, n.Pointee);
+                PrintHIR(depth + 1, n.Pointee);
                 break;
             case FuncDecl n:
                 Console.WriteLine($"{fullPrefix}FuncDecl");
-                PrintAstToken(depth + 1, n.NameToken, "Name");
+                PrintHIRToken(depth + 1, n.NameToken, "Name");
                 PrintChildrenAst(depth + 1, n.Params);
                 if (n.ReturnType != null)
                 {
-                    PrintAst(depth + 1, n.ReturnType);
+                    PrintHIR(depth + 1, n.ReturnType);
                 }
 
-                PrintAst(depth + 1, n.Body);
+                PrintHIR(depth + 1, n.Body);
                 break;
             case StmtLet n:
                 Console.WriteLine($"{fullPrefix}StmtLet");
-                PrintAstToken(depth + 1, n.NameToken, "Name");
+                PrintHIRToken(depth + 1, n.NameToken, "Name");
                 if (n.TypeDecl != null)
                 {
-                    PrintAst(depth + 1, n.TypeDecl);
+                    PrintHIR(depth + 1, n.TypeDecl);
                 }
 
                 if (n.Expr != null)
                 {
-                    PrintAst(depth + 1, n.Expr);
+                    PrintHIR(depth + 1, n.Expr);
                 }
 
                 break;
@@ -97,32 +97,32 @@ public class HIRPrinter
                 }
 
                 Console.WriteLine($"{fullPrefix}StmtReturn: {PrettyExpr(n.Expr)}");
-                PrintAst(depth + 1, n.Expr);
+                PrintHIR(depth + 1, n.Expr);
 
                 break;
             case StmtAssign n:
                 Console.WriteLine(
                     $"{fullPrefix}StmtAssign: {PrettyExpr(n.Target)} = {PrettyExpr(n.Value)}");
-                PrintAst(depth + 1, n.Target);
-                PrintAst(depth + 1, n.Value);
+                PrintHIR(depth + 1, n.Target);
+                PrintHIR(depth + 1, n.Value);
                 break;
             case StmtExpr n:
                 Console.WriteLine($"{fullPrefix}StmtExpr: {PrettyExpr(n.Expr)}");
-                PrintAst(depth + 1, n.Expr);
+                PrintHIR(depth + 1, n.Expr);
                 break;
 
             case ExprBinary n:
                 Console.WriteLine($"{fullPrefix}BinaryExpr({n.Op}): {PrettyExpr(n)}");
-                PrintAst(depth + 1, n.Left, "Left");
-                PrintAst(depth + 1, n.Right, "Right");
+                PrintHIR(depth + 1, n.Left, "Left");
+                PrintHIR(depth + 1, n.Right, "Right");
                 break;
             case ExprUnary n:
                 Console.WriteLine($"{fullPrefix}UnaryExpr({n.Op}): {PrettyExpr(n)}");
-                PrintAst(depth + 1, n.Operand);
+                PrintHIR(depth + 1, n.Operand);
                 break;
             case ExprCall n:
                 Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)}");
-                PrintAst(depth + 1, n.Callee);
+                PrintHIR(depth + 1, n.Callee);
                 PrintChildrenAst(depth + 1, n.Args);
                 break;
             case ExprCallArg exprCallArg:
@@ -133,7 +133,7 @@ public class HIRPrinter
                 }
 
                 Console.WriteLine($"{fullPrefix}ExprCallArg{nameInfo}: {PrettyExpr(exprCallArg.Expr)}");
-                PrintAst(depth + 1, exprCallArg.Expr);
+                PrintHIR(depth + 1, exprCallArg.Expr);
                 break;
             case ExprIntConst n:
                 Console.WriteLine(
@@ -153,7 +153,7 @@ public class HIRPrinter
     {
         foreach (Node node in nodes)
         {
-            PrintAst(depth, node);
+            PrintHIR(depth, node);
         }
     }
 
@@ -214,7 +214,7 @@ public class HIRPrinter
         return ret.ToString();
     }
 
-    private void PrintAstToken(int depth, int token, string name)
+    private void PrintHIRToken(int depth, int token, string name)
     {
         string indent = MakeIndent(depth);
         Console.WriteLine($"{indent}{name}: \"{_tokens[token].Value(_code)}\"");
