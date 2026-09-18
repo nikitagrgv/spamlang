@@ -152,6 +152,10 @@ public class AstPrinter
 
     private void PrintChildrenAst(int depth, IReadOnlyList<Node> nodes)
     {
+        foreach (Node node in nodes)
+        {
+            PrintAst(depth, node);
+        }
     }
 
     private string TokenValue(int tokenIndex)
