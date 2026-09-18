@@ -25,17 +25,6 @@ public class AstPrinter
         PrintAst(0, unit);
     }
 
-    private string MakeIndent(int depth)
-    {
-        string indent = "";
-        for (int i = 0; i < depth; i++)
-        {
-            indent += " |   ";
-        }
-
-        return indent;
-    }
-
     private void PrintAst(int depth, Node node, string prefix = "")
     {
         string fullPrefix = MakeIndent(depth);
@@ -229,5 +218,16 @@ public class AstPrinter
     {
         string indent = MakeIndent(depth);
         Console.WriteLine($"{indent}{name}: \"{_tokens[token].Value(_code)}\"");
+    }
+
+    private static string MakeIndent(int depth)
+    {
+        string indent = "";
+        for (int i = 0; i < depth; i++)
+        {
+            indent += " |   ";
+        }
+
+        return indent;
     }
 }
