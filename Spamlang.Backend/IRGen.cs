@@ -159,7 +159,7 @@ public class IRGen
 
     private IRValue GenExprValue(IRBasicBlock block, HIRExpr expr)
     {
-        Debug.Assert(expr.IsLValue);
+        Debug.Assert(!expr.IsLValue);
         switch (expr)
         {
             case HIRExprBinary hirExprBinary:
@@ -189,8 +189,8 @@ public class IRGen
 
     private IRValue GenExprLoadValue(IRBasicBlock block, HIRExprLoad expr)
     {
-        Debug.Assert(expr.IsLValue);
-        IRValue addr = GenExprAddr(block, expr);
+        Debug.Assert(expr.Address.IsLValue);
+        IRValue addr = GenExprAddr(block, expr.Address);
         SpamType type = IRUtils.ToLowerType(expr.Type);
         IRInstructionLoad load = new()
         {
