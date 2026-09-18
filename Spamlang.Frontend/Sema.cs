@@ -796,6 +796,7 @@ public class Sema
     private TypedUnary VisitExprUnary(ExprUnary expr)
     {
         TypedExpr operand = VisitExpr(expr.Operand);
+        operand = ToRValue(operand);
 
         SpamType type;
         if (operand.Type == BuiltinType.Error)
