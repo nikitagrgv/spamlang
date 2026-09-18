@@ -56,43 +56,43 @@ public abstract class TypedExpr : TypedNode
     public abstract bool IsLValue { get; }
 }
 
-public class TypedLocalRef : TypedExpr
+public class TypedExprLocalRef : TypedExpr
 {
     public required LocalSymbol Symbol { get; init; }
     public override bool IsLValue => true;
 }
 
-public class TypedFuncRef : TypedExpr
+public class TypedExprFuncRef : TypedExpr
 {
     public required FuncSymbol Symbol { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedLoad : TypedExpr
+public class TypedExprLoad : TypedExpr
 {
     public required TypedExpr Address { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedIntConst : TypedExpr
+public class TypedExprIntConst : TypedExpr
 {
     public required Int128 Value { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedZeroInit : TypedExpr
+public class TypedExprZeroInit : TypedExpr
 {
     public override bool IsLValue => false;
 }
 
-public class TypedUnary : TypedExpr
+public class TypedExprUnary : TypedExpr
 {
     public required UnaryOp Op { get; init; }
     public required TypedExpr Operand { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedBinary : TypedExpr
+public class TypedExprBinary : TypedExpr
 {
     public required BinaryOp Op { get; init; }
     public required TypedExpr Left { get; init; }
@@ -100,7 +100,7 @@ public class TypedBinary : TypedExpr
     public override bool IsLValue => false;
 }
 
-public class TypedCall : TypedExpr
+public class TypedExprCall : TypedExpr
 {
     public required TypedExpr Callee { get; init; }
     public required IReadOnlyList<TypedArg> Args { get; init; }
@@ -113,13 +113,13 @@ public class TypedArg : TypedNode
     public required int ParameterIndex { get; init; }
 }
 
-public class TypedErrorExpr : TypedExpr
+public class TypedExprError : TypedExpr
 {
     public required IReadOnlyList<TypedExpr> Children { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedCastExpr : TypedExpr
+public class TypedExprCast : TypedExpr
 {
     public required TypedExpr Value { get; init; }
     public override bool IsLValue => false;

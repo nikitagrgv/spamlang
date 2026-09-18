@@ -347,7 +347,7 @@ public class Sema
                 declType = BuiltinType.Error;
             }
 
-            init = new TypedZeroInit
+            init = new TypedExprZeroInit
             {
                 Type = declType,
                 Syntax = stmt,
@@ -434,7 +434,7 @@ public class Sema
         }
     }
 
-    private TypedBinary VisitExprBinary(ExprBinary expr)
+    private TypedExprBinary VisitExprBinary(ExprBinary expr)
     {
         TypedExpr left = VisitExpr(expr.Left);
         TypedExpr right = VisitExpr(expr.Right);
@@ -462,7 +462,7 @@ public class Sema
 
         left = Adapt(left, commonType);
         right = Adapt(right, commonType);
-        return new TypedBinary
+        return new TypedExprBinary
         {
             Left = left,
             Right = right,
@@ -495,7 +495,7 @@ public class Sema
 
         // Can be null if the call is indirect (via variable or expr)
         FuncSymbol? funcSymbol = null;
-        if (callee is TypedFuncRef funcRef)
+        if (callee is TypedExprFuncRef funcRef)
         {
             funcSymbol = funcRef.Symbol;
             Debug.Assert(funcSymbol.Params.Count == funcType.ParamTypes.Count);
@@ -598,7 +598,7 @@ public class Sema
             return ErrorCall(expr, callee, typedArgs);
         }
 
-        return new TypedCall
+        return new TypedExprCall
         {
             Callee = callee,
             Args = typedArgs,
@@ -608,7 +608,7 @@ public class Sema
         };
     }
 
-    private TypedErrorExpr ErrorCall(ExprCall expr, TypedExpr callee, List<TypedArg> visitedArgs)
+    private TypedExprError ErrorCall(ExprCall expr, TypedExpr callee, List<TypedArg> visitedArgs)
     {
         List<TypedExpr> children = new();
         children.EnsureCapacity(1 + expr.Args.Count);
@@ -629,7 +629,7 @@ public class Sema
         }
 
         Debug.Assert(children.Count == expr.Args.Count + 1);
-        return new TypedErrorExpr
+        return new TypedExprError
         {
             Children = children,
             Type = BuiltinType.Error,
@@ -660,7 +660,7 @@ public class Sema
         if (sym == null)
         {
             Error($"Symbol not found: \"{name}\"", expr);
-            return new TypedErrorExpr
+            return new TypedExprError
             {
                 Children = [],
                 Type = BuiltinType.Error,
@@ -674,7 +674,7 @@ public class Sema
         switch (sym)
         {
             case LocalSymbol localSym:
-                return new TypedLocalRef
+                return new TypedExprLocalRef
                 {
                     Symbol = localSym,
                     Type = localSym.Type,
@@ -682,7 +682,7 @@ public class Sema
                     IsSynthesized = false,
                 };
             case FuncSymbol funcSym:
-                return new TypedFuncRef
+                return new TypedExprFuncRef
                 {
                     Symbol = funcSym,
                     Type = funcSym.FuncType,
@@ -692,7 +692,7 @@ public class Sema
             case TypeSymbol:
                 // TODO: Allow that, for e.g. `i32.TypeSize()`
                 Error($"Type cannot be used as an identifier: \"{name}\"", expr);
-                return new TypedErrorExpr
+                return new TypedExprError
                 {
                     Children = [],
                     Type = BuiltinType.Error,
@@ -704,7 +704,7 @@ public class Sema
         }
     }
 
-    private TypedIntConst VisitExprInt(ExprInt expr)
+    private TypedExprIntConst VisitExprInt(ExprInt expr)
     {
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
@@ -728,7 +728,7 @@ public class Sema
             ErrorOutOfRange(expr.IsNegative, str, expr);
         }
 
-        return new TypedIntConst
+        return new TypedExprIntConst
         {
             Value = value,
             Type = BuiltinType.I32,
@@ -796,7 +796,7 @@ public class Sema
         return value;
     }
 
-    private TypedUnary VisitExprUnary(ExprUnary expr)
+    private TypedExprUnary VisitExprUnary(ExprUnary expr)
     {
         TypedExpr operand = VisitExpr(expr.Operand);
         operand = ToRValue(operand);
@@ -816,7 +816,7 @@ public class Sema
             type = operand.Type;
         }
 
-        return new TypedUnary
+        return new TypedExprUnary
         {
             Op = expr.Op,
             Operand = operand,
@@ -986,7 +986,7 @@ public class Sema
         if (!CanImplicitlyCast(type, targetType))
         {
             Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr.Syntax);
-            return new TypedErrorExpr
+            return new TypedExprError
             {
                 Children = [expr],
                 Type = BuiltinType.Error,
@@ -995,7 +995,7 @@ public class Sema
             };
         }
 
-        return new TypedCastExpr
+        return new TypedExprCast
         {
             Value = expr,
             Type = targetType,
@@ -1011,7 +1011,7 @@ public class Sema
             return expr;
         }
 
-        return new TypedLoad
+        return new TypedExprLoad
         {
             Address = expr,
             Type = expr.Type,
