@@ -274,8 +274,7 @@ public class IRGen
 
     private IRValue GenExprCallValue(IRBasicBlock block, HIRExprCall expr)
     {
-        Debug.Assert(expr.Callee.ResolvedType is FuncType, "Must be ensured by sema");
-        FuncType funcType = (FuncType)expr.Callee.ResolvedType;
+        FuncType funcType = (FuncType)expr.Callee.Type;
 
         IRValue callee = GenExprValue(block, expr.Callee);
 
@@ -287,13 +286,10 @@ public class IRGen
             args.Add(null);
         }
 
-        foreach (ExprCallArg arg in expr.Args)
+        foreach (HIRArg arg in expr.Args)
         {
-            Debug.Assert(arg.ParameterIndex.HasValue, "Must be set by sema");
-            int paramIndex = arg.ParameterIndex.Value;
-
-            Debug.Assert(args[paramIndex] == null);
-            args[paramIndex] = GenExprValue(block, arg.Expr);
+            Debug.Assert(args[arg.ParameterIndex] == null);
+            args[arg.ParameterIndex] = GenExprValue(block, arg.Value);
         }
 
         Debug.Assert(!args.Contains(null), "All args must be set");
