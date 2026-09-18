@@ -477,20 +477,20 @@ public class Sema
     {
         // TODO: Support default parameters
 
-        List<HIRArg> typedArgs = new();
+        List<HIRArg> hirArgs = new();
 
         HIRExpr callee = VisitExpr(expr.Callee);
         callee = ToRValue(callee);
 
         if (callee.Type == BuiltinType.Error)
         {
-            return ErrorCall(expr, callee, typedArgs);
+            return ErrorCall(expr, callee, hirArgs);
         }
 
         if (callee.Type is not FuncType funcType)
         {
             Error("Cannot call a non-function type", expr);
-            return ErrorCall(expr, callee, typedArgs);
+            return ErrorCall(expr, callee, hirArgs);
         }
 
         // Can be null if the call is indirect (via variable or expr)
@@ -513,7 +513,7 @@ public class Sema
 
             str += $"accepts {funcParams.Count} arguments, got {args.Count}";
             Error(str, expr);
-            return ErrorCall(expr, callee, typedArgs);
+            return ErrorCall(expr, callee, hirArgs);
         }
 
         bool[] usedParams = new bool[funcParams.Count];
@@ -524,7 +524,7 @@ public class Sema
             if (hasUnorderedNamedArgs && arg.ArgNameToken == null)
             {
                 Error("Cannot use positional arguments after named arguments in changed order", arg);
-                return ErrorCall(expr, callee, typedArgs);
+                return ErrorCall(expr, callee, hirArgs);
             }
 
             int paramIndex = i;
@@ -533,7 +533,7 @@ public class Sema
                 if (funcSymbol == null)
                 {
                     Error("Cannot use named arguments with indirect calls", arg);
-                    return ErrorCall(expr, callee, typedArgs);
+                    return ErrorCall(expr, callee, hirArgs);
                 }
 
                 ReadOnlySpan<char> argName = GetTokenValue(arg.ArgNameToken.Value);
@@ -541,7 +541,7 @@ public class Sema
                 if (paramIndex == -1)
                 {
                     Error($"Function \"{funcSymbol.Name}\" doesn't have parameter with name \"{argName}\"", arg);
-                    return ErrorCall(expr, callee, typedArgs);
+                    return ErrorCall(expr, callee, hirArgs);
                 }
 
                 hasUnorderedNamedArgs |= paramIndex != i;
@@ -558,7 +558,7 @@ public class Sema
                 err += "is already specified";
 
                 Error(err, arg);
-                return ErrorCall(expr, callee, typedArgs);
+                return ErrorCall(expr, callee, hirArgs);
             }
 
             usedParams[paramIndex] = true;
@@ -568,14 +568,14 @@ public class Sema
             argExpr = ToRValue(argExpr);
             argExpr = Adapt(argExpr, paramType);
 
-            HIRArg typedArg = new()
+            HIRArg hirArg = new()
             {
                 Value = argExpr,
                 ParameterIndex = paramIndex,
                 Syntax = arg,
                 IsSynthesized = false,
             };
-            typedArgs.Add(typedArg);
+            hirArgs.Add(hirArg);
         }
 
         for (int i = 0; i < usedParams.Length; i++)
@@ -595,13 +595,13 @@ public class Sema
             err += "is missing";
 
             Error(err, expr);
-            return ErrorCall(expr, callee, typedArgs);
+            return ErrorCall(expr, callee, hirArgs);
         }
 
         return new HIRExprCall
         {
             Callee = callee,
-            Args = typedArgs,
+            Args = hirArgs,
             Type = funcType.ReturnType,
             Syntax = expr,
             IsSynthesized = false,
@@ -623,9 +623,9 @@ public class Sema
         for (int i = visitedArgs.Count; i < expr.Args.Count; i++)
         {
             ExprCallArg arg = expr.Args[i];
-            HIRExpr typedArg = VisitExpr(arg.Expr);
-            typedArg = ToRValue(typedArg);
-            children.Add(typedArg);
+            HIRExpr hirArg = VisitExpr(arg.Expr);
+            hirArg = ToRValue(hirArg);
+            children.Add(hirArg);
         }
 
         Debug.Assert(children.Count == expr.Args.Count + 1);
