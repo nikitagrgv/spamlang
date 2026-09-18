@@ -16,7 +16,7 @@ public class IRGen
     public IRModule Run(HIRCompilationUnit unit)
     {
         Dictionary<Symbol, IRValue> globalScope = new();
-        _symbolScopes.Add(globalScope);
+        PushSymScope(globalScope);
 
         List<IRFunction> functions = new();
         foreach (HIRFuncDecl funcDecl in unit.FuncDecls)
@@ -47,7 +47,7 @@ public class IRGen
             Functions = functions,
         };
 
-        _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
+        PopSymScope();
 
         AllocateIds(module);
 
@@ -68,7 +68,7 @@ public class IRGen
         function.BasicBlocks.Add(entry);
 
         Dictionary<Symbol, IRValue> funcScope = new();
-        _symbolScopes.Add(funcScope);
+        PushSymScope(funcScope);
 
         GenParams(entry, funcDecl.Params, function.Params);
         GenLocals(entry, locals);
@@ -86,7 +86,7 @@ public class IRGen
 
         Debug.Assert(entry.Terminator != null);
 
-        _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
+        PopSymScope();
     }
 
     private void GenBlock(IRBasicBlock block, Block blockNode)
