@@ -992,16 +992,13 @@ public class Sema
             };
         }
 
-        ExprCast cast = new ExprImplicitCast
+        return new TypedCastExpr
         {
-            StartToken = expr.StartToken,
-            EndToken = expr.EndToken,
-            Operand = expr,
-            Target = targetType,
-            ResolvedType = targetType,
-            ValueCategory = ValueCategory.RValue,
+            Value = expr,
+            Type = targetType,
+            Syntax = expr.Syntax,
+            IsSynthesized = false,
         };
-        return cast;
     }
 
     private TypedExpr ToRValue(TypedExpr expr)

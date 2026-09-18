@@ -122,6 +122,5 @@ public class TypedErrorExpr : TypedExpr
 public class TypedCastExpr : TypedExpr
 {
     public required TypedExpr Value { get; init; }
-    public required SpamType TargetType { get; init; }
     public override bool IsLValue => false;
 }
