@@ -824,8 +824,6 @@ public class Sema
 
     private void RegisterSymbol(Symbol symbol)
     {
-        // TODO: Lookup once
-
         Scope scope = CurrentScope();
 
         string name = symbol.Name;
