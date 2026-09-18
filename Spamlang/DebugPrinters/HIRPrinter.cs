@@ -188,7 +188,7 @@ public class HIRPrinter
 
                 return ret.ToString();
             case HIRExprIntConst exprInt:
-                return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
+                return $"{exprInt.Value}";
             case HIRExprIdentifier exprIdentifier:
                 return TokenValue(exprIdentifier.IdentifierToken);
             default: throw new Exception("Unknown node type: " + expr.GetType().Name);
