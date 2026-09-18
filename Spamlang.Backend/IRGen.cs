@@ -170,7 +170,7 @@ public class IRGen
         block.Add(ret);
     }
 
-    private IRValue GenExprValue(IRBasicBlock block, Expr expr)
+    private IRValue GenExprValue(IRBasicBlock block, HIRExpr expr)
     {
         Debug.Assert(expr.ResolvedType != null);
         Debug.Assert(expr.ValueCategory != null);
@@ -207,14 +207,14 @@ public class IRGen
         }
     }
 
-    private IRValue GenExprBinaryValue(IRBasicBlock block, ExprBinary expr)
+    private IRValue GenExprBinaryValue(IRBasicBlock block, HIRExprBinary expr)
     {
         IRValue left = GenExprValue(block, expr.Left);
         IRValue right = GenExprValue(block, expr.Right);
         return GenBinaryOp(block, left, right, expr.Op);
     }
 
-    private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr)
+    private IRValue GenExprUnaryValue(IRBasicBlock block, HIRExprUnary expr)
     {
         IRValue operand = GenExprValue(block, expr.Operand);
         BinaryOp op;
@@ -265,7 +265,7 @@ public class IRGen
         return instr;
     }
 
-    private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr)
+    private IRValue GenExprCallValue(IRBasicBlock block, HIRExprCall expr)
     {
         Debug.Assert(expr.Callee.ResolvedType is FuncType, "Must be ensured by sema");
         FuncType funcType = (FuncType)expr.Callee.ResolvedType;
@@ -302,7 +302,7 @@ public class IRGen
         return call;
     }
 
-    private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr)
+    private IRValue GenExprCastValue(IRBasicBlock block, HIRExprCast expr)
     {
         IRValue value = GenExprValue(block, expr.Operand);
         SpamType type = IRUtils.ToLowerType(expr.Target);
@@ -315,7 +315,7 @@ public class IRGen
         return cast;
     }
 
-    private IRValue GenExprIdentifierValue(ExprIdentifier expr)
+    private IRValue GenExprLocalRefValue(HIRExprLocalRef expr)
     {
         Debug.Assert(expr.Symbol != null);
         Debug.Assert(expr.Symbol is FuncSymbol, "Variables can't reach here (other are lvalues)");
@@ -326,7 +326,11 @@ public class IRGen
         return value;
     }
 
-    private IRValue GenExprIntValue(ExprInt expr)
+    private IRValue GenExprFuncRef(HIRExprFuncRef expr)
+    {
+    }
+
+    private IRValue GenExprIntValue(HIRExprIntConst expr)
     {
         Debug.Assert(expr.ResolvedType != null);
         SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
@@ -338,16 +342,13 @@ public class IRGen
         return value;
     }
 
-    private IRValue GenExprAddr(IRBasicBlock block, Expr expr)
+    private IRValue GenExprAddr(IRBasicBlock block, HIRExpr expr)
     {
-        Debug.Assert(expr.ResolvedType != null);
-        Debug.Assert(expr.ValueCategory == ValueCategory.LValue);
+        Debug.Assert(expr.IsLValue);
         switch (expr)
         {
-            case ExprIdentifier exprIdentifier:
-                Debug.Assert(exprIdentifier.Symbol != null);
-                Symbol sym = exprIdentifier.Symbol;
-                IRValue? value = LookupValue(sym);
+            case HIRExprLocalRef locRef:
+                IRValue? value = LookupValue(locRef.Symbol);
                 Debug.Assert(value != null);
                 return value;
             default:
