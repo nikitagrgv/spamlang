@@ -135,7 +135,7 @@ public class Sema
             return;
         }
 
-        FuncType mainFunc = (FuncType)mainSym.Type;
+        FuncType mainFunc = mainSym.FuncType;
         if (mainFunc.ReturnType != BuiltinType.I32)
         {
             // TODO: Allow void
