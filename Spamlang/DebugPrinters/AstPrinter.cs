@@ -48,11 +48,11 @@ public class AstPrinter
         {
             case CompilationUnit n:
                 Console.WriteLine($"{fullPrefix}CompilationUnit");
-                n.FuncDecls.ForEach(fd => PrintAst(depth + 1, fd));
+                PrintChildrenAst(depth + 1, n.FuncDecls);
                 break;
             case Block n:
                 Console.WriteLine($"{fullPrefix}Block");
-                n.Stmts.ForEach(stmt => PrintAst(depth + 1, stmt));
+                PrintChildrenAst(depth + 1, n.Stmts);
                 break;
             case Param n:
                 Console.WriteLine($"{fullPrefix}Param | Type {n.Type}");
@@ -60,12 +60,12 @@ public class AstPrinter
                 PrintAst(depth + 1, n.Type);
                 break;
             case IdentifierTypeNode n:
-                Console.WriteLine($"{fullPrefix}IdentifierTypeNode | Type {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}IdentifierTypeNode");
                 PrintAstToken(depth + 1, n.TypeNameToken, "Type");
                 break;
             case FuncTypeNode n:
-                Console.WriteLine($"{fullPrefix}FuncTypeNode | Type {n.ResolvedType}");
-                n.Params.ForEach(p => PrintAst(depth + 1, p));
+                Console.WriteLine($"{fullPrefix}FuncTypeNode");
+                PrintChildrenAst(depth + 1, n.Params);
                 if (n.ReturnType != null)
                 {
                     PrintAst(depth + 1, n.ReturnType);
@@ -73,13 +73,13 @@ public class AstPrinter
 
                 break;
             case PointerTypeNode n:
-                Console.WriteLine($"{fullPrefix}PointerTypeNode | Type {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}PointerTypeNode");
                 PrintAst(depth + 1, n.Pointee);
                 break;
             case FuncDecl n:
                 Console.WriteLine($"{fullPrefix}FuncDecl");
                 PrintAstToken(depth + 1, n.NameToken, "Name");
-                n.Params.ForEach(p => PrintAst(depth + 1, p));
+                PrintChildrenAst(depth + 1, n.Params);
                 if (n.ReturnType != null)
                 {
                     PrintAst(depth + 1, n.ReturnType);
@@ -136,7 +136,7 @@ public class AstPrinter
             case ExprCall n:
                 Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)}");
                 PrintAst(depth + 1, n.Callee);
-                n.Args.ForEach(arg => PrintAst(depth + 1, arg.Expr));
+                PrintChildrenAst(depth + 1, n.Args);
                 break;
             case ExprInt n:
                 Console.WriteLine(
@@ -148,6 +148,10 @@ public class AstPrinter
                 break;
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
+    }
+
+    private void PrintChildrenAst(int depth, IReadOnlyList<Node> nodes)
+    {
     }
 
     private string TokenValue(int tokenIndex)
