@@ -45,7 +45,7 @@ public sealed class FuncSymbol : Symbol
     public required IReadOnlyList<ParamSymbol> Params { get; init; }
     public required FuncType FuncType { get; init; }
 
-    public override SpamType Type => FuncType.ReturnType;
+    public override SpamType Type => FuncType;
     public override Node? DeclaringNode => Declaration;
     public override string SymbolKindName => "function";
 }
