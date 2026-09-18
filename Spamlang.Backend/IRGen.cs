@@ -338,6 +338,8 @@ public class IRGen
 
     private IRValue GenExprZeroInitValue(HIRExprZeroInit expr)
     {
+        IRValue value = MakeZeroInitialized(expr.Type);
+        return value;
     }
 
     private IRValue GenExprAddr(IRBasicBlock block, HIRExpr expr)
