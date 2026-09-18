@@ -187,15 +187,14 @@ public class IRGen
                 return GenExprIntValue(hirExprIntConst);
             case HIRExprLoad hirExprLoad:
                 return GenExprLoadValue(block, hirExprLoad);
-            case HIRExprLocalRef hirExprLocalRef:
-                return GenExprLocalRefValue(hirExprLocalRef);
             case HIRExprUnary hirExprUnary:
                 return GenExprUnaryValue(block, hirExprUnary);
             case HIRExprZeroInit hirExprZeroInit:
                 return GenExprZeroInitValue(hirExprZeroInit);
+            case HIRExprLocalRef:
+                throw new Exception($"Unexpected {nameof(HIRExprLocalRef)}. Must be loaded");
             case HIRExprError:
-                // Backend mustn't be run on errors
-                throw new UnreachableException();
+                throw new Exception("Backend mustn't be run on errors");
             default:
                 throw new UnreachableException();
         }
@@ -321,17 +320,6 @@ public class IRGen
         };
         block.Add(cast);
         return cast;
-    }
-
-    private IRValue GenExprLocalRefValue(HIRExprLocalRef expr)
-    {
-        Debug.Assert(expr.Symbol != null);
-        Debug.Assert(expr.Symbol is FuncSymbol, "Variables can't reach here (other are lvalues)");
-
-        Symbol sym = expr.Symbol;
-        IRValue? value = LookupValue(sym);
-        Debug.Assert(value != null);
-        return value;
     }
 
     private IRValue GenExprFuncRefValue(IRBasicBlock block, HIRExprFuncRef expr)
