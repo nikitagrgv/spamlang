@@ -55,7 +55,7 @@ public class AstPrinter
                 PrintChildrenAst(depth + 1, n.Stmts);
                 break;
             case Param n:
-                Console.WriteLine($"{fullPrefix}Param | Type {n.Type}");
+                Console.WriteLine($"{fullPrefix}Param");
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 PrintAst(depth + 1, n.Type);
                 break;
