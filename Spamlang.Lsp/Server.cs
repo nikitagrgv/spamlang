@@ -403,21 +403,21 @@ public class Server
             {
                 sb.Append("```spamlang\n");
                 sb.Append($"fn {sym.Name}(");
-                for (int i = 0; i < sym.Declaration.Params.Count; i++)
+                for (int i = 0; i < sym.Params.Count; i++)
                 {
                     if (i != 0)
                     {
                         sb.Append(", ");
                     }
 
-                    Param param = sym.Declaration.Params[i];
-                    sb.Append($"{param.Symbol!.Name}: {param.Symbol!.Type}");
+                    ParamSymbol param = sym.Params[i];
+                    sb.Append($"{param.Name}: {param.Type}");
                 }
 
                 sb.Append(")");
-                if (sym.Declaration.ReturnType != null)
+                if (sym.FuncType.ReturnType != BuiltinType.Void)
                 {
-                    sb.Append($" -> {sym.Declaration.ReturnType.ResolvedType}");
+                    sb.Append($" -> {sym.FuncType.ReturnType}");
                 }
 
                 sb.Append("\n```\n\n---\n\n");
