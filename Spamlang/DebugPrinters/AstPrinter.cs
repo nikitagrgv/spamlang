@@ -56,7 +56,6 @@ public class AstPrinter
                 break;
             case Param n:
                 Console.WriteLine($"{fullPrefix}Param | Type {n.Type}");
-                PrintSymbol(depth + 1, n.Symbol);
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 PrintAst(depth + 1, n.Type);
                 break;
@@ -79,7 +78,6 @@ public class AstPrinter
                 break;
             case FuncDecl n:
                 Console.WriteLine($"{fullPrefix}FuncDecl");
-                PrintSymbol(depth + 1, n.Symbol);
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 n.Params.ForEach(p => PrintAst(depth + 1, p));
                 if (n.ReturnType != null)
@@ -91,7 +89,6 @@ public class AstPrinter
                 break;
             case StmtLet n:
                 Console.WriteLine($"{fullPrefix}StmtLet");
-                PrintSymbol(depth + 1, n.Symbol);
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 if (n.TypeDecl != null)
                 {
@@ -128,26 +125,26 @@ public class AstPrinter
                 break;
 
             case ExprBinary n:
-                Console.WriteLine($"{fullPrefix}BinaryExpr({n.Op}): {PrettyExpr(n)} | Type = {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}BinaryExpr({n.Op}): {PrettyExpr(n)}");
                 PrintAst(depth + 1, n.Left, "Left");
                 PrintAst(depth + 1, n.Right, "Right");
                 break;
             case ExprUnary n:
-                Console.WriteLine($"{fullPrefix}UnaryExpr({n.Op}): {PrettyExpr(n)} | Type = {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}UnaryExpr({n.Op}): {PrettyExpr(n)}");
                 PrintAst(depth + 1, n.Operand);
                 break;
             case ExprCall n:
-                Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)} | Type = {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)}");
                 PrintAst(depth + 1, n.Callee);
                 n.Args.ForEach(arg => PrintAst(depth + 1, arg.Expr));
                 break;
             case ExprInt n:
                 Console.WriteLine(
-                    $"{fullPrefix}ExprInt: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | Type = {n.ResolvedType} | Value = {n.Value} | IsNegative = {n.IsNegative}");
+                    $"{fullPrefix}ExprInt: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
                 break;
             case ExprIdentifier n:
                 Console.WriteLine(
-                    $"{fullPrefix}ExprIdentifier: {TokenValue(n.IdentifierToken)} | Type = {n.ResolvedType}");
+                    $"{fullPrefix}ExprIdentifier: {TokenValue(n.IdentifierToken)}");
                 break;
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
@@ -214,11 +211,5 @@ public class AstPrinter
     {
         string indent = MakeIndent(depth);
         Console.WriteLine($"{indent}{name}: \"{_tokens[token].Value(_code)}\"");
-    }
-
-    private void PrintSymbol(int depth, Symbol? symbol)
-    {
-        string indent = MakeIndent(depth);
-        Console.WriteLine($"{indent}Symbol: {symbol}");
     }
 }
