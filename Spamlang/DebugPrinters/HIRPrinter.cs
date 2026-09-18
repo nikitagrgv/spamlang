@@ -1,3 +1,4 @@
+using System.Text;
 using Spamlang.Frontend;
 
 namespace Spamlang.DebugPrinters;
@@ -117,7 +118,7 @@ public class HIRPrinter
                 PrintHIR(depth + 1, n.Callee);
                 PrintChildrenAst(depth + 1, n.Args);
                 break;
-            case HIRExprCallArg exprCallArg:
+            case HIRCallArg exprCallArg:
                 string nameInfo = "";
                 if (exprCallArg.ArgNameToken != null)
                 {
@@ -130,10 +131,6 @@ public class HIRPrinter
             case HIRExprIntConst n:
                 Console.WriteLine(
                     $"{fullPrefix}ExprInt: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
-                break;
-            case HIRExprIdentifier n:
-                Console.WriteLine(
-                    $"{fullPrefix}ExprIdentifier: {TokenValue(n.IdentifierToken)}");
                 break;
 
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
@@ -154,24 +151,24 @@ public class HIRPrinter
         return _tokens[tokenIndex].Value(_code).ToString();
     }
 
-    private string PrettyExpr(Expr expr)
+    private string PrettyExpr(HIRExpr expr)
     {
         StringBuilder ret = new();
         ret.Append('(');
         switch (expr)
         {
-            case ExprBinary binaryExpr:
+            case HIRExprBinary binaryExpr:
                 ret.Append(PrettyExpr(binaryExpr.Left));
                 ret.Append(' ');
                 ret.Append(TokenUtils.ToString(binaryExpr.Op));
                 ret.Append(' ');
                 ret.Append(PrettyExpr(binaryExpr.Right));
                 break;
-            case ExprUnary unaryExpr:
+            case HIRExprUnary unaryExpr:
                 ret.Append(TokenUtils.ToString(unaryExpr.Op));
                 ret.Append(PrettyExpr(unaryExpr.Operand));
                 break;
-            case ExprCall exprCall:
+            case HIRExprCall exprCall:
                 ret.Clear();
                 ret.Append(PrettyExpr(exprCall.Callee));
                 ret.Append('(');
@@ -195,9 +192,9 @@ public class HIRPrinter
                 ret.Append(')');
 
                 return ret.ToString();
-            case ExprIntConst exprInt:
+            case HIRExprIntConst exprInt:
                 return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
-            case ExprIdentifier exprIdentifier:
+            case HIRExprIdentifier exprIdentifier:
                 return TokenValue(exprIdentifier.IdentifierToken);
             default: throw new Exception("Unknown node type: " + expr.GetType().Name);
         }
