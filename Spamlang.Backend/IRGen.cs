@@ -69,7 +69,7 @@ public class IRGen
         GenParams(entry, funcDecl.Symbol.Params, function.Params);
         GenLocals(entry, funcDecl.Locals);
 
-        GenBlock(entry, funcDecl.Body);
+        GenStmts(entry, funcDecl.Body.Stmts);
 
         if (function.LoweredSignature.ReturnType == BuiltinType.Void && entry.Terminator == null)
         {
@@ -85,29 +85,29 @@ public class IRGen
         PopSymScope();
     }
 
-    private void GenBlock(IRBasicBlock block, Block blockNode)
+    private void GenStmts(IRBasicBlock block, IReadOnlyList<HIRStmt> stmts)
     {
-        foreach (Stmt stmt in blockNode.Stmts)
+        foreach (HIRStmt stmt in stmts)
         {
             switch (stmt)
             {
-                case Block b:
-                    GenBlock(block, b);
+                case HIRBlock b:
+                    GenStmts(block, b.Stmts);
                     break;
-                case StmtAssign stmtAssign:
+                case HIRStmtAssign stmtAssign:
                     GenStmtAssign(block, stmtAssign);
                     break;
-                case StmtExpr stmtExpr:
+                case HIRStmtExpr stmtExpr:
                     GenStmtExpr(block, stmtExpr);
                     break;
-                case StmtLet stmtLet:
+                case HIRStmtLet stmtLet:
                     GenStmtLet(block, stmtLet);
                     break;
-                case StmtReturn stmtReturn:
+                case HIRStmtReturn stmtReturn:
                     GenStmtReturn(block, stmtReturn);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(stmt));
+                    throw new UnreachableException();
             }
         }
     }
