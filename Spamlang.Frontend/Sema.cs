@@ -24,7 +24,7 @@ public class Sema
         _typeRegistry = typeRegistry;
     }
 
-    public TypedCompilationUnit Run(CompilationUnit unit, Dictionary<int, Symbol>? outTokenToSymbol = null)
+    public HIRCompilationUnit Run(CompilationUnit unit, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
         _tokenToSymbol = outTokenToSymbol;
 
@@ -33,7 +33,7 @@ public class Sema
 
         RegisterBuiltinTypeSymbols();
         List<FuncSymbol> funcSymbols = RegisterFunctionSymbols(unit);
-        TypedCompilationUnit compUnit = VisitCompilationUnit(unit, funcSymbols);
+        HIRCompilationUnit compUnit = VisitCompilationUnit(unit, funcSymbols);
         CheckMain();
 
         PopScope();
@@ -151,20 +151,20 @@ public class Sema
         }
     }
 
-    private TypedCompilationUnit VisitCompilationUnit(CompilationUnit unit, List<FuncSymbol> funcSymbols)
+    private HIRCompilationUnit VisitCompilationUnit(CompilationUnit unit, List<FuncSymbol> funcSymbols)
     {
         Debug.Assert(funcSymbols.Count == unit.FuncDecls.Count);
 
-        List<TypedFuncDecl> functions = new();
+        List<HIRFuncDecl> functions = new();
         for (int i = 0; i < unit.FuncDecls.Count; i++)
         {
             FuncDecl fd = unit.FuncDecls[i];
             FuncSymbol funcSym = funcSymbols[i];
-            TypedFuncDecl tfd = VisitFuncDecl(fd, funcSym);
+            HIRFuncDecl tfd = VisitFuncDecl(fd, funcSym);
             functions.Add(tfd);
         }
 
-        return new TypedCompilationUnit
+        return new HIRCompilationUnit
         {
             FuncDecls = functions,
             Syntax = unit,
@@ -172,7 +172,7 @@ public class Sema
         };
     }
 
-    private TypedFuncDecl VisitFuncDecl(FuncDecl fd, FuncSymbol funcSym)
+    private HIRFuncDecl VisitFuncDecl(FuncDecl fd, FuncSymbol funcSym)
     {
         Scope scope = new(CurrentScope());
         PushFunc(funcSym);
@@ -184,7 +184,7 @@ public class Sema
         }
 
         List<VariableSymbol> allVariables = new();
-        TypedBlock body = VisitBlock(fd.Body, allVariables, out Stmt? terminator);
+        HIRBlock body = VisitBlock(fd.Body, allVariables, out Stmt? terminator);
 
         if (funcSym.FuncType.ReturnType != BuiltinType.Void && terminator == null)
         {
@@ -194,7 +194,7 @@ public class Sema
         PopScope();
         PopFunc();
 
-        return new TypedFuncDecl
+        return new HIRFuncDecl
         {
             Body = body,
             Symbol = funcSym,
@@ -204,12 +204,12 @@ public class Sema
         };
     }
 
-    private TypedBlock VisitBlock(Block block, List<VariableSymbol> allVariables, out Stmt? terminator)
+    private HIRBlock VisitBlock(Block block, List<VariableSymbol> allVariables, out Stmt? terminator)
     {
         terminator = null;
         bool unreachableReported = false;
 
-        List<TypedStmt> stmts = new();
+        List<HIRStmt> stmts = new();
         List<VariableSymbol> variables = new();
         foreach (Stmt stmt in block.Stmts)
         {
@@ -226,7 +226,7 @@ public class Sema
                     Scope scope = new(CurrentScope());
                     PushScope(scope);
 
-                    TypedBlock tb = VisitBlock(stmtBlock, allVariables, out Stmt? innerTerminator);
+                    HIRBlock tb = VisitBlock(stmtBlock, allVariables, out Stmt? innerTerminator);
                     stmts.Add(tb);
 
                     PopScope();
@@ -238,20 +238,20 @@ public class Sema
 
                     break;
                 case StmtAssign stmtAssign:
-                    TypedStmtAssign tsa = VisitStmtAssign(stmtAssign);
+                    HIRStmtAssign tsa = VisitStmtAssign(stmtAssign);
                     stmts.Add(tsa);
                     break;
                 case StmtExpr stmtExpr:
-                    TypedStmtExpr tse = VisitStmtExpr(stmtExpr);
+                    HIRStmtExpr tse = VisitStmtExpr(stmtExpr);
                     stmts.Add(tse);
                     break;
                 case StmtLet stmtLet:
-                    TypedStmtLet tsl = VisitStmtLet(stmtLet);
+                    HIRStmtLet tsl = VisitStmtLet(stmtLet);
                     stmts.Add(tsl);
                     variables.Add(tsl.VariableSymbol);
                     break;
                 case StmtReturn stmtReturn:
-                    TypedStmtReturn tsr = VisitStmtReturn(stmtReturn);
+                    HIRStmtReturn tsr = VisitStmtReturn(stmtReturn);
                     stmts.Add(tsr);
                     terminator = stmtReturn;
                     break;
@@ -261,7 +261,7 @@ public class Sema
         }
 
         allVariables.AddRange(variables);
-        return new TypedBlock
+        return new HIRBlock
         {
             Variables = variables,
             Stmts = stmts,
@@ -270,19 +270,19 @@ public class Sema
         };
     }
 
-    private TypedStmtAssign VisitStmtAssign(StmtAssign stmt)
+    private HIRStmtAssign VisitStmtAssign(StmtAssign stmt)
     {
-        TypedExpr target = VisitExpr(stmt.Target);
+        HIRExpr target = VisitExpr(stmt.Target);
         if (target.Type != BuiltinType.Error && !target.IsLValue)
         {
             Error("Only lvalue can be used as assignment target", stmt.Target);
         }
 
-        TypedExpr value = VisitExpr(stmt.Value);
+        HIRExpr value = VisitExpr(stmt.Value);
         value = ToRValue(value);
         value = Adapt(value, target.Type);
 
-        return new TypedStmtAssign
+        return new HIRStmtAssign
         {
             Target = target,
             Value = value,
@@ -291,11 +291,11 @@ public class Sema
         };
     }
 
-    private TypedStmtExpr VisitStmtExpr(StmtExpr stmt)
+    private HIRStmtExpr VisitStmtExpr(StmtExpr stmt)
     {
-        TypedExpr expr = VisitExpr(stmt.Expr);
+        HIRExpr expr = VisitExpr(stmt.Expr);
         expr = ToRValue(expr);
-        return new TypedStmtExpr
+        return new HIRStmtExpr
         {
             Expr = expr,
             Syntax = stmt,
@@ -303,7 +303,7 @@ public class Sema
         };
     }
 
-    private TypedStmtLet VisitStmtLet(StmtLet stmt)
+    private HIRStmtLet VisitStmtLet(StmtLet stmt)
     {
         // NOTE: Uninit is ok, defaults to zero
         // TODO: Variable of function type can be uninitialized, bad
@@ -316,7 +316,7 @@ public class Sema
             declType = ResolveType(stmt.TypeDecl);
         }
 
-        TypedExpr init;
+        HIRExpr init;
         if (stmt.Expr != null)
         {
             init = VisitExpr(stmt.Expr);
@@ -347,7 +347,7 @@ public class Sema
                 declType = BuiltinType.Error;
             }
 
-            init = new TypedExprZeroInit
+            init = new HIRExprZeroInit
             {
                 Type = declType,
                 Syntax = stmt,
@@ -371,7 +371,7 @@ public class Sema
         RegisterSymbol(sym);
         RegisterTokenAsSymbol(stmt.NameToken, sym);
 
-        return new TypedStmtLet
+        return new HIRStmtLet
         {
             VariableSymbol = sym,
             Init = init,
@@ -380,7 +380,7 @@ public class Sema
         };
     }
 
-    private TypedStmtReturn VisitStmtReturn(StmtReturn stmt)
+    private HIRStmtReturn VisitStmtReturn(StmtReturn stmt)
     {
         FuncSymbol currentFunc = CurrentFunc();
         FuncType funcType = currentFunc.FuncType;
@@ -396,7 +396,7 @@ public class Sema
             Error($"Function \"{currentFunc.Name}\" must return value", stmt);
         }
 
-        TypedExpr? expr = null;
+        HIRExpr? expr = null;
         if (stmt.Expr != null)
         {
             expr = VisitExpr(stmt.Expr);
@@ -407,7 +407,7 @@ public class Sema
             }
         }
 
-        return new TypedStmtReturn
+        return new HIRStmtReturn
         {
             Value = expr,
             Syntax = stmt,
@@ -415,7 +415,7 @@ public class Sema
         };
     }
 
-    private TypedExpr VisitExpr(Expr expr)
+    private HIRExpr VisitExpr(Expr expr)
     {
         switch (expr)
         {
@@ -434,10 +434,10 @@ public class Sema
         }
     }
 
-    private TypedExprBinary VisitExprBinary(ExprBinary expr)
+    private HIRExprBinary VisitExprBinary(ExprBinary expr)
     {
-        TypedExpr left = VisitExpr(expr.Left);
-        TypedExpr right = VisitExpr(expr.Right);
+        HIRExpr left = VisitExpr(expr.Left);
+        HIRExpr right = VisitExpr(expr.Right);
 
         left = ToRValue(left);
         right = ToRValue(right);
@@ -462,7 +462,7 @@ public class Sema
 
         left = Adapt(left, commonType);
         right = Adapt(right, commonType);
-        return new TypedExprBinary
+        return new HIRExprBinary
         {
             Left = left,
             Right = right,
@@ -473,13 +473,13 @@ public class Sema
         };
     }
 
-    private TypedExpr VisitExprCall(ExprCall expr)
+    private HIRExpr VisitExprCall(ExprCall expr)
     {
         // TODO: Support default parameters
 
-        List<TypedArg> typedArgs = new();
+        List<HIRArg> typedArgs = new();
 
-        TypedExpr callee = VisitExpr(expr.Callee);
+        HIRExpr callee = VisitExpr(expr.Callee);
         callee = ToRValue(callee);
 
         if (callee.Type == BuiltinType.Error)
@@ -495,7 +495,7 @@ public class Sema
 
         // Can be null if the call is indirect (via variable or expr)
         FuncSymbol? funcSymbol = null;
-        if (callee is TypedExprFuncRef funcRef)
+        if (callee is HIRExprFuncRef funcRef)
         {
             funcSymbol = funcRef.Symbol;
             Debug.Assert(funcSymbol.Params.Count == funcType.ParamTypes.Count);
@@ -564,11 +564,11 @@ public class Sema
             usedParams[paramIndex] = true;
 
             SpamType paramType = funcParams[paramIndex];
-            TypedExpr argExpr = VisitExpr(arg.Expr);
+            HIRExpr argExpr = VisitExpr(arg.Expr);
             argExpr = ToRValue(argExpr);
             argExpr = Adapt(argExpr, paramType);
 
-            TypedArg typedArg = new()
+            HIRArg typedArg = new()
             {
                 Value = argExpr,
                 ParameterIndex = paramIndex,
@@ -598,7 +598,7 @@ public class Sema
             return ErrorCall(expr, callee, typedArgs);
         }
 
-        return new TypedExprCall
+        return new HIRExprCall
         {
             Callee = callee,
             Args = typedArgs,
@@ -608,13 +608,13 @@ public class Sema
         };
     }
 
-    private TypedExprError ErrorCall(ExprCall expr, TypedExpr callee, List<TypedArg> visitedArgs)
+    private HIRExprError ErrorCall(ExprCall expr, HIRExpr callee, List<HIRArg> visitedArgs)
     {
-        List<TypedExpr> children = new();
+        List<HIRExpr> children = new();
         children.EnsureCapacity(1 + expr.Args.Count);
         children.Add(callee);
 
-        foreach (TypedArg arg in visitedArgs)
+        foreach (HIRArg arg in visitedArgs)
         {
             children.Add(arg.Value);
         }
@@ -623,13 +623,13 @@ public class Sema
         for (int i = visitedArgs.Count; i < expr.Args.Count; i++)
         {
             ExprCallArg arg = expr.Args[i];
-            TypedExpr typedArg = VisitExpr(arg.Expr);
+            HIRExpr typedArg = VisitExpr(arg.Expr);
             typedArg = ToRValue(typedArg);
             children.Add(typedArg);
         }
 
         Debug.Assert(children.Count == expr.Args.Count + 1);
-        return new TypedExprError
+        return new HIRExprError
         {
             Children = children,
             Type = BuiltinType.Error,
@@ -653,14 +653,14 @@ public class Sema
         return -1;
     }
 
-    private TypedExpr VisitExprIdentifier(ExprIdentifier expr)
+    private HIRExpr VisitExprIdentifier(ExprIdentifier expr)
     {
         ReadOnlySpan<char> name = GetTokenValue(expr.IdentifierToken);
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
         {
             Error($"Symbol not found: \"{name}\"", expr);
-            return new TypedExprError
+            return new HIRExprError
             {
                 Children = [],
                 Type = BuiltinType.Error,
@@ -674,7 +674,7 @@ public class Sema
         switch (sym)
         {
             case LocalSymbol localSym:
-                return new TypedExprLocalRef
+                return new HIRExprLocalRef
                 {
                     Symbol = localSym,
                     Type = localSym.Type,
@@ -682,7 +682,7 @@ public class Sema
                     IsSynthesized = false,
                 };
             case FuncSymbol funcSym:
-                return new TypedExprFuncRef
+                return new HIRExprFuncRef
                 {
                     Symbol = funcSym,
                     Type = funcSym.FuncType,
@@ -692,7 +692,7 @@ public class Sema
             case TypeSymbol:
                 // TODO: Allow that, for e.g. `i32.TypeSize()`
                 Error($"Type cannot be used as an identifier: \"{name}\"", expr);
-                return new TypedExprError
+                return new HIRExprError
                 {
                     Children = [],
                     Type = BuiltinType.Error,
@@ -704,7 +704,7 @@ public class Sema
         }
     }
 
-    private TypedExprIntConst VisitExprInt(ExprInt expr)
+    private HIRExprIntConst VisitExprInt(ExprInt expr)
     {
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
@@ -728,7 +728,7 @@ public class Sema
             ErrorOutOfRange(expr.IsNegative, str, expr);
         }
 
-        return new TypedExprIntConst
+        return new HIRExprIntConst
         {
             Value = value,
             Type = BuiltinType.I32,
@@ -796,9 +796,9 @@ public class Sema
         return value;
     }
 
-    private TypedExprUnary VisitExprUnary(ExprUnary expr)
+    private HIRExprUnary VisitExprUnary(ExprUnary expr)
     {
-        TypedExpr operand = VisitExpr(expr.Operand);
+        HIRExpr operand = VisitExpr(expr.Operand);
         operand = ToRValue(operand);
 
         SpamType type;
@@ -816,7 +816,7 @@ public class Sema
             type = operand.Type;
         }
 
-        return new TypedExprUnary
+        return new HIRExprUnary
         {
             Op = expr.Op,
             Operand = operand,
@@ -969,7 +969,7 @@ public class Sema
         return _funcStack[^1];
     }
 
-    private TypedExpr Adapt(TypedExpr expr, SpamType targetType)
+    private HIRExpr Adapt(HIRExpr expr, SpamType targetType)
     {
         SpamType type = expr.Type;
         if (type == BuiltinType.Error || targetType == BuiltinType.Error)
@@ -986,7 +986,7 @@ public class Sema
         if (!CanImplicitlyCast(type, targetType))
         {
             Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr.Syntax);
-            return new TypedExprError
+            return new HIRExprError
             {
                 Children = [expr],
                 Type = BuiltinType.Error,
@@ -995,7 +995,7 @@ public class Sema
             };
         }
 
-        return new TypedExprCast
+        return new HIRExprCast
         {
             Value = expr,
             Type = targetType,
@@ -1004,14 +1004,14 @@ public class Sema
         };
     }
 
-    private TypedExpr ToRValue(TypedExpr expr)
+    private HIRExpr ToRValue(HIRExpr expr)
     {
         if (!expr.IsLValue || expr.Type == BuiltinType.Error)
         {
             return expr;
         }
 
-        return new TypedExprLoad
+        return new HIRExprLoad
         {
             Address = expr,
             Type = expr.Type,

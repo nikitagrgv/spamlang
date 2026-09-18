@@ -6,7 +6,7 @@ public class Frontend
     {
         public required List<Token> Tokens { get; init; }
         public required CompilationUnit CompilationUnit { get; init; }
-        public required TypedCompilationUnit TypedCompilationUnit { get; init; }
+        public required HIRCompilationUnit HIRCompilationUnit { get; init; }
     }
 
     public static Result Run(string code, TypeRegistry typeRegistry, Diagnostic diag, Timers? timers, Dictionary<int, Symbol>? outTokenToSymbol = null)
@@ -23,14 +23,14 @@ public class Frontend
 
         timers?.RestartTimer();
         Sema sema = new(code, tokens, diag, typeRegistry);
-        TypedCompilationUnit typedCompilationUnit = sema.Run(compilationUnit, outTokenToSymbol);
+        HIRCompilationUnit typedCompilationUnit = sema.Run(compilationUnit, outTokenToSymbol);
         timers?.FinishTimer("Sema");
 
         return new Result
         {
             Tokens = tokens,
             CompilationUnit = compilationUnit,
-            TypedCompilationUnit = typedCompilationUnit,
+            HIRCompilationUnit = typedCompilationUnit,
         };
     }
 }

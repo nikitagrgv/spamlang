@@ -1,126 +1,126 @@
 namespace Spamlang.Frontend;
 
-public abstract class TypedNode
+public abstract class HIRNode
 {
     public required Node Syntax { get; init; }
     public required bool IsSynthesized { get; init; }
 }
 
-public class TypedCompilationUnit : TypedNode
+public class HIRCompilationUnit : HIRNode
 {
-    public required IReadOnlyList<TypedFuncDecl> FuncDecls { get; init; }
+    public required IReadOnlyList<HIRFuncDecl> FuncDecls { get; init; }
 }
 
-public class TypedFuncDecl : TypedNode
+public class HIRFuncDecl : HIRNode
 {
     public required FuncSymbol Symbol { get; init; }
     public required IReadOnlyList<VariableSymbol> Variables { get; init; }
-    public required TypedBlock Body { get; init; }
+    public required HIRBlock Body { get; init; }
 }
 
-public class TypedBlock : TypedStmt
+public class HIRBlock : HIRStmt
 {
     public required IReadOnlyList<VariableSymbol> Variables { get; init; }
-    public required IReadOnlyList<TypedStmt> Stmts { get; init; }
+    public required IReadOnlyList<HIRStmt> Stmts { get; init; }
 }
 
-public abstract class TypedStmt : TypedNode
+public abstract class HIRStmt : HIRNode
 {
 }
 
-public class TypedStmtLet : TypedStmt
+public class HIRStmtLet : HIRStmt
 {
     public required VariableSymbol VariableSymbol { get; init; }
-    public required TypedExpr Init { get; init; }
+    public required HIRExpr Init { get; init; }
 }
 
-public class TypedStmtAssign : TypedStmt
+public class HIRStmtAssign : HIRStmt
 {
-    public required TypedExpr Target { get; init; }
-    public required TypedExpr Value { get; init; }
+    public required HIRExpr Target { get; init; }
+    public required HIRExpr Value { get; init; }
 }
 
-public class TypedStmtReturn : TypedStmt
+public class HIRStmtReturn : HIRStmt
 {
-    public required TypedExpr? Value { get; init; }
+    public required HIRExpr? Value { get; init; }
 }
 
-public class TypedStmtExpr : TypedStmt
+public class HIRStmtExpr : HIRStmt
 {
-    public required TypedExpr Expr { get; init; }
+    public required HIRExpr Expr { get; init; }
 }
 
-public abstract class TypedExpr : TypedNode
+public abstract class HIRExpr : HIRNode
 {
     public required SpamType Type { get; init; }
     public abstract bool IsLValue { get; }
 }
 
-public class TypedExprLocalRef : TypedExpr
+public class HIRExprLocalRef : HIRExpr
 {
     public required LocalSymbol Symbol { get; init; }
     public override bool IsLValue => true;
 }
 
-public class TypedExprFuncRef : TypedExpr
+public class HIRExprFuncRef : HIRExpr
 {
     public required FuncSymbol Symbol { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedExprLoad : TypedExpr
+public class HIRExprLoad : HIRExpr
 {
-    public required TypedExpr Address { get; init; }
+    public required HIRExpr Address { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedExprIntConst : TypedExpr
+public class HIRExprIntConst : HIRExpr
 {
     public required Int128 Value { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedExprZeroInit : TypedExpr
+public class HIRExprZeroInit : HIRExpr
 {
     public override bool IsLValue => false;
 }
 
-public class TypedExprUnary : TypedExpr
+public class HIRExprUnary : HIRExpr
 {
     public required UnaryOp Op { get; init; }
-    public required TypedExpr Operand { get; init; }
+    public required HIRExpr Operand { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedExprBinary : TypedExpr
+public class HIRExprBinary : HIRExpr
 {
     public required BinaryOp Op { get; init; }
-    public required TypedExpr Left { get; init; }
-    public required TypedExpr Right { get; init; }
+    public required HIRExpr Left { get; init; }
+    public required HIRExpr Right { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedExprCall : TypedExpr
+public class HIRExprCall : HIRExpr
 {
-    public required TypedExpr Callee { get; init; }
-    public required IReadOnlyList<TypedArg> Args { get; init; }
+    public required HIRExpr Callee { get; init; }
+    public required IReadOnlyList<HIRArg> Args { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedArg : TypedNode
+public class HIRArg : HIRNode
 {
-    public required TypedExpr Value { get; init; }
+    public required HIRExpr Value { get; init; }
     public required int ParameterIndex { get; init; }
 }
 
-public class TypedExprError : TypedExpr
+public class HIRExprError : HIRExpr
 {
-    public required IReadOnlyList<TypedExpr> Children { get; init; }
+    public required IReadOnlyList<HIRExpr> Children { get; init; }
     public override bool IsLValue => false;
 }
 
-public class TypedExprCast : TypedExpr
+public class HIRExprCast : HIRExpr
 {
-    public required TypedExpr Value { get; init; }
+    public required HIRExpr Value { get; init; }
     public override bool IsLValue => false;
 }

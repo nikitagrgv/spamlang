@@ -10,7 +10,7 @@ public class Backend
         public required MModule MModule { get; init; }
     }
 
-    public static Result Run(TypedCompilationUnit compilationUnit, TypeRegistry typeRegistry, Timers? timers)
+    public static Result Run(HIRCompilationUnit compilationUnit, TypeRegistry typeRegistry, Timers? timers)
     {
         timers?.RestartTimer();
         IRGen irGen = new(typeRegistry);

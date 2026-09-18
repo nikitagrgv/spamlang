@@ -13,7 +13,7 @@ public class IRGen
         _typeRegistry = typeRegistry;
     }
 
-    public IRModule Run(TypedCompilationUnit unit)
+    public IRModule Run(HIRCompilationUnit unit)
     {
         Dictionary<Symbol, IRValue> globalScope = new();
         _symbolScopes.Add(globalScope);
