@@ -145,6 +145,7 @@ public class AstPrinter
                 }
 
                 Console.WriteLine($"{fullPrefix}ExprCallArg{nameInfo}: {PrettyExpr(exprCallArg.Expr)}");
+                PrintAst(depth + 1, exprCallArg.Expr);
                 break;
             case ExprInt n:
                 Console.WriteLine(
