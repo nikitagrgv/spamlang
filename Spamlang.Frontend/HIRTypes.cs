@@ -103,11 +103,11 @@ public class HIRExprBinary : HIRExpr
 public class HIRExprCall : HIRExpr
 {
     public required HIRExpr Callee { get; init; }
-    public required IReadOnlyList<HIRArg> Args { get; init; }
+    public required IReadOnlyList<HIRCallArg> Args { get; init; }
     public override bool IsLValue => false;
 }
 
-public class HIRArg : HIRNode
+public class HIRCallArg : HIRNode
 {
     public required HIRExpr Value { get; init; }
     public required int ParameterIndex { get; init; }

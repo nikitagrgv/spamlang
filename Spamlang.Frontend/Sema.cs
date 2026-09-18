@@ -425,7 +425,7 @@ public class Sema
                 return VisitExprCall(exprCall);
             case ExprIdentifier exprIdentifier:
                 return VisitExprIdentifier(exprIdentifier);
-            case ExprInt exprInt:
+            case ExprIntConst exprInt:
                 return VisitExprInt(exprInt);
             case ExprUnary exprUnary:
                 return VisitExprUnary(exprUnary);
@@ -477,7 +477,7 @@ public class Sema
     {
         // TODO: Support default parameters
 
-        List<HIRArg> hirArgs = new();
+        List<HIRCallArg> hirArgs = new();
 
         HIRExpr callee = VisitExpr(expr.Callee);
         callee = ToRValue(callee);
@@ -568,14 +568,14 @@ public class Sema
             argExpr = ToRValue(argExpr);
             argExpr = Adapt(argExpr, paramType);
 
-            HIRArg hirArg = new()
+            HIRCallArg hirCallArg = new()
             {
                 Value = argExpr,
                 ParameterIndex = paramIndex,
                 Syntax = arg,
                 IsSynthesized = false,
             };
-            hirArgs.Add(hirArg);
+            hirArgs.Add(hirCallArg);
         }
 
         for (int i = 0; i < usedParams.Length; i++)
@@ -608,13 +608,13 @@ public class Sema
         };
     }
 
-    private HIRExprError ErrorCall(ExprCall expr, HIRExpr callee, List<HIRArg> visitedArgs)
+    private HIRExprError ErrorCall(ExprCall expr, HIRExpr callee, List<HIRCallArg> visitedArgs)
     {
         List<HIRExpr> children = new();
         children.EnsureCapacity(1 + expr.Args.Count);
         children.Add(callee);
 
-        foreach (HIRArg arg in visitedArgs)
+        foreach (HIRCallArg arg in visitedArgs)
         {
             children.Add(arg.Value);
         }
@@ -704,7 +704,7 @@ public class Sema
         }
     }
 
-    private HIRExprIntConst VisitExprInt(ExprInt expr)
+    private HIRExprIntConst VisitExprInt(ExprIntConst expr)
     {
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 

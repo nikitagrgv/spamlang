@@ -136,7 +136,7 @@ public class AstPrinter
                 Console.WriteLine($"{fullPrefix}ExprCallArg{nameInfo}: {PrettyExpr(exprCallArg.Expr)}");
                 PrintAst(depth + 1, exprCallArg.Expr);
                 break;
-            case ExprInt n:
+            case ExprIntConst n:
                 Console.WriteLine(
                     $"{fullPrefix}ExprInt: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
                 break;
@@ -203,7 +203,7 @@ public class AstPrinter
                 ret.Append(')');
 
                 return ret.ToString();
-            case ExprInt exprInt:
+            case ExprIntConst exprInt:
                 return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
             case ExprIdentifier exprIdentifier:
                 return TokenValue(exprIdentifier.IdentifierToken);

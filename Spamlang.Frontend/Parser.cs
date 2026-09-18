@@ -564,7 +564,7 @@ public class Parser
             {
                 int literalToken = _cursor - 1;
                 bool negated = opTokType == TokenType.Minus;
-                return new ExprInt
+                return new ExprIntConst
                 {
                     StartToken = begin,
                     EndToken = End(begin),
@@ -640,7 +640,7 @@ public class Parser
         if (TryConsume(TokenType.LiteralInt))
         {
             int end = End(begin);
-            return new ExprInt
+            return new ExprIntConst
             {
                 StartToken = begin,
                 EndToken = end,

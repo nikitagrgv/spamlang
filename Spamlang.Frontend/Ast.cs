@@ -99,7 +99,7 @@ public abstract class ExprPrimary : Expr
 {
 }
 
-public sealed class ExprInt : ExprPrimary
+public sealed class ExprIntConst : ExprPrimary
 {
     public required int LiteralToken { get; init; }
     public required bool IsNegative { get; init; }

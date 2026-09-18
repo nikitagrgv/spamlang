@@ -273,7 +273,7 @@ public class IRGen
             args.Add(null);
         }
 
-        foreach (HIRArg arg in expr.Args)
+        foreach (HIRCallArg arg in expr.Args)
         {
             Debug.Assert(args[arg.ParameterIndex] == null);
             args[arg.ParameterIndex] = GenExprValue(block, arg.Value);
