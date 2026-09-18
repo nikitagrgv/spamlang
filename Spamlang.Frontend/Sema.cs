@@ -198,7 +198,7 @@ public class Sema
         {
             Body = body,
             Symbol = funcSym,
-            Variables = allVariables,
+            Locals = allVariables,
             Syntax = fd,
             IsSynthesized = false,
         };

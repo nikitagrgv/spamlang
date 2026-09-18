@@ -14,7 +14,7 @@ public class HIRCompilationUnit : HIRNode
 public class HIRFuncDecl : HIRNode
 {
     public required FuncSymbol Symbol { get; init; }
-    public required IReadOnlyList<VariableSymbol> Variables { get; init; }
+    public required IReadOnlyList<VariableSymbol> Locals { get; init; }
     public required HIRBlock Body { get; init; }
 }
 

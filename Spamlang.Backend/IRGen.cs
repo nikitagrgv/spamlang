@@ -56,10 +56,6 @@ public class IRGen
 
     private void GenFunction(HIRFuncDecl funcDecl, IRFunction function)
     {
-        // TODO: Reuse lists/dicts
-        List<StmtLet> locals = new();
-        CollectLocals(funcDecl.Body, locals);
-
         IRBasicBlock entry = new()
         {
             Instructions = new List<IRInstruction>(),
@@ -70,8 +66,8 @@ public class IRGen
         Dictionary<Symbol, IRValue> funcScope = new();
         PushSymScope(funcScope);
 
-        GenParams(entry, funcDecl.Params, function.Params);
-        GenLocals(entry, locals);
+        GenParams(entry, funcDecl.Symbol.Params, function.Params);
+        GenLocals(entry, funcDecl.Locals);
 
         GenBlock(entry, funcDecl.Body);
 
@@ -376,13 +372,10 @@ public class IRGen
         throw new NotImplementedException();
     }
 
-    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals)
+    private void GenLocals(IRBasicBlock entry, IReadOnlyList<VariableSymbol> locals)
     {
-        foreach (StmtLet let in locals)
+        foreach (VariableSymbol sym in locals)
         {
-            Debug.Assert(let.Symbol != null);
-
-            Symbol sym = let.Symbol;
             SpamType type = IRUtils.ToLowerType(sym.Type);
 
             IRInstructionAlloca alloca = new()
@@ -396,16 +389,13 @@ public class IRGen
         }
     }
 
-    private void GenParams(IRBasicBlock entry, IReadOnlyList<Param> funcParams, List<IRParam> irParams)
+    private void GenParams(IRBasicBlock entry, IReadOnlyList<ParamSymbol> funcParams, List<IRParam> irParams)
     {
         Debug.Assert(irParams.Count == 0);
 
         int initialNumInstructions = entry.Instructions.Count;
-        foreach (Param param in funcParams)
+        foreach (ParamSymbol sym in funcParams)
         {
-            Debug.Assert(param.Symbol != null);
-            Symbol sym = param.Symbol;
-
             SpamType type = IRUtils.ToLowerType(sym.Type);
             IRParam irParam = new()
             {
@@ -435,21 +425,6 @@ public class IRGen
                 Address = alloca
             };
             entry.Add(store);
-        }
-    }
-
-    private void CollectLocals(Block body, List<StmtLet> locals)
-    {
-        foreach (Stmt stmt in body.Stmts)
-        {
-            if (stmt is StmtLet let)
-            {
-                locals.Add(let);
-            }
-            else if (stmt is Block block)
-            {
-                CollectLocals(block, locals);
-            }
         }
     }
 
