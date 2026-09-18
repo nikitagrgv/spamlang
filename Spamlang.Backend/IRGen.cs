@@ -392,7 +392,7 @@ public class IRGen
             entry.Add(alloca);
 
             Debug.Assert(LookupValue(sym) == null);
-            CurrentSymScope.Add(sym, alloca);
+            CurrentSymScope().Add(sym, alloca);
         }
     }
 
@@ -421,7 +421,7 @@ public class IRGen
             entry.Add(alloca);
 
             Debug.Assert(LookupValue(sym) == null);
-            CurrentSymScope.Add(sym, alloca);
+            CurrentSymScope().Add(sym, alloca);
         }
 
         for (int i = 0; i < irParams.Count; i++)
