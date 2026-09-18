@@ -26,7 +26,7 @@ public class HIRPrinter
 
     private void PrintHIR(int depth, HIRNode node, string prefix = "")
     {
-                string fullPrefix = MakeIndent(depth);
+        string fullPrefix = MakeIndent(depth);
         if (prefix != "")
         {
             fullPrefix += prefix + ": ";
@@ -147,8 +147,8 @@ public class HIRPrinter
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
     }
-    
-    
+
+
     private void PrintChildrenAst(int depth, IReadOnlyList<Node> nodes)
     {
         foreach (Node node in nodes)
