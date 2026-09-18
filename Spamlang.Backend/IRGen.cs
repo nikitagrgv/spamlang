@@ -205,7 +205,7 @@ public class IRGen
     {
         Debug.Assert(expr.IsLValue);
         IRValue addr = GenExprAddr(block, expr);
-        SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
+        SpamType type = IRUtils.ToLowerType(expr.Type);
         IRInstructionLoad load = new()
         {
             LoadedType = type,
