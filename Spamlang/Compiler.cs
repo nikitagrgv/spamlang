@@ -299,6 +299,17 @@ public class Compiler
         }
     }
 
+    private void PrintIR(List<Token> tokens, string code, HIRCompilationUnit compilationUnit)
+    {
+        if (_flags.DebugHIR)
+        {
+            PrintSeparator();
+            HIRPrinter.Print(compilationUnit, tokens, code);
+            PrintSeparator();
+        }
+    }
+
+
     private void PrintIR(IRModule irModule)
     {
         if (_flags.DebugIR)
