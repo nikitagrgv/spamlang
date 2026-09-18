@@ -110,7 +110,7 @@ public sealed class ExprIdentifier : ExprPrimary
     public required int IdentifierToken { get; init; }
 }
 
-public sealed class ExprCallArg : Node
+public sealed class CallArg : Node
 {
     public required Expr Expr { get; init; }
     public required int? ArgNameToken { get; init; }
@@ -119,5 +119,5 @@ public sealed class ExprCallArg : Node
 public sealed class ExprCall : ExprPrimary
 {
     public required Expr Callee { get; init; }
-    public required IReadOnlyList<ExprCallArg> Args { get; init; }
+    public required IReadOnlyList<CallArg> Args { get; init; }
 }

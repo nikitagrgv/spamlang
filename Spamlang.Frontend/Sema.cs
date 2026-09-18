@@ -502,7 +502,7 @@ public class Sema
         }
 
         IReadOnlyList<SpamType> funcParams = funcType.ParamTypes;
-        IReadOnlyList<ExprCallArg> args = expr.Args;
+        IReadOnlyList<CallArg> args = expr.Args;
         if (args.Count > funcParams.Count)
         {
             string str = "Function ";
@@ -520,7 +520,7 @@ public class Sema
         bool hasUnorderedNamedArgs = false;
         for (int i = 0; i < args.Count; ++i)
         {
-            ExprCallArg arg = args[i];
+            CallArg arg = args[i];
             if (hasUnorderedNamedArgs && arg.ArgNameToken == null)
             {
                 Error("Cannot use positional arguments after named arguments in changed order", arg);
@@ -622,7 +622,7 @@ public class Sema
         // Visit remaining args to emit errors for them too
         for (int i = visitedArgs.Count; i < expr.Args.Count; i++)
         {
-            ExprCallArg arg = expr.Args[i];
+            CallArg arg = expr.Args[i];
             HIRExpr hirArg = VisitExpr(arg.Expr);
             hirArg = ToRValue(hirArg);
             children.Add(hirArg);

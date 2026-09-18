@@ -593,7 +593,7 @@ public class Parser
 
         while (TryConsume(TokenType.LPar))
         {
-            List<ExprCallArg> args = [];
+            List<CallArg> args = [];
             if (!Check(TokenType.RPar))
             {
                 do
@@ -608,7 +608,7 @@ public class Parser
                     }
 
                     Expr expr = ParseExpr();
-                    ExprCallArg arg = new()
+                    CallArg arg = new()
                     {
                         StartToken = argBegin,
                         EndToken = End(argBegin),

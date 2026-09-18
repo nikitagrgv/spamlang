@@ -126,7 +126,7 @@ public class AstPrinter
                 PrintAst(depth + 1, n.Callee);
                 PrintChildrenAst(depth + 1, n.Args);
                 break;
-            case ExprCallArg exprCallArg:
+            case CallArg exprCallArg:
                 string nameInfo = "";
                 if (exprCallArg.ArgNameToken != null)
                 {
@@ -190,7 +190,7 @@ public class AstPrinter
                         ret.Append(", ");
                     }
 
-                    ExprCallArg arg = exprCall.Args[i];
+                    CallArg arg = exprCall.Args[i];
                     if (arg.ArgNameToken != null)
                     {
                         ret.Append(TokenValue(arg.ArgNameToken.Value));
