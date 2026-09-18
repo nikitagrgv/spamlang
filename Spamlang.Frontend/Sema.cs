@@ -92,7 +92,8 @@ public class Sema
                 Name = GetTokenValue(param.NameToken).ToString(),
                 ParamType = type,
             };
-            RegisterSymbol(sym);
+            // NOTE: Don't register param symbol right now, do this in function scope!  
+            // RegisterSymbol(sym);
             RegisterTokenAsSymbol(param.NameToken, sym);
             paramTypes.Add(type);
             paramSymbols.Add(sym);
@@ -178,7 +179,10 @@ public class Sema
         PushFunc(funcSym);
         PushScope(scope);
 
-        // NOTE: Params are already registered
+        foreach (ParamSymbol paramSymbol in funcSym.Params)
+        {
+            RegisterSymbol(paramSymbol);
+        }
 
         List<VariableSymbol> allVariables = new();
         TypedBlock body = VisitBlock(fd.Body, allVariables, out Stmt? terminator);
