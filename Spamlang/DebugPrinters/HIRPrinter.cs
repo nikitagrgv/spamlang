@@ -179,14 +179,9 @@ public class HIRPrinter
                         ret.Append(", ");
                     }
 
-                    CallArg arg = exprCall.Args[i];
-                    if (arg.ArgNameToken != null)
-                    {
-                        ret.Append(TokenValue(arg.ArgNameToken.Value));
-                        ret.Append(": ");
-                    }
-
+                    HIRCallArg arg = exprCall.Args[i];
                     ret.Append(PrettyExpr(arg.Expr));
+                    ret.Append($" (index={TokenValue(arg.ParameterIndex)})");
                 }
 
                 ret.Append(')');
