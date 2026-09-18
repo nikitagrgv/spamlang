@@ -993,7 +993,7 @@ public class Sema
                 Children = [expr],
                 Type = BuiltinType.Error,
                 Syntax = expr.Syntax,
-                IsSynthesized = false,
+                IsSynthesized = true,
             };
         }
 
@@ -1002,7 +1002,7 @@ public class Sema
             Value = expr,
             Type = targetType,
             Syntax = expr.Syntax,
-            IsSynthesized = false,
+            IsSynthesized = true,
         };
     }
 
