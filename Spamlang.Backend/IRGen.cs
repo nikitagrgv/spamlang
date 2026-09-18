@@ -392,7 +392,7 @@ public class IRGen
             entry.Add(alloca);
 
             Debug.Assert(LookupValue(sym) == null);
-            CurrentScope.Add(sym, alloca);
+            CurrentSymScope.Add(sym, alloca);
         }
     }
 
@@ -421,7 +421,7 @@ public class IRGen
             entry.Add(alloca);
 
             Debug.Assert(LookupValue(sym) == null);
-            CurrentScope.Add(sym, alloca);
+            CurrentSymScope.Add(sym, alloca);
         }
 
         for (int i = 0; i < irParams.Count; i++)
@@ -453,7 +453,20 @@ public class IRGen
         }
     }
 
-    private Dictionary<Symbol, IRValue> CurrentScope => _symbolScopes[^1];
+    private void PushSymScope(Dictionary<Symbol, IRValue> scope)
+    {
+        _symbolScopes.Add(scope);
+    }
+
+    private void PopSymScope()
+    {
+        _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
+    }
+
+    private Dictionary<Symbol, IRValue> CurrentSymScope()
+    {
+        return _symbolScopes[^1];
+    }
 
     private IRValue? LookupValue(Symbol symbol)
     {
