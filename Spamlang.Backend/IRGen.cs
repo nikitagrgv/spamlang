@@ -320,12 +320,14 @@ public class IRGen
 
     private IRValue GenExprFuncRefValue(IRBasicBlock block, HIRExprFuncRef expr)
     {
+        IRValue? value = LookupValue(expr.Symbol);
+        Debug.Assert(value != null);
+        return value;
     }
 
     private IRValue GenExprIntValue(HIRExprIntConst expr)
     {
-        Debug.Assert(expr.ResolvedType != null);
-        SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
+        SpamType type = IRUtils.ToLowerType(expr.Type);
         IRConstantInt value = new()
         {
             Value = expr.Value,
