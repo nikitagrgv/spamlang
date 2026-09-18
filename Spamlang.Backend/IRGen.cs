@@ -112,7 +112,7 @@ public class IRGen
         }
     }
 
-    private void GenStmtAssign(IRBasicBlock block, StmtAssign stmtAssign)
+    private void GenStmtAssign(IRBasicBlock block, HIRStmtAssign stmtAssign)
     {
         IRValue value = GenExprValue(block, stmtAssign.Value);
         IRValue addr = GenExprAddr(block, stmtAssign.Target);
@@ -124,12 +124,12 @@ public class IRGen
         block.Add(store);
     }
 
-    private void GenStmtExpr(IRBasicBlock block, StmtExpr stmtExpr)
+    private void GenStmtExpr(IRBasicBlock block, HIRStmtExpr stmtExpr)
     {
         GenExprValue(block, stmtExpr.Expr);
     }
 
-    private void GenStmtLet(IRBasicBlock block, StmtLet stmtLet)
+    private void GenStmtLet(IRBasicBlock block, HIRStmtLet stmtLet)
     {
         Debug.Assert(stmtLet.Symbol != null);
 
@@ -155,7 +155,7 @@ public class IRGen
         block.Add(store);
     }
 
-    private void GenStmtReturn(IRBasicBlock block, StmtReturn stmtReturn)
+    private void GenStmtReturn(IRBasicBlock block, HIRStmtReturn stmtReturn)
     {
         IRValue? value = null;
         if (stmtReturn.Expr != null)
