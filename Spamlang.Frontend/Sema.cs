@@ -768,16 +768,25 @@ public class Sema
             Error($"Invalid integer literal: {str}", expr);
         }
 
-        // TODO: Smart resolve type based on value
-        if (value > Int32.MaxValue || value < Int32.MinValue)
+        SpamType type;
+        if (value > Int64.MaxValue || value < Int64.MinValue)
         {
+            type = BuiltinType.I64;
             ErrorOutOfRange(expr.IsNegative, str, expr);
+        }
+        else if (value > Int32.MaxValue || value < Int32.MinValue)
+        {
+            type = BuiltinType.I64;
+        }
+        else
+        {
+            type = BuiltinType.I32;
         }
 
         return new HIRExprIntConst
         {
             Value = value,
-            Type = BuiltinType.I32,
+            Type = type,
             Syntax = expr,
             IsSynthesized = false,
         };
