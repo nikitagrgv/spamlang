@@ -49,16 +49,16 @@ public class HIRPrinter
                 break;
             case HIRExprLocalRef n:
                 Console.WriteLine($"{fullPrefix}");
-                PrintSymbol(depth + 1, n.Symbol, "Symbol");
+                PrintSymbol(depth + 1, n.Symbol);
                 break;
             case HIRExprFuncRef n:
                 Console.WriteLine($"{fullPrefix}");
-                PrintSymbol(depth + 1, n.Symbol, "Symbol");
+                PrintSymbol(depth + 1, n.Symbol);
                 break;
             case HIRFuncDecl n:
                 Console.WriteLine($"{fullPrefix}");
                 PrintSymbol(depth + 1, n.Symbol);
-                PrintSymbols(depth + 1, n.Locals);
+                PrintSymbols(depth + 1, n.Locals, "Local");
                 PrintHIR(depth + 1, n.Body);
                 break;
             case HIRStmtLet n:
