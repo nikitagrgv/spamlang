@@ -59,31 +59,19 @@ public class HIRPrinter
                 Console.WriteLine($"{fullPrefix}");
                 PrintSymbol(depth + 1, n.Symbol);
                 PrintSymbols(depth + 1, n.Locals, "Local");
-                PrintHIR(depth + 1, n.Body);
+                PrintHIR(depth + 1, n.Body, "Body");
                 break;
             case HIRStmtLet n:
                 Console.WriteLine($"{fullPrefix}");
-                PrintHIRToken(depth + 1, n.NameToken, "Name");
-                if (n.TypeDecl != null)
-                {
-                    PrintHIR(depth + 1, n.TypeDecl);
-                }
-
-                if (n.Expr != null)
-                {
-                    PrintHIR(depth + 1, n.Expr);
-                }
-
+                PrintSymbol(depth + 1, n.VariableSymbol, "Variable");
+                PrintHIR(depth + 1, n.Init, "Init");
                 break;
             case HIRStmtReturn n:
                 Console.WriteLine($"{fullPrefix}");
-                if (n.Value == null)
+                if (n.Value != null)
                 {
-                    break;
+                    PrintHIR(depth + 1, n.Value, "Value");
                 }
-
-                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n.Expr)}");
-                PrintHIR(depth + 1, n.Expr);
 
                 break;
             case HIRStmtAssign n:
