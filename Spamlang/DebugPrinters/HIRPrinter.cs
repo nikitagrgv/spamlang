@@ -164,17 +164,6 @@ public class HIRPrinter
         }
     }
 
-    private string TokenValue(int tokenIndex)
-    {
-        return _tokens[tokenIndex].Value(_code).ToString();
-    }
-
-    private void PrintHIRToken(int depth, int token, string name)
-    {
-        string indent = MakeIndent(depth);
-        Console.WriteLine($"{indent}{name}: \"{_tokens[token].Value(_code)}\"");
-    }
-
     private static string MakeIndent(int depth)
     {
         string indent = "";
