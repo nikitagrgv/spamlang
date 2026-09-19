@@ -83,7 +83,6 @@ public class HIRPrinter
                 Console.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Expr, "Expr");
                 break;
-
             case HIRExprBinary n:
                 Console.WriteLine($"{fullPrefix}({n.Op})");
                 PrintHIR(depth + 1, n.Left, "Left");
