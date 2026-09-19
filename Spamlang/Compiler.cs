@@ -264,10 +264,13 @@ public class Compiler
 
     private void ReportDiag(Diagnostic diag)
     {
+        Console.Error.WriteLine("Diagnostics:");
         foreach (DiagnosticEntry entry in diag.Entries)
         {
             Console.Error.WriteLine(entry.PrettyString());
         }
+
+        Console.Error.WriteLine();
     }
 
     private void PrintLexer(List<Token> tokens, string code)
