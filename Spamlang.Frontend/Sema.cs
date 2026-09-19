@@ -374,7 +374,6 @@ public class Sema
             else if (declType is FuncType)
             {
                 Error("Cannot leave variable with function type not initialized", stmt);
-                declType = BuiltinType.Error;
                 init = new HIRExprError
                 {
                     Children = [],
