@@ -363,14 +363,35 @@ public class Sema
             {
                 // Eather type or default value must be specified
                 declType = BuiltinType.Error;
+                init = new HIRExprError
+                {
+                    Children = [],
+                    Type = BuiltinType.Error,
+                    Syntax = stmt,
+                    IsSynthesized = false,
+                };
             }
-
-            init = new HIRExprZeroInit
+            else if (declType is FuncType)
             {
-                Type = declType,
-                Syntax = stmt,
-                IsSynthesized = true,
-            };
+                Error("Cannot leave variable with function type not initialized", stmt);
+                declType = BuiltinType.Error;
+                init = new HIRExprError
+                {
+                    Children = [],
+                    Type = BuiltinType.Error,
+                    Syntax = stmt,
+                    IsSynthesized = false,
+                };
+            }
+            else
+            {
+                init = new HIRExprZeroInit
+                {
+                    Type = declType,
+                    Syntax = stmt,
+                    IsSynthesized = true,
+                };
+            }
         }
 
         if (declType == null)
