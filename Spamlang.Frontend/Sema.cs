@@ -238,14 +238,14 @@ public class Sema
                     Scope scope = new(CurrentScope());
                     PushScope(scope);
 
-                    HIRBlock tb = VisitBlock(stmtBlock, allVariables, out Stmt? innerTerminator);
+                    HIRBlock tb = VisitBlock(stmtBlock, allVariables, out Stmt? innerTerm);
                     AddStatement(tb);
 
                     PopScope();
 
-                    if (innerTerminator != null && firstTerm == null)
+                    if (innerTerm != null && firstTerm == null)
                     {
-                        firstTerm = innerTerminator;
+                        firstTerm = innerTerm;
                     }
 
                     break;
