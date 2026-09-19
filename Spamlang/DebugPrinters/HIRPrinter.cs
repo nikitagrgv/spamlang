@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Spamlang.Frontend;
 
@@ -130,7 +131,7 @@ public class HIRPrinter
                 Console.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Address, "Address");
                 break;
-            default: throw new Exception("Unknown node type: " + node.GetType().Name);
+            default: throw new UnreachableException();
         }
     }
 
@@ -198,16 +199,14 @@ public class HIRPrinter
 
                 break;
             case HIRExprFuncRef e:
-                break;
+                return e.Symbol.Name;
             case HIRExprIntConst e:
-                return (e.IsNegative ? "-" : "") + TokenValue(e.LiteralToken);
+                return $"{e.Value}";
             case HIRExprLoad e:
-                break;
+                return $"LOAD({e.Address})";
             case HIRExprLocalRef e:
-                break;
-            case HIRExprIdentifier e:
-                return TokenValue(e.IdentifierToken);
-            default: throw new Exception("Unknown node type: " + expr.GetType().Name);
+                return e.Symbol.Name;
+            default: throw new UnreachableException();
         }
 
         ret.Append(')');
