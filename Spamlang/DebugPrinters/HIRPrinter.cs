@@ -35,6 +35,12 @@ public class HIRPrinter
         }
 
         fullPrefix += node.GetType().Name;
+
+        if (node.IsSynthesized)
+        {
+            fullPrefix += " [SYNTH]";
+        }
+
         if (node is HIRExpr expr)
         {
             fullPrefix += $" | Type = {expr.Type}";
