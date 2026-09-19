@@ -361,7 +361,7 @@ public class Sema
         {
             if (declType == null)
             {
-                // Eather type or default value must be specified
+                // Either type or default value must be specified
                 declType = BuiltinType.Error;
                 init = new HIRExprError
                 {
