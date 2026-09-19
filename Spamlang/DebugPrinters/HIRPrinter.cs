@@ -47,17 +47,12 @@ public class HIRPrinter
                 PrintChildrenAst(depth + 1, n.Stmts);
                 break;
             case HIRExprLocalRef n:
-                Console.WriteLine($"{fullPrefix} | IsLValue = {n.IsLValue}");
+                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n)}");
                 PrintSymbol(depth + 1, n.Symbol);
                 break;
             case HIRExprFuncRef n:
-                Console.WriteLine($"{fullPrefix}");
-                PrintChildrenAst(depth + 1, n.Params);
-                if (n.ReturnType != null)
-                {
-                    PrintHIR(depth + 1, n.ReturnType);
-                }
-
+                Console.WriteLine($"{fullPrefix} | {PrettyExpr(n)}");
+                PrintSymbol(depth + 1, n.Symbol);
                 break;
             case HIRFuncDecl n:
                 Console.WriteLine($"{fullPrefix}");
