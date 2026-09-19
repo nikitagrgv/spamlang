@@ -230,14 +230,6 @@ public class Sema
             Warning($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt.Syntax);
         }
 
-        void AddVariable(VariableSymbol variable)
-        {
-            if (firstTerm == null)
-            {
-                variables.Add(variable);
-            }
-        }
-
         foreach (Stmt stmt in block.Stmts)
         {
             switch (stmt)
@@ -268,7 +260,7 @@ public class Sema
                 case StmtLet stmtLet:
                     HIRStmtLet tsl = VisitStmtLet(stmtLet);
                     AddStatement(tsl);
-                    AddVariable(tsl.VariableSymbol);
+                    variables.Add(tsl.VariableSymbol);
                     break;
                 case StmtReturn stmtReturn:
                     HIRStmtReturn tsr = VisitStmtReturn(stmtReturn);
