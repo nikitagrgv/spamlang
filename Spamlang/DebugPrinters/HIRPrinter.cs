@@ -140,57 +140,52 @@ public class HIRPrinter
         ret.Append('(');
         switch (expr)
         {
-            case HIRExprBinary binaryExpr:
-                ret.Append(PrettyExpr(binaryExpr.Left));
+            case HIRExprBinary e:
+                ret.Append(PrettyExpr(e.Left));
                 ret.Append(' ');
-                ret.Append(TokenUtils.ToString(binaryExpr.Op));
+                ret.Append(TokenUtils.ToString(e.Op));
                 ret.Append(' ');
-                ret.Append(PrettyExpr(binaryExpr.Right));
+                ret.Append(PrettyExpr(e.Right));
                 break;
-            case HIRExprUnary unaryExpr:
-                ret.Append(TokenUtils.ToString(unaryExpr.Op));
-                ret.Append(PrettyExpr(unaryExpr.Operand));
+            case HIRExprUnary e:
+                ret.Append(TokenUtils.ToString(e.Op));
+                ret.Append(PrettyExpr(e.Operand));
                 break;
-            case HIRExprZeroInit hirExprZeroInit:
+            case HIRExprZeroInit:
+                ret.Append("{ZERO}");
                 break;
-            case HIRExprCall exprCall:
+            case HIRExprCall e:
                 ret.Clear();
-                ret.Append(PrettyExpr(exprCall.Callee));
+                ret.Append(PrettyExpr(e.Callee));
                 ret.Append('(');
-                for (int i = 0; i < exprCall.Args.Count; ++i)
+                for (int i = 0; i < e.Args.Count; ++i)
                 {
                     if (i != 0)
                     {
                         ret.Append(", ");
                     }
 
-                    CallArg arg = exprCall.Args[i];
-                    if (arg.ArgNameToken != null)
-                    {
-                        ret.Append(TokenValue(arg.ArgNameToken.Value));
-                        ret.Append(": ");
-                    }
-
-                    ret.Append(PrettyExpr(arg.Value));
+                    HIRCallArg arg = e.Args[i];
+                    ret.Append($"{arg.ParameterIndex}: {PrettyExpr(arg.Value)}");
                 }
 
                 ret.Append(')');
 
                 return ret.ToString();
-            case HIRExprCast hirExprCast:
+            case HIRExprCast e:
                 break;
-            case HIRExprError hirExprError:
+            case HIRExprError e:
                 break;
-            case HIRExprFuncRef hirExprFuncRef:
+            case HIRExprFuncRef e:
                 break;
-            case HIRExprIntConst exprInt:
-                return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
-            case HIRExprLoad hirExprLoad:
+            case HIRExprIntConst e:
+                return (e.IsNegative ? "-" : "") + TokenValue(e.LiteralToken);
+            case HIRExprLoad e:
                 break;
-            case HIRExprLocalRef hirExprLocalRef:
+            case HIRExprLocalRef e:
                 break;
-            case HIRExprIdentifier exprIdentifier:
-                return TokenValue(exprIdentifier.IdentifierToken);
+            case HIRExprIdentifier e:
+                return TokenValue(e.IdentifierToken);
             default: throw new Exception("Unknown node type: " + expr.GetType().Name);
         }
 
