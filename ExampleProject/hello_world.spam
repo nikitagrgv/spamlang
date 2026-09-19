@@ -1,5 +1,6 @@
 fn main() -> i32
 {
+    let ggs = getGetSub;
     let gs = ggs();
     let s: fn(i32, i32)->i32 = gs();
 
