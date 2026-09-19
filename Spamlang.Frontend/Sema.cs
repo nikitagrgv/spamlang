@@ -204,22 +204,34 @@ public class Sema
         };
     }
 
-    private HIRBlock VisitBlock(Block block, List<VariableSymbol> allVariables, out Stmt? terminator)
+    private HIRBlock VisitBlock(Block block, List<VariableSymbol> allVariables, out Stmt? firstTerminator)
     {
-        terminator = null;
-        bool unreachableReported = false;
-
+        Stmt? firstTerm = null;
         List<HIRStmt> stmts = new();
         List<VariableSymbol> variables = new();
-        foreach (Stmt stmt in block.Stmts)
+
+        bool unreachableReported = false;
+
+        void AddStatement(HIRStmt stmt)
         {
-            if (terminator != null && !unreachableReported)
+            if (firstTerm == null)
             {
-                unreachableReported = true;
-                Token termTok = _tokens[terminator.StartToken];
-                Warning($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt);
+                stmts.Add(stmt);
+                return;
             }
 
+            if (unreachableReported)
+            {
+                return;
+            }
+
+            unreachableReported = true;
+            Token termTok = _tokens[firstTerm.StartToken];
+            Warning($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt.Syntax);
+        }
+
+        foreach (Stmt stmt in block.Stmts)
+        {
             switch (stmt)
             {
                 case Block stmtBlock:
@@ -227,33 +239,33 @@ public class Sema
                     PushScope(scope);
 
                     HIRBlock tb = VisitBlock(stmtBlock, allVariables, out Stmt? innerTerminator);
-                    stmts.Add(tb);
+                    AddStatement(tb);
 
                     PopScope();
 
                     if (innerTerminator != null)
                     {
-                        terminator = innerTerminator;
+                        firstTerm = innerTerminator;
                     }
 
                     break;
                 case StmtAssign stmtAssign:
                     HIRStmtAssign tsa = VisitStmtAssign(stmtAssign);
-                    stmts.Add(tsa);
+                    AddStatement(tsa);
                     break;
                 case StmtExpr stmtExpr:
                     HIRStmtExpr tse = VisitStmtExpr(stmtExpr);
-                    stmts.Add(tse);
+                    AddStatement(tse);
                     break;
                 case StmtLet stmtLet:
                     HIRStmtLet tsl = VisitStmtLet(stmtLet);
-                    stmts.Add(tsl);
+                    AddStatement(tsl);
                     variables.Add(tsl.VariableSymbol);
                     break;
                 case StmtReturn stmtReturn:
                     HIRStmtReturn tsr = VisitStmtReturn(stmtReturn);
-                    stmts.Add(tsr);
-                    terminator = stmtReturn;
+                    AddStatement(tsr);
+                    firstTerm = stmtReturn;
                     break;
                 default:
                     throw new UnreachableException();
@@ -261,6 +273,7 @@ public class Sema
         }
 
         allVariables.AddRange(variables);
+        firstTerminator = firstTerm;
         return new HIRBlock
         {
             Variables = variables,

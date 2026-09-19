@@ -3,6 +3,13 @@ using Spamlang.Frontend;
 
 namespace Spamlang.Backend;
 
+public class InvalidHIRException : Exception
+{
+    public InvalidHIRException(string message) : base(message)
+    {
+    }
+}
+
 public class IRGen
 {
     private readonly List<Dictionary<Symbol, IRValue>> _symbolScopes = new();
@@ -79,7 +86,10 @@ public class IRGen
             entry.Add(ret);
         }
 
-        Debug.Assert(entry.Terminator != null);
+        if (entry.Terminator == null)
+        {
+            throw new InvalidHIRException("Non void function must have a return statement at the end");
+        }
 
         PopSymScope();
     }
@@ -179,9 +189,9 @@ public class IRGen
             case HIRExprZeroInit hirExprZeroInit:
                 return GenExprZeroInitValue(hirExprZeroInit);
             case HIRExprLocalRef:
-                throw new Exception($"Unexpected {nameof(HIRExprLocalRef)}. Must be loaded");
+                throw new InvalidHIRException($"Unexpected {nameof(HIRExprLocalRef)}. Must be loaded");
             case HIRExprError:
-                throw new Exception("Backend mustn't be run on errors");
+                throw new InvalidHIRException("Backend mustn't be run on errors");
             default:
                 throw new UnreachableException();
         }

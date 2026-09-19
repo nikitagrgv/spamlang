@@ -17,6 +17,7 @@ fn main() -> i32
 fn sub(a: i32, b: i32) -> i32
 {
     return a - b;
+    let abb = 123;
 }
 
 fn getSub() -> fn(i32, i32) -> i32
