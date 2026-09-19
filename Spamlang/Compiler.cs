@@ -74,8 +74,8 @@ public class Compiler
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Internal error (frontend): {e}");
-            throw;
+            Console.Error.WriteLine($"Internal error (frontend): {e}");
+            return false;
         }
 
         PrintLexer(frontendResult.Tokens, code);
@@ -96,8 +96,8 @@ public class Compiler
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Internal error (backend): {e}");
-            throw;
+            Console.Error.WriteLine($"Internal error (backend): {e}");
+            return false;
         }
 
         PrintIR(backendResult.IRModule);
