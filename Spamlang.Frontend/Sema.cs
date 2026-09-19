@@ -243,7 +243,7 @@ public class Sema
 
                     PopScope();
 
-                    if (innerTerminator != null)
+                    if (innerTerminator != null && firstTerm == null)
                     {
                         firstTerm = innerTerminator;
                     }
