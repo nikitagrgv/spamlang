@@ -35,6 +35,10 @@ public class HIRPrinter
         }
 
         fullPrefix += node.GetType().Name;
+        if (node is HIRExpr expr)
+        {
+            fullPrefix += $" | Type = {expr.Type}";
+        }
 
         switch (node)
         {
@@ -84,16 +88,16 @@ public class HIRPrinter
                 PrintHIR(depth + 1, n.Expr, "Expr");
                 break;
             case HIRExprBinary n:
-                Console.WriteLine($"{fullPrefix}({n.Op})");
+                Console.WriteLine($"{fullPrefix} | Op = {n.Op}");
                 PrintHIR(depth + 1, n.Left, "Left");
                 PrintHIR(depth + 1, n.Right, "Right");
                 break;
             case HIRExprUnary n:
-                Console.WriteLine($"{fullPrefix}({n.Op})");
+                Console.WriteLine($"{fullPrefix} | Op = {n.Op}");
                 PrintHIR(depth + 1, n.Operand, "Operand");
                 break;
             case HIRExprZeroInit n:
-                Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
+                Console.WriteLine($"{fullPrefix}");
                 break;
             case HIRExprCall n:
                 Console.WriteLine($"{fullPrefix}");
@@ -101,11 +105,11 @@ public class HIRPrinter
                 PrintChildren(depth + 1, n.Args);
                 break;
             case HIRExprCast n:
-                Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
+                Console.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Value, "Value");
                 break;
             case HIRExprError n:
-                Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
+                Console.WriteLine($"{fullPrefix}");
                 PrintChildren(depth + 1, n.Children);
                 break;
             case HIRCallArg n:
@@ -113,10 +117,10 @@ public class HIRPrinter
                 PrintHIR(depth + 1, n.Value, "Value");
                 break;
             case HIRExprIntConst n:
-                Console.WriteLine($"{fullPrefix}: {n.Type.Name} | Value = {n.Value}");
+                Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
                 break;
             case HIRExprLoad n:
-                Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
+                Console.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Address, "Address");
                 break;
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
