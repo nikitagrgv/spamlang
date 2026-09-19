@@ -194,7 +194,7 @@ public class HIRPrinter
             case HIRExprIntConst e:
                 return $"{e.Value}";
             case HIRExprLoad e:
-                return $"LOAD({e.Address})";
+                return $"LOAD({PrettyExpr(e.Address)})";
             case HIRExprLocalRef e:
                 return e.Symbol.Name;
             default: throw new UnreachableException();
