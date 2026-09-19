@@ -135,7 +135,7 @@ public class HIRPrinter
             prefix += "Symbol";
         }
 
-        Console.WriteLine($"{prefix}: {sym.Name}");
+        Console.WriteLine($"{prefix}: {sym.Name} ({sym.Type})");
     }
 
     private void PrintSymbols(int depth, IReadOnlyList<Symbol> symbols, string name = "")
