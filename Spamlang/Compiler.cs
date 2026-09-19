@@ -264,6 +264,11 @@ public class Compiler
 
     private void ReportDiag(Diagnostic diag)
     {
+        if (diag.Entries.Count == 0)
+        {
+            return;
+        }
+
         Console.Error.WriteLine();
         foreach (DiagnosticEntry entry in diag.Entries)
         {
