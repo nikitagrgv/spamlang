@@ -67,7 +67,16 @@ public class Compiler
         Diagnostic diag = new();
         TypeRegistry typeRegistry = new();
 
-        Frontend.Frontend.Result frontendResult = Frontend.Frontend.Run(code, typeRegistry, diag, timers);
+        Frontend.Frontend.Result frontendResult;
+        try
+        {
+            frontendResult = Frontend.Frontend.Run(code, typeRegistry, diag, timers);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Internal error (frontend): {e}");
+            throw;
+        }
 
         PrintLexer(frontendResult.Tokens, code);
         PrintLexerPretty(frontendResult.Tokens, code);
@@ -80,7 +89,16 @@ public class Compiler
             return false;
         }
 
-        Backend.Backend.Result backendResult = Backend.Backend.Run(frontendResult.HIRCompilationUnit, typeRegistry, timers);
+        Backend.Backend.Result backendResult;
+        try
+        {
+            backendResult = Backend.Backend.Run(frontendResult.HIRCompilationUnit, typeRegistry, timers);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Internal error (backend): {e}");
+            throw;
+        }
 
         PrintIR(backendResult.IRModule);
         PrintMIR(backendResult.MModule);
