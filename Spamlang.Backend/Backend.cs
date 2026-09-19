@@ -6,11 +6,11 @@ public class Backend
 {
     public struct Result
     {
-        public IRModule IRModule { get; init; }
-        public MModule MModule { get; init; }
+        public required IRModule IRModule { get; init; }
+        public required MModule MModule { get; init; }
     }
 
-    public static Result Run(CompilationUnit compilationUnit, TypeRegistry typeRegistry, Timers? timers)
+    public static Result Run(HIRCompilationUnit compilationUnit, TypeRegistry typeRegistry, Timers? timers)
     {
         timers?.RestartTimer();
         IRGen irGen = new(typeRegistry);

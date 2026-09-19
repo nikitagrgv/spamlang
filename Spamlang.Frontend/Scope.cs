@@ -13,6 +13,25 @@ public class Scope
         _lookup = _symbols.GetAlternateLookup<ReadOnlySpan<char>>();
     }
 
+    public Symbol? LookupAny(ReadOnlySpan<char> name, out bool isLocal)
+    {
+        _lookup.TryGetValue(name, out Symbol? symbol);
+        if (symbol != null)
+        {
+            isLocal = true;
+            return symbol;
+        }
+
+        if (Parent == null)
+        {
+            isLocal = false;
+            return null;
+        }
+
+        isLocal = false;
+        return Parent.LookupRecursive(name);
+    }
+
     public Symbol? LookupLocal(ReadOnlySpan<char> name)
     {
         _lookup.TryGetValue(name, out Symbol? symbol);

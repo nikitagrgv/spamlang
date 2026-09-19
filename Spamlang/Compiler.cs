@@ -14,6 +14,7 @@ public class Compiler
         public required bool DebugLexer = false;
         public required bool DebugLexerPretty = false;
         public required bool DebugParser = false;
+        public required bool DebugHIR = false;
         public required bool DebugIR = false;
         public required bool DebugMIR = false;
         public required bool DebugTimer = false;
@@ -66,11 +67,21 @@ public class Compiler
         Diagnostic diag = new();
         TypeRegistry typeRegistry = new();
 
-        Frontend.Frontend.Result frontendResult = Frontend.Frontend.Run(code, typeRegistry, diag, timers);
+        Frontend.Frontend.Result frontendResult;
+        try
+        {
+            frontendResult = Frontend.Frontend.Run(code, typeRegistry, diag, timers);
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine($"Internal error (frontend): {e}");
+            return false;
+        }
 
         PrintLexer(frontendResult.Tokens, code);
         PrintLexerPretty(frontendResult.Tokens, code);
         PrintAst(frontendResult.Tokens, code, frontendResult.CompilationUnit);
+        PrintHIR(frontendResult.HIRCompilationUnit);
 
         if (diag.HasErrors)
         {
@@ -78,7 +89,16 @@ public class Compiler
             return false;
         }
 
-        Backend.Backend.Result backendResult = Backend.Backend.Run(frontendResult.CompilationUnit, typeRegistry, timers);
+        Backend.Backend.Result backendResult;
+        try
+        {
+            backendResult = Backend.Backend.Run(frontendResult.HIRCompilationUnit, typeRegistry, timers);
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine($"Internal error (backend): {e}");
+            return false;
+        }
 
         PrintIR(backendResult.IRModule);
         PrintMIR(backendResult.MModule);
@@ -262,10 +282,18 @@ public class Compiler
 
     private void ReportDiag(Diagnostic diag)
     {
+        if (diag.Entries.Count == 0)
+        {
+            return;
+        }
+
+        Console.Error.WriteLine();
         foreach (DiagnosticEntry entry in diag.Entries)
         {
             Console.Error.WriteLine(entry.PrettyString());
         }
+
+        Console.Error.WriteLine();
     }
 
     private void PrintLexer(List<Token> tokens, string code)
@@ -297,6 +325,17 @@ public class Compiler
             PrintSeparator();
         }
     }
+
+    private void PrintHIR(HIRCompilationUnit compilationUnit)
+    {
+        if (_flags.DebugHIR)
+        {
+            PrintSeparator();
+            HIRPrinter.Print(compilationUnit);
+            PrintSeparator();
+        }
+    }
+
 
     private void PrintIR(IRModule irModule)
     {

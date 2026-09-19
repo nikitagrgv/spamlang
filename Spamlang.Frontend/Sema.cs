@@ -8,8 +8,10 @@ public class Sema
     private readonly Diagnostic _diag;
     private readonly IReadOnlyList<Token> _tokens;
     private readonly List<Scope> _scopes = new(); // TODO: Do we need list? Or just current scope?
-    private readonly List<FuncSymbol> _funcStack = new();
     private readonly TypeRegistry _typeRegistry;
+
+    // For local functions (declared inside functions)
+    private readonly List<FuncSymbol> _funcStack = new();
 
     // Optional, for LSP Server
     private Dictionary<int, Symbol>? _tokenToSymbol = null;
@@ -22,35 +24,104 @@ public class Sema
         _typeRegistry = typeRegistry;
     }
 
-    public void Run(CompilationUnit unit, Dictionary<int, Symbol>? outTokenToSymbol = null)
+    public HIRCompilationUnit Run(CompilationUnit unit, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
         _tokenToSymbol = outTokenToSymbol;
 
-        Scope scope = new(null);
-        unit.Scope = scope;
+        Scope scope = new(parent: null);
         PushScope(scope);
 
-        RegisterBuiltin(scope);
+        RegisterBuiltinTypeSymbols();
+        List<FuncSymbol> funcSymbols = RegisterFunctionSymbols(unit);
+        HIRCompilationUnit compUnit = VisitCompilationUnit(unit, funcSymbols);
+        CheckMain();
 
-        RegisterFunctionSymbols(unit);
-
-        VisitCompilationUnit(unit);
-
-        CheckMain(unit);
+        PopScope();
 
         _tokenToSymbol = null;
+        return compUnit;
     }
 
-    private void CheckMain(CompilationUnit unit)
+    private void RegisterBuiltinTypeSymbols()
+    {
+        void Register(string name, SpamType type)
+        {
+            TypeSymbol symbol = new()
+            {
+                Name = name,
+                SymbolType = type,
+            };
+            bool added = CurrentScope().TryDeclare(symbol);
+            Debug.Assert(added);
+        }
+
+        Register("i32", BuiltinType.I32);
+    }
+
+    private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
+    {
+        List<FuncSymbol> symbols = new();
+        foreach (FuncDecl fd in unit.FuncDecls)
+        {
+            FuncSymbol sym = RegisterFunctionSymbol(fd);
+            symbols.Add(sym);
+        }
+
+        return symbols;
+    }
+
+    private FuncSymbol RegisterFunctionSymbol(FuncDecl fd)
+    {
+        SpamType returnType = BuiltinType.Void;
+        if (fd.ReturnType != null)
+        {
+            SpamType type = ResolveType(fd.ReturnType);
+            returnType = type;
+        }
+
+        // TODO: Reuse list
+        List<SpamType> paramTypes = new();
+        List<ParamSymbol> paramSymbols = new();
+        foreach (Param param in fd.Params)
+        {
+            SpamType type = ResolveType(param.Type);
+            ParamSymbol sym = new()
+            {
+                Declaration = param,
+                Name = GetTokenValue(param.NameToken).ToString(),
+                ParamType = type,
+            };
+            // NOTE: Don't register param symbol right now, do this in function scope!  
+            // RegisterSymbol(sym);
+            RegisterTokenAsSymbol(param.NameToken, sym);
+            paramTypes.Add(type);
+            paramSymbols.Add(sym);
+        }
+
+        FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
+        FuncSymbol funcSym = new()
+        {
+            Declaration = fd,
+            FuncType = funcType,
+            Name = GetTokenValue(fd.NameToken).ToString(),
+            Params = paramSymbols,
+        };
+
+        RegisterSymbol(funcSym);
+        RegisterTokenAsSymbol(fd.NameToken, funcSym);
+
+        return funcSym;
+    }
+
+    private void CheckMain()
     {
         // TODO: Make it optional
 
-        Debug.Assert(unit.Scope != null);
-
-        Symbol? sym = unit.Scope.LookupLocal("main");
+        string main = "main";
+        Symbol? sym = CurrentScope().LookupLocal(main);
         if (sym == null)
         {
-            Error("\"main\" function not found", unit);
+            Error($"\"{main}\" function not found");
             return;
         }
 
@@ -60,173 +131,199 @@ public class Sema
         FuncSymbol? mainSym = sym as FuncSymbol;
         if (mainSym == null)
         {
-            Error($"\"main\" must be a function, got {sym.SymbolKindName}", mainDecl);
+            Error($"\"{main}\" must be a function, got {sym.SymbolKindName}", mainDecl);
             return;
         }
 
-        FuncType mainFunc = (FuncType)mainSym.Type;
+        FuncType mainFunc = mainSym.FuncType;
         if (mainFunc.ReturnType != BuiltinType.I32)
         {
             // TODO: Allow void
-            Error($"\"main\" must return i32, got {mainFunc.ReturnType}", mainDecl);
+            Error($"\"{main}\" must return i32, got {mainFunc.ReturnType}", mainDecl);
             return;
         }
 
         if (mainFunc.ParamTypes.Count > 0)
         {
             // TODO: Implement argc,argv
-            Error($"\"main\" must have 0 params, got {mainFunc.ParamTypes.Count}", mainDecl);
+            Error($"\"{main}\" must have 0 params, got {mainFunc.ParamTypes.Count}", mainDecl);
             return;
         }
     }
 
-    private void VisitCompilationUnit(CompilationUnit unit)
+    private HIRCompilationUnit VisitCompilationUnit(CompilationUnit unit, List<FuncSymbol> funcSymbols)
     {
-        foreach (FuncDecl fd in unit.FuncDecls)
+        Debug.Assert(funcSymbols.Count == unit.FuncDecls.Count);
+
+        List<HIRFuncDecl> functions = new();
+        for (int i = 0; i < unit.FuncDecls.Count; i++)
         {
-            VisitFuncDecl(fd);
+            FuncDecl fd = unit.FuncDecls[i];
+            FuncSymbol funcSym = funcSymbols[i];
+            HIRFuncDecl tfd = VisitFuncDecl(fd, funcSym);
+            functions.Add(tfd);
         }
+
+        return new HIRCompilationUnit
+        {
+            FuncDecls = functions,
+            Syntax = unit,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitFuncDecl(FuncDecl fd)
+    private HIRFuncDecl VisitFuncDecl(FuncDecl fd, FuncSymbol funcSym)
     {
-        Debug.Assert(fd.Symbol != null, $"Must be registered in {nameof(RegisterFunctionSymbols)}");
-        Debug.Assert(fd.ReturnType == null || fd.ReturnType.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
-
-        _funcStack.Add(fd.Symbol);
-
         Scope scope = new(CurrentScope());
+        PushFunc(funcSym);
         PushScope(scope);
 
-        foreach (Param param in fd.Params)
+        foreach (ParamSymbol paramSymbol in funcSym.Params)
         {
-            Debug.Assert(param.Type.ResolvedType != null, $"Must be resolved in {nameof(RegisterFunctionSymbols)}");
-
-            SpamType type = param.Type.ResolvedType;
-            ReadOnlySpan<char> name = GetTokenValue(param.NameToken);
-
-            ParamSymbol sym = new()
-            {
-                Declaration = param,
-                DeclaringScope = scope,
-                Type = type,
-                Name = name.ToString(),
-            };
-
-            param.Symbol = sym;
-            RegisterSymbol(sym);
-            RegisterTokenAsSymbol(param.NameToken, sym);
+            RegisterSymbol(paramSymbol);
         }
 
-        fd.Body.Scope = scope;
-        VisitBlock(fd.Body, out Stmt? terminator);
+        List<VariableSymbol> allVariables = new();
+        HIRBlock body = VisitBlock(fd.Body, allVariables, out Stmt? terminator);
 
-        FuncType funcType = (FuncType)fd.Symbol.Type;
-        if (funcType.ReturnType != BuiltinType.Void && terminator == null)
+        if (funcSym.FuncType.ReturnType != BuiltinType.Void && terminator == null)
         {
-            _diag.AddError($"No return statement on the end of function \"{fd.Symbol.Name}\"", _tokens[fd.EndToken]);
+            Error($"No return statement at the end of function \"{funcSym.Name}\"", fd.EndToken);
         }
 
         PopScope();
+        PopFunc();
 
-        Debug.Assert(_funcStack[^1] == fd.Symbol);
-        _funcStack.RemoveAt(_funcStack.Count - 1);
+        return new HIRFuncDecl
+        {
+            Body = body,
+            Symbol = funcSym,
+            Locals = allVariables,
+            Syntax = fd,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitBlock(Block block, out Stmt? terminator)
+    private HIRBlock VisitBlock(Block block, List<VariableSymbol> allVariables, out Stmt? firstTerminator)
     {
-        Debug.Assert(block.Scope != null, "Block scope must be set from outside");
+        Stmt? firstTerm = null;
+        List<HIRStmt> stmts = new();
+        List<VariableSymbol> variables = new();
 
-        terminator = null;
         bool unreachableReported = false;
+
+        void AddStatement(HIRStmt stmt)
+        {
+            if (firstTerm == null)
+            {
+                stmts.Add(stmt);
+                return;
+            }
+
+            if (unreachableReported)
+            {
+                return;
+            }
+
+            unreachableReported = true;
+            Token termTok = _tokens[firstTerm.StartToken];
+            Warning($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt.Syntax);
+        }
+
         foreach (Stmt stmt in block.Stmts)
         {
-            if (terminator != null && !unreachableReported)
-            {
-                unreachableReported = true;
-                Token termTok = _tokens[terminator.StartToken];
-                Warning($"Unreachable code, terminated at {termTok.Line}:{termTok.Column}", stmt);
-            }
-
             switch (stmt)
             {
-                case Block b:
+                case Block stmtBlock:
                     Scope scope = new(CurrentScope());
-                    b.Scope = scope;
                     PushScope(scope);
-                    VisitBlock(b, out Stmt? innerTerminator);
 
-                    if (innerTerminator != null)
-                    {
-                        terminator = innerTerminator;
-                    }
+                    HIRBlock tb = VisitBlock(stmtBlock, allVariables, out Stmt? innerTerm);
+                    AddStatement(tb);
 
                     PopScope();
+
+                    if (innerTerm != null && firstTerm == null)
+                    {
+                        firstTerm = innerTerm;
+                    }
+
                     break;
                 case StmtAssign stmtAssign:
-                    VisitStmtAssign(stmtAssign);
+                    HIRStmtAssign tsa = VisitStmtAssign(stmtAssign);
+                    AddStatement(tsa);
                     break;
                 case StmtExpr stmtExpr:
-                    VisitStmtExpr(stmtExpr);
+                    HIRStmtExpr tse = VisitStmtExpr(stmtExpr);
+                    AddStatement(tse);
                     break;
                 case StmtLet stmtLet:
-                    VisitStmtLet(stmtLet);
+                    HIRStmtLet tsl = VisitStmtLet(stmtLet);
+                    AddStatement(tsl);
+                    variables.Add(tsl.VariableSymbol);
                     break;
                 case StmtReturn stmtReturn:
-                    VisitStmtReturn(stmtReturn);
-                    terminator = stmtReturn;
+                    HIRStmtReturn tsr = VisitStmtReturn(stmtReturn);
+                    AddStatement(tsr);
+                    if (firstTerm == null)
+                    {
+                        firstTerm = stmtReturn;
+                    }
+
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(stmt));
+                    throw new UnreachableException();
             }
         }
+
+        allVariables.AddRange(variables);
+        firstTerminator = firstTerm;
+        return new HIRBlock
+        {
+            Variables = variables,
+            Stmts = stmts,
+            Syntax = block,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitStmtAssign(StmtAssign stmt)
+    private HIRStmtAssign VisitStmtAssign(StmtAssign stmt)
     {
-        // TODO: Add assignable check (const), make functions lvalue
-
-        VisitExpr(stmt.Target);
-        VisitExpr(stmt.Value);
-
-        Debug.Assert(stmt.Target.ResolvedType != null);
-        Debug.Assert(stmt.Value.ResolvedType != null);
-
-        if (stmt.Target.ResolvedType == BuiltinType.Error)
-        {
-            // Already reported
-            return;
-        }
-
-        if (stmt.Target.ValueCategory != ValueCategory.LValue)
+        HIRExpr target = VisitExpr(stmt.Target);
+        if (target.Type != BuiltinType.Error && !target.IsLValue)
         {
             Error("Only lvalue can be used as assignment target", stmt.Target);
-            return;
         }
 
-        SpamType targetType = stmt.Target.ResolvedType;
-        SpamType valueType = stmt.Value.ResolvedType;
+        HIRExpr value = VisitExpr(stmt.Value);
+        value = ToRValue(value);
+        value = Adapt(value, target.Type);
 
-        if (valueType == BuiltinType.Error)
+        return new HIRStmtAssign
         {
-            // Already reported
-            return;
-        }
-
-        stmt.Value = Adapt(stmt.Value, targetType);
+            Target = target,
+            Value = value,
+            Syntax = stmt,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitStmtExpr(StmtExpr stmt)
+    private HIRStmtExpr VisitStmtExpr(StmtExpr stmt)
     {
-        VisitExpr(stmt.Expr);
+        HIRExpr expr = VisitExpr(stmt.Expr);
+        expr = ToRValue(expr);
+        return new HIRStmtExpr
+        {
+            Expr = expr,
+            Syntax = stmt,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitStmtLet(StmtLet stmt)
+    private HIRStmtLet VisitStmtLet(StmtLet stmt)
     {
         // NOTE: Uninit is ok, defaults to zero
-        // NOTE: Variable of function type can be uninitialized too, but we don't care
-
-        Debug.Assert(stmt.Expr != null || stmt.TypeDecl != null, "Must be guaranteed by parser");
+        // TODO: Variable of function type can be uninitialized, bad
 
         ReadOnlySpan<char> name = GetTokenValue(stmt.NameToken);
 
@@ -236,12 +333,12 @@ public class Sema
             declType = ResolveType(stmt.TypeDecl);
         }
 
+        HIRExpr init;
         if (stmt.Expr != null)
         {
-            VisitExpr(stmt.Expr);
-            Debug.Assert(stmt.Expr.ResolvedType != null);
-            SpamType exprType = stmt.Expr.ResolvedType;
-            if (exprType == BuiltinType.Void)
+            init = VisitExpr(stmt.Expr);
+            init = ToRValue(init);
+            if (init.Type == BuiltinType.Void)
             {
                 string message = $"Cannot assign variable \"{name}\" to void";
                 if (declType != null)
@@ -253,17 +350,52 @@ public class Sema
             }
             else if (declType != null)
             {
-                stmt.Expr = Adapt(stmt.Expr, declType);
+                init = Adapt(init, declType);
             }
             else
             {
-                declType = exprType;
+                declType = init.Type;
+            }
+        }
+        else
+        {
+            if (declType == null)
+            {
+                // Either type or default value must be specified
+                declType = BuiltinType.Error;
+                init = new HIRExprError
+                {
+                    Children = [],
+                    Type = BuiltinType.Error,
+                    Syntax = stmt,
+                    IsSynthesized = true,
+                };
+            }
+            else if (declType is FuncType)
+            {
+                Error("Cannot leave variable with function type not initialized", stmt);
+                init = new HIRExprError
+                {
+                    Children = [],
+                    Type = BuiltinType.Error,
+                    Syntax = stmt,
+                    IsSynthesized = true,
+                };
+            }
+            else
+            {
+                init = new HIRExprZeroInit
+                {
+                    Type = declType,
+                    Syntax = stmt,
+                    IsSynthesized = true,
+                };
             }
         }
 
         if (declType == null)
         {
-            // Already reported above
+            // Already reported
             declType = BuiltinType.Error;
         }
 
@@ -271,201 +403,183 @@ public class Sema
         {
             Declaration = stmt,
             Name = name.ToString(),
-            DeclaringScope = CurrentScope(),
-            Type = declType,
+            VariableType = declType,
         };
 
-        stmt.Symbol = sym;
         RegisterSymbol(sym);
         RegisterTokenAsSymbol(stmt.NameToken, sym);
+
+        return new HIRStmtLet
+        {
+            VariableSymbol = sym,
+            Init = init,
+            Syntax = stmt,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitStmtReturn(StmtReturn stmt)
+    private HIRStmtReturn VisitStmtReturn(StmtReturn stmt)
     {
-        Debug.Assert(_funcStack.Count > 0);
-
-        if (stmt.Expr != null)
-        {
-            VisitExpr(stmt.Expr);
-        }
-
-        FuncSymbol currentFunc = _funcStack[^1];
-        FuncType funcType = (FuncType)currentFunc.Type;
+        FuncSymbol currentFunc = CurrentFunc();
+        FuncType funcType = currentFunc.FuncType;
         SpamType returnType = funcType.ReturnType;
 
-        if (returnType == BuiltinType.Error)
+        if (returnType == BuiltinType.Void && stmt.Expr != null)
         {
-            // Already reported
-            return;
+            Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" returns void", stmt);
         }
 
-        if (returnType == BuiltinType.Void)
-        {
-            if (stmt.Expr != null)
-            {
-                Error($"Unexpected expression in return statement. Function \"{currentFunc.Name}\" returns void",
-                    stmt);
-            }
-
-            return;
-        }
-
-        if (stmt.Expr == null)
+        if (returnType != BuiltinType.Void && stmt.Expr == null)
         {
             Error($"Function \"{currentFunc.Name}\" must return value", stmt);
-            return;
         }
 
-        stmt.Expr = Adapt(stmt.Expr, returnType);
+        HIRExpr? expr = null;
+        if (stmt.Expr != null)
+        {
+            expr = VisitExpr(stmt.Expr);
+            expr = ToRValue(expr);
+            if (returnType != BuiltinType.Void)
+            {
+                expr = Adapt(expr, returnType);
+            }
+        }
+
+        return new HIRStmtReturn
+        {
+            Value = expr,
+            Syntax = stmt,
+            IsSynthesized = false,
+        };
     }
 
-    private void VisitExpr(Expr expr)
+    private HIRExpr VisitExpr(Expr expr)
     {
         switch (expr)
         {
             case ExprBinary exprBinary:
-                VisitExprBinary(exprBinary);
-                break;
+                return VisitExprBinary(exprBinary);
             case ExprCall exprCall:
-                VisitExprCall(exprCall);
-                break;
+                return VisitExprCall(exprCall);
             case ExprIdentifier exprIdentifier:
-                VisitExprIdentifier(exprIdentifier);
-                break;
-            case ExprInt exprInt:
-                VisitExprInt(exprInt);
-                break;
+                return VisitExprIdentifier(exprIdentifier);
+            case ExprIntConst exprInt:
+                return VisitExprIntConst(exprInt);
             case ExprUnary exprUnary:
-                VisitExprUnary(exprUnary);
-                break;
+                return VisitExprUnary(exprUnary);
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
-
-        Debug.Assert(expr.ResolvedType != null);
-        Debug.Assert(expr.ValueCategory != null);
     }
 
-    private void VisitExprBinary(ExprBinary expr)
+    private HIRExprBinary VisitExprBinary(ExprBinary expr)
     {
-        expr.ValueCategory = ValueCategory.RValue;
+        HIRExpr left = VisitExpr(expr.Left);
+        HIRExpr right = VisitExpr(expr.Right);
 
-        VisitExpr(expr.Left);
-        VisitExpr(expr.Right);
+        left = ToRValue(left);
+        right = ToRValue(right);
 
-        Debug.Assert(expr.Left.ResolvedType != null);
-        Debug.Assert(expr.Right.ResolvedType != null);
+        SpamType leftType = left.Type;
+        SpamType rightType = right.Type;
 
-        SpamType leftType = expr.Left.ResolvedType;
-        SpamType rightType = expr.Right.ResolvedType;
-
+        SpamType? commonType;
         if (leftType == BuiltinType.Error || rightType == BuiltinType.Error)
         {
-            // Already reported
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            commonType = BuiltinType.Error;
         }
-
-        SpamType? commonType = GetBinaryResultType(leftType, rightType, expr.Op);
-        if (commonType == null)
+        else
         {
-            Error($"Cannot use \"{TokenUtils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
-        }
-
-        expr.Left = Adapt(expr.Left, commonType);
-        expr.Right = Adapt(expr.Right, commonType);
-        expr.ResolvedType = commonType;
-    }
-
-    private void VisitExprCall(ExprCall expr)
-    {
-        // TODO: Support default parameters
-
-        expr.ValueCategory = ValueCategory.RValue;
-
-        VisitExpr(expr.Callee);
-        foreach (ExprCallArg arg in expr.Args)
-        {
-            VisitExpr(arg.Expr);
-        }
-
-        if (expr.Callee.ResolvedType == BuiltinType.Error)
-        {
-            // Already reported
-            expr.ResolvedType = BuiltinType.Error;
-            return;
-        }
-
-        if (expr.Callee.ResolvedType is not FuncType funcType)
-        {
-            Error("Cannot call a non-function type", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
-        }
-
-        // Can be null if call is indirect (e.g. via variable or expr)
-        FuncDecl? funcDecl = null;
-        if (expr.Callee is ExprIdentifier callee)
-        {
-            Debug.Assert(callee.Symbol != null, "ResolvedType is OK, so symbol must be valid");
-
-            // NOTE: Callee identifier is not always a FuncSymbol! E.g. variable with a pointer to function
-            // Don't emit error for this!
-            if (callee.Symbol is FuncSymbol funcSym)
+            commonType = GetBinaryResultType(leftType, rightType, expr.Op);
+            if (commonType == null)
             {
-                funcDecl = funcSym.Declaration;
-                Debug.Assert(funcDecl.Symbol == funcSym);
+                Error($"Cannot use \"{TokenUtils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
+                commonType = BuiltinType.Error;
             }
         }
 
-        IReadOnlyList<SpamType> funcParams = funcType.ParamTypes;
-        List<ExprCallArg> args = expr.Args;
-        bool[] usedParams = new bool[funcParams.Count];
-        bool hasUnorderedNamedArgs = false;
+        left = Adapt(left, commonType);
+        right = Adapt(right, commonType);
+        return new HIRExprBinary
+        {
+            Left = left,
+            Right = right,
+            Op = expr.Op,
+            Type = commonType,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
+    }
 
+    private HIRExpr VisitExprCall(ExprCall expr)
+    {
+        // TODO: Support default parameters
+
+        List<HIRCallArg> hirArgs = new();
+
+        HIRExpr callee = VisitExpr(expr.Callee);
+        callee = ToRValue(callee);
+
+        if (callee.Type == BuiltinType.Error)
+        {
+            return ErrorCall(expr, callee, hirArgs);
+        }
+
+        if (callee.Type is not FuncType funcType)
+        {
+            Error("Cannot call a non-function type", expr);
+            return ErrorCall(expr, callee, hirArgs);
+        }
+
+        // Can be null if the call is indirect (via variable or expr)
+        FuncSymbol? funcSymbol = null;
+        if (callee is HIRExprFuncRef funcRef)
+        {
+            funcSymbol = funcRef.Symbol;
+            Debug.Assert(funcSymbol.Params.Count == funcType.ParamTypes.Count);
+        }
+
+        IReadOnlyList<SpamType> funcParams = funcType.ParamTypes;
+        IReadOnlyList<CallArg> args = expr.Args;
         if (args.Count > funcParams.Count)
         {
             string str = "Function ";
-            if (funcDecl != null)
+            if (funcSymbol != null)
             {
-                str += $"\"{GetTokenValue(funcDecl.NameToken)}\" ";
+                str += $"\"{funcSymbol.Name}\" ";
             }
 
             str += $"accepts {funcParams.Count} arguments, got {args.Count}";
             Error(str, expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            return ErrorCall(expr, callee, hirArgs);
         }
 
+        bool[] usedParams = new bool[funcParams.Count];
+        bool hasUnorderedNamedArgs = false;
         for (int i = 0; i < args.Count; ++i)
         {
-            ExprCallArg arg = args[i];
+            CallArg arg = args[i];
             if (hasUnorderedNamedArgs && arg.ArgNameToken == null)
             {
                 Error("Cannot use positional arguments after named arguments in changed order", arg);
-                expr.ResolvedType = BuiltinType.Error;
-                return;
+                return ErrorCall(expr, callee, hirArgs);
             }
 
             int paramIndex = i;
             if (arg.ArgNameToken != null)
             {
-                if (funcDecl == null)
+                if (funcSymbol == null)
                 {
                     Error("Cannot use named arguments with indirect calls", arg);
-                    expr.ResolvedType = BuiltinType.Error;
-                    return;
+                    return ErrorCall(expr, callee, hirArgs);
                 }
 
                 ReadOnlySpan<char> argName = GetTokenValue(arg.ArgNameToken.Value);
-                paramIndex = FindParamIndexByName(funcDecl, argName);
+                paramIndex = FindParamIndexByName(funcSymbol, argName);
                 if (paramIndex == -1)
                 {
-                    Error($"Function \"{funcDecl.Symbol!.Name}\" doesn't have parameter with name \"{argName}\"", arg);
-                    expr.ResolvedType = BuiltinType.Error;
-                    return;
+                    Error($"Function \"{funcSymbol.Name}\" doesn't have parameter with name \"{argName}\"", arg);
+                    return ErrorCall(expr, callee, hirArgs);
                 }
 
                 hasUnorderedNamedArgs |= paramIndex != i;
@@ -474,60 +588,100 @@ public class Sema
             if (usedParams[paramIndex])
             {
                 string err = $"Parameter {paramIndex + 1} ";
-                if (funcDecl != null)
+                if (funcSymbol != null)
                 {
-                    err += $"({GetTokenValue(funcDecl.Params[paramIndex].NameToken)}) ";
+                    err += $"({funcSymbol.Params[paramIndex].Name}) ";
                 }
 
-                err += "is specified twice";
+                err += "is already specified";
 
                 Error(err, arg);
-                expr.ResolvedType = BuiltinType.Error;
-                return;
+                return ErrorCall(expr, callee, hirArgs);
             }
 
             usedParams[paramIndex] = true;
 
             SpamType paramType = funcParams[paramIndex];
+            HIRExpr argExpr = VisitExpr(arg.Value);
+            argExpr = ToRValue(argExpr);
+            argExpr = Adapt(argExpr, paramType);
 
-            Debug.Assert(paramType != null, "Must be already resolved");
-            Debug.Assert(arg.Expr.ResolvedType != null, "Must be resolved above");
-
-            arg.ParameterIndex = paramIndex;
-            arg.Expr = Adapt(arg.Expr, paramType);
+            HIRCallArg hirCallArg = new()
+            {
+                Value = argExpr,
+                ParameterIndex = paramIndex,
+                Syntax = arg,
+                IsSynthesized = false,
+            };
+            hirArgs.Add(hirCallArg);
         }
 
         for (int i = 0; i < usedParams.Length; i++)
         {
-            bool parmUsed = usedParams[i];
-            if (parmUsed)
+            bool paramUsed = usedParams[i];
+            if (paramUsed)
             {
                 continue;
             }
 
             string err = $"Parameter {i + 1} ";
-            if (funcDecl != null)
+            if (funcSymbol != null)
             {
-                err += $"({GetTokenValue(funcDecl.Params[i].NameToken)}) ";
+                err += $"({funcSymbol.Params[i].Name}) ";
             }
 
             err += "is missing";
 
             Error(err, expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            return ErrorCall(expr, callee, hirArgs);
         }
 
-        expr.ResolvedType = funcType.ReturnType;
+        return new HIRExprCall
+        {
+            Callee = callee,
+            Args = hirArgs,
+            Type = funcType.ReturnType,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
-    private int FindParamIndexByName(FuncDecl funcDecl, ReadOnlySpan<char> name)
+    private HIRExprError ErrorCall(ExprCall expr, HIRExpr callee, List<HIRCallArg> visitedArgs)
     {
-        for (int i = 0; i < funcDecl.Params.Count; i++)
+        List<HIRExpr> children = new();
+        children.EnsureCapacity(1 + expr.Args.Count);
+        children.Add(callee);
+
+        foreach (HIRCallArg arg in visitedArgs)
         {
-            Param param = funcDecl.Params[i];
-            ReadOnlySpan<char> paramName = GetTokenValue(param.NameToken);
-            bool match = name.SequenceEqual(paramName);
+            children.Add(arg.Value);
+        }
+
+        // Visit remaining args to emit errors for them too
+        for (int i = visitedArgs.Count; i < expr.Args.Count; i++)
+        {
+            CallArg arg = expr.Args[i];
+            HIRExpr hirArg = VisitExpr(arg.Value);
+            hirArg = ToRValue(hirArg);
+            children.Add(hirArg);
+        }
+
+        Debug.Assert(children.Count == expr.Args.Count + 1);
+        return new HIRExprError
+        {
+            Children = children,
+            Type = BuiltinType.Error,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
+    }
+
+    private static int FindParamIndexByName(FuncSymbol funcSymbol, ReadOnlySpan<char> name)
+    {
+        for (int i = 0; i < funcSymbol.Params.Count; i++)
+        {
+            ParamSymbol param = funcSymbol.Params[i];
+            bool match = name.SequenceEqual(param.Name);
             if (match)
             {
                 return i;
@@ -537,49 +691,59 @@ public class Sema
         return -1;
     }
 
-    private void VisitExprIdentifier(ExprIdentifier expr)
+    private HIRExpr VisitExprIdentifier(ExprIdentifier expr)
     {
-        expr.ValueCategory = ValueCategory.RValue;
-
         ReadOnlySpan<char> name = GetTokenValue(expr.IdentifierToken);
         Symbol? sym = LookupRecursive(name);
         if (sym == null)
         {
             Error($"Symbol not found: \"{name}\"", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.Error,
+                Syntax = expr,
+                IsSynthesized = false,
+            };
         }
 
         RegisterTokenAsSymbol(expr.IdentifierToken, sym);
 
         switch (sym)
         {
-            case ParamSymbol:
-            case VariableSymbol:
-                expr.ValueCategory = ValueCategory.LValue;
-                break;
-            case FuncSymbol:
-                break;
+            case LocalSymbol localSym:
+                return new HIRExprLocalRef
+                {
+                    Symbol = localSym,
+                    Type = localSym.Type,
+                    Syntax = expr,
+                    IsSynthesized = false,
+                };
+            case FuncSymbol funcSym:
+                return new HIRExprFuncRef
+                {
+                    Symbol = funcSym,
+                    Type = funcSym.FuncType,
+                    Syntax = expr,
+                    IsSynthesized = false,
+                };
             case TypeSymbol:
-                // TODO: Allow that, for e.g. `i32.TypeSize`
+                // TODO: Allow that, for e.g. `i32.TypeSize()`
                 Error($"Type cannot be used as an identifier: \"{name}\"", expr);
-                expr.ResolvedType = BuiltinType.Error;
-                return;
+                return new HIRExprError
+                {
+                    Children = [],
+                    Type = BuiltinType.Error,
+                    Syntax = expr,
+                    IsSynthesized = false,
+                };
             default:
-                throw new ArgumentOutOfRangeException(nameof(sym));
+                throw new UnreachableException();
         }
-
-        expr.Symbol = sym;
-        expr.ResolvedType = sym.Type;
     }
 
-    private void VisitExprInt(ExprInt expr)
+    private HIRExprIntConst VisitExprIntConst(ExprIntConst expr)
     {
-        // TODO: Refactor, handle negation in lexer and make it a part of the literal?
-        // TODO: Overflows checks
-
-        expr.ValueCategory = ValueCategory.RValue;
-
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
         Int128 value = 0;
@@ -602,8 +766,13 @@ public class Sema
             ErrorOutOfRange(expr.IsNegative, str, expr);
         }
 
-        expr.Value = value;
-        expr.ResolvedType = BuiltinType.I32;
+        return new HIRExprIntConst
+        {
+            Value = value,
+            Type = BuiltinType.I32,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
     private static Int128 ParseIntLiteralValue(ReadOnlySpan<char> str, bool negative)
@@ -665,123 +834,61 @@ public class Sema
         return value;
     }
 
-    private void VisitExprUnary(ExprUnary expr)
+    private HIRExprUnary VisitExprUnary(ExprUnary expr)
     {
-        expr.ValueCategory = ValueCategory.RValue;
+        HIRExpr operand = VisitExpr(expr.Operand);
+        operand = ToRValue(operand);
 
-        VisitExpr(expr.Expr);
-        Debug.Assert(expr.Expr.ResolvedType != null);
-
-        if (expr.Expr.ResolvedType == BuiltinType.Error)
+        SpamType type;
+        if (operand.Type == BuiltinType.Error)
         {
-            // Already reported
-            expr.ResolvedType = BuiltinType.Error;
-            return;
+            type = BuiltinType.Error;
+        }
+        else if (!CanUseUnary(operand.Type, expr.Op))
+        {
+            Error($"Cannot use unary operator \"{expr.Op}\" on type \"{operand.Type}\"", expr);
+            type = BuiltinType.Error;
+        }
+        else
+        {
+            type = operand.Type;
         }
 
-        if (!CanUseUnary(expr.Expr.ResolvedType, expr.Op))
+        return new HIRExprUnary
         {
-            Error($"Cannot use unary operator \"{expr.Op}\" on type \"{expr.Expr.ResolvedType}\"", expr);
-            expr.ResolvedType = BuiltinType.Error;
-            return;
-        }
-
-        expr.ResolvedType = expr.Expr.ResolvedType;
-    }
-
-    private void RegisterBuiltin(Scope scope)
-    {
-        void Register(string name, SpamType type)
-        {
-            TypeSymbol symbol = new()
-            {
-                Name = name,
-                DeclaringScope = scope,
-                Type = type,
-            };
-            bool added = scope.TryDeclare(symbol);
-            Debug.Assert(added);
-        }
-
-        // NOTE: Don't register void because it's not supposed to be used by user
-        Register("i32", BuiltinType.I32);
-    }
-
-    private void RegisterFunctionSymbols(CompilationUnit unit)
-    {
-        foreach (FuncDecl fd in unit.FuncDecls)
-        {
-            AddFunctionSymbol(fd);
-        }
-    }
-
-    private void AddFunctionSymbol(FuncDecl fd)
-    {
-        SpamType returnType = BuiltinType.Void;
-        if (fd.ReturnType != null)
-        {
-            SpamType type = ResolveType(fd.ReturnType);
-            returnType = type;
-        }
-
-        // TODO: Reuse list
-        List<SpamType> paramTypes = [];
-        foreach (Param param in fd.Params)
-        {
-            SpamType type = ResolveType(param.Type);
-            paramTypes.Add(type);
-        }
-
-        Scope scope = CurrentScope();
-        ReadOnlySpan<char> name = GetTokenValue(fd.NameToken);
-
-        FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
-        FuncSymbol sym = new()
-        {
-            Declaration = fd,
-            DeclaringScope = scope,
-            Type = funcType,
-            Name = name.ToString(),
+            Op = expr.Op,
+            Operand = operand,
+            Type = type,
+            Syntax = expr,
+            IsSynthesized = false,
         };
-
-        fd.Symbol = sym;
-
-        // NOTE: Create symbol even if it's a redeclaration
-
-        RegisterSymbol(sym);
-        RegisterTokenAsSymbol(fd.NameToken, sym);
     }
 
     private void RegisterSymbol(Symbol symbol)
     {
-        // TODO: Lookup once
-
-        Scope scope = symbol.DeclaringScope;
+        Scope scope = CurrentScope();
 
         string name = symbol.Name;
-        Symbol? loc = scope.LookupLocal(name);
-        if (loc != null)
+        Symbol? existing = scope.LookupAny(name, out bool isLocal);
+        if (existing != null)
         {
-            ErrorRedeclaration(symbol, loc);
-            return;
-        }
-
-        Symbol? rec = scope.LookupRecursive(name);
-        if (rec != null)
-        {
-            switch (rec)
+            if (isLocal)
             {
-                case ParamSymbol:
-                case VariableSymbol:
-                    WarningShadow(symbol, rec);
+                ErrorRedeclaration(symbol, existing);
+                return;
+            }
+
+            switch (existing)
+            {
+                case LocalSymbol:
+                    WarningShadow(symbol, existing);
                     break;
                 case FuncSymbol:
                 case TypeSymbol:
                     // Only variables/params can be shadowed
-                    ErrorRedeclaration(symbol, rec);
+                    ErrorRedeclaration(symbol, existing);
                     return;
-
-                default: throw new Exception("Unknown symbol type: " + rec.SymbolKindName);
+                default: throw new UnreachableException();
             }
         }
 
@@ -802,7 +909,6 @@ public class Sema
 
     private SpamType ResolveType(TypeNode node)
     {
-        Debug.Assert(node.ResolvedType == null);
         switch (node)
         {
             case FuncTypeNode n:
@@ -823,8 +929,7 @@ public class Sema
         if (sym == null)
         {
             Error($"Type not found: \"{name}\"", node);
-            node.ResolvedType = BuiltinType.Error;
-            return node.ResolvedType;
+            return BuiltinType.Error;
         }
 
         RegisterTokenAsSymbol(node.TypeNameToken, sym);
@@ -833,18 +938,14 @@ public class Sema
         if (typeSym == null)
         {
             Error($"Type expected: \"{name}\". Given: \"{sym.SymbolKindName}\"", node);
-            node.ResolvedType = BuiltinType.Error;
-            return node.ResolvedType;
+            return BuiltinType.Error;
         }
 
-        node.ResolvedType = typeSym.Type;
-        return node.ResolvedType;
+        return typeSym.Type;
     }
 
     private SpamType ResolveFuncType(FuncTypeNode node)
     {
-        // TODO: Duplicated with AddFunctionSymbol 
-
         SpamType returnType = BuiltinType.Void;
         if (node.ReturnType != null)
         {
@@ -853,7 +954,7 @@ public class Sema
         }
 
         // TODO: Reuse list
-        List<SpamType> paramTypes = [];
+        List<SpamType> paramTypes = new();
         foreach (TypeNode param in node.Params)
         {
             SpamType type = ResolveType(param);
@@ -861,16 +962,14 @@ public class Sema
         }
 
         FuncType funcType = _typeRegistry.GetFuncType(returnType, paramTypes);
-        node.ResolvedType = funcType;
         return funcType;
     }
 
     private SpamType ResolvePointerType(PointerTypeNode node)
     {
         // TODO: Support
-        node.ResolvedType = BuiltinType.Error;
         Error("Pointer types are not supported yet", node);
-        return node.ResolvedType;
+        return BuiltinType.Error;
     }
 
     private Symbol? LookupRecursive(ReadOnlySpan<char> name)
@@ -893,11 +992,24 @@ public class Sema
         return _scopes[^1];
     }
 
-    private Expr Adapt(Expr expr, SpamType targetType)
+    private void PushFunc(FuncSymbol func)
     {
-        Debug.Assert(expr.ResolvedType != null, "Must be resolve before adapt");
+        _funcStack.Add(func);
+    }
 
-        SpamType type = expr.ResolvedType;
+    private void PopFunc()
+    {
+        _funcStack.RemoveAt(_funcStack.Count - 1);
+    }
+
+    private FuncSymbol CurrentFunc()
+    {
+        return _funcStack[^1];
+    }
+
+    private HIRExpr Adapt(HIRExpr expr, SpamType targetType)
+    {
+        SpamType type = expr.Type;
         if (type == BuiltinType.Error || targetType == BuiltinType.Error)
         {
             // Already reported
@@ -909,23 +1021,41 @@ public class Sema
             return expr;
         }
 
-        if (CanImplicitlyCast(type, targetType))
+        if (!CanImplicitlyCast(type, targetType))
         {
-            Debug.Assert(expr.ResolvedType != targetType, "Don't need cast");
-            ExprCast cast = new ExprImplicitCast
+            Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr.Syntax);
+            return new HIRExprError
             {
-                StartToken = expr.StartToken,
-                EndToken = expr.EndToken,
-                Operand = expr,
-                Target = targetType,
-                ResolvedType = targetType,
-                ValueCategory = ValueCategory.RValue,
+                Children = [expr],
+                Type = BuiltinType.Error,
+                Syntax = expr.Syntax,
+                IsSynthesized = true,
             };
-            return cast;
         }
 
-        Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr);
-        return expr;
+        return new HIRExprCast
+        {
+            Value = expr,
+            Type = targetType,
+            Syntax = expr.Syntax,
+            IsSynthesized = true,
+        };
+    }
+
+    private HIRExpr ToRValue(HIRExpr expr)
+    {
+        if (!expr.IsLValue || expr.Type == BuiltinType.Error)
+        {
+            return expr;
+        }
+
+        return new HIRExprLoad
+        {
+            Address = expr,
+            Type = expr.Type,
+            Syntax = expr.Syntax,
+            IsSynthesized = true,
+        };
     }
 
     private SpamType? GetBinaryResultType(SpamType a, SpamType b, BinaryOp op)
@@ -979,6 +1109,16 @@ public class Sema
     private ReadOnlySpan<char> GetTokenValue(int tokenIndex)
     {
         return _tokens[tokenIndex].Value(_code);
+    }
+
+    private void Error(string message)
+    {
+        _diag.AddError(message, _tokens[^1]);
+    }
+
+    private void Error(string message, int tokenIndex)
+    {
+        _diag.AddError(message, _tokens[tokenIndex]);
     }
 
     private void Error(string message, Node node)

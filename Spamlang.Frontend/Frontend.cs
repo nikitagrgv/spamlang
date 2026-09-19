@@ -4,8 +4,9 @@ public class Frontend
 {
     public struct Result
     {
-        public List<Token> Tokens { get; init; }
-        public CompilationUnit CompilationUnit { get; init; }
+        public required List<Token> Tokens { get; init; }
+        public required CompilationUnit CompilationUnit { get; init; }
+        public required HIRCompilationUnit HIRCompilationUnit { get; init; }
     }
 
     public static Result Run(string code, TypeRegistry typeRegistry, Diagnostic diag, Timers? timers, Dictionary<int, Symbol>? outTokenToSymbol = null)
@@ -22,13 +23,14 @@ public class Frontend
 
         timers?.RestartTimer();
         Sema sema = new(code, tokens, diag, typeRegistry);
-        sema.Run(compilationUnit, outTokenToSymbol);
+        HIRCompilationUnit hirCompilationUnit = sema.Run(compilationUnit, outTokenToSymbol);
         timers?.FinishTimer("Sema");
 
         return new Result
         {
             Tokens = tokens,
             CompilationUnit = compilationUnit,
+            HIRCompilationUnit = hirCompilationUnit,
         };
     }
 }

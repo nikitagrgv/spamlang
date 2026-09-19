@@ -564,7 +564,7 @@ public class Parser
             {
                 int literalToken = _cursor - 1;
                 bool negated = opTokType == TokenType.Minus;
-                return new ExprInt
+                return new ExprIntConst
                 {
                     StartToken = begin,
                     EndToken = End(begin),
@@ -578,7 +578,7 @@ public class Parser
             {
                 StartToken = begin,
                 EndToken = End(begin),
-                Expr = expr,
+                Operand = expr,
                 Op = TokenUtils.ToUnaryOp(opTokType),
             };
         }
@@ -593,7 +593,7 @@ public class Parser
 
         while (TryConsume(TokenType.LPar))
         {
-            List<ExprCallArg> args = [];
+            List<CallArg> args = [];
             if (!Check(TokenType.RPar))
             {
                 do
@@ -608,11 +608,11 @@ public class Parser
                     }
 
                     Expr expr = ParseExpr();
-                    ExprCallArg arg = new()
+                    CallArg arg = new()
                     {
                         StartToken = argBegin,
                         EndToken = End(argBegin),
-                        Expr = expr,
+                        Value = expr,
                         ArgNameToken = argNameToken,
                     };
                     args.Add(arg);
@@ -640,7 +640,7 @@ public class Parser
         if (TryConsume(TokenType.LiteralInt))
         {
             int end = End(begin);
-            return new ExprInt
+            return new ExprIntConst
             {
                 StartToken = begin,
                 EndToken = end,

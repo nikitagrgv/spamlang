@@ -3,6 +3,13 @@ using Spamlang.Frontend;
 
 namespace Spamlang.Backend;
 
+public class InvalidHIRException : Exception
+{
+    public InvalidHIRException(string message) : base(message)
+    {
+    }
+}
+
 public class IRGen
 {
     private readonly List<Dictionary<Symbol, IRValue>> _symbolScopes = new();
@@ -13,16 +20,15 @@ public class IRGen
         _typeRegistry = typeRegistry;
     }
 
-    public IRModule Run(CompilationUnit unit)
+    public IRModule Run(HIRCompilationUnit unit)
     {
         Dictionary<Symbol, IRValue> globalScope = new();
-        _symbolScopes.Add(globalScope);
+        PushSymScope(globalScope);
 
         List<IRFunction> functions = new();
-        foreach (FuncDecl funcDecl in unit.FuncDecls)
+        foreach (HIRFuncDecl funcDecl in unit.FuncDecls)
         {
-            Debug.Assert(funcDecl.Symbol is { Type: FuncType });
-            FuncType signature = (FuncType)funcDecl.Symbol.Type;
+            FuncType signature = funcDecl.Symbol.FuncType;
             FuncType lowerSignature = IRUtils.ToLowerSignature(signature, _typeRegistry);
             IRFunction func = new()
             {
@@ -37,7 +43,7 @@ public class IRGen
 
         for (int i = 0; i < unit.FuncDecls.Count; i++)
         {
-            FuncDecl funcDecl = unit.FuncDecls[i];
+            HIRFuncDecl funcDecl = unit.FuncDecls[i];
             IRFunction function = functions[i];
             GenFunction(funcDecl, function);
         }
@@ -47,19 +53,15 @@ public class IRGen
             Functions = functions,
         };
 
-        _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
+        PopSymScope();
 
         AllocateIds(module);
 
         return module;
     }
 
-    private void GenFunction(FuncDecl funcDecl, IRFunction function)
+    private void GenFunction(HIRFuncDecl funcDecl, IRFunction function)
     {
-        // TODO: Reuse lists/dicts
-        List<StmtLet> locals = new();
-        CollectLocals(funcDecl.Body, locals);
-
         IRBasicBlock entry = new()
         {
             Instructions = new List<IRInstruction>(),
@@ -68,12 +70,12 @@ public class IRGen
         function.BasicBlocks.Add(entry);
 
         Dictionary<Symbol, IRValue> funcScope = new();
-        _symbolScopes.Add(funcScope);
+        PushSymScope(funcScope);
 
-        GenParams(entry, funcDecl.Params, function.Params);
-        GenLocals(entry, locals);
+        GenParams(entry, funcDecl.Symbol.Params, function.Params);
+        GenLocals(entry, funcDecl.Locals);
 
-        GenBlock(entry, funcDecl.Body);
+        GenStmts(entry, funcDecl.Body.Stmts);
 
         if (function.LoweredSignature.ReturnType == BuiltinType.Void && entry.Terminator == null)
         {
@@ -84,39 +86,42 @@ public class IRGen
             entry.Add(ret);
         }
 
-        Debug.Assert(entry.Terminator != null);
+        if (entry.Terminator == null)
+        {
+            throw new InvalidHIRException("Non void function must have a return statement at the end");
+        }
 
-        _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
+        PopSymScope();
     }
 
-    private void GenBlock(IRBasicBlock block, Block blockNode)
+    private void GenStmts(IRBasicBlock block, IReadOnlyList<HIRStmt> stmts)
     {
-        foreach (Stmt stmt in blockNode.Stmts)
+        foreach (HIRStmt stmt in stmts)
         {
             switch (stmt)
             {
-                case Block b:
-                    GenBlock(block, b);
+                case HIRBlock b:
+                    GenStmts(block, b.Stmts);
                     break;
-                case StmtAssign stmtAssign:
+                case HIRStmtAssign stmtAssign:
                     GenStmtAssign(block, stmtAssign);
                     break;
-                case StmtExpr stmtExpr:
+                case HIRStmtExpr stmtExpr:
                     GenStmtExpr(block, stmtExpr);
                     break;
-                case StmtLet stmtLet:
+                case HIRStmtLet stmtLet:
                     GenStmtLet(block, stmtLet);
                     break;
-                case StmtReturn stmtReturn:
+                case HIRStmtReturn stmtReturn:
                     GenStmtReturn(block, stmtReturn);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(stmt));
+                    throw new UnreachableException();
             }
         }
     }
 
-    private void GenStmtAssign(IRBasicBlock block, StmtAssign stmtAssign)
+    private void GenStmtAssign(IRBasicBlock block, HIRStmtAssign stmtAssign)
     {
         IRValue value = GenExprValue(block, stmtAssign.Value);
         IRValue addr = GenExprAddr(block, stmtAssign.Target);
@@ -128,28 +133,15 @@ public class IRGen
         block.Add(store);
     }
 
-    private void GenStmtExpr(IRBasicBlock block, StmtExpr stmtExpr)
+    private void GenStmtExpr(IRBasicBlock block, HIRStmtExpr stmtExpr)
     {
         GenExprValue(block, stmtExpr.Expr);
     }
 
-    private void GenStmtLet(IRBasicBlock block, StmtLet stmtLet)
+    private void GenStmtLet(IRBasicBlock block, HIRStmtLet stmtLet)
     {
-        Debug.Assert(stmtLet.Symbol != null);
-
-        IRValue value;
-        if (stmtLet.Expr != null)
-        {
-            value = GenExprValue(block, stmtLet.Expr);
-        }
-        else
-        {
-            SpamType type = IRUtils.ToLowerType(stmtLet.Symbol.Type);
-            value = MakeZeroInitialized(type);
-        }
-
-        IRValue? addr = LookupValue(stmtLet.Symbol);
-        Debug.Assert(addr != null);
+        IRValue value = GenExprValue(block, stmtLet.Init);
+        IRValue addr = LookupValue(stmtLet.VariableSymbol);
 
         IRInstructionStore store = new()
         {
@@ -159,12 +151,12 @@ public class IRGen
         block.Add(store);
     }
 
-    private void GenStmtReturn(IRBasicBlock block, StmtReturn stmtReturn)
+    private void GenStmtReturn(IRBasicBlock block, HIRStmtReturn stmtReturn)
     {
         IRValue? value = null;
-        if (stmtReturn.Expr != null)
+        if (stmtReturn.Value != null)
         {
-            value = GenExprValue(block, stmtReturn.Expr);
+            value = GenExprValue(block, stmtReturn.Value);
         }
 
         IRInstructionRet ret = new()
@@ -174,53 +166,68 @@ public class IRGen
         block.Add(ret);
     }
 
-    private IRValue GenExprValue(IRBasicBlock block, Expr expr)
+    private IRValue GenExprValue(IRBasicBlock block, HIRExpr expr)
     {
-        Debug.Assert(expr.ResolvedType != null);
-        Debug.Assert(expr.ValueCategory != null);
-
-        if (expr.ValueCategory == ValueCategory.LValue)
+        if (expr.IsLValue)
         {
-            IRValue addr = GenExprAddr(block, expr);
-            SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
-            IRInstructionLoad load = new()
-            {
-                LoadedType = type,
-                Address = addr,
-            };
-            block.Add(load);
-            return load;
+            throw new InvalidHIRException("LValue must be loaded");
         }
 
         switch (expr)
         {
-            case ExprBinary exprBinary:
-                return GenExprBinaryValue(block, exprBinary);
-            case ExprCall exprCall:
-                return GenExprCallValue(block, exprCall);
-            case ExprImplicitCast exprImplicitCast:
-                return GenExprImplicitCastValue(block, exprImplicitCast);
-            case ExprIdentifier exprIdentifier:
-                return GenExprIdentifierValue(exprIdentifier);
-            case ExprInt exprInt:
-                return GenExprIntValue(exprInt);
-            case ExprUnary exprUnary:
-                return GenExprUnaryValue(block, exprUnary);
+            case HIRExprBinary hirExprBinary:
+                return GenExprBinaryValue(block, hirExprBinary);
+            case HIRExprCall hirExprCall:
+                return GenExprCallValue(block, hirExprCall);
+            case HIRExprCast hirExprCast:
+                return GenExprCastValue(block, hirExprCast);
+            case HIRExprFuncRef hirExprFuncRef:
+                return GenExprFuncRefValue(block, hirExprFuncRef);
+            case HIRExprIntConst hirExprIntConst:
+                return GenExprIntValue(hirExprIntConst);
+            case HIRExprLoad hirExprLoad:
+                return GenExprLoadValue(block, hirExprLoad);
+            case HIRExprUnary hirExprUnary:
+                return GenExprUnaryValue(block, hirExprUnary);
+            case HIRExprZeroInit hirExprZeroInit:
+                return GenExprZeroInitValue(hirExprZeroInit);
+            case HIRExprLocalRef:
+                throw new InvalidHIRException($"Unexpected {nameof(HIRExprLocalRef)}. Must be loaded");
+            case HIRExprError:
+                throw new InvalidHIRException("Backend mustn't be run on errors");
             default:
-                throw new ArgumentOutOfRangeException(nameof(expr));
+                throw new UnreachableException();
         }
     }
 
-    private IRValue GenExprBinaryValue(IRBasicBlock block, ExprBinary expr)
+    private IRValue GenExprLoadValue(IRBasicBlock block, HIRExprLoad expr)
+    {
+        if (!expr.Address.IsLValue)
+        {
+            throw new InvalidHIRException("Cannot load non-lvalue");
+        }
+
+        IRValue addr = GenExprAddr(block, expr.Address);
+        SpamType type = IRUtils.ToLowerType(expr.Type);
+        IRInstructionLoad load = new()
+        {
+            LoadedType = type,
+            Address = addr,
+        };
+        block.Add(load);
+        return load;
+    }
+
+    private IRValue GenExprBinaryValue(IRBasicBlock block, HIRExprBinary expr)
     {
         IRValue left = GenExprValue(block, expr.Left);
         IRValue right = GenExprValue(block, expr.Right);
         return GenBinaryOp(block, left, right, expr.Op);
     }
 
-    private IRValue GenExprUnaryValue(IRBasicBlock block, ExprUnary expr)
+    private IRValue GenExprUnaryValue(IRBasicBlock block, HIRExprUnary expr)
     {
-        IRValue operand = GenExprValue(block, expr.Expr);
+        IRValue operand = GenExprValue(block, expr.Operand);
         BinaryOp op;
         switch (expr.Op)
         {
@@ -236,7 +243,10 @@ public class IRGen
 
     private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
-        Debug.Assert(left.Type == right.Type);
+        if (left.Type != right.Type)
+        {
+            throw new InvalidHIRException("Cannot perform binary operation on different types");
+        }
 
         bool signed;
         if (left.Type == BuiltinType.I32)
@@ -269,10 +279,9 @@ public class IRGen
         return instr;
     }
 
-    private IRValue GenExprCallValue(IRBasicBlock block, ExprCall expr)
+    private IRValue GenExprCallValue(IRBasicBlock block, HIRExprCall expr)
     {
-        Debug.Assert(expr.Callee.ResolvedType is FuncType, "Must be ensured by sema");
-        FuncType funcType = (FuncType)expr.Callee.ResolvedType;
+        FuncType funcType = (FuncType)expr.Callee.Type;
 
         IRValue callee = GenExprValue(block, expr.Callee);
 
@@ -284,16 +293,20 @@ public class IRGen
             args.Add(null);
         }
 
-        foreach (ExprCallArg arg in expr.Args)
+        foreach (HIRCallArg arg in expr.Args)
         {
-            Debug.Assert(arg.ParameterIndex.HasValue, "Must be set by sema");
-            int paramIndex = arg.ParameterIndex.Value;
+            if (args[arg.ParameterIndex] != null)
+            {
+                throw new InvalidHIRException($"Duplicate argument {arg.ParameterIndex} in call");
+            }
 
-            Debug.Assert(args[paramIndex] == null);
-            args[paramIndex] = GenExprValue(block, arg.Expr);
+            args[arg.ParameterIndex] = GenExprValue(block, arg.Value);
         }
 
-        Debug.Assert(!args.Contains(null), "All args must be set");
+        if (args.Contains(null))
+        {
+            throw new InvalidHIRException("Not all arguments were set in call");
+        }
 
         FuncType lowerSignature = IRUtils.ToLowerSignature(funcType, _typeRegistry);
         IRInstructionCall call = new()
@@ -306,10 +319,10 @@ public class IRGen
         return call;
     }
 
-    private IRValue GenExprImplicitCastValue(IRBasicBlock block, ExprImplicitCast expr)
+    private IRValue GenExprCastValue(IRBasicBlock block, HIRExprCast expr)
     {
-        IRValue value = GenExprValue(block, expr.Operand);
-        SpamType type = IRUtils.ToLowerType(expr.Target);
+        IRValue value = GenExprValue(block, expr.Value);
+        SpamType type = IRUtils.ToLowerType(expr.Type);
         IRInstructionCast cast = new()
         {
             Value = value,
@@ -319,21 +332,15 @@ public class IRGen
         return cast;
     }
 
-    private IRValue GenExprIdentifierValue(ExprIdentifier expr)
+    private IRValue GenExprFuncRefValue(IRBasicBlock block, HIRExprFuncRef expr)
     {
-        Debug.Assert(expr.Symbol != null);
-        Debug.Assert(expr.Symbol is FuncSymbol, "Variables can't reach here (other are lvalues)");
-
-        Symbol sym = expr.Symbol;
-        IRValue? value = LookupValue(sym);
-        Debug.Assert(value != null);
+        IRValue value = LookupValue(expr.Symbol);
         return value;
     }
 
-    private IRValue GenExprIntValue(ExprInt expr)
+    private IRValue GenExprIntValue(HIRExprIntConst expr)
     {
-        Debug.Assert(expr.ResolvedType != null);
-        SpamType type = IRUtils.ToLowerType(expr.ResolvedType);
+        SpamType type = IRUtils.ToLowerType(expr.Type);
         IRConstantInt value = new()
         {
             Value = expr.Value,
@@ -342,17 +349,23 @@ public class IRGen
         return value;
     }
 
-    private IRValue GenExprAddr(IRBasicBlock block, Expr expr)
+    private IRValue GenExprZeroInitValue(HIRExprZeroInit expr)
     {
-        Debug.Assert(expr.ResolvedType != null);
-        Debug.Assert(expr.ValueCategory == ValueCategory.LValue);
+        IRValue value = MakeZeroInitialized(expr.Type);
+        return value;
+    }
+
+    private IRValue GenExprAddr(IRBasicBlock block, HIRExpr expr)
+    {
+        if (!expr.IsLValue)
+        {
+            throw new InvalidHIRException("Cannot take address of non-lvalue");
+        }
+
         switch (expr)
         {
-            case ExprIdentifier exprIdentifier:
-                Debug.Assert(exprIdentifier.Symbol != null);
-                Symbol sym = exprIdentifier.Symbol;
-                IRValue? value = LookupValue(sym);
-                Debug.Assert(value != null);
+            case HIRExprLocalRef locRef:
+                IRValue value = LookupValue(locRef.Symbol);
                 return value;
             default:
                 throw new UnreachableException();
@@ -361,7 +374,10 @@ public class IRGen
 
     private IRValue MakeZeroInitialized(SpamType type)
     {
-        Debug.Assert(type is not FuncType);
+        if (type is FuncType)
+        {
+            throw new InvalidHIRException("Cannot make a function zero initialized");
+        }
 
         // TODO: Don't allocate, put in static fields
         if (type == BuiltinType.I32 || type == BuiltinType.Ptr)
@@ -376,13 +392,10 @@ public class IRGen
         throw new NotImplementedException();
     }
 
-    private void GenLocals(IRBasicBlock entry, List<StmtLet> locals)
+    private void GenLocals(IRBasicBlock entry, IReadOnlyList<VariableSymbol> locals)
     {
-        foreach (StmtLet let in locals)
+        foreach (VariableSymbol sym in locals)
         {
-            Debug.Assert(let.Symbol != null);
-
-            Symbol sym = let.Symbol;
             SpamType type = IRUtils.ToLowerType(sym.Type);
 
             IRInstructionAlloca alloca = new()
@@ -391,21 +404,22 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(LookupValue(sym) == null);
-            CurrentScope.Add(sym, alloca);
+            if (TryLookupValue(sym) != null)
+            {
+                throw new InvalidHIRException($"Redeclaration of symbol {sym.Name}");
+            }
+
+            CurrentSymScope().Add(sym, alloca);
         }
     }
 
-    private void GenParams(IRBasicBlock entry, IReadOnlyList<Param> funcParams, List<IRParam> irParams)
+    private void GenParams(IRBasicBlock entry, IReadOnlyList<ParamSymbol> funcParams, List<IRParam> irParams)
     {
         Debug.Assert(irParams.Count == 0);
 
         int initialNumInstructions = entry.Instructions.Count;
-        foreach (Param param in funcParams)
+        foreach (ParamSymbol sym in funcParams)
         {
-            Debug.Assert(param.Symbol != null);
-            Symbol sym = param.Symbol;
-
             SpamType type = IRUtils.ToLowerType(sym.Type);
             IRParam irParam = new()
             {
@@ -420,8 +434,12 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(LookupValue(sym) == null);
-            CurrentScope.Add(sym, alloca);
+            if (TryLookupValue(sym) != null)
+            {
+                throw new InvalidHIRException($"Redeclaration of symbol {sym.Name}");
+            }
+
+            CurrentSymScope().Add(sym, alloca);
         }
 
         for (int i = 0; i < irParams.Count; i++)
@@ -438,24 +456,33 @@ public class IRGen
         }
     }
 
-    private void CollectLocals(Block body, List<StmtLet> locals)
+    private void PushSymScope(Dictionary<Symbol, IRValue> scope)
     {
-        foreach (Stmt stmt in body.Stmts)
-        {
-            if (stmt is StmtLet let)
-            {
-                locals.Add(let);
-            }
-            else if (stmt is Block block)
-            {
-                CollectLocals(block, locals);
-            }
-        }
+        _symbolScopes.Add(scope);
     }
 
-    private Dictionary<Symbol, IRValue> CurrentScope => _symbolScopes[^1];
+    private void PopSymScope()
+    {
+        _symbolScopes.RemoveAt(_symbolScopes.Count - 1);
+    }
 
-    private IRValue? LookupValue(Symbol symbol)
+    private Dictionary<Symbol, IRValue> CurrentSymScope()
+    {
+        return _symbolScopes[^1];
+    }
+
+    private IRValue LookupValue(Symbol symbol)
+    {
+        IRValue? value = TryLookupValue(symbol);
+        if (value == null)
+        {
+            throw new InvalidHIRException($"Cannot find symbol {symbol.Name}");
+        }
+
+        return value;
+    }
+
+    private IRValue? TryLookupValue(Symbol symbol)
     {
         for (int i = _symbolScopes.Count - 1; i >= 0; --i)
         {

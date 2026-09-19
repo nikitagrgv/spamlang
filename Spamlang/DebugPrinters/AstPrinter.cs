@@ -25,17 +25,6 @@ public class AstPrinter
         PrintAst(0, unit);
     }
 
-    private string MakeIndent(int depth)
-    {
-        string indent = "";
-        for (int i = 0; i < depth; i++)
-        {
-            indent += " |   ";
-        }
-
-        return indent;
-    }
-
     private void PrintAst(int depth, Node node, string prefix = "")
     {
         string fullPrefix = MakeIndent(depth);
@@ -44,29 +33,30 @@ public class AstPrinter
             fullPrefix += prefix + ": ";
         }
 
+        fullPrefix += node.GetType().Name;
+
         switch (node)
         {
             case CompilationUnit n:
-                Console.WriteLine($"{fullPrefix}CompilationUnit");
-                n.FuncDecls.ForEach(fd => PrintAst(depth + 1, fd));
+                Console.WriteLine($"{fullPrefix}");
+                PrintChildrenAst(depth + 1, n.FuncDecls);
                 break;
             case Block n:
-                Console.WriteLine($"{fullPrefix}Block");
-                n.Stmts.ForEach(stmt => PrintAst(depth + 1, stmt));
+                Console.WriteLine($"{fullPrefix}");
+                PrintChildrenAst(depth + 1, n.Stmts);
                 break;
             case Param n:
-                Console.WriteLine($"{fullPrefix}Param | Type {n.Type}");
-                PrintSymbol(depth + 1, n.Symbol);
+                Console.WriteLine($"{fullPrefix}");
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 PrintAst(depth + 1, n.Type);
                 break;
             case IdentifierTypeNode n:
-                Console.WriteLine($"{fullPrefix}IdentifierTypeNode | Type {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}");
                 PrintAstToken(depth + 1, n.TypeNameToken, "Type");
                 break;
             case FuncTypeNode n:
-                Console.WriteLine($"{fullPrefix}FuncTypeNode | Type {n.ResolvedType}");
-                n.Params.ForEach(p => PrintAst(depth + 1, p));
+                Console.WriteLine($"{fullPrefix}");
+                PrintChildrenAst(depth + 1, n.Params);
                 if (n.ReturnType != null)
                 {
                     PrintAst(depth + 1, n.ReturnType);
@@ -74,14 +64,13 @@ public class AstPrinter
 
                 break;
             case PointerTypeNode n:
-                Console.WriteLine($"{fullPrefix}PointerTypeNode | Type {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}");
                 PrintAst(depth + 1, n.Pointee);
                 break;
             case FuncDecl n:
-                Console.WriteLine($"{fullPrefix}FuncDecl");
-                PrintSymbol(depth + 1, n.Symbol);
+                Console.WriteLine($"{fullPrefix}");
                 PrintAstToken(depth + 1, n.NameToken, "Name");
-                n.Params.ForEach(p => PrintAst(depth + 1, p));
+                PrintChildrenAst(depth + 1, n.Params);
                 if (n.ReturnType != null)
                 {
                     PrintAst(depth + 1, n.ReturnType);
@@ -90,8 +79,7 @@ public class AstPrinter
                 PrintAst(depth + 1, n.Body);
                 break;
             case StmtLet n:
-                Console.WriteLine($"{fullPrefix}StmtLet");
-                PrintSymbol(depth + 1, n.Symbol);
+                Console.WriteLine($"{fullPrefix}");
                 PrintAstToken(depth + 1, n.NameToken, "Name");
                 if (n.TypeDecl != null)
                 {
@@ -107,49 +95,63 @@ public class AstPrinter
             case StmtReturn n:
                 if (n.Expr == null)
                 {
-                    Console.WriteLine($"{fullPrefix}StmtReturn");
+                    Console.WriteLine($"{fullPrefix}");
                     break;
                 }
 
-                Console.WriteLine($"{fullPrefix}StmtReturn: {PrettyExpr(n.Expr)}");
+                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n.Expr)}");
                 PrintAst(depth + 1, n.Expr);
 
                 break;
-
             case StmtAssign n:
-                Console.WriteLine(
-                    $"{fullPrefix}StmtAssign: {PrettyExpr(n.Target)} = {PrettyExpr(n.Value)}");
+                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n.Target)} = {PrettyExpr(n.Value)}");
                 PrintAst(depth + 1, n.Target);
                 PrintAst(depth + 1, n.Value);
                 break;
             case StmtExpr n:
-                Console.WriteLine($"{fullPrefix}StmtExpr: {PrettyExpr(n.Expr)}");
+                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n.Expr)}");
                 PrintAst(depth + 1, n.Expr);
                 break;
-
             case ExprBinary n:
-                Console.WriteLine($"{fullPrefix}BinaryExpr({n.Op}): {PrettyExpr(n)} | Type = {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}({n.Op}): {PrettyExpr(n)}");
                 PrintAst(depth + 1, n.Left, "Left");
                 PrintAst(depth + 1, n.Right, "Right");
                 break;
             case ExprUnary n:
-                Console.WriteLine($"{fullPrefix}UnaryExpr({n.Op}): {PrettyExpr(n)} | Type = {n.ResolvedType}");
-                PrintAst(depth + 1, n.Expr);
+                Console.WriteLine($"{fullPrefix}({n.Op}): {PrettyExpr(n)}");
+                PrintAst(depth + 1, n.Operand);
                 break;
             case ExprCall n:
-                Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)} | Type = {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n)}");
                 PrintAst(depth + 1, n.Callee);
-                n.Args.ForEach(arg => PrintAst(depth + 1, arg.Expr));
+                PrintChildrenAst(depth + 1, n.Args);
                 break;
-            case ExprInt n:
-                Console.WriteLine(
-                    $"{fullPrefix}ExprInt: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | Type = {n.ResolvedType} | Value = {n.Value} | IsNegative = {n.IsNegative}");
+            case CallArg exprCallArg:
+                string nameInfo = "";
+                if (exprCallArg.ArgNameToken != null)
+                {
+                    nameInfo = $" ({TokenValue(exprCallArg.ArgNameToken.Value)})";
+                }
+
+                Console.WriteLine($"{fullPrefix}{nameInfo}: {PrettyExpr(exprCallArg.Value)}");
+                PrintAst(depth + 1, exprCallArg.Value);
+                break;
+            case ExprIntConst n:
+                Console.WriteLine($"{fullPrefix}: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
                 break;
             case ExprIdentifier n:
-                Console.WriteLine(
-                    $"{fullPrefix}ExprIdentifier: {TokenValue(n.IdentifierToken)} | Type = {n.ResolvedType}");
+                Console.WriteLine($"{fullPrefix}: {TokenValue(n.IdentifierToken)}");
                 break;
+
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
+        }
+    }
+
+    private void PrintChildrenAst(int depth, IReadOnlyList<Node> nodes)
+    {
+        foreach (Node node in nodes)
+        {
+            PrintAst(depth, node);
         }
     }
 
@@ -173,7 +175,7 @@ public class AstPrinter
                 break;
             case ExprUnary unaryExpr:
                 ret.Append(TokenUtils.ToString(unaryExpr.Op));
-                ret.Append(PrettyExpr(unaryExpr.Expr));
+                ret.Append(PrettyExpr(unaryExpr.Operand));
                 break;
             case ExprCall exprCall:
                 ret.Clear();
@@ -186,20 +188,20 @@ public class AstPrinter
                         ret.Append(", ");
                     }
 
-                    ExprCallArg arg = exprCall.Args[i];
+                    CallArg arg = exprCall.Args[i];
                     if (arg.ArgNameToken != null)
                     {
                         ret.Append(TokenValue(arg.ArgNameToken.Value));
                         ret.Append(": ");
                     }
 
-                    ret.Append(PrettyExpr(arg.Expr));
+                    ret.Append(PrettyExpr(arg.Value));
                 }
 
                 ret.Append(')');
 
                 return ret.ToString();
-            case ExprInt exprInt:
+            case ExprIntConst exprInt:
                 return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
             case ExprIdentifier exprIdentifier:
                 return TokenValue(exprIdentifier.IdentifierToken);
@@ -216,9 +218,14 @@ public class AstPrinter
         Console.WriteLine($"{indent}{name}: \"{_tokens[token].Value(_code)}\"");
     }
 
-    private void PrintSymbol(int depth, Symbol? symbol)
+    private static string MakeIndent(int depth)
     {
-        string indent = MakeIndent(depth);
-        Console.WriteLine($"{indent}Symbol: {symbol}");
+        string indent = "";
+        for (int i = 0; i < depth; i++)
+        {
+            indent += " |   ";
+        }
+
+        return indent;
     }
 }
