@@ -374,7 +374,10 @@ public class IRGen
 
     private IRValue MakeZeroInitialized(SpamType type)
     {
-        Debug.Assert(type is not FuncType);
+        if (type is FuncType)
+        {
+            throw new InvalidHIRException("Cannot make a function zero initialized");
+        }
 
         // TODO: Don't allocate, put in static fields
         if (type == BuiltinType.I32 || type == BuiltinType.Ptr)
@@ -401,7 +404,11 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(TryLookupValue(sym) == null);
+            if (TryLookupValue(sym) != null)
+            {
+                throw new InvalidHIRException($"Redeclaration of symbol {sym.Name}");
+            }
+
             CurrentSymScope().Add(sym, alloca);
         }
     }
@@ -427,7 +434,11 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(TryLookupValue(sym) == null);
+            if (TryLookupValue(sym) != null)
+            {
+                throw new InvalidHIRException($"Redeclaration of symbol {sym.Name}");
+            }
+
             CurrentSymScope().Add(sym, alloca);
         }
 
