@@ -108,22 +108,17 @@ public class HIRPrinter
                 Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
                 PrintChildren(depth + 1, n.Children);
                 break;
-            case HIRCallArg exprCallArg:
-                string nameInfo = "";
-                if (exprCallArg.ArgNameToken != null)
-                {
-                    nameInfo = $" ({TokenValue(exprCallArg.ArgNameToken.Value)})";
-                }
-
-                Console.WriteLine($"{fullPrefix}{nameInfo}: {PrettyExpr(exprCallArg.Expr)}");
-                PrintHIR(depth + 1, exprCallArg.Expr);
+            case HIRCallArg n:
+                Console.WriteLine($"{fullPrefix} | ParameterIndex = {n.ParameterIndex}");
+                PrintHIR(depth + 1, n.Value, "Value");
                 break;
             case HIRExprIntConst n:
-                Console.WriteLine($"{fullPrefix}: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
+                Console.WriteLine($"{fullPrefix}: {n.Type.Name} | Value = {n.Value}");
                 break;
-            case HIRExprLoad hirExprLoad:
+            case HIRExprLoad n:
+                Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
+                PrintHIR(depth + 1, n.Address, "Address");
                 break;
-
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
     }
