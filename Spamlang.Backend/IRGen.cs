@@ -141,11 +141,7 @@ public class IRGen
     private void GenStmtLet(IRBasicBlock block, HIRStmtLet stmtLet)
     {
         IRValue value = GenExprValue(block, stmtLet.Init);
-        IRValue? addr = LookupValue(stmtLet.VariableSymbol);
-        if (addr == null)
-        {
-            throw new InvalidHIRException($"Cannot find symbol {stmtLet.VariableSymbol.Name}");
-        }
+        IRValue addr = LookupValue(stmtLet.VariableSymbol);
 
         IRInstructionStore store = new()
         {
@@ -299,11 +295,18 @@ public class IRGen
 
         foreach (HIRCallArg arg in expr.Args)
         {
-            Debug.Assert(args[arg.ParameterIndex] == null);
+            if (args[arg.ParameterIndex] != null)
+            {
+                throw new InvalidHIRException($"Duplicate argument {arg.ParameterIndex} in call");
+            }
+
             args[arg.ParameterIndex] = GenExprValue(block, arg.Value);
         }
 
-        Debug.Assert(!args.Contains(null), "All args must be set");
+        if (args.Contains(null))
+        {
+            throw new InvalidHIRException("Not all arguments were set in call");
+        }
 
         FuncType lowerSignature = IRUtils.ToLowerSignature(funcType, _typeRegistry);
         IRInstructionCall call = new()
@@ -331,8 +334,7 @@ public class IRGen
 
     private IRValue GenExprFuncRefValue(IRBasicBlock block, HIRExprFuncRef expr)
     {
-        IRValue? value = LookupValue(expr.Symbol);
-        Debug.Assert(value != null);
+        IRValue value = LookupValue(expr.Symbol);
         return value;
     }
 
@@ -355,12 +357,15 @@ public class IRGen
 
     private IRValue GenExprAddr(IRBasicBlock block, HIRExpr expr)
     {
-        Debug.Assert(expr.IsLValue);
+        if (!expr.IsLValue)
+        {
+            throw new InvalidHIRException("Cannot take address of non-lvalue");
+        }
+
         switch (expr)
         {
             case HIRExprLocalRef locRef:
-                IRValue? value = LookupValue(locRef.Symbol);
-                Debug.Assert(value != null);
+                IRValue value = LookupValue(locRef.Symbol);
                 return value;
             default:
                 throw new UnreachableException();
@@ -396,7 +401,7 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(LookupValue(sym) == null);
+            Debug.Assert(TryLookupValue(sym) == null);
             CurrentSymScope().Add(sym, alloca);
         }
     }
@@ -422,7 +427,7 @@ public class IRGen
             };
             entry.Add(alloca);
 
-            Debug.Assert(LookupValue(sym) == null);
+            Debug.Assert(TryLookupValue(sym) == null);
             CurrentSymScope().Add(sym, alloca);
         }
 
@@ -455,7 +460,18 @@ public class IRGen
         return _symbolScopes[^1];
     }
 
-    private IRValue? LookupValue(Symbol symbol)
+    private IRValue LookupValue(Symbol symbol)
+    {
+        IRValue? value = TryLookupValue(symbol);
+        if (value == null)
+        {
+            throw new InvalidHIRException($"Cannot find symbol {symbol.Name}");
+        }
+
+        return value;
+    }
+
+    private IRValue? TryLookupValue(Symbol symbol)
     {
         for (int i = _symbolScopes.Count - 1; i >= 0; --i)
         {
