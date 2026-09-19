@@ -6,19 +6,10 @@ namespace Spamlang.DebugPrinters;
 
 public class HIRPrinter
 {
-    private readonly IReadOnlyList<Token> _tokens;
-    private readonly string _code;
-
-    public static void Print(HIRCompilationUnit unit, IReadOnlyList<Token> tokens, string code)
+    public static void Print(HIRCompilationUnit unit)
     {
-        HIRPrinter printer = new(tokens, code);
+        HIRPrinter printer = new();
         printer.PrintHIR(unit);
-    }
-
-    private HIRPrinter(IReadOnlyList<Token> tokens, string code)
-    {
-        _code = code;
-        _tokens = tokens;
     }
 
     private void PrintHIR(HIRCompilationUnit unit)
@@ -211,17 +202,6 @@ public class HIRPrinter
 
         ret.Append(')');
         return ret.ToString();
-    }
-
-    private void PrintAstToken(int depth, int token, string name)
-    {
-        string indent = MakeIndent(depth);
-        Console.WriteLine($"{indent}{name}: \"{_tokens[token].Value(_code)}\"");
-    }
-
-    private string TokenValue(int tokenIndex)
-    {
-        return _tokens[tokenIndex].Value(_code).ToString();
     }
 
     private void PrintSymbol(int depth, Symbol sym, string name = "")

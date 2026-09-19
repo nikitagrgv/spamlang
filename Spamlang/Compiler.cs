@@ -305,7 +305,7 @@ public class Compiler
         if (_flags.DebugHIR)
         {
             PrintSeparator();
-            HIRPrinter.Print(compilationUnit, tokens, code);
+            HIRPrinter.Print(compilationUnit);
             PrintSeparator();
         }
     }
