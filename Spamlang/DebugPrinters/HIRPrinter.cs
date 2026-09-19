@@ -1,4 +1,3 @@
-using System.Text;
 using Spamlang.Frontend;
 
 namespace Spamlang.DebugPrinters;
