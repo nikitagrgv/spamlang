@@ -30,7 +30,15 @@ public sealed class BuiltinType : SpamType
 
     public static readonly BuiltinType Error = new("<error>", 0, 1);
 
+    public static readonly BuiltinType I8 = new("i8", 1, 1);
+    public static readonly BuiltinType I16 = new("i16", 2, 2);
     public static readonly BuiltinType I32 = new("i32", 4, 4);
+    public static readonly BuiltinType I64 = new("i64", 8, 8);
+
+    public static readonly BuiltinType U8 = new("u8", 1, 1);
+    public static readonly BuiltinType U16 = new("u16", 2, 2);
+    public static readonly BuiltinType U32 = new("u32", 4, 4);
+    public static readonly BuiltinType U64 = new("u64", 8, 8);
 
     public static readonly BuiltinType Ptr = new("ptr", 8, 8);
 }

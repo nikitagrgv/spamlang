@@ -55,7 +55,15 @@ public class Sema
             Debug.Assert(added);
         }
 
+        Register("i8", BuiltinType.I8);
+        Register("i16", BuiltinType.I16);
         Register("i32", BuiltinType.I32);
+        Register("i64", BuiltinType.I64);
+
+        Register("u8", BuiltinType.U8);
+        Register("u16", BuiltinType.U16);
+        Register("u32", BuiltinType.U32);
+        Register("u64", BuiltinType.U64);
     }
 
     private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
