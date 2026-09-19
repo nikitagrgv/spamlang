@@ -40,12 +40,12 @@ public class HIRPrinter
         {
             case HIRCompilationUnit n:
                 Console.WriteLine($"{fullPrefix}");
-                PrintChildrenAst(depth + 1, n.FuncDecls);
+                PrintChildren(depth + 1, n.FuncDecls);
                 break;
             case HIRBlock n:
                 Console.WriteLine($"{fullPrefix}");
                 PrintSymbols(depth + 1, n.Variables, "Variable");
-                PrintChildrenAst(depth + 1, n.Stmts);
+                PrintChildren(depth + 1, n.Stmts);
                 break;
             case HIRExprLocalRef n:
                 Console.WriteLine($"{fullPrefix}");
@@ -92,16 +92,21 @@ public class HIRPrinter
                 Console.WriteLine($"{fullPrefix}({n.Op})");
                 PrintHIR(depth + 1, n.Operand, "Operand");
                 break;
-            case HIRExprZeroInit hirExprZeroInit:
+            case HIRExprZeroInit n:
+                Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
                 break;
             case HIRExprCall n:
                 Console.WriteLine($"{fullPrefix}");
-                PrintHIR(depth + 1, n.Callee);
-                PrintChildrenAst(depth + 1, n.Args);
+                PrintHIR(depth + 1, n.Callee, "Callee");
+                PrintChildren(depth + 1, n.Args);
                 break;
-            case HIRExprCast hirExprCast:
+            case HIRExprCast n:
+                Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
+                PrintHIR(depth + 1, n.Value, "Value");
                 break;
-            case HIRExprError hirExprError:
+            case HIRExprError n:
+                Console.WriteLine($"{fullPrefix}: {n.Type.Name}");
+                PrintChildren(depth + 1, n.Children);
                 break;
             case HIRCallArg exprCallArg:
                 string nameInfo = "";
@@ -146,7 +151,7 @@ public class HIRPrinter
         }
     }
 
-    private void PrintChildrenAst(int depth, IReadOnlyList<HIRNode> nodes)
+    private void PrintChildren(int depth, IReadOnlyList<HIRNode> nodes)
     {
         foreach (HIRNode node in nodes)
         {
