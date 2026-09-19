@@ -178,6 +178,24 @@ public class HIRPrinter
                 ret.Append(e.Type);
                 break;
             case HIRExprError e:
+                ret.Append("ERROR");
+                if (e.Children.Count > 0)
+                {
+                    ret.Append('{');
+                    for (int i = 0; i < e.Children.Count; i++)
+                    {
+                        HIRExpr child = e.Children[i];
+                        if (i != 0)
+                        {
+                            ret.Append(", ");
+                        }
+
+                        ret.Append(PrettyExpr(child));
+                    }
+
+                    ret.Append('}');
+                }
+
                 break;
             case HIRExprFuncRef e:
                 break;
