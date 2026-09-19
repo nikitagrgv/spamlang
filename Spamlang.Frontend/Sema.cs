@@ -265,7 +265,11 @@ public class Sema
                 case StmtReturn stmtReturn:
                     HIRStmtReturn tsr = VisitStmtReturn(stmtReturn);
                     AddStatement(tsr);
-                    firstTerm = stmtReturn;
+                    if (firstTerm == null)
+                    {
+                        firstTerm = stmtReturn;
+                    }
+
                     break;
                 default:
                     throw new UnreachableException();
