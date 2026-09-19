@@ -33,6 +33,8 @@ public class AstPrinter
             fullPrefix += prefix + ": ";
         }
 
+        fullPrefix += node.GetType().Name;
+
         switch (node)
         {
             case CompilationUnit n:
