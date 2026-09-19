@@ -90,7 +90,7 @@ public class HIRPrinter
                 break;
             case HIRExprUnary n:
                 Console.WriteLine($"{fullPrefix}({n.Op})");
-                PrintHIR(depth + 1, n.Operand);
+                PrintHIR(depth + 1, n.Operand, "Operand");
                 break;
             case HIRExprZeroInit hirExprZeroInit:
                 break;
