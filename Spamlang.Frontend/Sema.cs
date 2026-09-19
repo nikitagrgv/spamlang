@@ -426,7 +426,7 @@ public class Sema
             case ExprIdentifier exprIdentifier:
                 return VisitExprIdentifier(exprIdentifier);
             case ExprIntConst exprInt:
-                return VisitExprInt(exprInt);
+                return VisitExprIntConst(exprInt);
             case ExprUnary exprUnary:
                 return VisitExprUnary(exprUnary);
             default:
@@ -704,7 +704,7 @@ public class Sema
         }
     }
 
-    private HIRExprIntConst VisitExprInt(ExprIntConst expr)
+    private HIRExprIntConst VisitExprIntConst(ExprIntConst expr)
     {
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
