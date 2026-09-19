@@ -1,3 +1,4 @@
+using System.Text;
 using Spamlang.Frontend;
 
 namespace Spamlang.DebugPrinters;
@@ -43,6 +44,7 @@ public class HIRPrinter
         if (node is HIRExpr expr)
         {
             fullPrefix += $" | Type = {expr.Type}";
+            fullPrefix += $" | Expr = {PrettyExpr(expr)}";
         }
 
         switch (node)
@@ -130,6 +132,81 @@ public class HIRPrinter
                 break;
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
+    }
+
+    private string PrettyExpr(HIRExpr expr)
+    {
+        StringBuilder ret = new();
+        ret.Append('(');
+        switch (expr)
+        {
+            case HIRExprBinary binaryExpr:
+                ret.Append(PrettyExpr(binaryExpr.Left));
+                ret.Append(' ');
+                ret.Append(TokenUtils.ToString(binaryExpr.Op));
+                ret.Append(' ');
+                ret.Append(PrettyExpr(binaryExpr.Right));
+                break;
+            case HIRExprUnary unaryExpr:
+                ret.Append(TokenUtils.ToString(unaryExpr.Op));
+                ret.Append(PrettyExpr(unaryExpr.Operand));
+                break;
+            case HIRExprZeroInit hirExprZeroInit:
+                break;
+            case HIRExprCall exprCall:
+                ret.Clear();
+                ret.Append(PrettyExpr(exprCall.Callee));
+                ret.Append('(');
+                for (int i = 0; i < exprCall.Args.Count; ++i)
+                {
+                    if (i != 0)
+                    {
+                        ret.Append(", ");
+                    }
+
+                    CallArg arg = exprCall.Args[i];
+                    if (arg.ArgNameToken != null)
+                    {
+                        ret.Append(TokenValue(arg.ArgNameToken.Value));
+                        ret.Append(": ");
+                    }
+
+                    ret.Append(PrettyExpr(arg.Value));
+                }
+
+                ret.Append(')');
+
+                return ret.ToString();
+            case HIRExprCast hirExprCast:
+                break;
+            case HIRExprError hirExprError:
+                break;
+            case HIRExprFuncRef hirExprFuncRef:
+                break;
+            case HIRExprIntConst exprInt:
+                return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
+            case HIRExprLoad hirExprLoad:
+                break;
+            case HIRExprLocalRef hirExprLocalRef:
+                break;
+            case HIRExprIdentifier exprIdentifier:
+                return TokenValue(exprIdentifier.IdentifierToken);
+            default: throw new Exception("Unknown node type: " + expr.GetType().Name);
+        }
+
+        ret.Append(')');
+        return ret.ToString();
+    }
+
+    private void PrintAstToken(int depth, int token, string name)
+    {
+        string indent = MakeIndent(depth);
+        Console.WriteLine($"{indent}{name}: \"{_tokens[token].Value(_code)}\"");
+    }
+
+    private string TokenValue(int tokenIndex)
+    {
+        return _tokens[tokenIndex].Value(_code).ToString();
     }
 
     private void PrintSymbol(int depth, Symbol sym, string name = "")
