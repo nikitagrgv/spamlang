@@ -25,6 +25,7 @@ public class HIRPrinter
         PrintHIR(0, unit);
     }
 
+    // TODO: Pretty expr
     private void PrintHIR(int depth, HIRNode node, string prefix = "")
     {
         string fullPrefix = MakeIndent(depth);
@@ -43,26 +44,21 @@ public class HIRPrinter
                 break;
             case HIRBlock n:
                 Console.WriteLine($"{fullPrefix}");
-                PrintSymbols(depth + 1, n.Variables);
+                PrintSymbols(depth + 1, n.Variables, "Variable");
                 PrintChildrenAst(depth + 1, n.Stmts);
                 break;
             case HIRExprLocalRef n:
-                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n)}");
-                PrintSymbol(depth + 1, n.Symbol);
+                Console.WriteLine($"{fullPrefix}");
+                PrintSymbol(depth + 1, n.Symbol, "Symbol");
                 break;
             case HIRExprFuncRef n:
-                Console.WriteLine($"{fullPrefix} | {PrettyExpr(n)}");
-                PrintSymbol(depth + 1, n.Symbol);
+                Console.WriteLine($"{fullPrefix}");
+                PrintSymbol(depth + 1, n.Symbol, "Symbol");
                 break;
             case HIRFuncDecl n:
                 Console.WriteLine($"{fullPrefix}");
-                PrintHIRToken(depth + 1, n.NameToken, "Name");
-                PrintChildrenAst(depth + 1, n.Params);
-                if (n.ReturnType != null)
-                {
-                    PrintHIR(depth + 1, n.ReturnType);
-                }
-
+                PrintSymbol(depth + 1, n.Symbol);
+                PrintSymbols(depth + 1, n.Locals);
                 PrintHIR(depth + 1, n.Body);
                 break;
             case HIRStmtLet n:
@@ -80,9 +76,9 @@ public class HIRPrinter
 
                 break;
             case HIRStmtReturn n:
-                if (n.Expr == null)
+                Console.WriteLine($"{fullPrefix}");
+                if (n.Value == null)
                 {
-                    Console.WriteLine($"{fullPrefix}");
                     break;
                 }
 
@@ -91,28 +87,28 @@ public class HIRPrinter
 
                 break;
             case HIRStmtAssign n:
-                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n.Target)} = {PrettyExpr(n.Value)}");
+                Console.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Target);
                 PrintHIR(depth + 1, n.Value);
                 break;
             case HIRStmtExpr n:
-                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n.Expr)}");
+                Console.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Expr);
                 break;
 
             case HIRExprBinary n:
-                Console.WriteLine($"{fullPrefix}({n.Op}): {PrettyExpr(n)}");
+                Console.WriteLine($"{fullPrefix}({n.Op})");
                 PrintHIR(depth + 1, n.Left, "Left");
                 PrintHIR(depth + 1, n.Right, "Right");
                 break;
             case HIRExprUnary n:
-                Console.WriteLine($"{fullPrefix}({n.Op}): {PrettyExpr(n)}");
+                Console.WriteLine($"{fullPrefix}({n.Op})");
                 PrintHIR(depth + 1, n.Operand);
                 break;
             case HIRExprZeroInit hirExprZeroInit:
                 break;
             case HIRExprCall n:
-                Console.WriteLine($"{fullPrefix}: {PrettyExpr(n)}");
+                Console.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Callee);
                 PrintChildrenAst(depth + 1, n.Args);
                 break;
@@ -140,76 +136,26 @@ public class HIRPrinter
         }
     }
 
-    private string PrettyExpr(HIRExpr expr)
+    private void PrintSymbol(int depth, Symbol sym, string name = "")
     {
-        StringBuilder ret = new();
-        ret.Append('(');
-        switch (expr)
+        string prefix = MakeIndent(depth);
+        if (name != "")
         {
-            case HIRExprBinary binaryExpr:
-                ret.Append(PrettyExpr(binaryExpr.Left));
-                ret.Append(' ');
-                ret.Append(TokenUtils.ToString(binaryExpr.Op));
-                ret.Append(' ');
-                ret.Append(PrettyExpr(binaryExpr.Right));
-                break;
-            case HIRExprUnary unaryExpr:
-                ret.Append(TokenUtils.ToString(unaryExpr.Op));
-                ret.Append(PrettyExpr(unaryExpr.Operand));
-                break;
-            case HIRExprZeroInit hirExprZeroInit:
-                break;
-            case HIRExprCall exprCall:
-                ret.Clear();
-                ret.Append(PrettyExpr(exprCall.Callee));
-                ret.Append('(');
-                for (int i = 0; i < exprCall.Args.Count; ++i)
-                {
-                    if (i != 0)
-                    {
-                        ret.Append(", ");
-                    }
-
-                    HIRCallArg arg = exprCall.Args[i];
-                    ret.Append(PrettyExpr(arg.Value));
-                    ret.Append($" (index={TokenValue(arg.ParameterIndex)})");
-                }
-
-                ret.Append(')');
-
-                return ret.ToString();
-            case HIRExprCast hirExprCast:
-                break;
-            case HIRExprError hirExprError:
-                break;
-            case HIRExprFuncRef hirExprFuncRef:
-                break;
-            case HIRExprIntConst exprInt:
-                return $"{exprInt.Value}";
-            case HIRExprLoad hirExprLoad:
-                break;
-            case HIRExprLocalRef hirExprLocalRef:
-                break;
-            case HIRExprIdentifier exprIdentifier:
-                return TokenValue(exprIdentifier.IdentifierToken);
-            default: throw new Exception("Unknown node type: " + expr.GetType().Name);
+            prefix += name;
+        }
+        else
+        {
+            prefix += "Symbol";
         }
 
-        ret.Append(')');
-        return ret.ToString();
+        Console.WriteLine($"{prefix}: {sym.Name}");
     }
 
-
-    private void PrintSymbol(int depth, Symbol sym)
-    {
-        Console.WriteLine($"{MakeIndent(depth)}Symbol: {sym.Name}");
-    }
-
-    private void PrintSymbols(int depth, IReadOnlyList<Symbol> symbols)
+    private void PrintSymbols(int depth, IReadOnlyList<Symbol> symbols, string name = "")
     {
         foreach (Symbol sym in symbols)
         {
-            PrintSymbol(depth, sym);
+            PrintSymbol(depth, sym, name);
         }
     }
 
