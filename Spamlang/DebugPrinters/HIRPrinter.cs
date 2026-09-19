@@ -41,12 +41,12 @@ public class HIRPrinter
                 break;
             case HIRBlock n:
                 Console.WriteLine($"{fullPrefix}Block");
+                PrintSymbols(depth + 1, n.Variables);
                 PrintChildrenAst(depth + 1, n.Stmts);
                 break;
             case HIRExprLocalRef n:
-                Console.WriteLine($"{fullPrefix}Param");
-                PrintHIRToken(depth + 1, n.NameToken, "Name");
-                PrintHIR(depth + 1, n.Type);
+                Console.WriteLine($"{fullPrefix}Param | IsLValue = {n.IsLValue}");
+                PrintSymbol(depth + 1, n.Symbol);
                 break;
             case HIRExprFuncRef n:
                 Console.WriteLine($"{fullPrefix}FuncTypeNode");
@@ -113,10 +113,16 @@ public class HIRPrinter
                 Console.WriteLine($"{fullPrefix}UnaryExpr({n.Op}): {PrettyExpr(n)}");
                 PrintHIR(depth + 1, n.Operand);
                 break;
+            case HIRExprZeroInit hirExprZeroInit:
+                break;
             case HIRExprCall n:
                 Console.WriteLine($"{fullPrefix}Call: {PrettyExpr(n)}");
                 PrintHIR(depth + 1, n.Callee);
                 PrintChildrenAst(depth + 1, n.Args);
+                break;
+            case HIRExprCast hirExprCast:
+                break;
+            case HIRExprError hirExprError:
                 break;
             case HIRCallArg exprCallArg:
                 string nameInfo = "";
@@ -132,23 +138,11 @@ public class HIRPrinter
                 Console.WriteLine(
                     $"{fullPrefix}ExprInt: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
                 break;
+            case HIRExprLoad hirExprLoad:
+                break;
 
             default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
-    }
-
-
-    private void PrintChildrenAst(int depth, IReadOnlyList<Node> nodes)
-    {
-        foreach (Node node in nodes)
-        {
-            PrintHIR(depth, node);
-        }
-    }
-
-    private string TokenValue(int tokenIndex)
-    {
-        return _tokens[tokenIndex].Value(_code).ToString();
     }
 
     private string PrettyExpr(HIRExpr expr)
@@ -167,6 +161,8 @@ public class HIRPrinter
             case HIRExprUnary unaryExpr:
                 ret.Append(TokenUtils.ToString(unaryExpr.Op));
                 ret.Append(PrettyExpr(unaryExpr.Operand));
+                break;
+            case HIRExprZeroInit hirExprZeroInit:
                 break;
             case HIRExprCall exprCall:
                 ret.Clear();
@@ -187,8 +183,18 @@ public class HIRPrinter
                 ret.Append(')');
 
                 return ret.ToString();
+            case HIRExprCast hirExprCast:
+                break;
+            case HIRExprError hirExprError:
+                break;
+            case HIRExprFuncRef hirExprFuncRef:
+                break;
             case HIRExprIntConst exprInt:
                 return $"{exprInt.Value}";
+            case HIRExprLoad hirExprLoad:
+                break;
+            case HIRExprLocalRef hirExprLocalRef:
+                break;
             case HIRExprIdentifier exprIdentifier:
                 return TokenValue(exprIdentifier.IdentifierToken);
             default: throw new Exception("Unknown node type: " + expr.GetType().Name);
@@ -196,6 +202,33 @@ public class HIRPrinter
 
         ret.Append(')');
         return ret.ToString();
+    }
+
+
+    private void PrintSymbol(int depth, Symbol sym)
+    {
+        Console.WriteLine($"{MakeIndent(depth)}Symbol: {sym.Name}");
+    }
+
+    private void PrintSymbols(int depth, IReadOnlyList<Symbol> symbols)
+    {
+        foreach (Symbol sym in symbols)
+        {
+            PrintSymbol(depth, sym);
+        }
+    }
+
+    private void PrintChildrenAst(int depth, IReadOnlyList<HIRNode> nodes)
+    {
+        foreach (HIRNode node in nodes)
+        {
+            PrintHIR(depth, node);
+        }
+    }
+
+    private string TokenValue(int tokenIndex)
+    {
+        return _tokens[tokenIndex].Value(_code).ToString();
     }
 
     private void PrintHIRToken(int depth, int token, string name)
