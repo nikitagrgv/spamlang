@@ -368,7 +368,7 @@ public class Sema
                     Children = [],
                     Type = BuiltinType.Error,
                     Syntax = stmt,
-                    IsSynthesized = false,
+                    IsSynthesized = true,
                 };
             }
             else if (declType is FuncType)
@@ -380,7 +380,7 @@ public class Sema
                     Children = [],
                     Type = BuiltinType.Error,
                     Syntax = stmt,
-                    IsSynthesized = false,
+                    IsSynthesized = true,
                 };
             }
             else
