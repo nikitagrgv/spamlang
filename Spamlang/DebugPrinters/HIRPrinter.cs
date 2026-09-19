@@ -76,8 +76,8 @@ public class HIRPrinter
                 break;
             case HIRStmtAssign n:
                 Console.WriteLine($"{fullPrefix}");
-                PrintHIR(depth + 1, n.Target);
-                PrintHIR(depth + 1, n.Value);
+                PrintHIR(depth + 1, n.Target, "Target");
+                PrintHIR(depth + 1, n.Value, "Value");
                 break;
             case HIRStmtExpr n:
                 Console.WriteLine($"{fullPrefix}");
