@@ -173,6 +173,9 @@ public class HIRPrinter
 
                 return ret.ToString();
             case HIRExprCast e:
+                ret.Append(PrettyExpr(e.Value));
+                ret.Append(" as ");
+                ret.Append(e.Type);
                 break;
             case HIRExprError e:
                 break;
