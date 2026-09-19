@@ -142,7 +142,10 @@ public class IRGen
     {
         IRValue value = GenExprValue(block, stmtLet.Init);
         IRValue? addr = LookupValue(stmtLet.VariableSymbol);
-        Debug.Assert(addr != null);
+        if (addr == null)
+        {
+            throw new InvalidHIRException($"Cannot find symbol {stmtLet.VariableSymbol.Name}");
+        }
 
         IRInstructionStore store = new()
         {
@@ -169,7 +172,11 @@ public class IRGen
 
     private IRValue GenExprValue(IRBasicBlock block, HIRExpr expr)
     {
-        Debug.Assert(!expr.IsLValue);
+        if (expr.IsLValue)
+        {
+            throw new InvalidHIRException("LValue must be loaded");
+        }
+
         switch (expr)
         {
             case HIRExprBinary hirExprBinary:
@@ -199,7 +206,11 @@ public class IRGen
 
     private IRValue GenExprLoadValue(IRBasicBlock block, HIRExprLoad expr)
     {
-        Debug.Assert(expr.Address.IsLValue);
+        if (!expr.Address.IsLValue)
+        {
+            throw new InvalidHIRException("Cannot load non-lvalue");
+        }
+
         IRValue addr = GenExprAddr(block, expr.Address);
         SpamType type = IRUtils.ToLowerType(expr.Type);
         IRInstructionLoad load = new()
@@ -236,7 +247,10 @@ public class IRGen
 
     private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
-        Debug.Assert(left.Type == right.Type);
+        if (left.Type != right.Type)
+        {
+            throw new InvalidHIRException("Cannot perform binary operation on different types");
+        }
 
         bool signed;
         if (left.Type == BuiltinType.I32)
