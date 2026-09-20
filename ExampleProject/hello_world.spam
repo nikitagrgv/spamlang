@@ -45,5 +45,5 @@ fn demo_types()
     let test_e: i16 = 1 + 2;
     let test_f: i16 = a + 100000;
     let test_g: i64 = 3000000000;
-    let test_h = 5 as i8; 
+    let test_h = 5 as i8;
 }
