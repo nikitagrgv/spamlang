@@ -1190,8 +1190,11 @@ public class Sema
 
     private bool CanExplicitlyCast(SpamType from, SpamType to)
     {
-        Debug.Assert(from != to);
-        // TODO: Implement
+        if (from.Kind == TypeKind.AbstractNumber || from.IsInteger() || from.IsFloat())
+        {
+            return to.IsInteger() || to.IsFloat();
+        }
+
         return false;
     }
 
