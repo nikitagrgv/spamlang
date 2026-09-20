@@ -42,7 +42,7 @@
     },
     {
       "name": "keyword.operator.spamlang",
-      "match": "->|==|!=|<=|>=|&&|\\|\\||[-+*/%=!<>&\\|]"
+      "match": "->|==|!=|<=|>=|&&|\\|\\||[-+*/%=!<>&|]"
     },
     {
       "name": "punctuation.spamlang",
