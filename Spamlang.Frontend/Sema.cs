@@ -1180,6 +1180,8 @@ public class Sema
             {
                 return to.Size > from.Size;
             }
+
+            return false;
         }
 
         return false;
