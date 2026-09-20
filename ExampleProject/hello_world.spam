@@ -49,7 +49,7 @@ fn demo_types()
     let test_i: bool = true;
     let test_j: bool = false;
     let test_k = 5 == 6;
-    let test_l: f64 = 5.123;
-    let test_m: f32 = 5.123f + 5.1F;
-    let test_m = 5.123f + 5.1F;
+    let test_l: f32 = 5.123f + 5.1F;
+    let test_m: f64 = 5.123;
+    let test_m = 5.123f + test_m;
 }
