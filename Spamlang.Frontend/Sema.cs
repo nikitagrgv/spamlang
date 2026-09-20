@@ -700,7 +700,7 @@ public class Sema
         }
         else if (!CanExplicitlyCast(value.Type, targetType))
         {
-            Error($"Cannot cast \"{value.Type}\" to \"{targetType}\"", expr);
+            Error($"Cannot cast \"{value.Type}\" to \"{targetType}\"", expr.TargetType);
             return new HIRExprError
             {
                 Children = [value],
