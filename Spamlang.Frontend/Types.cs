@@ -82,3 +82,13 @@ public sealed class FuncType : SpamType
         return new FuncType(returnType, paramTypes);
     }
 }
+
+public static class TypesUtils
+{
+    public static bool IsInteger(this SpamType type)
+    {
+        return type.Kind == TypeKind.AbstractInteger ||
+               type.Kind == TypeKind.SignedInteger ||
+               type.Kind == TypeKind.UnsignedInteger;
+    }
+}
