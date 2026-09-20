@@ -203,8 +203,6 @@ public class Lexer
             return false;
         }
 
-        float s = 1.;
-
         int pos = 0;
         bool hexOrBinary = false;
         if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
