@@ -1164,6 +1164,19 @@ public class Sema
             return false;
         }
 
+        if (to.Kind == TypeKind.Float)
+        {
+            if (from.Kind == TypeKind.AbstractNumber)
+            {
+                return true;
+            }
+
+            if (from.Kind == TypeKind.Float)
+            {
+                return to.Size >= from.Size;
+            }
+        }
+
         return false;
     }
 
