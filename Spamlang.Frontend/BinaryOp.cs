@@ -7,4 +7,11 @@ public enum BinaryOp
     Mul,
     Div,
     Rem,
+
+    Equal,
+    NotEqual,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
 }
