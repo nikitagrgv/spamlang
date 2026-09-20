@@ -64,6 +64,11 @@ public class Sema
         Register("u16", BuiltinType.U16);
         Register("u32", BuiltinType.U32);
         Register("u64", BuiltinType.U64);
+
+        Register("f32", BuiltinType.F32);
+        Register("f64", BuiltinType.F64);
+
+        Register("bool", BuiltinType.Bool);
     }
 
     private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)

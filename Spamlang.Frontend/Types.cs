@@ -8,6 +8,7 @@ public enum TypeKind
     SignedInteger,
     UnsignedInteger,
     Float,
+    Bool,
     Pointer,
     Function,
 }
@@ -63,6 +64,8 @@ public sealed class BuiltinType : SpamType
 
     public static readonly BuiltinType F32 = new(TypeKind.UnsignedInteger, "f32", 4, 4);
     public static readonly BuiltinType F64 = new(TypeKind.UnsignedInteger, "f64", 8, 8);
+
+    public static readonly BuiltinType Bool = new(TypeKind.Bool, "bool", 1, 1);
 }
 
 public sealed class FuncType : SpamType
