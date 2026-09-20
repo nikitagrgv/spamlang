@@ -1151,11 +1151,6 @@ public class Sema
                 return to.Size > from.Size;
             }
 
-            if (from.Kind == TypeKind.Bool)
-            {
-                return true;
-            }
-
             return false;
         }
 
@@ -1169,11 +1164,6 @@ public class Sema
             if (from.Kind == TypeKind.UnsignedInteger)
             {
                 return to.Size >= from.Size;
-            }
-
-            if (from.Kind == TypeKind.Bool)
-            {
-                return true;
             }
 
             return false;
@@ -1205,6 +1195,18 @@ public class Sema
 
     private bool CanExplicitlyCast(SpamType from, SpamType to)
     {
+        Debug.Assert(from != to, "Must be different types!");
+
+        if (to.IsInteger())
+        {
+            return from.Kind == TypeKind.AbstractNumber || from.IsInteger() || from.IsFloat() || from.IsBool();
+        }
+
+        if (to.IsFloat())
+        {
+            return from.Kind == TypeKind.AbstractNumber || from.IsInteger() || from.IsFloat();
+        }
+
         if (from.Kind == TypeKind.AbstractNumber || from.IsInteger() || from.IsFloat())
         {
             return to.IsInteger() || to.IsFloat();

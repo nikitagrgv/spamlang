@@ -102,4 +102,9 @@ public static class TypesUtils
     {
         return type.Kind == TypeKind.Float;
     }
+
+    public static bool IsBool(this SpamType type)
+    {
+        return type.Kind == TypeKind.Bool;
+    }
 }
