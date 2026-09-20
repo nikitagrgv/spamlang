@@ -688,6 +688,35 @@ public class Sema
 
     private HIRExpr VisitExprCast(ExprCast expr)
     {
+        HIRExpr value = VisitExpr(expr.Value);
+        SpamType targetType = ResolveType(expr.TargetType);
+        if (value.Type == BuiltinType.Error || targetType == BuiltinType.Error)
+        {
+            // Already reported
+        }
+        else if (value.Type == targetType)
+        {
+            return value;
+        }
+        else if (!CanExplicitlyCast(value.Type, targetType))
+        {
+            Error($"Cannot explicitly cast \"{value.Type}\" to \"{targetType}\"", expr);
+            return new HIRExprError
+            {
+                Children = [value],
+                Type = BuiltinType.Error,
+                Syntax = expr,
+                IsSynthesized = true,
+            };
+        }
+
+        return new HIRExprCast
+        {
+            Value = value,
+            Type = targetType,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
     private HIRExpr VisitExprIdentifier(ExprIdentifier expr)
@@ -1108,6 +1137,13 @@ public class Sema
     }
 
     private bool CanImplicitlyCast(SpamType from, SpamType to)
+    {
+        Debug.Assert(from != to);
+        // TODO: Implement
+        return false;
+    }
+
+    private bool CanExplicitlyCast(SpamType from, SpamType to)
     {
         Debug.Assert(from != to);
         // TODO: Implement
