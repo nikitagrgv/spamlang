@@ -1207,11 +1207,6 @@ public class Sema
             return from.Kind == TypeKind.AbstractNumber || from.IsInteger() || from.IsFloat();
         }
 
-        if (from.Kind == TypeKind.AbstractNumber || from.IsInteger() || from.IsFloat())
-        {
-            return to.IsInteger() || to.IsFloat();
-        }
-
         return false;
     }
 
