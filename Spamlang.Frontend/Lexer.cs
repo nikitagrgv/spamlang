@@ -169,7 +169,8 @@ public class Lexer
             "fn" => TokenType.KeywordFunc,
             "return" => TokenType.KeywordReturn,
             "let" => TokenType.KeywordLet,
-            _ => null
+            "as" => TokenType.KeywordAs,
+            _ => null,
         };
     }
 

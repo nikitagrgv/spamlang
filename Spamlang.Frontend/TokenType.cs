@@ -23,6 +23,7 @@ public enum TokenType
     KeywordFunc,
     KeywordReturn,
     KeywordLet,
+    KeywordAs,
 
     Identifier,
 

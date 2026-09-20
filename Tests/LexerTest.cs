@@ -24,6 +24,7 @@ public class LexerTest
         ("fn", TokenType.KeywordFunc),
         ("return", TokenType.KeywordReturn),
         ("let", TokenType.KeywordLet),
+        ("as", TokenType.KeywordAs),
         ("spam", TokenType.Identifier),
         ("123", TokenType.LiteralInt),
         ("->", TokenType.Arrow),
@@ -453,7 +454,7 @@ public class LexerTest
     [Fact]
     public void Lexer_ParsesSimpleProgram()
     {
-        string code = "fn main() -> i32 { return 123 + 10 * x; }";
+        string code = "fn main() -> i32 { return 123 + 10 * x as i32; }";
         Diagnostic diag = new();
         Lexer lexer = new();
         List<Token> tokens = lexer.Run(code, diag);
@@ -482,11 +483,13 @@ public class LexerTest
         CheckNext(TokenType.LiteralInt);
         CheckNext(TokenType.Star);
         CheckNext(TokenType.Identifier);
+        CheckNext(TokenType.KeywordAs);
+        CheckNext(TokenType.Identifier);
         CheckNext(TokenType.Semicolon);
         CheckNext(TokenType.RBrace);
         CheckNext(TokenType.Eof);
 
-        int expectedCount = 16;
+        int expectedCount = 18;
         Assert.Equal(expectedCount, cur);
         Assert.Equal(expectedCount, tokens.Count);
     }
