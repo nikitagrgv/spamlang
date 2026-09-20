@@ -87,8 +87,9 @@ public static class TypesUtils
 {
     public static bool IsInteger(this SpamType type)
     {
-        return type.Kind == TypeKind.AbstractInteger ||
-               type.Kind == TypeKind.SignedInteger ||
-               type.Kind == TypeKind.UnsignedInteger;
+        TypeKind kind = type.Kind;
+        return kind == TypeKind.AbstractInteger ||
+               kind == TypeKind.SignedInteger ||
+               kind == TypeKind.UnsignedInteger;
     }
 }
