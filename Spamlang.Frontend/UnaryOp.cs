@@ -4,4 +4,6 @@ public enum UnaryOp
 {
     Plus,
     Minus,
+
+    Not,
 }
