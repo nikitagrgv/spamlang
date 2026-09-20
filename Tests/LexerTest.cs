@@ -42,8 +42,7 @@ public class LexerTest
 
         ("123", TokenType.LiteralInt),
         ("124.12", TokenType.LiteralFloat),
-        ("true", TokenType.LiteralTrue),
-        ("false", TokenType.LiteralFalse),
+        ("true", TokenType.LiteralBool),
 
         ("->", TokenType.Arrow),
     ];
