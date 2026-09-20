@@ -41,6 +41,7 @@ public class LexerTest
         ("spam", TokenType.Identifier),
 
         ("123", TokenType.LiteralInt),
+        ("124.12", TokenType.LiteralFloat),
         ("true", TokenType.LiteralTrue),
         ("false", TokenType.LiteralFalse),
 
@@ -302,6 +303,29 @@ public class LexerTest
         Assert.Equal(TokenType.Invalid, tokens[0].Type);
         Assert.Equal(0, diag.Entries[0].Position);
         Assert.Equal(str.Length, diag.Entries[0].Length);
+    }
+
+    [Theory]
+    [InlineData("0.0")]
+    [InlineData("1.2")]
+    [InlineData("1.2f")]
+    [InlineData(".1")]
+    [InlineData(".1f")]
+    [InlineData("1.2e2")]
+    [InlineData("1.2e-2")]
+    [InlineData("1.2e-2f")]
+    [InlineData("1.2E-2F")]
+    public void Lexer_ParsesLiteralFloat(string str)
+    {
+        string code = str;
+        Diagnostic diag = new();
+        Lexer lexer = new();
+        List<Token> tokens = lexer.Run(code, diag);
+
+        Assert.False(diag.HasErrors);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.LiteralFloat, tokens[0].Type);
     }
 
     [Theory]

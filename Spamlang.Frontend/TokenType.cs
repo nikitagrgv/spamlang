@@ -37,6 +37,7 @@ public enum TokenType
     Identifier,
 
     LiteralInt,
+    LiteralFloat,
     LiteralTrue,
     LiteralFalse,
 
