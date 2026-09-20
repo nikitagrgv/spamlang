@@ -1129,24 +1129,40 @@ public class Sema
             return false;
         }
 
-        if (from.Kind == TypeKind.AbstractNumber)
+        if (to.Kind == TypeKind.SignedInteger)
         {
-            Debug.Assert(to.Kind != TypeKind.AbstractNumber);
-            return to.IsInteger() || to.IsFloat();
-        }
+            if (from.Kind == TypeKind.AbstractNumber)
+            {
+                return true;
+            }
 
-        if (to.Kind == from.Kind)
-        {
-            return to.IsInteger() || to.IsFloat() && to.Size >= from.Size;
-        }
+            if (from.Kind == TypeKind.SignedInteger)
+            {
+                return to.Size >= from.Size;
+            }
 
-        if (to.Kind == TypeKind.SignedInteger && from.Kind == TypeKind.UnsignedInteger ||
-            to.Kind == TypeKind.UnsignedInteger && from.Kind == TypeKind.SignedInteger)
-        {
-            // Signed vs unsigned - need explicit cast
+            if (from.Kind == TypeKind.UnsignedInteger)
+            {
+                return to.Size > from.Size;
+            }
+
             return false;
         }
 
+        if (to.Kind == TypeKind.UnsignedInteger)
+        {
+            if (from.Kind == TypeKind.AbstractNumber)
+            {
+                return true;
+            }
+
+            if (from.Kind == TypeKind.UnsignedInteger)
+            {
+                return to.Size >= from.Size;
+            }
+
+            return false;
+        }
 
         return false;
     }
