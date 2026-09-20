@@ -493,29 +493,29 @@ public class Sema
         SpamType leftType = left.Type;
         SpamType rightType = right.Type;
 
-        SpamType? commonType;
+        SpamType? resultType;
         if (leftType == BuiltinType.Error || rightType == BuiltinType.Error)
         {
-            commonType = BuiltinType.Error;
+            resultType = BuiltinType.Error;
         }
         else
         {
-            commonType = GetBinaryResultType(leftType, rightType, expr.Op);
-            if (commonType == null)
+            resultType = GetBinaryResultType(leftType, rightType, expr.Op);
+            if (resultType == null)
             {
                 Error($"Cannot use \"{TokenUtils.ToString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
-                commonType = BuiltinType.Error;
+                resultType = BuiltinType.Error;
             }
         }
 
-        left = Adapt(left, commonType);
-        right = Adapt(right, commonType);
+        left = Adapt(left, resultType);
+        right = Adapt(right, resultType);
         return new HIRExprBinary
         {
             Left = left,
             Right = right,
             Op = expr.Op,
-            Type = commonType,
+            Type = resultType,
             Syntax = expr,
             IsSynthesized = false,
         };
