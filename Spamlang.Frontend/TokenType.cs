@@ -38,8 +38,7 @@ public enum TokenType
 
     LiteralInt,
     LiteralFloat,
-    LiteralTrue,
-    LiteralFalse,
+    LiteralBool,
 
     Arrow,
 

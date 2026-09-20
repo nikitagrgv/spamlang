@@ -309,6 +309,9 @@ public class LexerTest
     [InlineData("0.0")]
     [InlineData("1.2")]
     [InlineData("1.2f")]
+    [InlineData("0f")]
+    [InlineData("123f")]
+    [InlineData("0123f")]
     [InlineData(".1")]
     [InlineData(".1f")]
     [InlineData("1.2e2")]
@@ -326,6 +329,51 @@ public class LexerTest
         Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.LiteralFloat, tokens[0].Type);
+    }
+
+    [Theory]
+    [InlineData("1.")]
+    [InlineData("1.f")]
+    public void Lexer_TrailingPointIsNotConsideredAsFloat(string str)
+    {
+        Diagnostic diag = new();
+        Lexer lexer = new();
+        List<Token> tokens = lexer.Run(str, diag);
+
+        Assert.NotEqual(TokenType.LiteralFloat, tokens[0].Type);
+    }
+
+    [Theory]
+    [InlineData("true")]
+    [InlineData("false")]
+    public void Lexer_ParsesLiteralBool(string str)
+    {
+        string code = str;
+        Diagnostic diag = new();
+        Lexer lexer = new();
+        List<Token> tokens = lexer.Run(code, diag);
+
+        Assert.False(diag.HasErrors);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.LiteralBool, tokens[0].Type);
+    }
+
+    [Theory]
+    [InlineData("TRUE")]
+    [InlineData("FALSE")]
+    [InlineData("True")]
+    [InlineData("False")]
+    [InlineData("trUe")]
+    [InlineData("faLse")]
+    public void Lexer_CaseMattersForBoolLiterals(string str)
+    {
+        string code = str;
+        Diagnostic diag = new();
+        Lexer lexer = new();
+        List<Token> tokens = lexer.Run(code, diag);
+
+        Assert.NotEqual(TokenType.LiteralBool, tokens[0].Type);
     }
 
     [Theory]
