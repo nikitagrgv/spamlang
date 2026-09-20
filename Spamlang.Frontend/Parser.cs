@@ -486,7 +486,6 @@ public class Parser
         else
         {
             Expect(TokenType.Semicolon);
-
             int end = End(begin);
             stmt = new StmtExpr
             {
