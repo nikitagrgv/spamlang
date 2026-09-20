@@ -4,9 +4,10 @@ public enum TypeKind
 {
     Error,
     Void,
-    AbstractInteger,
+    AbstractNumber,
     SignedInteger,
     UnsignedInteger,
+    Float,
     Pointer,
     Function,
 }
@@ -48,7 +49,7 @@ public sealed class BuiltinType : SpamType
 
     public static readonly BuiltinType Ptr = new(TypeKind.Pointer, "ptr", 8, 8);
 
-    public static readonly BuiltinType AbstractInt = new(TypeKind.AbstractInteger, "integer", 0, 1);
+    public static readonly BuiltinType AbstractNumber = new(TypeKind.AbstractNumber, "integer", 0, 1);
 
     public static readonly BuiltinType I8 = new(TypeKind.SignedInteger, "i8", 1, 1);
     public static readonly BuiltinType I16 = new(TypeKind.SignedInteger, "i16", 2, 2);
@@ -59,6 +60,9 @@ public sealed class BuiltinType : SpamType
     public static readonly BuiltinType U16 = new(TypeKind.UnsignedInteger, "u16", 2, 2);
     public static readonly BuiltinType U32 = new(TypeKind.UnsignedInteger, "u32", 4, 4);
     public static readonly BuiltinType U64 = new(TypeKind.UnsignedInteger, "u64", 8, 8);
+
+    public static readonly BuiltinType F32 = new(TypeKind.UnsignedInteger, "f32", 4, 4);
+    public static readonly BuiltinType F64 = new(TypeKind.UnsignedInteger, "f64", 8, 8);
 }
 
 public sealed class FuncType : SpamType
@@ -88,8 +92,11 @@ public static class TypesUtils
     public static bool IsInteger(this SpamType type)
     {
         TypeKind kind = type.Kind;
-        return kind == TypeKind.AbstractInteger ||
-               kind == TypeKind.SignedInteger ||
-               kind == TypeKind.UnsignedInteger;
+        return kind == TypeKind.SignedInteger || kind == TypeKind.UnsignedInteger;
+    }
+
+    public static bool IsFloat(this SpamType type)
+    {
+        return type.Kind == TypeKind.Float;
     }
 }

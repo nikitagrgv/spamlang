@@ -791,7 +791,7 @@ public class Sema
         return new HIRExprIntConst
         {
             Value = value,
-            Type = BuiltinType.AbstractInt,
+            Type = BuiltinType.AbstractNumber,
             Syntax = expr,
             IsSynthesized = false,
         };
@@ -1084,11 +1084,11 @@ public class Sema
     {
         Debug.Assert(a != BuiltinType.Error && b != BuiltinType.Error);
 
-        if (!a.IsInteger || !b.IsInteger)
+        if (!a.IsInteger() || !b.IsInteger())
         {
             return null;
         }
-        
+
         if (a == b)
         {
             return a;
@@ -1121,7 +1121,32 @@ public class Sema
 
     private bool CanImplicitlyCast(SpamType from, SpamType to)
     {
-        Debug.Assert(from != to);
+        Debug.Assert(from != to, "Must be different types!");
+
+        if (to.Kind == TypeKind.AbstractNumber)
+        {
+            Debug.Assert(from.Kind != TypeKind.AbstractNumber);
+            return false;
+        }
+
+        if (from.Kind == TypeKind.AbstractNumber)
+        {
+            Debug.Assert(to.Kind != TypeKind.AbstractNumber);
+            return to.IsInteger() || to.IsFloat();
+        }
+
+        if (to.Kind == from.Kind)
+        {
+            return to.IsInteger() || to.IsFloat() && to.Size >= from.Size;
+        }
+
+        if (to.Kind == TypeKind.SignedInteger && from.Kind == TypeKind.UnsignedInteger ||
+            to.Kind == TypeKind.UnsignedInteger && from.Kind == TypeKind.SignedInteger)
+        {
+            return false;
+        }
+
+
         return false;
     }
 
