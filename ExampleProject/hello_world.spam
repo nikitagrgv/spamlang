@@ -4,7 +4,7 @@ fn main() -> i32
     let gs = ggs();
     let s: fn(i32, i32)->i32 = gs();
 
-    noop();
+    demo_types();
 
     let a = s(10, 1); // 9
     let b = sub(b: 10, a: 30); // 20
@@ -35,6 +35,15 @@ fn apply(f: fn(i32,i32)->i32, a: i32, b: i32) -> i32
     return result;
 }
 
-fn noop()
+fn demo_types()
 {
+    let test_a: i16 = 123;
+    let test_b = test_a + 123;
+    123 + test_a;
+    let test_c: i16 = 100000;
+    let test_d = 5;
+    let test_e: i16 = 1 + 2;
+    let test_f: i16 = a + 100000;
+    let test_g: i64 = 3000000000;
+    let test_h = 5 as i8; 
 }
