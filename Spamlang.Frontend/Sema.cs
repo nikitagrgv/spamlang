@@ -469,6 +469,8 @@ public class Sema
                 return VisitExprBinary(exprBinary);
             case ExprCall exprCall:
                 return VisitExprCall(exprCall);
+            case ExprCast exprCast:
+                return VisitExprCast(exprCast);
             case ExprIdentifier exprIdentifier:
                 return VisitExprIdentifier(exprIdentifier);
             case ExprIntConst exprInt:
@@ -684,19 +686,8 @@ public class Sema
         };
     }
 
-    private static int FindParamIndexByName(FuncSymbol funcSymbol, ReadOnlySpan<char> name)
+    private HIRExpr VisitExprCast(ExprCast expr)
     {
-        for (int i = 0; i < funcSymbol.Params.Count; i++)
-        {
-            ParamSymbol param = funcSymbol.Params[i];
-            bool match = name.SequenceEqual(param.Name);
-            if (match)
-            {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     private HIRExpr VisitExprIdentifier(ExprIdentifier expr)
@@ -1186,5 +1177,20 @@ public class Sema
 
         int newSymbolToken = newSymbol.DeclaringNode.StartToken;
         _diag.AddWarning(message, _tokens[newSymbolToken]);
+    }
+
+    private static int FindParamIndexByName(FuncSymbol funcSymbol, ReadOnlySpan<char> name)
+    {
+        for (int i = 0; i < funcSymbol.Params.Count; i++)
+        {
+            ParamSymbol param = funcSymbol.Params[i];
+            bool match = name.SequenceEqual(param.Name);
+            if (match)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
