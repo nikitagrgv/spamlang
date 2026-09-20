@@ -60,10 +60,10 @@ public sealed class FuncType : SpamType
 {
     public IReadOnlyList<SpamType> ParamTypes { get; }
     public SpamType ReturnType { get; }
-    public override bool IsInteger => false;
 
     public override int Size => 8;
     public override int Alignment => 8;
+    public override bool IsInteger => false;
 
     public override string Name => $"fn({string.Join(", ", ParamTypes.Select(t => t.Name))})->{ReturnType.Name}";
 
