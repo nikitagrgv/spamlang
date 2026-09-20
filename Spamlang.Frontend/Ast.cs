@@ -95,6 +95,12 @@ public sealed class ExprUnary : Expr
     public required Expr Operand { get; init; }
 }
 
+public sealed class ExprCast : Expr
+{
+    public required Expr Value { get; init; }
+    public required TypeNode TargetType { get; init; }
+}
+
 public abstract class ExprPrimary : Expr
 {
 }

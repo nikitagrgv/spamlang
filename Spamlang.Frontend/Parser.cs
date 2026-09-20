@@ -528,7 +528,7 @@ public class Parser
     private Expr ParseTerm()
     {
         int begin = _cursor;
-        Expr left = ParseUnary();
+        Expr left = ParseCast();
         while (Check(TokenType.Star) ||
                Check(TokenType.Slash) ||
                Check(TokenType.Percent))
@@ -536,7 +536,7 @@ public class Parser
             int opPos = _cursor;
             Advance();
 
-            Expr right = ParseUnary();
+            Expr right = ParseCast();
             int end = End(begin);
 
             left = new ExprBinary
@@ -550,6 +550,26 @@ public class Parser
         }
 
         return left;
+    }
+
+    private Expr ParseCast()
+    {
+        int begin = _cursor;
+        Expr value = ParseUnary();
+        while (TryConsume(TokenType.KeywordAs))
+        {
+            TypeNode target = ParseType();
+            int end = End(begin);
+            value = new ExprCast
+            {
+                StartToken = begin,
+                EndToken = end,
+                Value = value,
+                TargetType = target,
+            };
+        }
+
+        return value;
     }
 
     private Expr ParseUnary()
