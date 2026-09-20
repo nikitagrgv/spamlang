@@ -1151,6 +1151,11 @@ public class Sema
                 return to.Size > from.Size;
             }
 
+            if (from.Kind == TypeKind.Bool)
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -1164,6 +1169,11 @@ public class Sema
             if (from.Kind == TypeKind.UnsignedInteger)
             {
                 return to.Size >= from.Size;
+            }
+
+            if (from.Kind == TypeKind.Bool)
+            {
+                return true;
             }
 
             return false;
