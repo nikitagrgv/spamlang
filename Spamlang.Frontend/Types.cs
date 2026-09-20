@@ -58,14 +58,13 @@ public sealed class BuiltinType : SpamType
 
 public sealed class FuncType : SpamType
 {
-    public IReadOnlyList<SpamType> ParamTypes { get; }
-    public SpamType ReturnType { get; }
-
+    public override string Name => $"fn({string.Join(", ", ParamTypes.Select(t => t.Name))})->{ReturnType.Name}";
     public override int Size => 8;
     public override int Alignment => 8;
     public override bool IsInteger => false;
 
-    public override string Name => $"fn({string.Join(", ", ParamTypes.Select(t => t.Name))})->{ReturnType.Name}";
+    public IReadOnlyList<SpamType> ParamTypes { get; }
+    public SpamType ReturnType { get; }
 
     private FuncType(SpamType returnType, IReadOnlyList<SpamType> paramTypes)
     {
