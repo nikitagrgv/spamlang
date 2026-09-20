@@ -1175,6 +1175,11 @@ public class Sema
             {
                 return to.Size >= from.Size;
             }
+
+            if (from.Kind == TypeKind.SignedInteger || from.Kind == TypeKind.UnsignedInteger)
+            {
+                return to.Size > from.Size;
+            }
         }
 
         return false;
