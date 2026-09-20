@@ -1084,13 +1084,11 @@ public class Sema
     {
         Debug.Assert(a != BuiltinType.Error && b != BuiltinType.Error);
 
-        if (a != BuiltinType.I32 || b != BuiltinType.I32)
+        if (!a.IsInteger || !b.IsInteger)
         {
             return null;
         }
-
-        // TODO: Consider op too
-
+        
         if (a == b)
         {
             return a;
@@ -1124,7 +1122,6 @@ public class Sema
     private bool CanImplicitlyCast(SpamType from, SpamType to)
     {
         Debug.Assert(from != to);
-        // TODO: Implement
         return false;
     }
 
