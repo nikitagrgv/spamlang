@@ -30,7 +30,7 @@
     },
     {
       "name": "constant.numeric.float.spamlang",
-      "match": "\\b\\d+\\.\\d+([eE][-+]?\\d+)?[fF]?\\b"
+      "match": "\\b\\d+(\\.\\d+([eE][-+]?\\d+)?[fF]?|[eE][-+]?\\d+[fF]?|[fF])\\b"
     },
     {
       "name": "constant.numeric.integer.spamlang",
@@ -42,7 +42,7 @@
     },
     {
       "name": "keyword.operator.spamlang",
-      "match": "->|==|!=|>=|<=|[-+*/%=<>!]"
+      "match": "->|==|!=|<=|>=|&&|\\|\\||[-+*/%=!<>&|]"
     },
     {
       "name": "punctuation.spamlang",
