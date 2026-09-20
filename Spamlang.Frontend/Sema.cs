@@ -788,25 +788,10 @@ public class Sema
             Error($"Invalid integer literal: {str}", expr);
         }
 
-        SpamType type;
-        if (value > Int64.MaxValue || value < Int64.MinValue)
-        {
-            type = BuiltinType.I64;
-            ErrorOutOfRange(expr.IsNegative, str, expr);
-        }
-        else if (value > Int32.MaxValue || value < Int32.MinValue)
-        {
-            type = BuiltinType.I64;
-        }
-        else
-        {
-            type = BuiltinType.I32;
-        }
-
         return new HIRExprIntConst
         {
             Value = value,
-            Type = type,
+            Type = BuiltinType.AbstractInt,
             Syntax = expr,
             IsSynthesized = false,
         };
