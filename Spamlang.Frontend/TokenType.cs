@@ -20,6 +20,15 @@ public enum TokenType
     Slash,
     Percent,
 
+    Equal,
+    NotEqual,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
+
+    Exclamation,
+
     KeywordFunc,
     KeywordReturn,
     KeywordLet,
@@ -28,6 +37,8 @@ public enum TokenType
     Identifier,
 
     LiteralInt,
+    LiteralTrue,
+    LiteralFalse,
 
     Arrow,
 

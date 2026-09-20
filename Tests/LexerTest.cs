@@ -15,18 +15,35 @@ public class LexerTest
         (",", TokenType.Comma),
         (":", TokenType.Colon),
         (";", TokenType.Semicolon),
+
         ("=", TokenType.Assign),
+
         ("+", TokenType.Plus),
         ("-", TokenType.Minus),
         ("*", TokenType.Star),
         ("/", TokenType.Slash),
         ("%", TokenType.Percent),
+
+        ("==", TokenType.Equal),
+        ("!=", TokenType.NotEqual),
+        ("<", TokenType.Less),
+        ("<=", TokenType.LessEqual),
+        (">", TokenType.Greater),
+        (">=", TokenType.GreaterEqual),
+
+        ("!", TokenType.Exclamation),
+
         ("fn", TokenType.KeywordFunc),
         ("return", TokenType.KeywordReturn),
         ("let", TokenType.KeywordLet),
         ("as", TokenType.KeywordAs),
+
         ("spam", TokenType.Identifier),
+
         ("123", TokenType.LiteralInt),
+        ("true", TokenType.LiteralTrue),
+        ("false", TokenType.LiteralFalse),
+
         ("->", TokenType.Arrow),
     ];
 
