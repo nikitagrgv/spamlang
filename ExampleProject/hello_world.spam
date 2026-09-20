@@ -54,5 +54,6 @@ fn demo_types()
     let test_n: f32 = 5.123f + 5.1F;
     let test_o: f64 = 5.123;
     let test_p = 5.123f + test_o;
-    let test_r = 5e123;
+    let test_q = 5e123;
+    let test_r = 5e123f;
 }
