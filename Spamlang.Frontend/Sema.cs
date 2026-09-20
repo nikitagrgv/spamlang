@@ -44,31 +44,31 @@ public class Sema
 
     private void RegisterBuiltinTypeSymbols()
     {
-        void Register(string name, SpamType type)
+        void Register(SpamType type)
         {
             TypeSymbol symbol = new()
             {
-                Name = name,
+                Name = type.Name,
                 SymbolType = type,
             };
             bool added = CurrentScope().TryDeclare(symbol);
             Debug.Assert(added);
         }
 
-        Register("i8", BuiltinType.I8);
-        Register("i16", BuiltinType.I16);
-        Register("i32", BuiltinType.I32);
-        Register("i64", BuiltinType.I64);
+        Register(BuiltinType.I8);
+        Register(BuiltinType.I16);
+        Register(BuiltinType.I32);
+        Register(BuiltinType.I64);
 
-        Register("u8", BuiltinType.U8);
-        Register("u16", BuiltinType.U16);
-        Register("u32", BuiltinType.U32);
-        Register("u64", BuiltinType.U64);
+        Register(BuiltinType.U8);
+        Register(BuiltinType.U16);
+        Register(BuiltinType.U32);
+        Register(BuiltinType.U64);
 
-        Register("f32", BuiltinType.F32);
-        Register("f64", BuiltinType.F64);
+        Register(BuiltinType.F32);
+        Register(BuiltinType.F64);
 
-        Register("bool", BuiltinType.Bool);
+        Register(BuiltinType.Bool);
     }
 
     private List<FuncSymbol> RegisterFunctionSymbols(CompilationUnit unit)
