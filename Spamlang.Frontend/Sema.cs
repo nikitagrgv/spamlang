@@ -1143,6 +1143,7 @@ public class Sema
         if (to.Kind == TypeKind.SignedInteger && from.Kind == TypeKind.UnsignedInteger ||
             to.Kind == TypeKind.UnsignedInteger && from.Kind == TypeKind.SignedInteger)
         {
+            // Signed vs unsigned - need explicit cast
             return false;
         }
 
