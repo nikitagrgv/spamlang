@@ -50,5 +50,5 @@ fn demo_types()
     let test_j: bool = false; 
     let test_k: 5 == 6; 
     let test_l: 5.123; 
-    let test_m: 5.123f; 
+    let test_m: 5.123f + 5.1F; 
 }
