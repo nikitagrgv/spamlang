@@ -1178,7 +1178,7 @@ public class Sema
 
             if (from.Kind == TypeKind.SignedInteger || from.Kind == TypeKind.UnsignedInteger)
             {
-                Debug.Assert(to.Size == 4 || to.Size == 8, "Condition below works only for f32/f64");
+                Debug.Assert(to.Size == 4 || to.Size == 8, "Fix condition below");
                 return to.Size > from.Size;
             }
 
