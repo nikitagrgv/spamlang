@@ -305,12 +305,15 @@ public class Lexer
         {
             return false;
         }
-        
-        // Examples:
-        // 12.34
-        // 12.34E+5
-        // 1e2
 
+        // Examples:
+        // 1.2
+        // 1.2e2
+        // 1.2e-2
+        // 1.2E-2
+        // 1.2E+2
+        // 1e2
+        // 1E2
         int pos = 1;
         while (pos < str.Length && char.IsAsciiDigit(str[pos]))
         {
