@@ -133,6 +133,18 @@ public class Lexer
                 };
                 tokens.Add(token);
             }
+            else if (TryParseLiteralBool(word))
+            {
+                Token token = new()
+                {
+                    Type = TokenType.LiteralBool,
+                    Position = pos,
+                    Length = word.Length,
+                    Line = line,
+                    Column = column,
+                };
+                tokens.Add(token);
+            }
             else
             {
                 Token token = new()
@@ -172,6 +184,12 @@ public class Lexer
             "as" => TokenType.KeywordAs,
             _ => null,
         };
+    }
+
+    private bool TryParseLiteralBool(ReadOnlySpan<char> word)
+    {
+        return word.Equals("true", StringComparison.Ordinal) ||
+               word.Equals("false", StringComparison.Ordinal);
     }
 
     private static void ParseWord(ReadOnlySpan<char> str, out int len, out bool valid)
