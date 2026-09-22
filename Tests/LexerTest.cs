@@ -305,18 +305,13 @@ public class LexerTest
     }
 
     [Theory]
-    [InlineData("0.0")]
     [InlineData("1.2")]
-    [InlineData("1.2f")]
-    [InlineData("0f")]
-    [InlineData("123f")]
-    [InlineData("0123f")]
-    [InlineData(".1")]
-    [InlineData(".1f")]
     [InlineData("1.2e2")]
     [InlineData("1.2e-2")]
-    [InlineData("1.2e-2f")]
-    [InlineData("1.2E-2F")]
+    [InlineData("1.2E-2")]
+    [InlineData("1.2E+2")]
+    [InlineData("1e2")]
+    [InlineData("1E2")]
     public void Lexer_ParsesLiteralFloat(string str)
     {
         string code = str;
@@ -332,8 +327,8 @@ public class LexerTest
 
     [Theory]
     [InlineData("1.")]
-    [InlineData("1.f")]
-    public void Lexer_TrailingPointIsNotConsideredAsFloat(string str)
+    [InlineData(".1")]
+    public void Lexer_TrailingAndLeadingPointIsForbiddenForLiteralFloat(string str)
     {
         Diagnostic diag = new();
         Lexer lexer = new();

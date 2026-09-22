@@ -79,7 +79,30 @@ public class Lexer
                 continue;
             }
 
-            if (TryParseLiteralInt(_code.AsSpan(pos), out int valueLen, out bool valid))
+            if (TryParseLiteralFloat(_code.AsSpan(pos), out int valueLen, out bool valid))
+            {
+                Token token = new()
+                {
+                    Type = TokenType.LiteralFloat,
+                    Position = pos,
+                    Length = valueLen,
+                    Line = line,
+                    Column = column,
+                };
+
+                if (!valid)
+                {
+                    token.Type = TokenType.Invalid;
+                    _diag.AddError("Invalid float literal", token);
+                }
+
+                tokens.Add(token);
+                pos += valueLen;
+                column += valueLen;
+                continue;
+            }
+
+            if (TryParseLiteralInt(_code.AsSpan(pos), out valueLen, out valid))
             {
                 Token token = new()
                 {
@@ -174,7 +197,7 @@ public class Lexer
         return tokens;
     }
 
-    private TokenType? TryParseKeyword(ReadOnlySpan<char> word)
+    private static TokenType? TryParseKeyword(ReadOnlySpan<char> word)
     {
         return word switch
         {
@@ -186,7 +209,7 @@ public class Lexer
         };
     }
 
-    private bool TryParseLiteralBool(ReadOnlySpan<char> word)
+    private static bool TryParseLiteralBool(ReadOnlySpan<char> word)
     {
         return word.Equals("true", StringComparison.Ordinal) ||
                word.Equals("false", StringComparison.Ordinal);
@@ -269,6 +292,33 @@ public class Lexer
         {
             valid = false;
         }
+
+        return true;
+    }
+
+    private static bool TryParseLiteralFloat(ReadOnlySpan<char> str, out int len, out bool valid)
+    {
+        len = 0;
+        valid = true;
+
+        if (!char.IsAsciiDigit(str[0]))
+        {
+            return false;
+        }
+        
+        // Examples:
+        // 12.34
+        // 12.34E+5
+        // 1e2
+
+        int pos = 1;
+        while (pos < str.Length && char.IsAsciiDigit(str[pos]))
+        {
+            ++pos;
+        }
+
+
+        len = pos;
 
         return true;
     }
