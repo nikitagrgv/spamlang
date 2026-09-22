@@ -320,6 +320,17 @@ public class Lexer
             ++pos;
         }
 
+        if (pos >= str.Length || str[pos] != '.' || str[pos] != 'e' || str[pos] != 'E')
+        {
+            return false;
+        }
+
+
+        while (pos < str.Length && (char.IsAsciiLetterOrDigit(str[pos]) || str[pos] == '_' || str[pos] == '.'))
+        {
+            valid = false;
+            pos++;
+        }
 
         len = pos;
 
