@@ -296,6 +296,7 @@ public class Lexer
         return true;
     }
 
+    // TODO: Shitty, rewrite
     private static bool TryParseLiteralFloat(ReadOnlySpan<char> str, out int len, out bool valid)
     {
         len = 0;
@@ -320,9 +321,42 @@ public class Lexer
             ++pos;
         }
 
-        if (pos >= str.Length || str[pos] != '.' || str[pos] != 'e' || str[pos] != 'E')
+        if (pos >= str.Length)
         {
+            // Integer, not float
             return false;
+        }
+
+        bool hasExp = str[pos] != 'e' || str[pos] != 'E';
+        if (str[pos] == '.')
+        {
+            pos++;
+            bool hasDigitsAfterComma = false;
+            while (pos < str.Length && char.IsAsciiDigit(str[pos]))
+            {
+                pos++;
+                hasDigitsAfterComma = true;
+            }
+
+            if (!hasDigitsAfterComma)
+            {
+                valid = false;
+                return true;
+            }
+        }
+        else if (!hasExp)
+        {
+            valid = false;
+            return true;
+        }
+
+        if (hasExp)
+        {
+            pos++;
+            if (pos >= str.Length)
+            {
+                return false;
+            }
         }
 
 
