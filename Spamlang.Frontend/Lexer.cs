@@ -1,5 +1,6 @@
 namespace Spamlang.Frontend;
 
+// TODO: Refactor!
 public class Lexer
 {
     private string _code = "";
