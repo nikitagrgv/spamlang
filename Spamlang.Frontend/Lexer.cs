@@ -40,6 +40,30 @@ public class Lexer
                 continue;
             }
 
+            /////////////////////// TODO: literals here!
+
+            if (!TryParseWord(out ReadOnlySpan<char> word))
+            {
+                _diag.AddError("Invalid token", _cursor, 1, _line, _column);
+                _cursor++;
+                _column++;
+                continue;
+            }
+
+            if (TryParseKeyword(word))
+            {
+                continue;
+            }
+
+            if (TryParseLiteralBool(word))
+            {
+                continue;
+            }
+
+            AddToken(TokenType.Identifier, word.Length);
+
+
+            ////////////////////////////////////////////////////////////////////////
             if (TryParseLiteralFloat(_code.AsSpan(pos), out int valueLen, out bool valid))
             {
                 Token token = new()
@@ -104,7 +128,6 @@ public class Lexer
                 continue;
             }
 
-            ReadOnlySpan<char> word = _code.AsSpan(pos, wordLen);
             if (TryParseKeyword(word) is { } keywordType)
             {
                 Token token = new()
