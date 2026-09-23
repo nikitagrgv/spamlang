@@ -40,7 +40,15 @@ public class Lexer
                 continue;
             }
 
-            /////////////////////// TODO: literals here!
+            if (TryParseLiteralInt())
+            {
+                continue;
+            }
+
+            if (TryParseLiteralFloat())
+            {
+                continue;
+            }
 
             if (!TryParseWord(out ReadOnlySpan<char> word))
             {
@@ -61,124 +69,10 @@ public class Lexer
             }
 
             AddToken(TokenType.Identifier, word.Length);
-
-
-            ////////////////////////////////////////////////////////////////////////
-            if (TryParseLiteralFloat(_code.AsSpan(pos), out int valueLen, out bool valid))
-            {
-                Token token = new()
-                {
-                    Type = TokenType.LiteralFloat,
-                    Position = pos,
-                    Length = valueLen,
-                    Line = line,
-                    Column = column,
-                };
-
-                if (!valid)
-                {
-                    token.Type = TokenType.Invalid;
-                    _diag.AddError("Invalid float literal", token);
-                }
-
-                tokens.Add(token);
-                pos += valueLen;
-                column += valueLen;
-                continue;
-            }
-
-            if (TryParseLiteralInt(_code.AsSpan(pos), out valueLen, out valid))
-            {
-                Token token = new()
-                {
-                    Type = TokenType.LiteralInt,
-                    Position = pos,
-                    Length = valueLen,
-                    Line = line,
-                    Column = column,
-                };
-
-                if (!valid)
-                {
-                    token.Type = TokenType.Invalid;
-                    _diag.AddError("Invalid integer literal", token);
-                }
-
-                tokens.Add(token);
-                pos += valueLen;
-                column += valueLen;
-                continue;
-            }
-
-            ParseWord(_code.AsSpan(pos), out int wordLen, out valid);
-            if (!valid)
-            {
-                Token invalidToken = new()
-                {
-                    Type = TokenType.Invalid,
-                    Position = pos,
-                    Length = wordLen,
-                    Line = line,
-                    Column = column,
-                };
-                tokens.Add(invalidToken);
-                pos += wordLen;
-                column += wordLen;
-                _diag.AddError("Invalid token", invalidToken);
-                continue;
-            }
-
-            if (TryParseKeyword(word) is { } keywordType)
-            {
-                Token token = new()
-                {
-                    Type = keywordType,
-                    Position = pos,
-                    Length = word.Length,
-                    Line = line,
-                    Column = column,
-                };
-                tokens.Add(token);
-            }
-            else if (TryParseBool(word))
-            {
-                Token token = new()
-                {
-                    Type = TokenType.LiteralBool,
-                    Position = pos,
-                    Length = word.Length,
-                    Line = line,
-                    Column = column,
-                };
-                tokens.Add(token);
-            }
-            else
-            {
-                Token token = new()
-                {
-                    Type = TokenType.Identifier,
-                    Position = pos,
-                    Length = word.Length,
-                    Line = line,
-                    Column = column,
-                };
-                tokens.Add(token);
-            }
-
-            pos += word.Length;
-            column += word.Length;
         }
 
-        tokens.Add(new Token()
-        {
-            Type = TokenType.Eof,
-            Position = pos,
-            Length = 0,
-            Line = line,
-            Column = column
-        });
-
-        return tokens;
+        AddToken(TokenType.Eof, 0);
+        return _tokens;
     }
 
     private bool TryParseComment()
