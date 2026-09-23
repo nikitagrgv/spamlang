@@ -66,8 +66,8 @@ public class LexerTest
     {
         string code = token;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -81,8 +81,8 @@ public class LexerTest
     {
         string code = token;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -94,8 +94,8 @@ public class LexerTest
     public void Lexer_AppendsEofForEmptyCode()
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run("", diag);
+        Lexer lexer = new("", diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -107,8 +107,8 @@ public class LexerTest
     public void Lexer_ColumnsStartsWith1()
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run("123", diag);
+        Lexer lexer = new("123", diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.Equal(1, tokens[0].Column);
     }
@@ -129,8 +129,8 @@ public class LexerTest
     public void Lexer_ColumnCountsSpaces(string code, int expectedColumn = 1)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.Equal(expectedColumn, tokens[0].Column);
     }
@@ -139,8 +139,8 @@ public class LexerTest
     public void Lexer_LinesStartsWith1()
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run("123", diag);
+        Lexer lexer = new("123", diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.Equal(1, tokens[0].Line);
     }
@@ -159,8 +159,8 @@ public class LexerTest
     public void Lexer_LineCountsLF(string code, int expectedLine = 1)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.Equal(expectedLine, tokens[0].Line);
     }
@@ -179,8 +179,8 @@ public class LexerTest
     public void Lexer_LineIgnoresCR(string code, int expectedLine = 1)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.Equal(expectedLine, tokens[0].Line);
     }
@@ -193,8 +193,8 @@ public class LexerTest
     public void Lexer_RefusesTabs(string code, int tabPos)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.True(diag.HasErrors);
         Assert.Single(diag.Entries);
@@ -213,8 +213,8 @@ public class LexerTest
     {
         string code = "123 // \t\n123";
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -236,8 +236,8 @@ public class LexerTest
     {
         string code = str;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -257,8 +257,8 @@ public class LexerTest
     {
         string code = str;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -278,8 +278,8 @@ public class LexerTest
     public void Lexer_ParsesLiteralIntHex(string str)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(str, diag);
+        Lexer lexer = new(str, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -294,8 +294,8 @@ public class LexerTest
     public void Lexer_ReportsErrorForInvalidIntLiteral(string str)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(str, diag);
+        Lexer lexer = new(str, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.True(diag.HasErrors);
         Assert.Single(diag.Entries);
@@ -316,8 +316,8 @@ public class LexerTest
     {
         string code = str;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -331,8 +331,8 @@ public class LexerTest
     public void Lexer_TrailingAndLeadingPointIsForbiddenForLiteralFloat(string str)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(str, diag);
+        Lexer lexer = new(str, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.NotEqual(TokenType.LiteralFloat, tokens[0].Type);
     }
@@ -344,8 +344,8 @@ public class LexerTest
     {
         string code = str;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -364,8 +364,8 @@ public class LexerTest
     {
         string code = str;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.NotEqual(TokenType.LiteralBool, tokens[0].Type);
     }
@@ -382,8 +382,8 @@ public class LexerTest
     public void Lexer_CanOmitWhitespacesBetweenTokens(string str, int count)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(str, diag);
+        Lexer lexer = new(str, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -411,8 +411,8 @@ public class LexerTest
     {
         string code = str;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -430,8 +430,8 @@ public class LexerTest
     {
         string code = str;
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -450,8 +450,8 @@ public class LexerTest
     public void Lexer_ReportsErrorForEachUnexpectedSymbols(string str, int numErrors)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(str, diag);
+        Lexer lexer = new(str, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.True(diag.HasErrors);
 
@@ -466,8 +466,8 @@ public class LexerTest
     public void Lexer_ReportsPositionOfUnexpectedSymbolsCorrectly(string str, int pos)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(str, diag);
+        Lexer lexer = new(str, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.True(diag.HasErrors);
 
@@ -485,8 +485,8 @@ public class LexerTest
     public void Lexer_UnexpectedSymbolSplitsCode(string str, TokenType left, TokenType right)
     {
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(str, diag);
+        Lexer lexer = new(str, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.True(diag.HasErrors);
         Assert.Single(diag.Entries);
@@ -519,8 +519,8 @@ public class LexerTest
         }
 
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(codeBuilder.ToString(), diag);
+        Lexer lexer = new(codeBuilder.ToString(), diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
@@ -539,8 +539,8 @@ public class LexerTest
     {
         string code = "fn main() -> i32 { return 123 + 10 * x as i32; }";
         Diagnostic diag = new();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
