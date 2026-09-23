@@ -1,66 +1,37 @@
 namespace Spamlang.Frontend;
 
-// TODO: Refactor!
 public class Lexer
 {
-    private string _code = "";
-    private Diagnostic? _diag;
+    private readonly string _code;
+    private readonly Diagnostic _diag;
+    private readonly List<Token> _tokens = [];
+    private int _cursor;
+    private int _column = 1;
+    private int _line = 1;
+    private bool _tabErrorEmitted = false;
 
-    public List<Token> Run(string code, Diagnostic diag)
+    public Lexer(string code, Diagnostic diag)
     {
         _code = code;
         _diag = diag;
+    }
 
-        List<Token> tokens = [];
-        int codeLen = _code.Length;
-        int pos = 0;
-        int line = 1;
-        int column = 1;
-        bool comment = false;
-
-        while (pos < codeLen)
+    public List<Token> Run()
+    {
+        while (_cursor < _code.Length)
         {
-            char c = _code[pos];
-
-            if (c == '/' && pos + 1 < codeLen && _code[pos + 1] == '/')
+            if (TryParseComment())
             {
-                comment = true;
-            }
-
-            switch (c)
-            {
-                case '\n':
-                    comment = false;
-                    line++;
-                    column = 1;
-                    pos++;
-                    continue;
-                case ' ':
-                    pos++;
-                    column++;
-                    continue;
-            }
-
-            if (comment)
-            {
-                pos++;
-                column++;
                 continue;
             }
 
-            if (c == '\t')
+            if (TryParseNewline())
             {
-                // Emit error, but don't add invalid token
-                _diag.AddError("Tab characters are forbidden", pos, 1, line, column);
-                pos++;
-                column++;
                 continue;
             }
 
-            if (char.IsWhiteSpace(c))
+            if (TryParseWhitespaces())
             {
-                pos++;
-                column++;
                 continue;
             }
 
@@ -198,6 +169,76 @@ public class Lexer
         return tokens;
     }
 
+    private bool TryParseComment()
+    {
+        if (_cursor + 1 >= _code.Length || _code[_cursor] != '/' || _code[_cursor + 1] != '/')
+        {
+            return false;
+        }
+
+        _cursor += 2;
+        while (_cursor < _code.Length)
+        {
+            if (TryParseNewline())
+            {
+                break;
+            }
+
+            _cursor++;
+        }
+
+        return true;
+    }
+
+    private bool TryParseNewline()
+    {
+        if (_code[_cursor] != '\n')
+        {
+            return false;
+        }
+
+        _cursor++;
+        _line++;
+        _column = 1;
+        return true;
+    }
+
+    private bool TryParseWhitespaces()
+    {
+        int init = _cursor;
+        while (_cursor < _code.Length)
+        {
+            char ch = _code[_cursor];
+            switch (ch)
+            {
+                case '\t':
+                {
+                    if (!_tabErrorEmitted)
+                    {
+                        _diag.AddError("Tab characters are forbidden", _cursor, 1, _line, _column);
+                        _tabErrorEmitted = true;
+                    }
+
+                    _cursor++;
+                    _column += 4;
+                    continue;
+                }
+                case '\r':
+                    // TODO: Add new line?
+                    _cursor++;
+                    continue;
+                case ' ':
+                    _cursor++;
+                    _column++;
+                    continue;
+            }
+
+            break;
+        }
+
+        return init != _cursor;
+    }
+
     private static TokenType? TryParseKeyword(ReadOnlySpan<char> word)
     {
         return word switch
@@ -319,7 +360,7 @@ public class Lexer
         int pos = 1;
         while (pos < str.Length && char.IsAsciiDigit(str[pos]))
         {
-            ++pos;
+            pos++;
         }
 
         if (pos >= str.Length)
