@@ -55,7 +55,7 @@ public class Lexer
                 continue;
             }
 
-            if (TryParseLiteralBool(word))
+            if (TryParseBool(word))
             {
                 continue;
             }
@@ -140,7 +140,7 @@ public class Lexer
                 };
                 tokens.Add(token);
             }
-            else if (TryParseLiteralBool(word))
+            else if (TryParseBool(word))
             {
                 Token token = new()
                 {
@@ -295,12 +295,17 @@ public class Lexer
         return true;
     }
 
-    private static bool TryParseLiteralBool(ReadOnlySpan<char> word)
+    private bool TryParseBool(ReadOnlySpan<char> word)
     {
-        return word.Equals("true", StringComparison.Ordinal) ||
-               word.Equals("false", StringComparison.Ordinal);
-    }
+        TokenType? type = ToBool(word);
+        if (type == null)
+        {
+            return false;
+        }
 
+        AddToken(type.Value, word.Length);
+        return true;
+    }
 
     private static bool TryParseLiteralInt(ReadOnlySpan<char> str, out int len, out bool valid)
     {
@@ -504,6 +509,15 @@ public class Lexer
             "return" => TokenType.KeywordReturn,
             "let" => TokenType.KeywordLet,
             "as" => TokenType.KeywordAs,
+            _ => null,
+        };
+    }
+
+    private static TokenType? ToBool(ReadOnlySpan<char> word)
+    {
+        return word switch
+        {
+            "true" or "false" => TokenType.LiteralBool,
             _ => null,
         };
     }
