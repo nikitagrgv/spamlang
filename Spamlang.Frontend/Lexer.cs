@@ -50,25 +50,25 @@ public class Lexer
                 continue;
             }
 
-            if (!TryParseWord(out ReadOnlySpan<char> word))
+            if (TryParseWord(out ReadOnlySpan<char> word))
             {
-                _diag.AddError("Invalid token", _cursor, 1, _line, _column);
-                _cursor++;
-                _column++;
+                if (TryParseKeyword(word))
+                {
+                    continue;
+                }
+
+                if (TryParseBool(word))
+                {
+                    continue;
+                }
+
+                AddToken(TokenType.Identifier, word.Length);
                 continue;
             }
 
-            if (TryParseKeyword(word))
-            {
-                continue;
-            }
-
-            if (TryParseBool(word))
-            {
-                continue;
-            }
-
-            AddToken(TokenType.Identifier, word.Length);
+            _diag.AddError("Invalid token", _cursor, 1, _line, _column);
+            _cursor++;
+            _column++;
         }
 
         AddToken(TokenType.Eof, 0);
