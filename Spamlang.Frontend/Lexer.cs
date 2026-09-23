@@ -249,7 +249,7 @@ public class Lexer
         }
 
         int begin = _cursor;
-        ++_cursor;
+        _cursor++;
         while (_cursor < _code.Length && IsWordPart(_code[_cursor]))
         {
             _cursor++;
