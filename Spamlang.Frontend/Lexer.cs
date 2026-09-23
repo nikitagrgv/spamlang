@@ -35,19 +35,8 @@ public class Lexer
                 continue;
             }
 
-            if (TryParseSymbolicalToken(_code.AsSpan(pos), out int symbolTokenLen) is { } symbolToken)
+            if (TryParseSymbolicalToken())
             {
-                Token token = new()
-                {
-                    Type = symbolToken,
-                    Position = pos,
-                    Length = symbolTokenLen,
-                    Line = line,
-                    Column = column,
-                };
-                tokens.Add(token);
-                pos += symbolTokenLen;
-                column += symbolTokenLen;
                 continue;
             }
 
@@ -239,16 +228,28 @@ public class Lexer
         return init != _cursor;
     }
 
-    private static TokenType? TryParseKeyword(ReadOnlySpan<char> word)
+    private bool TryParseSymbolicalToken()
     {
-        return word switch
+        TokenType? type = ToSymbolicalToken(_code.AsSpan(_cursor), out int len);
+        if (type == null)
         {
-            "fn" => TokenType.KeywordFunc,
-            "return" => TokenType.KeywordReturn,
-            "let" => TokenType.KeywordLet,
-            "as" => TokenType.KeywordAs,
-            _ => null,
-        };
+            return false;
+        }
+
+        AddToken(type.Value, len);
+        return true;
+    }
+
+    private bool TryParseKeyword(ReadOnlySpan<char> word)
+    {
+        TokenType? type = ToKeyword(word);
+        if (type == null)
+        {
+            return false;
+        }
+
+        AddToken(type.Value, word.Length);
+        return true;
     }
 
     private static bool TryParseLiteralBool(ReadOnlySpan<char> word)
@@ -418,7 +419,22 @@ public class Lexer
     private static bool IsWordStart(char c) => char.IsAsciiLetter(c) || c == '_';
     private static bool IsWordPart(char c) => char.IsAsciiLetterOrDigit(c) || c == '_';
 
-    private static TokenType? TryParseSymbolicalToken(ReadOnlySpan<char> str, out int len)
+    private void AddToken(TokenType type, int len)
+    {
+        Token token = new()
+        {
+            Type = type,
+            Position = _cursor,
+            Length = len,
+            Line = _line,
+            Column = _column,
+        };
+        _tokens.Add(token);
+        _cursor += len;
+        _column += len;
+    }
+
+    private static TokenType? ToSymbolicalToken(ReadOnlySpan<char> str, out int len)
     {
         len = 1;
         switch (str[0])
@@ -458,5 +474,17 @@ public class Lexer
             default:
                 return null;
         }
+    }
+
+    private static TokenType? ToKeyword(ReadOnlySpan<char> word)
+    {
+        return word switch
+        {
+            "fn" => TokenType.KeywordFunc,
+            "return" => TokenType.KeywordReturn,
+            "let" => TokenType.KeywordLet,
+            "as" => TokenType.KeywordAs,
+            _ => null,
+        };
     }
 }
