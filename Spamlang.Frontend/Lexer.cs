@@ -40,12 +40,12 @@ public class Lexer
                 continue;
             }
 
-            if (TryParseLiteralInt())
+            if (TryParseLiteralFloat())
             {
                 continue;
             }
 
-            if (TryParseLiteralFloat())
+            if (TryParseLiteralInt())
             {
                 continue;
             }
