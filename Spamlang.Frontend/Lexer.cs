@@ -248,16 +248,15 @@ public class Lexer
             return false;
         }
 
+        int begin = _cursor;
         ++_cursor;
-
-        int init = _cursor;
         while (_cursor < _code.Length && IsWordPart(_code[_cursor]))
         {
             _cursor++;
         }
 
-        int len = _cursor - init;
-        word = _code.AsSpan(init, len);
+        int len = _cursor - begin;
+        word = _code.AsSpan(begin, len);
         return true;
     }
 
