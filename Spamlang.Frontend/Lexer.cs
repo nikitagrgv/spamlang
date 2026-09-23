@@ -201,7 +201,7 @@ public class Lexer
         return true;
     }
 
-    private static bool TryParseLiteralInt(ReadOnlySpan<char> str, out int len, out bool valid)
+    private static bool TryParseLiteralInt()
     {
         len = 0;
         valid = true;
@@ -263,79 +263,8 @@ public class Lexer
         return true;
     }
 
-    // TODO: Shitty, rewrite
-    private static bool TryParseLiteralFloat(ReadOnlySpan<char> str, out int len, out bool valid)
+    private static bool TryParseLiteralFloat()
     {
-        len = 0;
-        valid = true;
-
-        if (!char.IsAsciiDigit(str[0]))
-        {
-            return false;
-        }
-
-        // Examples:
-        // 1.2
-        // 1.2e2
-        // 1.2e-2
-        // 1.2E-2
-        // 1.2E+2
-        // 1e2
-        // 1E2
-        int pos = 1;
-        while (pos < str.Length && char.IsAsciiDigit(str[pos]))
-        {
-            pos++;
-        }
-
-        if (pos >= str.Length)
-        {
-            // Integer, not float
-            return false;
-        }
-
-        bool hasExp = str[pos] != 'e' || str[pos] != 'E';
-        if (str[pos] == '.')
-        {
-            pos++;
-            bool hasDigitsAfterComma = false;
-            while (pos < str.Length && char.IsAsciiDigit(str[pos]))
-            {
-                pos++;
-                hasDigitsAfterComma = true;
-            }
-
-            if (!hasDigitsAfterComma)
-            {
-                valid = false;
-                return true;
-            }
-        }
-        else if (!hasExp)
-        {
-            valid = false;
-            return true;
-        }
-
-        if (hasExp)
-        {
-            pos++;
-            if (pos >= str.Length)
-            {
-                return false;
-            }
-        }
-
-
-        while (pos < str.Length && (char.IsAsciiLetterOrDigit(str[pos]) || str[pos] == '_' || str[pos] == '.'))
-        {
-            valid = false;
-            pos++;
-        }
-
-        len = pos;
-
-        return true;
     }
 
     private void AddToken(TokenType type, int len)
