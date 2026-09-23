@@ -240,6 +240,27 @@ public class Lexer
         return true;
     }
 
+    private bool TryParseWord(out ReadOnlySpan<char> word)
+    {
+        if (!IsWordStart(_code[_cursor]))
+        {
+            word = ReadOnlySpan<char>.Empty;
+            return false;
+        }
+
+        ++_cursor;
+
+        int init = _cursor;
+        while (_cursor < _code.Length && IsWordPart(_code[_cursor]))
+        {
+            _cursor++;
+        }
+
+        int len = _cursor - init;
+        word = _code.AsSpan(init, len);
+        return true;
+    }
+
     private bool TryParseKeyword(ReadOnlySpan<char> word)
     {
         TokenType? type = ToKeyword(word);
@@ -258,24 +279,6 @@ public class Lexer
                word.Equals("false", StringComparison.Ordinal);
     }
 
-    private static void ParseWord(ReadOnlySpan<char> str, out int len, out bool valid)
-    {
-        if (!IsWordStart(str[0]))
-        {
-            valid = false;
-            len = 1;
-            return;
-        }
-
-        int pos = 1;
-        while (pos < str.Length && IsWordPart(str[pos]))
-        {
-            pos++;
-        }
-
-        len = pos;
-        valid = true;
-    }
 
     private static bool TryParseLiteralInt(ReadOnlySpan<char> str, out int len, out bool valid)
     {
@@ -414,11 +417,6 @@ public class Lexer
         return true;
     }
 
-    private static bool IsOctalDigit(char c) => c >= '0' && c <= '7';
-
-    private static bool IsWordStart(char c) => char.IsAsciiLetter(c) || c == '_';
-    private static bool IsWordPart(char c) => char.IsAsciiLetterOrDigit(c) || c == '_';
-
     private void AddToken(TokenType type, int len)
     {
         Token token = new()
@@ -487,4 +485,9 @@ public class Lexer
             _ => null,
         };
     }
+
+    private static bool IsOctalDigit(char c) => c >= '0' && c <= '7';
+
+    private static bool IsWordStart(char c) => char.IsAsciiLetter(c) || c == '_';
+    private static bool IsWordPart(char c) => char.IsAsciiLetterOrDigit(c) || c == '_';
 }
