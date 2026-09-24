@@ -12,8 +12,8 @@ public class Frontend
     public static Result Run(string code, TypeRegistry typeRegistry, Diagnostic diag, Timers? timers, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
         timers?.RestartTimer();
-        Lexer lexer = new();
-        List<Token> tokens = lexer.Run(code, diag);
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
         timers?.FinishTimer("Lexer");
 
         timers?.RestartTimer();
