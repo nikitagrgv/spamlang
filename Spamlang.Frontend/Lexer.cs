@@ -262,19 +262,27 @@ public class Lexer
             }
         }
 
-        while (pos < str.Length && (char.IsAsciiLetterOrDigit(str[pos]) || str[pos] == '_'))
+        bool valid = true;
+        // Word right after the number (e.g. 123spam) - consume the word and emit error
+        while (pos < str.Length && IsWordPart(str[pos]))
         {
             valid = false;
             pos++;
         }
 
-        len = pos;
-
-        if (hexOrBinary && len <= 2)
+        if (hexOrBinary && pos <= 2)
         {
             valid = false;
         }
 
+        TokenType type = TokenType.LiteralInt;
+        if (!valid)
+        {
+            type = TokenType.Invalid;
+        }
+
+        int len = pos;
+        AddToken(type, len);
         return true;
     }
 
