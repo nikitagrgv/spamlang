@@ -121,7 +121,7 @@ public class Lexer
                     }
 
                     _cursor++;
-                    _column += 4;
+                    _column++;
                     continue;
                 }
                 case '\r':
