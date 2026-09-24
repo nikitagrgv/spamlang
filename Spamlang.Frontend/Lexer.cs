@@ -299,18 +299,8 @@ public class Lexer
                 return TokenType.Colon;
             case ';':
                 return TokenType.Semicolon;
-            case '=':
-                return TokenType.Assign;
             case '+':
                 return TokenType.Plus;
-            case '-':
-                if (str.Length > 1 && str[1] == '>')
-                {
-                    len = 2;
-                    return TokenType.Arrow;
-                }
-
-                return TokenType.Minus;
             case '*':
                 return TokenType.Star;
             case '/':
@@ -319,6 +309,42 @@ public class Lexer
                 return TokenType.Percent;
             case ',':
                 return TokenType.Comma;
+            case '-':
+                if (str.Length > 1 && str[1] == '>')
+                {
+                    len = 2;
+                    return TokenType.Arrow;
+                }
+
+                return TokenType.Minus;
+            case '=':
+                if (str.Length > 1 && str[1] == '=')
+                {
+                    len = 2;
+                    return TokenType.Equal;
+                }
+                return TokenType.Assign;
+            case '>':
+                if (str.Length > 1 && str[1] == '=')
+                {
+                    len = 2;
+                    return TokenType.GreaterEqual;
+                }
+                return TokenType.Greater;
+            case '<':
+                if (str.Length > 1 && str[1] == '=')
+                {
+                    len = 2;
+                    return TokenType.LessEqual;
+                }
+                return TokenType.Less;
+            case '!':
+                if (str.Length > 1 && str[1] == '=')
+                {
+                    len = 2;
+                    return TokenType.NotEqual;
+                }
+                return TokenType.Exclamation;
             default:
                 return null;
         }
