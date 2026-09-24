@@ -275,13 +275,14 @@ public class Lexer
             valid = false;
         }
 
+        int len = pos;
         TokenType type = TokenType.LiteralInt;
         if (!valid)
         {
+            _diag.AddError("Invalid integer literal", _cursor, len, _line, _column);
             type = TokenType.Invalid;
         }
 
-        int len = pos;
         AddToken(type, len);
         return true;
     }
