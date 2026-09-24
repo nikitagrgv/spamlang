@@ -48,7 +48,7 @@ public static class MOpcodes
 
 public abstract class MOperand;
 
-// TODO: Move these Size to instruction! 
+// TODO: Move these Size to instruction!
 public sealed class MOpReg : MOperand
 {
     public required Reg Reg { get; init; }

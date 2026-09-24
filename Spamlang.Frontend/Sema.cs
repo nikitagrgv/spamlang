@@ -104,7 +104,7 @@ public class Sema
                 Name = GetTokenValue(param.NameToken).ToString(),
                 ParamType = type,
             };
-            // NOTE: Don't register param symbol right now, do this in function scope!  
+            // NOTE: Don't register param symbol right now, do this in function scope!
             // RegisterSymbol(sym);
             RegisterTokenAsSymbol(param.NameToken, sym);
             paramTypes.Add(type);

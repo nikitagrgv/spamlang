@@ -190,7 +190,7 @@ public class Parser
                                 continue;
                             }
 
-                            // Delegate recovery to ParseCompilationUnit(), it will recover to the next function    
+                            // Delegate recovery to ParseCompilationUnit(), it will recover to the next function
                             throw new UnexpectedTokenException(Peek(), null);
                         }
 

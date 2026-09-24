@@ -118,7 +118,7 @@ public static class App
         }
         catch (Exception e)
         {
-            // NOTE: Leave the build dir for investigation 
+            // NOTE: Leave the build dir for investigation
             Console.WriteLine("Unexpected exception: " + e);
             Console.WriteLine("See build dir: " + buildPath);
             return 1;
