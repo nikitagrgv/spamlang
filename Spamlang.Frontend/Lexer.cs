@@ -215,10 +215,23 @@ public class Lexer
 
     private bool TryParseLiteralFloat()
     {
+        // Examples:
+        // 1.2
+        // 1.2e2
+        // 1.2e-2
+        // 1.2E-2
+        // 1.2E+2
+        // 1e2
+        // 1E2
     }
 
     private bool TryParseLiteralInt()
     {
+        // Examples:
+        // 123 - dec
+        // 0123 - oct
+        // 0b0101 - bin
+        // 0x12f - hex
         ReadOnlySpan<char> str = _code.AsSpan(_cursor);
 
         if (!char.IsAsciiDigit(str[0]))
