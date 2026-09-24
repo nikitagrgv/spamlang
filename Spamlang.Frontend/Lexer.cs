@@ -40,12 +40,7 @@ public class Lexer
                 continue;
             }
 
-            if (TryParseLiteralFloat())
-            {
-                continue;
-            }
-
-            if (TryParseLiteralInt())
+            if (TryParseNumber())
             {
                 continue;
             }
@@ -201,6 +196,27 @@ public class Lexer
         return true;
     }
 
+
+    private bool TryParseNumber()
+    {
+        if (TryParseLiteralFloat())
+        {
+            return true;
+        }
+
+        // NOTE: After parse float!
+        if (TryParseLiteralInt())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool TryParseLiteralFloat()
+    {
+    }
+
     private bool TryParseLiteralInt()
     {
         len = 0;
@@ -261,10 +277,6 @@ public class Lexer
         }
 
         return true;
-    }
-
-    private bool TryParseLiteralFloat()
-    {
     }
 
     private void AddToken(TokenType type, int len)
