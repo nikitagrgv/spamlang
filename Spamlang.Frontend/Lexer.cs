@@ -219,8 +219,7 @@ public class Lexer
 
     private bool TryParseLiteralInt()
     {
-        len = 0;
-        valid = true;
+        ReadOnlySpan<char> str = _code.AsSpan(_cursor);
 
         if (!char.IsAsciiDigit(str[0]))
         {
@@ -250,7 +249,7 @@ public class Lexer
         else if (str[0] == '0')
         {
             pos = 1;
-            while (pos < str.Length && IsOctalDigit(str[pos]))
+            while (pos < str.Length && (str[pos] >= '0' && str[pos] <= '7'))
             {
                 pos++;
             }
@@ -382,8 +381,6 @@ public class Lexer
             _ => null,
         };
     }
-
-    private static bool IsOctalDigit(char c) => c >= '0' && c <= '7';
 
     private static bool IsWordStart(char c) => char.IsAsciiLetter(c) || c == '_';
     private static bool IsWordPart(char c) => char.IsAsciiLetterOrDigit(c) || c == '_';
