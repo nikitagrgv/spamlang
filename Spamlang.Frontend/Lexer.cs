@@ -201,7 +201,7 @@ public class Lexer
         return true;
     }
 
-    private static bool TryParseLiteralInt()
+    private bool TryParseLiteralInt()
     {
         len = 0;
         valid = true;
@@ -263,7 +263,7 @@ public class Lexer
         return true;
     }
 
-    private static bool TryParseLiteralFloat()
+    private bool TryParseLiteralFloat()
     {
     }
 
