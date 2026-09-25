@@ -266,17 +266,29 @@ public class Lexer
             }
         }
 
-        if (str[pos] != 'e' || str[pos] != 'E')
+        if (str[pos] == 'e' || str[pos] == 'E')
         {
             pos++;
             if (pos >= str.Length)
             {
-                invalidReason ??= "No exponent";
+                invalidReason ??= "No digits after exponent";
             }
             else
             {
                 if (str[pos] == '+' || str[pos] == '-')
                 {
+                    pos++;
+                }
+
+                int prev = pos;
+                while (pos < str.Length && char.IsAsciiDigit(str[pos]))
+                {
+                    pos++;
+                }
+
+                if (pos == prev)
+                {
+                    invalidReason ??= "No digits after exponent";
                 }
             }
         }
@@ -286,6 +298,24 @@ public class Lexer
             // Just integer
             return false;
         }
+
+        // Word right after the number (e.g. 123.0spam) - consume the word and emit error
+        while (pos < str.Length && IsWordPart(str[pos]))
+        {
+            invalidReason ??= "Unexpected symbols after number";
+            pos++;
+        }
+
+        int len = pos;
+        TokenType type = TokenType.LiteralFloat;
+        if (invalidReason != null)
+        {
+            _diag.AddError($"Invalid integer literal: {invalidReason}", _cursor, len, _line, _column);
+            type = TokenType.Invalid;
+        }
+
+        AddToken(type, len);
+        return true;
     }
 
     private bool TryParseLiteralInt()
@@ -303,10 +333,11 @@ public class Lexer
         }
 
         int pos = 0;
-        bool hexOrBinary = false;
+        bool hex = false;
+        bool binary = false;
         if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
         {
-            hexOrBinary = true;
+            hex = true;
             pos = 2;
             while (pos < str.Length && char.IsAsciiHexDigit(str[pos]))
             {
@@ -315,7 +346,7 @@ public class Lexer
         }
         else if (str.StartsWith("0b", StringComparison.OrdinalIgnoreCase))
         {
-            hexOrBinary = true;
+            binary = true;
             pos = 2;
             while (pos < str.Length && (str[pos] == '0' || str[pos] == '1'))
             {
@@ -338,24 +369,28 @@ public class Lexer
             }
         }
 
-        bool valid = true;
+        string? invalidReason = null;
         // Word right after the number (e.g. 123spam) - consume the word and emit error
         while (pos < str.Length && IsWordPart(str[pos]))
         {
-            valid = false;
+            invalidReason ??= "Unexpected symbols after number";
             pos++;
         }
 
-        if (hexOrBinary && pos <= 2)
+        if (hex && pos <= 2)
         {
-            valid = false;
+            invalidReason ??= "Missing digits after '0x'";
+        }
+        else if (binary && pos <= 2)
+        {
+            invalidReason ??= "Missing digits after '0b'";
         }
 
         int len = pos;
         TokenType type = TokenType.LiteralInt;
-        if (!valid)
+        if (invalidReason != null)
         {
-            _diag.AddError("Invalid integer literal", _cursor, len, _line, _column);
+            _diag.AddError($"Invalid integer literal: {invalidReason}", _cursor, len, _line, _column);
             type = TokenType.Invalid;
         }
 
