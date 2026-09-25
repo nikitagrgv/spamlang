@@ -217,6 +217,7 @@ public class Lexer
     {
         // Examples:
         // 1.2
+        // 12.34
         // 1.2e2
         // 1.2e-2
         // 1.2E-2
@@ -232,6 +233,8 @@ public class Lexer
         {
             return false;
         }
+        
+        
     }
 
     private bool TryParseLiteralInt()
