@@ -57,15 +57,15 @@ public class Lexer
                     continue;
                 }
 
-                AddToken(TokenType.Identifier, word.Length);
+                AddTokenAndAdvance(TokenType.Identifier, word.Length);
                 continue;
             }
 
             _diag.AddError("Invalid token", _cursor, 1, _line, _column);
-            AddToken(TokenType.Invalid, 1);
+            AddTokenAndAdvance(TokenType.Invalid, 1);
         }
 
-        AddToken(TokenType.Eof, 0);
+        AddTokenAndAdvance(TokenType.Eof, 0);
         return _tokens;
     }
 
@@ -147,7 +147,7 @@ public class Lexer
             return false;
         }
 
-        AddToken(type.Value, len);
+        AddTokenAndAdvance(type.Value, len);
         return true;
     }
 
@@ -180,7 +180,7 @@ public class Lexer
             return false;
         }
 
-        AddToken(type.Value, word.Length);
+        AddTokenAndAdvance(type.Value, word.Length);
         return true;
     }
 
@@ -192,7 +192,7 @@ public class Lexer
             return false;
         }
 
-        AddToken(type.Value, word.Length);
+        AddTokenAndAdvance(type.Value, word.Length);
         return true;
     }
 
@@ -313,7 +313,7 @@ public class Lexer
             type = TokenType.Invalid;
         }
 
-        AddToken(type, len);
+        AddTokenAndAdvance(type, len);
         return true;
     }
 
@@ -393,11 +393,11 @@ public class Lexer
             type = TokenType.Invalid;
         }
 
-        AddToken(type, len);
+        AddTokenAndAdvance(type, len);
         return true;
     }
 
-    private void AddToken(TokenType type, int len)
+    private void AddTokenAndAdvance(TokenType type, int len)
     {
         Token token = new()
         {
