@@ -45,7 +45,7 @@ public class Lexer
                 continue;
             }
 
-            if (TryParseWord(out ReadOnlySpan<char> word))
+            if (TryGetWord(out ReadOnlySpan<char> word))
             {
                 if (TryParseKeyword(word))
                 {
@@ -153,23 +153,24 @@ public class Lexer
         return true;
     }
 
-    private bool TryParseWord(out ReadOnlySpan<char> word)
+    private bool TryGetWord(out ReadOnlySpan<char> word)
     {
-        if (!IsWordStart(_code[_cursor]))
+        ReadOnlySpan<char> str = _code.AsSpan(_cursor);
+
+        if (!IsWordStart(str[0]))
         {
             word = ReadOnlySpan<char>.Empty;
             return false;
         }
 
-        int begin = _cursor;
-        _cursor++;
-        while (_cursor < _code.Length && IsWordPart(_code[_cursor]))
+        int pos = 1;
+        while (pos < str.Length && IsWordPart(str[pos]))
         {
-            _cursor++;
+            pos++;
         }
 
-        int len = _cursor - begin;
-        word = _code.AsSpan(begin, len);
+        int len = pos;
+        word = _code.AsSpan(_cursor, len);
         return true;
     }
 
