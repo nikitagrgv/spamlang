@@ -215,6 +215,8 @@ public class Lexer
 
     private bool TryParseLiteralFloat()
     {
+        // NOTE: Regexps are easier, but with manual parse we can give more valid error feedback
+
         // Examples:
         // 1.2
         // 1.2e2
@@ -223,6 +225,13 @@ public class Lexer
         // 1.2E+2
         // 1e2
         // 1E2
+
+        ReadOnlySpan<char> str = _code.AsSpan(_cursor);
+
+        if (!char.IsAsciiDigit(str[0]))
+        {
+            return false;
+        }
     }
 
     private bool TryParseLiteralInt()
@@ -356,6 +365,7 @@ public class Lexer
                     len = 2;
                     return TokenType.Equal;
                 }
+
                 return TokenType.Assign;
             case '>':
                 if (str.Length > 1 && str[1] == '=')
@@ -363,6 +373,7 @@ public class Lexer
                     len = 2;
                     return TokenType.GreaterEqual;
                 }
+
                 return TokenType.Greater;
             case '<':
                 if (str.Length > 1 && str[1] == '=')
@@ -370,6 +381,7 @@ public class Lexer
                     len = 2;
                     return TokenType.LessEqual;
                 }
+
                 return TokenType.Less;
             case '!':
                 if (str.Length > 1 && str[1] == '=')
@@ -377,6 +389,7 @@ public class Lexer
                     len = 2;
                     return TokenType.NotEqual;
                 }
+
                 return TokenType.Exclamation;
             default:
                 return null;
