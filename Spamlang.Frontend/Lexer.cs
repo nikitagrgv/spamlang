@@ -215,8 +215,6 @@ public class Lexer
 
     private bool TryParseLiteralFloat()
     {
-        // NOTE: Regexps are easier, but with manual parse we can give a more valid error feedback
-
         // Examples:
         // 1.2
         // 1.2e2
@@ -225,6 +223,8 @@ public class Lexer
         // 1.2E+2
         // 1e2
         // 1E2
+
+        // NOTE: Regexps are easier, but with manual parse we can give a more valid error feedback
 
         ReadOnlySpan<char> str = _code.AsSpan(_cursor);
 
