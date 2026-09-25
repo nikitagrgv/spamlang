@@ -266,7 +266,7 @@ public class Lexer
             }
         }
 
-        if (str[pos] == 'e' || str[pos] == 'E')
+        if (pos < str.Length && (str[pos] == 'e' || str[pos] == 'E'))
         {
             pos++;
             if (pos >= str.Length)
