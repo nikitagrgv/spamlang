@@ -215,7 +215,7 @@ public class Lexer
 
     private bool TryParseLiteralFloat()
     {
-        // NOTE: Regexps are easier, but with manual parse we can give more valid error feedback
+        // NOTE: Regexps are easier, but with manual parse we can give a more valid error feedback
 
         // Examples:
         // 1.2
