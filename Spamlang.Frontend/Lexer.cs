@@ -61,6 +61,7 @@ public class Lexer
                 continue;
             }
 
+            AddToken(TokenType.Invalid, 1);
             _diag.AddError("Invalid token", _cursor, 1, _line, _column);
             _cursor++;
             _column++;
@@ -229,12 +230,62 @@ public class Lexer
 
         ReadOnlySpan<char> str = _code.AsSpan(_cursor);
 
-        if (!char.IsAsciiDigit(str[0]))
+        int pos = 0;
+        while (pos < str.Length && char.IsAsciiDigit(str[pos]))
         {
+            pos++;
+        }
+
+        if (pos == 0)
+        {
+            // Not a number
             return false;
         }
-        
-        
+
+        if (pos >= str.Length)
+        {
+            // Just integer at the end
+            return false;
+        }
+
+        int posBeforeFrac = pos;
+
+        string? invalidReason = null;
+        if (str[pos] == '.')
+        {
+            pos++;
+            int prev = pos;
+            while (pos < str.Length && char.IsAsciiDigit(str[pos]))
+            {
+                pos++;
+            }
+
+            if (pos == prev)
+            {
+                invalidReason ??= "No digits after '.'";
+            }
+        }
+
+        if (str[pos] != 'e' || str[pos] != 'E')
+        {
+            pos++;
+            if (pos >= str.Length)
+            {
+                invalidReason ??= "No exponent";
+            }
+            else
+            {
+                if (str[pos] == '+' || str[pos] == '-')
+                {
+                }
+            }
+        }
+
+        if (posBeforeFrac == pos)
+        {
+            // Just integer
+            return false;
+        }
     }
 
     private bool TryParseLiteralInt()
