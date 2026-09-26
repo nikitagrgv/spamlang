@@ -574,32 +574,36 @@ public class Parser
     private Expr ParseUnary()
     {
         int begin = _cursor;
-        if (TryConsume(TokenType.Plus) || TryConsume(TokenType.Minus))
+        bool numeric = TryConsume(TokenType.Plus) || TryConsume(TokenType.Minus);
+        if (numeric || TryConsume(TokenType.Exclamation))
         {
             int opPos = _cursor - 1;
             TokenType opTokType = _tokens[opPos].Type;
             bool negated = opTokType == TokenType.Minus;
 
-            if (TryConsume(TokenType.LiteralInt))
+            if (numeric)
             {
-                return new ExprIntConst
+                if (TryConsume(TokenType.LiteralInt))
                 {
-                    StartToken = begin,
-                    EndToken = End(begin),
-                    LiteralToken = _cursor - 1,
-                    IsNegative = negated,
-                };
-            }
+                    return new ExprIntConst
+                    {
+                        StartToken = begin,
+                        EndToken = End(begin),
+                        LiteralToken = _cursor - 1,
+                        IsNegative = negated,
+                    };
+                }
 
-            if (TryConsume(TokenType.LiteralFloat))
-            {
-                return new ExprFloatConst
+                if (TryConsume(TokenType.LiteralFloat))
                 {
-                    StartToken = begin,
-                    EndToken = End(begin),
-                    LiteralToken = _cursor - 1,
-                    IsNegative = negated,
-                };
+                    return new ExprFloatConst
+                    {
+                        StartToken = begin,
+                        EndToken = End(begin),
+                        LiteralToken = _cursor - 1,
+                        IsNegative = negated,
+                    };
+                }
             }
 
             Expr expr = ParseUnary();
