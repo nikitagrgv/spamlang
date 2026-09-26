@@ -51,7 +51,7 @@ public static partial class TokenUtils
         };
     }
 
-    public static BinaryOp ToBinaryOp(TokenType token)
+    public static BinaryOp? ToBinaryOp(TokenType token)
     {
         return token switch
         {
@@ -71,7 +71,7 @@ public static partial class TokenUtils
             TokenType.LessEqual => BinaryOp.LessEqual,
             TokenType.Greater => BinaryOp.Greater,
             TokenType.GreaterEqual => BinaryOp.GreaterEqual,
-            _ => throw new UnreachableException(),
+            _ => null,
         };
     }
 }

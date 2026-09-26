@@ -26,7 +26,7 @@ public static partial class TokenUtils
         };
     }
 
-    public static UnaryOp ToUnaryOp(TokenType token)
+    public static UnaryOp? ToUnaryOp(TokenType token)
     {
         return token switch
         {
@@ -34,7 +34,7 @@ public static partial class TokenUtils
             TokenType.Minus => UnaryOp.Minus,
             TokenType.Exclamation => UnaryOp.Not,
             TokenType.Tilde => UnaryOp.BitNot,
-            _ => throw new UnreachableException(),
+            _ => null,
         };
     }
 }
