@@ -76,18 +76,35 @@ public static class TokenTypeUtils
                 TokenType.Slash => "/",
                 TokenType.Percent => "%",
 
+                TokenType.Equal => "==",
+                TokenType.NotEqual => "!=",
+                TokenType.Less => "<",
+                TokenType.LessEqual => "<=",
+                TokenType.Greater => ">",
+                TokenType.GreaterEqual => ">=",
+
+                TokenType.Ampersand => "&",
+                TokenType.Pipe => "|",
+
+                TokenType.AmpersandAmpersand => "&&",
+                TokenType.PipePipe => "||",
+
+                TokenType.Exclamation => "!",
+
                 TokenType.KeywordFunc => "fn",
                 TokenType.KeywordReturn => "return",
                 TokenType.KeywordLet => "let",
+                TokenType.KeywordAs => "as",
 
                 TokenType.Identifier => "$",
 
                 TokenType.LiteralInt => "i",
+                TokenType.LiteralFloat => "f",
+                TokenType.LiteralBool => "b",
 
                 TokenType.Arrow => "->",
 
                 TokenType.Eof => "EOF",
-
                 _ => throw new Exception($"Unknown token type: {type}")
             };
         }
