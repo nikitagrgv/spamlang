@@ -10,6 +10,7 @@ public static class TokenUtils
         {
             UnaryOp.Plus => "+",
             UnaryOp.Minus => "-",
+            UnaryOp.Not => "!",
             _ => throw new UnreachableException()
         };
     }
