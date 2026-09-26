@@ -678,7 +678,7 @@ public class Parser
                 StartToken = begin,
                 EndToken = end,
                 LiteralToken = begin,
-                IsNegative = false
+                IsNegative = false,
             };
         }
 
@@ -687,7 +687,10 @@ public class Parser
             int end = End(begin);
             return new ExprFloatConst
             {
-                St
+                StartToken = begin,
+                EndToken = end,
+                LiteralToken = begin,
+                IsNegative = false,
             };
         }
 
