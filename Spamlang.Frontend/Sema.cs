@@ -867,10 +867,41 @@ public class Sema
 
     private HIRExprFloatConst VisitExprFloatConst(ExprIntConst expr)
     {
+        ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
+
+        double value = 0;
+        try
+        {
+            value = ParseFloatLiteralValue(str, expr.IsNegative);
+        }
+        catch (Exception)
+        {
+            Error($"Invalid float literal: {str}", expr);
+        }
+
+        return new HIRExprFloatConst
+        {
+            Value = value,
+            Type = BuiltinType.AbstractNumber,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
     private HIRExprBoolConst VisitExprBoolConst(ExprBoolConst expr)
     {
+        ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
+
+        Debug.Assert(str is "true" || str is "false");
+        bool value = str is "true";
+
+        return new HIRExprBoolConst
+        {
+            Value = value,
+            Type = BuiltinType.Bool,
+            Syntax = expr,
+            IsSynthesized = false,
+        };
     }
 
     private HIRExprUnary VisitExprUnary(ExprUnary expr)
