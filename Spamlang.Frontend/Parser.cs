@@ -587,7 +587,7 @@ public class Parser
                     StartToken = begin,
                     EndToken = End(begin),
                     LiteralToken = _cursor - 1,
-                    IsNegative = negated
+                    IsNegative = negated,
                 };
             }
 
@@ -598,7 +598,7 @@ public class Parser
                     StartToken = begin,
                     EndToken = End(begin),
                     LiteralToken = _cursor - 1,
-                    IsNegative = negated
+                    IsNegative = negated,
                 };
             }
 
