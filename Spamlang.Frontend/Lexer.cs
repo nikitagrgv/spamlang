@@ -186,13 +186,12 @@ public class Lexer
 
     private bool TryParseBool(ReadOnlySpan<char> word)
     {
-        TokenType? type = ToBool(word);
-        if (type == null)
+        if (!IsBool(word))
         {
             return false;
         }
 
-        AddTokenAndAdvance(type.Value, word.Length);
+        AddTokenAndAdvance(TokenType.LiteralBool, word.Length);
         return true;
     }
 
@@ -496,13 +495,9 @@ public class Lexer
         };
     }
 
-    private static TokenType? ToBool(ReadOnlySpan<char> word)
+    private static bool IsBool(ReadOnlySpan<char> word)
     {
-        return word switch
-        {
-            "true" or "false" => TokenType.LiteralBool,
-            _ => null,
-        };
+        return word is "true" or "false";
     }
 
     private static bool IsWordStart(char c) => char.IsAsciiLetter(c) || c == '_';
