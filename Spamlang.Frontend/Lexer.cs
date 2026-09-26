@@ -481,6 +481,7 @@ public class Lexer
             case '&':
                 if (str.Length > 1 && str[1] == '&')
                 {
+                    len = 2;
                     return TokenType.AmpersandAmpersand;
                 }
 
@@ -488,6 +489,7 @@ public class Lexer
             case '|':
                 if (str.Length > 1 && str[1] == '|')
                 {
+                    len = 2;
                     return TokenType.PipePipe;
                 }
 
