@@ -503,14 +503,9 @@ public class Parser
     {
         int begin = _cursor;
         Expr left = ParseTerm();
-        while (true)
+        while (Check(TokenType.Plus) || Check(TokenType.Minus))
         {
-            BinaryOp? op = TokenUtils.ToBinaryOp(Peek().Type);
-            if (op == null)
-            {
-                break;
-            }
-
+            int opPos = _cursor;
             Advance();
 
             Expr right = ParseTerm();
@@ -522,7 +517,7 @@ public class Parser
                 EndToken = end,
                 Left = left,
                 Right = right,
-                Op = op.Value,
+                Op = TokenUtils.ToBinaryOp(_tokens[opPos].Type)!.Value,
             };
         }
 
@@ -549,7 +544,7 @@ public class Parser
                 EndToken = end,
                 Left = left,
                 Right = right,
-                Op = TokenUtils.ToBinaryOp(_tokens[opPos].Type),
+                Op = TokenUtils.ToBinaryOp(_tokens[opPos].Type)!.Value,
             };
         }
 
