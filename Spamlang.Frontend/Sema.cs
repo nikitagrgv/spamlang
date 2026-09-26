@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Spamlang.Frontend;
 
@@ -886,6 +887,17 @@ public class Sema
             Syntax = expr,
             IsSynthesized = false,
         };
+    }
+
+    private static double ParseFloatLiteralValue(ReadOnlySpan<char> str, bool negative)
+    {
+        double v = double.Parse(str, NumberStyles.Float, CultureInfo.InvariantCulture);
+        if (negative)
+        {
+            v = -v;
+        }
+
+        return v;
     }
 
     private HIRExprBoolConst VisitExprBoolConst(ExprBoolConst expr)
