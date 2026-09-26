@@ -481,9 +481,17 @@ public class Lexer
             case '&':
                 if (str.Length > 1 && str[1] == '&')
                 {
-                    return TokenType.DoubleAnd;
+                    return TokenType.AmpersandAmpersand;
                 }
-                return 
+
+                return TokenType.Ampersand;
+            case '|':
+                if (str.Length > 1 && str[1] == '|')
+                {
+                    return TokenType.PipePipe;
+                }
+
+                return TokenType.Pipe;
             default:
                 return null;
         }
