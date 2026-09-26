@@ -238,6 +238,7 @@ public class AstPrinter
                 return ret;
             case PointerTypeNode n:
                 return "*" + PrettyTypeNode(n.Pointee);
+            default: throw new Exception("Unknown node type: " + node.GetType().Name);
         }
     }
 
