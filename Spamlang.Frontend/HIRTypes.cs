@@ -80,6 +80,18 @@ public sealed class HIRExprIntConst : HIRExpr
     public override bool IsLValue => false;
 }
 
+public sealed class HIRExprFloatConst : HIRExpr
+{
+    public required double Value { get; init; }
+    public override bool IsLValue => false;
+}
+
+public sealed class HIRExprBoolConst : HIRExpr
+{
+    public required bool Value { get; init; }
+    public override bool IsLValue => false;
+}
+
 public sealed class HIRExprZeroInit : HIRExpr
 {
     public override bool IsLValue => false;

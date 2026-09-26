@@ -865,11 +865,11 @@ public class Sema
         return value;
     }
 
-    private HIRExprIntConst VisitExprFloatConst(ExprIntConst expr)
+    private HIRExprFloatConst VisitExprFloatConst(ExprIntConst expr)
     {
     }
 
-    private HIRExprIntConst VisitExprBoolConst(ExprBoolConst expr)
+    private HIRExprBoolConst VisitExprBoolConst(ExprBoolConst expr)
     {
     }
 
