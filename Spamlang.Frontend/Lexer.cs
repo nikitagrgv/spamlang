@@ -478,6 +478,12 @@ public class Lexer
                 }
 
                 return TokenType.Exclamation;
+            case '&':
+                if (str.Length > 1 && str[1] == '&')
+                {
+                    return TokenType.DoubleAnd;
+                }
+                return 
             default:
                 return null;
         }

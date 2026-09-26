@@ -27,6 +27,12 @@ public enum TokenType
     Greater,
     GreaterEqual,
 
+    Ampersand,
+    Pipe,
+
+    AmpersandAmpersand,
+    PipePipe,
+
     Exclamation,
 
     KeywordFunc,
