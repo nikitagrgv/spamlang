@@ -612,7 +612,7 @@ public class Parser
                 StartToken = begin,
                 EndToken = End(begin),
                 Operand = expr,
-                Op = TokenUtils.ToUnaryOp(opTokType),
+                Op = TokenUtils.ToUnaryOp(opTokType)!.Value,
             };
         }
 
