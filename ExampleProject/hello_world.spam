@@ -48,7 +48,7 @@ fn demo_types()
     let test_h = 5 as i8;
     let test_i: bool = true;
     let test_j: bool = false;
-    let test_k: !test_j;
+    let test_k = !test_j;
     let test_l = 5 == 6;
     let test_m = 5 >= 6;
     let test_n: f32 = 5.123 + 5.1;
