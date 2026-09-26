@@ -33,7 +33,8 @@ public static class TokenUtils
         {
             TokenType.Plus => UnaryOp.Plus,
             TokenType.Minus => UnaryOp.Minus,
-            _ => throw new UnreachableException()
+            TokenType.Exclamation => UnaryOp.Not,
+            _ => throw new UnreachableException(),
         };
     }
 
