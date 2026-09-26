@@ -866,7 +866,7 @@ public class Sema
         return value;
     }
 
-    private HIRExprFloatConst VisitExprFloatConst(ExprIntConst expr)
+    private HIRExprFloatConst VisitExprFloatConst(ExprFloatConst expr)
     {
         ReadOnlySpan<char> str = GetTokenValue(expr.LiteralToken);
 
