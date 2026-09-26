@@ -144,6 +144,12 @@ public class AstPrinter
             case ExprIntConst n:
                 Console.WriteLine($"{fullPrefix}: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
                 break;
+            case ExprFloatConst n:
+                Console.WriteLine($"{fullPrefix}: {(n.IsNegative ? "-" : "")}{TokenValue(n.LiteralToken)} | IsNegative = {n.IsNegative}");
+                break;
+            case ExprBoolConst n:
+                Console.WriteLine($"{fullPrefix}: {TokenValue(n.LiteralToken)}");
+                break;
             case ExprIdentifier n:
                 Console.WriteLine($"{fullPrefix}: {TokenValue(n.IdentifierToken)}");
                 break;
