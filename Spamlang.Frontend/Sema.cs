@@ -480,6 +480,10 @@ public class Sema
                 return VisitExprIdentifier(exprIdentifier);
             case ExprIntConst exprInt:
                 return VisitExprIntConst(exprInt);
+            case ExprFloatConst exprFloatConst:
+                return VisitExprFloatConst(exprFloatConst);
+            case ExprBoolConst exprBoolConst:
+                return VisitExprBoolConst(exprBoolConst);
             case ExprUnary exprUnary:
                 return VisitExprUnary(exprUnary);
             default:
@@ -859,6 +863,14 @@ public class Sema
         }
 
         return value;
+    }
+
+    private HIRExprIntConst VisitExprFloatConst(ExprIntConst expr)
+    {
+    }
+
+    private HIRExprIntConst VisitExprBoolConst(ExprBoolConst expr)
+    {
     }
 
     private HIRExprUnary VisitExprUnary(ExprUnary expr)
