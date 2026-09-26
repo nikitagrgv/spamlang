@@ -37,6 +37,13 @@ fn apply(f: fn(i32,i32)->i32, a: i32, b: i32) -> i32
 
 fn demo_types()
 {
+    demo_int();
+    demo_bool();
+    demo_float();
+}
+
+fn demo_int()
+{
     let test_a: i16 = 123;
     let test_b = test_a + 123;
     123 + test_a;
@@ -46,13 +53,22 @@ fn demo_types()
     let test_f: i16 = test_a + 100000;
     let test_g: i64 = 3000000000;
     let test_h = 5 as i8;
-    let test_i: bool = true;
-    let test_j: bool = false;
-    let test_k = !test_j;
-    let test_l = 5 == 6;
-    let test_m = 5 >= 6;
-    let test_n: f32 = 5.123 + 5.1;
-    let test_n: f64 = 5.123 + 5.1;
-    let test_p = 5.123 + test_o;
-    let test_q = 5e123;
+}
+
+fn demo_bool()
+{
+    let test_a: bool = true;
+    let test_b: bool = false;
+    let test_c = !test_a;
+    let test_d = 5 == 6;
+    let test_e = 5 >= 6;
+}
+
+fn demo_float()
+{
+    let test_f32: f32 = 5.123 + 5.1;
+    let test_f64: f64 = 5.123 + 5.1;
+    let test_a = 5.123 + test_f32;
+    let test_b = 5.123 + test_f64;
+    let test_c = 5e123;
 }
