@@ -694,6 +694,17 @@ public class Parser
             };
         }
 
+        if (TryConsume(TokenType.LiteralBool))
+        {
+            int end = End(begin);
+            return new ExprBoolConst
+            {
+                StartToken = begin,
+                EndToken = end,
+                LiteralToken = begin,
+            };
+        }
+
         if (TryConsume(TokenType.LPar))
         {
             Expr expr = ParseExpr();
