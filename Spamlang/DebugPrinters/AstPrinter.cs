@@ -178,6 +178,8 @@ public class AstPrinter
                 ret.Append(' ');
                 ret.Append(PrettyExpr(binaryExpr.Right));
                 break;
+            case ExprBoolConst exprBoolConst:
+                return TokenValue(exprBoolConst.LiteralToken);
             case ExprUnary unaryExpr:
                 ret.Append(TokenUtils.ToString(unaryExpr.Op));
                 ret.Append(PrettyExpr(unaryExpr.Operand));
@@ -211,6 +213,8 @@ public class AstPrinter
                 ret.Append(" as ");
                 ret.Append(PrettyTypeNode(exprCast.TargetType));
                 break;
+            case ExprFloatConst exprFloatConst:
+                return (exprFloatConst.IsNegative ? "-" : "") + TokenValue(exprFloatConst.LiteralToken);
             case ExprIntConst exprInt:
                 return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
             case ExprIdentifier exprIdentifier:
