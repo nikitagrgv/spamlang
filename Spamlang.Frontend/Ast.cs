@@ -111,6 +111,12 @@ public sealed class ExprIntConst : ExprPrimary
     public required bool IsNegative { get; init; }
 }
 
+public sealed class ExprFloatConst : ExprPrimary
+{
+    public required int LiteralToken { get; init; }
+    public required bool IsNegative { get; init; }
+}
+
 public sealed class ExprIdentifier : ExprPrimary
 {
     public required int IdentifierToken { get; init; }

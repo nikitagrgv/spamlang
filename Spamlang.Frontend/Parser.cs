@@ -578,16 +578,26 @@ public class Parser
         {
             int opPos = _cursor - 1;
             TokenType opTokType = _tokens[opPos].Type;
+            bool negated = opTokType == TokenType.Minus;
 
             if (TryConsume(TokenType.LiteralInt))
             {
-                int literalToken = _cursor - 1;
-                bool negated = opTokType == TokenType.Minus;
                 return new ExprIntConst
                 {
                     StartToken = begin,
                     EndToken = End(begin),
-                    LiteralToken = literalToken,
+                    LiteralToken = _cursor - 1,
+                    IsNegative = negated
+                };
+            }
+
+            if (TryConsume(TokenType.LiteralFloat))
+            {
+                return new ExprFloatConst
+                {
+                    StartToken = begin,
+                    EndToken = End(begin),
+                    LiteralToken = _cursor - 1,
                     IsNegative = negated
                 };
             }
@@ -665,6 +675,15 @@ public class Parser
                 EndToken = end,
                 LiteralToken = begin,
                 IsNegative = false
+            };
+        }
+
+        if (TryConsume(TokenType.LiteralFloat))
+        {
+            int end = End(begin);
+            return new ExprFloatConst
+            {
+                St
             };
         }
 
