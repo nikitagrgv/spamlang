@@ -31,6 +31,13 @@ public class LexerTest
         (">", TokenType.Greater),
         (">=", TokenType.GreaterEqual),
 
+        ("&", TokenType.Ampersand),
+        ("|", TokenType.Pipe),
+
+        ("&&", TokenType.AmpersandAmpersand),
+        ("||", TokenType.PipePipe),
+
+
         ("!", TokenType.Exclamation),
 
         ("fn", TokenType.KeywordFunc),
