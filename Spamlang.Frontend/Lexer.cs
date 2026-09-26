@@ -61,7 +61,7 @@ public class Lexer
                 continue;
             }
 
-            _diag.AddError("Invalid token", _cursor, 1, _line, _column);
+            _diag.AddError($"Invalid token: {_code[_cursor]}", _cursor, 1, _line, _column);
             AddTokenAndAdvance(TokenType.Invalid, 1);
         }
 
