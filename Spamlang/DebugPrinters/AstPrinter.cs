@@ -126,6 +126,11 @@ public class AstPrinter
                 PrintAst(depth + 1, n.Callee);
                 PrintChildrenAst(depth + 1, n.Args);
                 break;
+            case ExprCast exprCast:
+                Console.WriteLine($"{fullPrefix}: {PrettyExpr(exprCast)}");
+                PrintAst(depth + 1, exprCast.TargetType, "TargetType");
+                PrintAst(depth + 1, exprCast.Value);
+                break;
             case CallArg exprCallArg:
                 string nameInfo = "";
                 if (exprCallArg.ArgNameToken != null)
