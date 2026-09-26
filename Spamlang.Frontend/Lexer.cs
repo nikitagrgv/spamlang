@@ -438,6 +438,10 @@ public class Lexer
                 return TokenType.Percent;
             case ',':
                 return TokenType.Comma;
+            case '^':
+                return TokenType.Caret;
+            case '~':
+                return TokenType.Tilde;
             case '-':
                 if (str.Length > 1 && str[1] == '>')
                 {
