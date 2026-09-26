@@ -39,7 +39,6 @@ public class Parser
     }
 
     private bool Check(TokenType type) => Peek().Type == type;
-    private bool CheckNext(TokenType type) => Peek(1).Type == type;
 
     private bool TryConsume(TokenType type)
     {
@@ -634,7 +633,7 @@ public class Parser
                     int argBegin = _cursor;
                     int? argNameToken = null;
                     // Named arg
-                    if (Peek(0).Type == TokenType.Identifier && Peek(1).Type == TokenType.Colon)
+                    if (Peek().Type == TokenType.Identifier && Peek(1).Type == TokenType.Colon)
                     {
                         argNameToken = Expect(TokenType.Identifier);
                         Expect(TokenType.Colon);
