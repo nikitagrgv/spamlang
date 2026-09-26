@@ -118,6 +118,12 @@ public class HIRPrinter
             case HIRExprIntConst n:
                 Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
                 break;
+            case HIRExprFloatConst n:
+                Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
+                break;
+            case HIRExprBoolConst n:
+                Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
+                break;
             case HIRExprLoad n:
                 Console.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Address, "Address");
@@ -192,6 +198,10 @@ public class HIRPrinter
             case HIRExprFuncRef e:
                 return e.Symbol.Name;
             case HIRExprIntConst e:
+                return $"{e.Value}";
+            case HIRExprFloatConst e:
+                return $"{e.Value}";
+            case HIRExprBoolConst e:
                 return $"{e.Value}";
             case HIRExprLoad e:
                 return $"LOAD({PrettyExpr(e.Address)})";
