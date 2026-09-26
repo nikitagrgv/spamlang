@@ -206,6 +206,11 @@ public class AstPrinter
                 ret.Append(')');
 
                 return ret.ToString();
+            case ExprCast exprCast:
+                ret.Append(PrettyExpr(exprCast.Value));
+                ret.Append(" as ");
+                ret.Append(PrettyTypeNode(exprCast.TargetType));
+                break;
             case ExprIntConst exprInt:
                 return (exprInt.IsNegative ? "-" : "") + TokenValue(exprInt.LiteralToken);
             case ExprIdentifier exprIdentifier:
@@ -215,6 +220,25 @@ public class AstPrinter
 
         ret.Append(')');
         return ret.ToString();
+    }
+
+    private string PrettyTypeNode(TypeNode node)
+    {
+        switch (node)
+        {
+            case IdentifierTypeNode n:
+                return TokenValue(n.TypeNameToken);
+            case FuncTypeNode n:
+                string ret = $"fn({string.Join(", ", n.Params.Select(PrettyTypeNode))})";
+                if (n.ReturnType != null)
+                {
+                    ret += $"->{PrettyTypeNode(n.ReturnType)}";
+                }
+
+                return ret;
+            case PointerTypeNode n:
+                return "*" + PrettyTypeNode(n.Pointee);
+        }
     }
 
     private void PrintAstToken(int depth, int token, string name)
