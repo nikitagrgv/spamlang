@@ -8,6 +8,12 @@ public enum BinaryOp
     Div,
     Rem,
 
+    BinaryAnd,
+    BinaryOr,
+
+    LogicAnd,
+    LogicOr,
+
     Equal,
     NotEqual,
     Less,
