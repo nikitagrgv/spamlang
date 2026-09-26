@@ -37,6 +37,8 @@ public class LexerTest
         ("&&", TokenType.AmpersandAmpersand),
         ("||", TokenType.PipePipe),
 
+        ("^", TokenType.Caret),
+        ("~", TokenType.Tilde),
 
         ("!", TokenType.Exclamation),
 

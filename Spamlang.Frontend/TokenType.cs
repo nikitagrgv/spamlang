@@ -33,6 +33,9 @@ public enum TokenType
     AmpersandAmpersand,
     PipePipe,
 
+    Caret,
+    Tilde,
+
     Exclamation,
 
     KeywordFunc,
@@ -88,6 +91,9 @@ public static class TokenTypeUtils
 
                 TokenType.AmpersandAmpersand => "&&",
                 TokenType.PipePipe => "||",
+
+                TokenType.Caret => "^",
+                TokenType.Tilde => "~",
 
                 TokenType.Exclamation => "!",
 
