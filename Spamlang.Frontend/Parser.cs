@@ -148,7 +148,7 @@ public class Parser
         {
             StartToken = begin,
             EndToken = end,
-            FuncDecls = funcDecls
+            FuncDecls = funcDecls,
         };
         return unit;
     }
@@ -386,7 +386,7 @@ public class Parser
         {
             StartToken = begin,
             EndToken = end,
-            Stmts = stmts
+            Stmts = stmts,
         };
     }
 
@@ -442,7 +442,7 @@ public class Parser
             EndToken = end,
             NameToken = nameToken,
             TypeDecl = typeDecl,
-            Expr = expr
+            Expr = expr,
         };
     }
 
@@ -464,7 +464,7 @@ public class Parser
         {
             StartToken = begin,
             EndToken = end,
-            Expr = expr
+            Expr = expr,
         };
     }
 
@@ -489,7 +489,7 @@ public class Parser
                 EndToken = end,
                 AssignToken = op,
                 Target = baseExp,
-                Value = value
+                Value = value,
             };
         }
         else
@@ -500,7 +500,7 @@ public class Parser
             {
                 StartToken = begin,
                 EndToken = end,
-                Expr = baseExp
+                Expr = baseExp,
             };
         }
 
@@ -669,7 +669,7 @@ public class Parser
                 StartToken = begin,
                 EndToken = end,
                 Callee = callee,
-                Args = args
+                Args = args,
             };
         }
 
@@ -739,7 +739,7 @@ public class Parser
         {
             StartToken = begin,
             EndToken = end,
-            IdentifierToken = identifierToken
+            IdentifierToken = identifierToken,
         };
     }
 

@@ -88,7 +88,7 @@ public static class ArgumentsParser
                     ShortName = arg.ShortName,
                     IsBoolean = property.PropertyType == typeof(bool),
                     IsRequired = arg.Required,
-                    Property = property
+                    Property = property,
                 };
                 parameters.Add(parameter);
             }
@@ -163,7 +163,7 @@ public static class ArgumentsParser
         Result<T> result = new()
         {
             Value = (T)resultValue,
-            Errors = errors
+            Errors = errors,
         };
 
         return result;

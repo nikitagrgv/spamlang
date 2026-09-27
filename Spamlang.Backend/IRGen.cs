@@ -450,7 +450,7 @@ public class IRGen
             IRInstructionStore store = new()
             {
                 Value = param,
-                Address = alloca
+                Address = alloca,
             };
             entry.Add(store);
         }

@@ -36,6 +36,9 @@ public enum TokenType
     Caret,
     Tilde,
 
+    ShiftLeft,
+    ShiftRight,
+
     Exclamation,
 
     KeywordFunc,
@@ -95,6 +98,9 @@ public static class TokenTypeUtils
                 TokenType.Caret => "^",
                 TokenType.Tilde => "~",
 
+                TokenType.ShiftLeft => "<<",
+                TokenType.ShiftRight => ">>",
+
                 TokenType.Exclamation => "!",
 
                 TokenType.KeywordFunc => "fn",
@@ -111,7 +117,7 @@ public static class TokenTypeUtils
                 TokenType.Arrow => "->",
 
                 TokenType.Eof => "EOF",
-                _ => throw new Exception($"Unknown token type: {type}")
+                _ => throw new Exception($"Unknown token type: {type}"),
             };
         }
 
@@ -121,7 +127,9 @@ public static class TokenTypeUtils
             {
                 TokenType.Identifier => "Identifier",
                 TokenType.LiteralInt => "LiteralInt",
-                _ => type.PrettyName()
+                TokenType.LiteralFloat => "LiteralFloat",
+                TokenType.LiteralBool => "LiteralBool",
+                _ => type.PrettyName(),
             };
         }
 
@@ -132,7 +140,9 @@ public static class TokenTypeUtils
                 return type switch
                 {
                     TokenType.LiteralInt => true,
-                    _ => false
+                    TokenType.LiteralFloat => true,
+                    TokenType.LiteralBool => true,
+                    _ => false,
                 };
             }
         }

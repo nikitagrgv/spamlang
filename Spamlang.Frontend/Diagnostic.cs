@@ -3,7 +3,7 @@ namespace Spamlang.Frontend;
 public enum DiagnosticSeverity
 {
     Error,
-    Warning
+    Warning,
 }
 
 // TODO: Add filename?
@@ -24,7 +24,7 @@ public readonly struct DiagnosticEntry
         {
             DiagnosticSeverity.Error => "error",
             DiagnosticSeverity.Warning => "warning",
-            _ => throw new ArgumentOutOfRangeException(nameof(Severity))
+            _ => throw new ArgumentOutOfRangeException(nameof(Severity)),
         };
 
         return $"{sev} at {Line}:{Column}: {Message}";

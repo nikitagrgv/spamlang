@@ -64,7 +64,7 @@ public static class Regs
             4 => 1,
             2 => 2,
             1 => 3,
-            _ => throw new UnreachableException()
+            _ => throw new UnreachableException(),
         };
 
         string name = Names[(int)reg][index];
@@ -85,7 +85,7 @@ public static class Regs
             4 => "dword ptr",
             2 => "word ptr",
             1 => "byte ptr",
-            _ => throw new UnreachableException()
+            _ => throw new UnreachableException(),
         };
     }
 }

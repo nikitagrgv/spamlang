@@ -110,9 +110,9 @@ public class Codegen
         MOpReg rbp = new() { Reg = Reg.Rbp, Size = 8 };
         MOpReg rsp = new() { Reg = Reg.Rsp, Size = 8 };
         List<MInstr> prologueInstructions = new();
-        prologueInstructions.Add(new MInstr { Op = MOpcode.Push, Left = rbp, });
-        prologueInstructions.Add(new MInstr { Op = MOpcode.Mov, Left = rbp, Right = rsp, });
-        prologueInstructions.Add(new MInstr { Op = MOpcode.Sub, Left = rsp, Right = new MOpImm { Value = frameSize }, });
+        prologueInstructions.Add(new MInstr { Op = MOpcode.Push, Left = rbp });
+        prologueInstructions.Add(new MInstr { Op = MOpcode.Mov, Left = rbp, Right = rsp });
+        prologueInstructions.Add(new MInstr { Op = MOpcode.Sub, Left = rsp, Right = new MOpImm { Value = frameSize } });
 
         // Spill params to stack
         foreach (IRParam param in irfunc.Params)
@@ -190,10 +190,10 @@ public class Codegen
 
         // Frame epilogue
         List<MInstr> epilogueInstructions = new();
-        epilogueInstructions.Add(new MInstr { Op = MOpcode.Mov, Left = rsp, Right = rbp, });
-        epilogueInstructions.Add(new MInstr { Op = MOpcode.Pop, Left = rbp, });
-        epilogueInstructions.Add(new MInstr { Op = MOpcode.Ret, });
-        MBasicBlock epilogue = new() { Instructions = epilogueInstructions, Name = epilogueLabel, };
+        epilogueInstructions.Add(new MInstr { Op = MOpcode.Mov, Left = rsp, Right = rbp });
+        epilogueInstructions.Add(new MInstr { Op = MOpcode.Pop, Left = rbp });
+        epilogueInstructions.Add(new MInstr { Op = MOpcode.Ret });
+        MBasicBlock epilogue = new() { Instructions = epilogueInstructions, Name = epilogueLabel };
         basicBlocks.Add(epilogue);
 
         MFunction func = new()
@@ -211,7 +211,7 @@ public class Codegen
         instructions.Add(new MInstr
         {
             Op = MOpcode.Lea,
-            Left = new MOpReg { Reg = Reg.Rax, Size = instr.Type.Size, },
+            Left = new MOpReg { Reg = Reg.Rax, Size = instr.Type.Size },
             Right = new MOpMem { Base = Reg.Rbp, Offset = allocatedOffset, Size = null },
             Comment = instr.PrintDefinition(),
         });
@@ -342,8 +342,8 @@ public class Codegen
         instructions.Add(new MInstr
         {
             Op = MOpcode.Mov,
-            Left = new MOpMem { Base = Reg.Rcx, Offset = null, Size = typeSize, },
-            Right = new MOpReg { Reg = Reg.Rax, Size = typeSize, },
+            Left = new MOpMem { Base = Reg.Rcx, Offset = null, Size = typeSize },
+            Right = new MOpReg { Reg = Reg.Rax, Size = typeSize },
         });
     }
 
@@ -354,8 +354,8 @@ public class Codegen
         instructions.Add(new MInstr
         {
             Op = MOpcode.Mov,
-            Left = new MOpReg { Reg = Reg.Rax, Size = instr.Type.Size, },
-            Right = new MOpMem { Base = Reg.Rcx, Offset = null, Size = instr.Type.Size, },
+            Left = new MOpReg { Reg = Reg.Rax, Size = instr.Type.Size },
+            Right = new MOpMem { Base = Reg.Rcx, Offset = null, Size = instr.Type.Size },
         });
         int instrOffset = ctx.InstrIdToOffset[instr.Id];
         StoreToOffset(ctx, instructions, Reg.Rax, instrOffset, instr.Type.Size);
