@@ -101,7 +101,8 @@ public class ParserTest
     }
 
     [Theory]
-    [InlineData("", "")]
+    [InlineData("a + b * c", "(a + (b * c))")]
+    [InlineData("a * b + c", "((a * b) + c)")]
     public void Parser_ParsesWithPrecedence(string code, string expectedFlat)
     {
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
