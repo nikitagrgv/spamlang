@@ -64,7 +64,7 @@ public class ParserTest
     {
         string code = $"a {op.AsString()} b";
 
-        (Expr expr, string flat, Diagnostic diag) = ParseExpr(code);
+        (Expr expr, string flat, Diagnostic diag, _) = ParseExpr(code);
 
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprBinary>(expr);
@@ -78,7 +78,7 @@ public class ParserTest
     {
         string code = $"{op.AsString()}a";
 
-        (Expr expr, string flat, Diagnostic diag) = ParseExpr(code);
+        (Expr expr, string flat, Diagnostic diag, _) = ParseExpr(code);
 
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprUnary>(expr);
@@ -91,15 +91,17 @@ public class ParserTest
     {
         string code = "a as b";
 
-        (Expr expr, string flat, Diagnostic diag) = ParseExpr(code);
+        (Expr expr, string flat, Diagnostic diag, List<Token> tokens) = ParseExpr(code);
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprCast>(expr);
+        Assert.Equal("a", ToFlatAst(((ExprCast)expr).Value, tokens, code));
+        Assert.Equal("b", ToFlatAst(((ExprCast)expr).TargetType, tokens, code));
         Assert.Equal("(a as b)", flat);
     }
 
     /////////////////////////////////////////////////////////////////////////
 
-    private static (Expr, string flat, Diagnostic) ParseExpr(string code)
+    private static (Expr, string flat, Diagnostic, List<Token>) ParseExpr(string code)
     {
         Diagnostic diag = new();
 
@@ -111,7 +113,7 @@ public class ParserTest
 
         string flat = ToFlatAst(expr, tokens, code);
 
-        return (expr, flat, diag);
+        return (expr, flat, diag, tokens);
     }
 
     private static string ToFlatAst(Expr expr, List<Token> tokens, string code)
