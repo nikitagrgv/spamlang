@@ -101,33 +101,45 @@ public class ParserTest
 
     /////////////////////////////////////////////////////////////////////////
 
-    private static (Expr, string flat, Diagnostic, List<Token>) ParseExpr(string code)
+    private class ExprAnalyzer
     {
-        Diagnostic diag = new();
+        private string _code;
 
-        Lexer lexer = new(code, diag);
-        List<Token> tokens = lexer.Run();
+        public ExprAnalyzer(string code)
+        {
+            _code = code;
+        }
 
-        Parser parser = new(code, tokens, diag);
-        Expr expr = parser.RunExpr();
+        public string Code => _code;
 
-        string flat = ToFlat(expr, tokens, code);
+        private static (Expr, string flat, Diagnostic, List<Token>) ParseExpr(string code)
+        {
+            Diagnostic diag = new();
 
-        return (expr, flat, diag, tokens);
-    }
+            Lexer lexer = new(code, diag);
+            List<Token> tokens = lexer.Run();
 
-    private static string ToFlat(Expr expr, List<Token> tokens, string code)
-    {
-        AstPrinter printer = new(tokens, code);
-        string flat = printer.PrettyExpr(expr);
-        return flat;
-    }
+            Parser parser = new(code, tokens, diag);
+            Expr expr = parser.RunExpr();
 
-    private static string ToFlat(TypeNode node, List<Token> tokens, string code)
-    {
-        AstPrinter printer = new(tokens, code);
-        string flat = printer.PrettyTypeNode(node);
-        return flat;
+            string flat = ToFlat(expr, tokens, code);
+
+            return (expr, flat, diag, tokens);
+        }
+
+        private static string ToFlat(Expr expr, List<Token> tokens, string code)
+        {
+            AstPrinter printer = new(tokens, code);
+            string flat = printer.PrettyExpr(expr);
+            return flat;
+        }
+
+        private static string ToFlat(TypeNode node, List<Token> tokens, string code)
+        {
+            AstPrinter printer = new(tokens, code);
+            string flat = printer.PrettyTypeNode(node);
+            return flat;
+        }
     }
 
     private static TheoryData<T> MakeData<T>(T[] values) where T : Enum
