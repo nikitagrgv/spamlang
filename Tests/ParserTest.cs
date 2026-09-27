@@ -39,7 +39,7 @@ public class ParserTest
     public static TheoryData<UnaryOp> AllUnaryOpsData = MakeData(AllUnaryOps);
 
     [Fact]
-    public void Lexer_CoversAllBinaryOps()
+    public void Parser_CoversAllBinaryOps()
     {
         HashSet<BinaryOp> covered = AllBinaryOps.ToHashSet();
         List<BinaryOp> missing = Enum.GetValues<BinaryOp>()
@@ -49,7 +49,7 @@ public class ParserTest
     }
 
     [Fact]
-    public void Lexer_CoversAllUnaryOps()
+    public void Parser_CoversAllUnaryOps()
     {
         HashSet<UnaryOp> covered = AllUnaryOps.ToHashSet();
         List<UnaryOp> missing = Enum.GetValues<UnaryOp>()
@@ -87,7 +87,7 @@ public class ParserTest
     }
 
     [Fact]
-    public void Parser_Cast()
+    public void Parser_ParsesCast()
     {
         string code = "a as b";
 
