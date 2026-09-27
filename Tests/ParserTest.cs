@@ -15,6 +15,8 @@ public class ParserTest
         BinaryOp.BitAnd,
         BinaryOp.BitOr,
         BinaryOp.BitXor,
+        BinaryOp.BitShiftLeft,
+        BinaryOp.BitShiftRight,
         BinaryOp.LogicAnd,
         BinaryOp.LogicOr,
         BinaryOp.Equal,
