@@ -14,7 +14,7 @@ public class AstPrinter
         printer.PrintAst(unit);
     }
 
-    private AstPrinter(IReadOnlyList<Token> tokens, string code)
+    public AstPrinter(IReadOnlyList<Token> tokens, string code)
     {
         _code = code;
         _tokens = tokens;
@@ -158,20 +158,7 @@ public class AstPrinter
         }
     }
 
-    private void PrintChildrenAst(int depth, IReadOnlyList<Node> nodes)
-    {
-        foreach (Node node in nodes)
-        {
-            PrintAst(depth, node);
-        }
-    }
-
-    private string TokenValue(int tokenIndex)
-    {
-        return _tokens[tokenIndex].Value(_code).ToString();
-    }
-
-    private string PrettyExpr(Expr expr)
+    public string PrettyExpr(Expr expr)
     {
         StringBuilder ret = new();
         ret.Append('(');
@@ -230,6 +217,19 @@ public class AstPrinter
 
         ret.Append(')');
         return ret.ToString();
+    }
+
+    private void PrintChildrenAst(int depth, IReadOnlyList<Node> nodes)
+    {
+        foreach (Node node in nodes)
+        {
+            PrintAst(depth, node);
+        }
+    }
+
+    private string TokenValue(int tokenIndex)
+    {
+        return _tokens[tokenIndex].Value(_code).ToString();
     }
 
     private string PrettyTypeNode(TypeNode node)
