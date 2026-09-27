@@ -103,28 +103,49 @@ public class ParserTest
 
     private class ExprAnalyzer
     {
-        private string _code;
-
-        public ExprAnalyzer(string code)
-        {
-            _code = code;
-        }
+        private readonly string _code;
+        private readonly Diagnostic _diag;
+        private readonly List<Token> _tokens;
+        private readonly Node _result;
+        private readonly string _flat;
 
         public string Code => _code;
+        public Expr ResultExpr => (Expr)_result;
+        public string Flat => _flat;
+        public Diagnostic Diag => _diag;
+        public bool HasErrors => _diag.HasErrors;
 
-        private static (Expr, string flat, Diagnostic, List<Token>) ParseExpr(string code)
+        public static ExprAnalyzer Parse(string code)
         {
-            Diagnostic diag = new();
+            ExprAnalyzer analyzer = new(code);
+            return analyzer;
+        }
 
-            Lexer lexer = new(code, diag);
-            List<Token> tokens = lexer.Run();
+        private ExprAnalyzer(string code)
+        {
+            _code = code;
+            _diag = new Diagnostic();
 
-            Parser parser = new(code, tokens, diag);
-            Expr expr = parser.RunExpr();
+            Lexer lexer = new(_code, _diag);
+            _tokens = lexer.Run();
 
-            string flat = ToFlat(expr, tokens, code);
+            Parser parser = new(_code, _tokens, _diag);
+            _result = parser.RunExpr();
 
-            return (expr, flat, diag, tokens);
+            _flat = ToFlat(_result);
+        }
+
+        public string ToFlat(Node node)
+        {
+            switch (node)
+            {
+                case Expr expr:
+                    return ToFlat(expr, _tokens, _code);
+                case TypeNode typeNode:
+                    return ToFlat(typeNode, _tokens, _code);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(node));
+            }
         }
 
         private static string ToFlat(Expr expr, List<Token> tokens, string code)
