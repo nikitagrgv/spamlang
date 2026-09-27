@@ -158,7 +158,7 @@ public class AstPrinter
         }
     }
 
-    public string PrettyExpr(Expr expr)
+    internal string PrettyExpr(Expr expr)
     {
         StringBuilder ret = new();
         ret.Append('(');

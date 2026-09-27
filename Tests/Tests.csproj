@@ -21,6 +21,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Spamlang.Backend\Spamlang.Backend.csproj" />
         <ProjectReference Include="..\Spamlang.Frontend\Spamlang.Frontend.csproj" />
+        <ProjectReference Include="..\Spamlang\Spamlang.csproj" />
     </ItemGroup>
 
 </Project>

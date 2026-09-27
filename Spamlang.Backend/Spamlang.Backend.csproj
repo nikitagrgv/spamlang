@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Spamlang.Frontend\Spamlang.Frontend.csproj" />
     </ItemGroup>
 

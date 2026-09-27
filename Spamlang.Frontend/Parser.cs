@@ -330,7 +330,7 @@ public class Parser
         };
     }
 
-    private Block ParseBlock()
+    internal Block ParseBlock()
     {
         int begin = _cursor;
         List<Stmt> stmts = [];

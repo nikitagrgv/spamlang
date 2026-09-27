@@ -1,4 +1,5 @@
-﻿using Spamlang.Frontend;
+﻿using Spamlang.DebugPrinters;
+using Spamlang.Frontend;
 
 namespace Tests;
 
@@ -6,31 +7,31 @@ public class ParserTest
 {
     private static bool HasErrors(string code)
     {
-        (CompilationUnit _, Diagnostic diag) = Parse(code);
+        (_, _, Diagnostic diag) = Parse(code);
         return diag.HasErrors;
     }
 
     private static string CodeToFlatAst(string code)
     {
-        (CompilationUnit unit, Diagnostic _) = Parse(code);
-        return ToFlatAst(unit, code);
+        (CompilationUnit unit, List<Token> tokens, Diagnostic _) = Parse(code);
+        return ToFlatAst(unit, tokens, code);
     }
 
-    private static (CompilationUnit, Diagnostic) Parse(string code)
+    private static (CompilationUnit, List<Token>, Diagnostic) Parse(string code)
     {
         Diagnostic diag = new();
         Lexer lexer = new(code, diag);
         List<Token> tokens = lexer.Run();
         Parser parser = new();
         CompilationUnit unit = parser.Run(code, tokens, diag);
-        return (unit, diag);
+        return (unit, tokens, diag);
     }
 
-    private static string ToFlatAst(CompilationUnit unit, string code)
+    private static string ToFlatAst(CompilationUnit unit, List<Token> tokens, string code)
     {
-        
+        AstPrinter printer = new(tokens, code);
+        printer.PrettyExpr();
     }
-
 
     [Theory]
     [InlineData(" ", " ")]
