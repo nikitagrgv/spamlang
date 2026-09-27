@@ -38,6 +38,17 @@ public class ParserTest
     }
 
     [Theory]
+    [InlineData("+")]
+    public void Parser_ParsesAllBinaryOps(string op)
+    {
+        string code = $"a {op} b";
+        string expected = $"(a {op} b)";
+
+        string parsed = ExprCodeToFlatAst(code);
+        Assert.Equal(expected, parsed);
+    }
+
+    [Theory]
     [InlineData("a + b", "(a + b)")]
     public void Parser_Parses(string code, string expected)
     {
