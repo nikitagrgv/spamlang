@@ -93,11 +93,11 @@ public class ParserTest
 
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
 
-        Assert.False(diag.HasErrors);
-        Assert.IsType<ExprCast>(expr);
-        Assert.Equal("a", ToFlat(((ExprCast)expr).Value, tokens, code));
-        Assert.Equal("b", ToFlat(((ExprCast)expr).TargetType, tokens, code));
-        Assert.Equal("(a as b)", flat);
+        Assert.False(analyzer.HasErrors);
+        Assert.IsType<ExprCast>(analyzer.Result);
+        Assert.Equal("a", analyzer.ToFlat(analyzer.ResultAs<ExprCast>().Value));
+        Assert.Equal("b", analyzer.ToFlat(analyzer.ResultAs<ExprCast>().TargetType));
+        Assert.Equal("(a as b)", analyzer.Flat);
     }
 
     /////////////////////////////////////////////////////////////////////////
