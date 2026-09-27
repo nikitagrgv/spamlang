@@ -56,7 +56,7 @@ public class ParserTest
     [InlineData(BinaryOp.GreaterEqual)]
     public void Parser_ParsesAllBinaryOps(BinaryOp op)
     {
-        string code = $"a {op.ToString()} b";
+        string code = $"a {op.AsString()} b";
 
         (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
         string flat = ToFlatAst(expr, tokens, code);
@@ -64,7 +64,7 @@ public class ParserTest
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprBinary>(expr);
         Assert.Equal(op, ((ExprBinary)expr).Op);
-        Assert.Equal($"(a {op.ToString()} b)", flat);
+        Assert.Equal($"(a {op.AsString()} b)", flat);
     }
 
     [Theory]
@@ -74,7 +74,7 @@ public class ParserTest
     [InlineData(UnaryOp.BitNot)]
     public void Parser_ParsesAllUnaryOps(UnaryOp op)
     {
-        string code = $"{op.ToString()}a";
+        string code = $"{op.AsString()}a";
 
         (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
         string flat = ToFlatAst(expr, tokens, code);
@@ -82,7 +82,7 @@ public class ParserTest
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprUnary>(expr);
         Assert.Equal(op, ((ExprUnary)expr).Op);
-        Assert.Equal($"(a {op.ToString()} b)", flat);
+        Assert.Equal($"(a {op.AsString()} b)", flat);
     }
 
     [Theory]
