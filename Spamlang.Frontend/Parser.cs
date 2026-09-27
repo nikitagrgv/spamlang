@@ -12,8 +12,8 @@ public class Parser
     private class UnexpectedTokenException(Token given, TokenType? expected)
         : Exception($"Unexpected token: {given.Type}")
     {
-        public Token GivenToken { get; init; } = given;
-        public TokenType? Expected { get; init; } = expected;
+        public Token GivenToken { get; } = given;
+        public TokenType? Expected { get; } = expected;
     }
 
     public CompilationUnit Run(string code, List<Token> tokens, Diagnostic diag)
