@@ -40,6 +40,9 @@ public class LexerTest
         ("^", TokenType.Caret),
         ("~", TokenType.Tilde),
 
+        ("<<", TokenType.ShiftLeft),
+        (">>", TokenType.ShiftRight),
+
         ("!", TokenType.Exclamation),
 
         ("fn", TokenType.KeywordFunc),
