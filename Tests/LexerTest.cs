@@ -591,6 +591,8 @@ public class LexerTest
         Assert.Equal(expectedCount, tokens.Count);
     }
 
+    /////////////////////////////////////////////////////////////////////////
+
     private static TheoryData<string, TokenType> MakeData()
     {
         TheoryData<string, TokenType> d = new();

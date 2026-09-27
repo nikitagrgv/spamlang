@@ -94,6 +94,8 @@ public class ParserTest
         Assert.Equal(expected, parsed);
     }
 
+    /////////////////////////////////////////////////////////////////////////
+
     private static bool ExprHasErrors(string code)
     {
         (_, _, Diagnostic diag) = ParseExpr(code);
