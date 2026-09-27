@@ -64,8 +64,7 @@ public class ParserTest
     {
         string code = $"a {op.AsString()} b";
 
-        (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
-        string flat = ToFlatAst(expr, tokens, code);
+        (Expr expr, string flat, Diagnostic diag) = ParseExpr(code);
 
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprBinary>(expr);
@@ -79,8 +78,7 @@ public class ParserTest
     {
         string code = $"{op.AsString()}a";
 
-        (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
-        string flat = ToFlatAst(expr, tokens, code);
+        (Expr expr, string flat, Diagnostic diag) = ParseExpr(code);
 
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprUnary>(expr);
@@ -89,28 +87,17 @@ public class ParserTest
     }
 
     [Theory]
-    [InlineData("a + b", "(a + b)")]
-    public void Parser_Parses(string code, string expected)
+    [InlineData("a as b", "(a as b)")]
+    public void Parser_Cast(string code, string expected)
     {
-        string parsed = ExprCodeToFlatAst(code);
+        (Expr expr, string flat, Diagnostic diag) = ParseExpr(code);
+
         Assert.Equal(expected, parsed);
     }
 
     /////////////////////////////////////////////////////////////////////////
 
-    private static bool ExprHasErrors(string code)
-    {
-        (_, _, Diagnostic diag) = ParseExpr(code);
-        return diag.HasErrors;
-    }
-
-    private static string ExprCodeToFlatAst(string code)
-    {
-        (Expr expr, List<Token> tokens, Diagnostic _) = ParseExpr(code);
-        return ToFlatAst(expr, tokens, code);
-    }
-
-    private static (Expr, List<Token>, Diagnostic) ParseExpr(string code)
+    private static (Expr, string flat, Diagnostic) ParseExpr(string code)
     {
         Diagnostic diag = new();
 
@@ -120,7 +107,9 @@ public class ParserTest
         Parser parser = new(code, tokens, diag);
         Expr expr = parser.RunExpr();
 
-        return (expr, tokens, diag);
+        string flat = ToFlatAst(expr, tokens, code);
+
+        return (expr, flat, diag);
     }
 
     private static string ToFlatAst(Expr expr, List<Token> tokens, string code)
