@@ -178,7 +178,6 @@ public class AstPrinter
                 ret.Append(PrettyExpr(unaryExpr.Operand));
                 break;
             case ExprCall exprCall:
-                ret.Clear();
                 ret.Append(PrettyExpr(exprCall.Callee));
                 ret.Append('(');
                 for (int i = 0; i < exprCall.Args.Count; ++i)
@@ -199,8 +198,7 @@ public class AstPrinter
                 }
 
                 ret.Append(')');
-
-                return ret.ToString();
+                break;
             case ExprCast exprCast:
                 ret.Append(PrettyExpr(exprCast.Value));
                 ret.Append(" as ");
