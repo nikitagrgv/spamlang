@@ -38,7 +38,7 @@ public class ParserTest
     }
 
     [Theory]
-    [InlineData(" ", " ")]
+    [InlineData("a + b", "(a + b)")]
     public void Parser_Parses(string code, string expected)
     {
         string parsed = ExprCodeToFlatAst(code);
