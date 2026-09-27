@@ -465,12 +465,24 @@ public class Lexer
                     return TokenType.GreaterEqual;
                 }
 
+                if (str.Length > 1 && str[1] == '>')
+                {
+                    len = 2;
+                    return TokenType.ShiftRight;
+                }
+
                 return TokenType.Greater;
             case '<':
                 if (str.Length > 1 && str[1] == '=')
                 {
                     len = 2;
                     return TokenType.LessEqual;
+                }
+
+                if (str.Length > 1 && str[1] == '<')
+                {
+                    len = 2;
+                    return TokenType.ShiftLeft;
                 }
 
                 return TokenType.Less;
