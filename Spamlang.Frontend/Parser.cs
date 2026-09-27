@@ -4,9 +4,9 @@ namespace Spamlang.Frontend;
 
 public class Parser
 {
-    private string _code = "";
-    private Diagnostic? _diag;
-    private List<Token> _tokens = [];
+    private readonly string _code;
+    private readonly Diagnostic _diag;
+    private readonly List<Token> _tokens;
     private int _cursor;
 
     private class UnexpectedTokenException(Token given, TokenType? expected)
@@ -16,15 +16,25 @@ public class Parser
         public TokenType? Expected { get; } = expected;
     }
 
-    public CompilationUnit Run(string code, List<Token> tokens, Diagnostic diag)
+    public Parser(string code, List<Token> tokens, Diagnostic diag)
     {
         _code = code;
         _diag = diag;
         _tokens = tokens;
-        _cursor = 0;
+    }
 
+    public CompilationUnit Run()
+    {
+        _cursor = 0;
         CompilationUnit compilationUnit = ParseCompilationUnit();
         return compilationUnit;
+    }
+
+    public Expr RunExpr()
+    {
+        _cursor = 0;
+        Expr expr = ParseExpr();
+        return expr;
     }
 
     private Token Peek(int n = 0)
@@ -330,7 +340,7 @@ public class Parser
         };
     }
 
-    internal Block ParseBlock()
+    private Block ParseBlock()
     {
         int begin = _cursor;
         List<Stmt> stmts = [];
@@ -741,7 +751,7 @@ public class Parser
     private void ReportError(Token given, TokenType? expected = null)
     {
         string message = UnexpectedTokenMessage(given, expected);
-        _diag?.AddError(message, given);
+        _diag.AddError(message, given);
     }
 
     private string UnexpectedTokenMessage(Token given, TokenType? expected = null)

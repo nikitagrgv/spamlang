@@ -5,39 +5,43 @@ namespace Tests;
 
 public class ParserTest
 {
-    private static bool HasErrors(string code)
+    private static bool ExprHasErrors(string code)
     {
-        (_, _, Diagnostic diag) = Parse(code);
+        (_, _, Diagnostic diag) = ParseExpr(code);
         return diag.HasErrors;
     }
 
-    private static string CodeToFlatAst(string code)
+    private static string ExprCodeToFlatAst(string code)
     {
-        (CompilationUnit unit, List<Token> tokens, Diagnostic _) = Parse(code);
-        return ToFlatAst(unit, tokens, code);
+        (Expr expr, List<Token> tokens, Diagnostic _) = ParseExpr(code);
+        return ToFlatAst(expr, tokens, code);
     }
 
-    private static (CompilationUnit, List<Token>, Diagnostic) Parse(string code)
+    private static (Expr, List<Token>, Diagnostic) ParseExpr(string code)
     {
         Diagnostic diag = new();
+
         Lexer lexer = new(code, diag);
         List<Token> tokens = lexer.Run();
-        Parser parser = new();
-        CompilationUnit unit = parser.Run(code, tokens, diag);
-        return (unit, tokens, diag);
+
+        Parser parser = new(code, tokens, diag);
+        Expr expr = parser.RunExpr();
+
+        return (expr, tokens, diag);
     }
 
-    private static string ToFlatAst(CompilationUnit unit, List<Token> tokens, string code)
+    private static string ToFlatAst(Expr expr, List<Token> tokens, string code)
     {
         AstPrinter printer = new(tokens, code);
-        printer.PrettyExpr();
+        string flat = printer.PrettyExpr(expr);
+        return flat;
     }
 
     [Theory]
     [InlineData(" ", " ")]
     public void Parser_Parses(string code, string expected)
     {
-        string parsed = CodeToFlatAst(code);
+        string parsed = ExprCodeToFlatAst(code);
         Assert.Equal(expected, parsed);
     }
 }
