@@ -158,7 +158,7 @@ public class AstPrinter
         }
     }
 
-    internal string PrettyExpr(Expr expr)
+    public string PrettyExpr(Expr expr)
     {
         StringBuilder ret = new();
         ret.Append('(');
@@ -232,7 +232,7 @@ public class AstPrinter
         return _tokens[tokenIndex].Value(_code).ToString();
     }
 
-    private string PrettyTypeNode(TypeNode node)
+    public string PrettyTypeNode(TypeNode node)
     {
         switch (node)
         {

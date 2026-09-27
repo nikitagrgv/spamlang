@@ -123,6 +123,13 @@ public class ParserTest
         return flat;
     }
 
+    private static string ToFlatAst(TypeNode node, List<Token> tokens, string code)
+    {
+        AstPrinter printer = new(tokens, code);
+        string flat = printer.PrettyTypeNode(node);
+        return flat;
+    }
+
     private static TheoryData<T> MakeData<T>(T[] values) where T : Enum
     {
         TheoryData<T> d = new();
