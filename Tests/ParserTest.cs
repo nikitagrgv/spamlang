@@ -35,8 +35,8 @@ public class ParserTest
         UnaryOp.BitNot,
     ];
 
-    private static TheoryData<BinaryOp> AllBinaryOpsData = MakeData(AllBinaryOps);
-    private static TheoryData<UnaryOp> AllUnaryOpsData = MakeData(AllUnaryOps);
+    public static TheoryData<BinaryOp> AllBinaryOpsData = MakeData(AllBinaryOps);
+    public static TheoryData<UnaryOp> AllUnaryOpsData = MakeData(AllUnaryOps);
 
     [Fact]
     public void Lexer_CoversAllBinaryOps()
