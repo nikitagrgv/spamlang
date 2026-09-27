@@ -38,6 +38,36 @@ public class ParserTest
     }
 
     [Theory]
+    [InlineData(BinaryOp.Plus)]
+    [InlineData(BinaryOp.Minus)]
+    [InlineData(BinaryOp.Mul)]
+    [InlineData(BinaryOp.Div)]
+    [InlineData(BinaryOp.Rem)]
+    [InlineData(BinaryOp.BitAnd)]
+    [InlineData(BinaryOp.BitOr)]
+    [InlineData(BinaryOp.BitXor)]
+    [InlineData(BinaryOp.LogicAnd)]
+    [InlineData(BinaryOp.LogicOr)]
+    [InlineData(BinaryOp.Equal)]
+    [InlineData(BinaryOp.NotEqual)]
+    [InlineData(BinaryOp.Less)]
+    [InlineData(BinaryOp.LessEqual)]
+    [InlineData(BinaryOp.Greater)]
+    [InlineData(BinaryOp.GreaterEqual)]
+    public void Parser_ParsesAllBinaryOps(BinaryOp op)
+    {
+        string code = $"a {op.ToString()} b";
+
+        (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
+        string flat = ToFlatAst(expr, tokens, code);
+
+        Assert.False(diag.HasErrors);
+        Assert.IsType<ExprBinary>(expr);
+        Assert.Equal(op, ((ExprBinary)expr).Op);
+        Assert.Equal($"(a {opString} b)", flat);
+    }
+
+    [Theory]
     [InlineData("+", BinaryOp.Plus)]
     [InlineData("-", BinaryOp.Minus)]
     [InlineData("*", BinaryOp.Mul)]
@@ -54,7 +84,7 @@ public class ParserTest
     [InlineData("<=", BinaryOp.LessEqual)]
     [InlineData(">", BinaryOp.Greater)]
     [InlineData(">=", BinaryOp.GreaterEqual)]
-    public void Parser_ParsesAllBinaryOps(string opString, BinaryOp op)
+    public void Parser_ParsesAllUnaryOps(string opString, UnaryOp op)
     {
         string code = $"a {opString} b";
 
