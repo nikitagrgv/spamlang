@@ -58,15 +58,20 @@ public class LexerTest
 
     public static TheoryData<string, TokenType> AllTokensData = MakeData();
 
-    private static TheoryData<string, TokenType> MakeData()
+    [Fact]
+    public void Lexer_CoversAllTokens()
     {
-        TheoryData<string, TokenType> d = new();
-        foreach ((string text, TokenType type) in AllTokens)
+        HashSet<TokenType> excluded = new()
         {
-            d.Add(text, type);
-        }
+            TokenType.Eof,
+            TokenType.Invalid,
+        };
 
-        return d;
+        HashSet<TokenType> covered = AllTokens.Select(t => t.Type).ToHashSet();
+        List<TokenType> missing = Enum.GetValues<TokenType>()
+            .Where(t => !excluded.Contains(t) && !covered.Contains(t))
+            .ToList();
+        Assert.True(missing.Count == 0, $"Missing tokens: {string.Join(", ", missing)}");
     }
 
     [Theory]
@@ -584,5 +589,16 @@ public class LexerTest
         int expectedCount = 18;
         Assert.Equal(expectedCount, cur);
         Assert.Equal(expectedCount, tokens.Count);
+    }
+
+    private static TheoryData<string, TokenType> MakeData()
+    {
+        TheoryData<string, TokenType> d = new();
+        foreach ((string text, TokenType type) in AllTokens)
+        {
+            d.Add(text, type);
+        }
+
+        return d;
     }
 }

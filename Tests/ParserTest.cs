@@ -5,6 +5,95 @@ namespace Tests;
 
 public class ParserTest
 {
+    private static readonly BinaryOp[] AllBinaryOps =
+    [
+        BinaryOp.Plus,
+        BinaryOp.Minus,
+        BinaryOp.Mul,
+        BinaryOp.Div,
+        BinaryOp.Rem,
+        BinaryOp.BitAnd,
+        BinaryOp.BitOr,
+        BinaryOp.BitXor,
+        BinaryOp.LogicAnd,
+        BinaryOp.LogicOr,
+        BinaryOp.Equal,
+        BinaryOp.NotEqual,
+        BinaryOp.Less,
+        BinaryOp.LessEqual,
+        BinaryOp.Greater,
+        BinaryOp.GreaterEqual,
+    ];
+
+    private static readonly UnaryOp[] AllUnaryOps =
+    [
+        UnaryOp.Plus,
+        UnaryOp.Minus,
+        UnaryOp.Not,
+        UnaryOp.BitNot,
+    ];
+
+    public static TheoryData<BinaryOp> AllBinaryOpsData = MakeData(AllBinaryOps);
+    public static TheoryData<UnaryOp> AllUnaryOpsData = MakeData(AllUnaryOps);
+
+    [Fact]
+    public void Lexer_CoversAllBinaryOps()
+    {
+        HashSet<BinaryOp> covered = AllBinaryOps.ToHashSet();
+        List<BinaryOp> missing = Enum.GetValues<BinaryOp>()
+            .Where(t => !covered.Contains(t))
+            .ToList();
+        Assert.True(missing.Count == 0, $"Missing binary ops: {string.Join(", ", missing)}");
+    }
+
+    [Fact]
+    public void Lexer_CoversAllUnaryOps()
+    {
+        HashSet<UnaryOp> covered = AllUnaryOps.ToHashSet();
+        List<UnaryOp> missing = Enum.GetValues<UnaryOp>()
+            .Where(t => !covered.Contains(t))
+            .ToList();
+        Assert.True(missing.Count == 0, $"Missing binary ops: {string.Join(", ", missing)}");
+    }
+
+    [Theory]
+    [MemberData(nameof(AllBinaryOpsData))]
+    public void Parser_ParsesAllBinaryOps(BinaryOp op)
+    {
+        string code = $"a {op.AsString()} b";
+
+        (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
+        string flat = ToFlatAst(expr, tokens, code);
+
+        Assert.False(diag.HasErrors);
+        Assert.IsType<ExprBinary>(expr);
+        Assert.Equal(op, ((ExprBinary)expr).Op);
+        Assert.Equal($"(a {op.AsString()} b)", flat);
+    }
+
+    [Theory]
+    [MemberData(nameof(AllUnaryOpsData))]
+    public void Parser_ParsesAllUnaryOps(UnaryOp op)
+    {
+        string code = $"{op.AsString()}a";
+
+        (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
+        string flat = ToFlatAst(expr, tokens, code);
+
+        Assert.False(diag.HasErrors);
+        Assert.IsType<ExprUnary>(expr);
+        Assert.Equal(op, ((ExprUnary)expr).Op);
+        Assert.Equal($"(a {op.AsString()} b)", flat);
+    }
+
+    [Theory]
+    [InlineData("a + b", "(a + b)")]
+    public void Parser_Parses(string code, string expected)
+    {
+        string parsed = ExprCodeToFlatAst(code);
+        Assert.Equal(expected, parsed);
+    }
+
     private static bool ExprHasErrors(string code)
     {
         (_, _, Diagnostic diag) = ParseExpr(code);
@@ -37,59 +126,14 @@ public class ParserTest
         return flat;
     }
 
-    [Theory]
-    [InlineData(BinaryOp.Plus)]
-    [InlineData(BinaryOp.Minus)]
-    [InlineData(BinaryOp.Mul)]
-    [InlineData(BinaryOp.Div)]
-    [InlineData(BinaryOp.Rem)]
-    [InlineData(BinaryOp.BitAnd)]
-    [InlineData(BinaryOp.BitOr)]
-    [InlineData(BinaryOp.BitXor)]
-    [InlineData(BinaryOp.LogicAnd)]
-    [InlineData(BinaryOp.LogicOr)]
-    [InlineData(BinaryOp.Equal)]
-    [InlineData(BinaryOp.NotEqual)]
-    [InlineData(BinaryOp.Less)]
-    [InlineData(BinaryOp.LessEqual)]
-    [InlineData(BinaryOp.Greater)]
-    [InlineData(BinaryOp.GreaterEqual)]
-    public void Parser_ParsesAllBinaryOps(BinaryOp op)
+    private static TheoryData<T> MakeData<T>(T[] values) where T : Enum
     {
-        string code = $"a {op.AsString()} b";
+        TheoryData<T> d = new();
+        foreach (T type in values)
+        {
+            d.Add(type);
+        }
 
-        (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
-        string flat = ToFlatAst(expr, tokens, code);
-
-        Assert.False(diag.HasErrors);
-        Assert.IsType<ExprBinary>(expr);
-        Assert.Equal(op, ((ExprBinary)expr).Op);
-        Assert.Equal($"(a {op.AsString()} b)", flat);
-    }
-
-    [Theory]
-    [InlineData(UnaryOp.Plus)]
-    [InlineData(UnaryOp.Minus)]
-    [InlineData(UnaryOp.Not)]
-    [InlineData(UnaryOp.BitNot)]
-    public void Parser_ParsesAllUnaryOps(UnaryOp op)
-    {
-        string code = $"{op.AsString()}a";
-
-        (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
-        string flat = ToFlatAst(expr, tokens, code);
-
-        Assert.False(diag.HasErrors);
-        Assert.IsType<ExprUnary>(expr);
-        Assert.Equal(op, ((ExprUnary)expr).Op);
-        Assert.Equal($"(a {op.AsString()} b)", flat);
-    }
-
-    [Theory]
-    [InlineData("a + b", "(a + b)")]
-    public void Parser_Parses(string code, string expected)
-    {
-        string parsed = ExprCodeToFlatAst(code);
-        Assert.Equal(expected, parsed);
+        return d;
     }
 }
