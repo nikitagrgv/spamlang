@@ -39,13 +39,32 @@ public class ParserTest
 
     [Theory]
     [InlineData("+")]
+    [InlineData("-")]
+    [InlineData("*")]
+    [InlineData("/")]
+    [InlineData("%")]
+    [InlineData("&")]
+    [InlineData("|")]
+    [InlineData("^")]
+    [InlineData("&&")]
+    [InlineData("||")]
+    [InlineData("==")]
+    [InlineData("!=")]
+    [InlineData("<")]
+    [InlineData("<=")]
+    [InlineData(">")]
+    [InlineData(">=")]
     public void Parser_ParsesAllBinaryOps(string op)
     {
         string code = $"a {op} b";
-        string expected = $"(a {op} b)";
 
-        string parsed = ExprCodeToFlatAst(code);
-        Assert.Equal(expected, parsed);
+        (Expr expr, List<Token> tokens, Diagnostic diag) = ParseExpr(code);
+
+        Assert.False(diag.HasErrors);
+
+        string expected = $"(a {op} b)";
+        string flat = ToFlatAst(expr, tokens, code);
+        Assert.Equal(expected, flat);
     }
 
     [Theory]
