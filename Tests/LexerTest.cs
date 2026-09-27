@@ -6,7 +6,7 @@ namespace Tests;
 
 public class LexerTest
 {
-    public static readonly (string Text, TokenType Type)[] AllTokens =
+    private static readonly (string Text, TokenType Type)[] AllTokens =
     [
         ("(", TokenType.LPar),
         (")", TokenType.RPar),
