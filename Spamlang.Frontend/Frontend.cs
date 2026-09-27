@@ -17,8 +17,8 @@ public class Frontend
         timers?.FinishTimer("Lexer");
 
         timers?.RestartTimer();
-        Parser parser = new();
-        CompilationUnit compilationUnit = parser.Run(code, tokens, diag);
+        Parser parser = new(code, tokens, diag);
+        CompilationUnit compilationUnit = parser.Run();
         timers?.FinishTimer("Parser");
 
         timers?.RestartTimer();
