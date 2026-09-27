@@ -101,6 +101,20 @@ public class ParserTest
     }
 
     [Theory]
+    [InlineData(BinaryOp.Plus)]
+    public void Parser_ParsesLeftAssoc(BinaryOp op)
+    {
+        string opStr = op.AsString();
+        string code = $"a {opStr} b {opStr} c {opStr} d";
+
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+
+        string expectedFlat = $"(((a {opStr} b) {opStr} c) {opStr} d)";
+        Assert.Equal(expectedFlat, analyzer.Flat);
+    }
+
+    [Theory]
     [InlineData("a + b * c", "(a + (b * c))")]
     [InlineData("a * b + c", "((a * b) + c)")]
     public void Parser_ParsesAccordingToPrecedence(string code, string expectedFlat)
