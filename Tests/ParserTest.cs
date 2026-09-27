@@ -83,7 +83,7 @@ public class ParserTest
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprUnary>(expr);
         Assert.Equal(op, ((ExprUnary)expr).Op);
-        Assert.Equal($"({op.AsString()}b)", flat);
+        Assert.Equal($"({op.AsString()}a)", flat);
     }
 
     [Theory]
