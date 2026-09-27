@@ -100,6 +100,15 @@ public class ParserTest
         Assert.Equal("(a as b)", analyzer.Flat);
     }
 
+    [Theory]
+    [InlineData("", "")]
+    public void Parser_ParsesWithPrecedence(string code, string expectedFlat)
+    {
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+        Assert.Equal(expectedFlat, analyzer.Flat);
+    }
+
     /////////////////////////////////////////////////////////////////////////
 
     private class ExprAnalyzer
