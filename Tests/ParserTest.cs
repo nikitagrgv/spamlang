@@ -64,12 +64,12 @@ public class ParserTest
     {
         string code = $"a {op.AsString()} b";
 
-        (Expr expr, string flat, Diagnostic diag, _) = ParseExpr(code);
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
 
-        Assert.False(diag.HasErrors);
-        Assert.IsType<ExprBinary>(expr);
-        Assert.Equal(op, ((ExprBinary)expr).Op);
-        Assert.Equal($"(a {op.AsString()} b)", flat);
+        Assert.False(analyzer.HasErrors);
+        Assert.IsType<ExprBinary>(analyzer.Result);
+        Assert.Equal(op, analyzer.ResultAs<ExprBinary>().Op);
+        Assert.Equal($"(a {op.AsString()} b)", analyzer.Flat);
     }
 
     [Theory]
@@ -78,12 +78,12 @@ public class ParserTest
     {
         string code = $"{op.AsString()}a";
 
-        (Expr expr, string flat, Diagnostic diag, _) = ParseExpr(code);
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
 
-        Assert.False(diag.HasErrors);
-        Assert.IsType<ExprUnary>(expr);
-        Assert.Equal(op, ((ExprUnary)expr).Op);
-        Assert.Equal($"({op.AsString()}a)", flat);
+        Assert.False(analyzer.HasErrors);
+        Assert.IsType<ExprUnary>(analyzer.Result);
+        Assert.Equal(op, analyzer.ResultAs<ExprUnary>().Op);
+        Assert.Equal($"({op.AsString()}a)", analyzer.Flat);
     }
 
     [Fact]
@@ -91,7 +91,8 @@ public class ParserTest
     {
         string code = "a as b";
 
-        (Expr expr, string flat, Diagnostic diag, List<Token> tokens) = ParseExpr(code);
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprCast>(expr);
         Assert.Equal("a", ToFlat(((ExprCast)expr).Value, tokens, code));
@@ -110,10 +111,12 @@ public class ParserTest
         private readonly string _flat;
 
         public string Code => _code;
-        public Expr ResultExpr => (Expr)_result;
+        public Node Result => _result;
         public string Flat => _flat;
         public Diagnostic Diag => _diag;
         public bool HasErrors => _diag.HasErrors;
+
+        public T ResultAs<T>() where T : Node => (T)_result;
 
         public static ExprAnalyzer Parse(string code)
         {
