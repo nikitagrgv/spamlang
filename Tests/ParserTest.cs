@@ -86,13 +86,15 @@ public class ParserTest
         Assert.Equal($"({op.AsString()}a)", flat);
     }
 
-    [Theory]
-    [InlineData("a as b", "(a as b)")]
-    public void Parser_Cast(string code, string expected)
+    [Fact]
+    public void Parser_Cast()
     {
-        (Expr expr, string flat, Diagnostic diag) = ParseExpr(code);
+        string code = "a as b";
 
-        Assert.Equal(expected, parsed);
+        (Expr expr, string flat, Diagnostic diag) = ParseExpr(code);
+        Assert.False(diag.HasErrors);
+        Assert.IsType<ExprCast>(expr);
+        Assert.Equal("(a as b)", flat);
     }
 
     /////////////////////////////////////////////////////////////////////////
