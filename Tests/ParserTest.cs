@@ -101,16 +101,16 @@ public class ParserTest
     }
 
     [Theory]
-    [InlineData(BinaryOp.Plus)]
-    public void Parser_ParsesLeftAssoc(BinaryOp op)
+    [InlineData("+")]
+    [InlineData("*")]
+    public void Parser_ParsesLeftAssoc(string op)
     {
-        string opStr = op.AsString();
-        string code = $"a {opStr} b {opStr} c {opStr} d";
+        string code = $"a {op} b {op} c {op} d";
 
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
         Assert.False(analyzer.HasErrors);
 
-        string expectedFlat = $"(((a {opStr} b) {opStr} c) {opStr} d)";
+        string expectedFlat = $"(((a {op} b) {op} c) {op} d)";
         Assert.Equal(expectedFlat, analyzer.Flat);
     }
 
