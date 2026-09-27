@@ -29,4 +29,13 @@ public class ParserTest
     private static string ToFlatAst(CompilationUnit unit, string code)
     {
     }
+
+
+    [Theory]
+    [InlineData(" ", " ")]
+    public void Parser_Parses(string code, string expected)
+    {
+        string parsed = CodeToFlatAst(code);
+        Assert.Equal(expected, parsed);
+    }
 }
