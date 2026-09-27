@@ -94,8 +94,8 @@ public class ParserTest
         (Expr expr, string flat, Diagnostic diag, List<Token> tokens) = ParseExpr(code);
         Assert.False(diag.HasErrors);
         Assert.IsType<ExprCast>(expr);
-        Assert.Equal("a", ToFlatAst(((ExprCast)expr).Value, tokens, code));
-        Assert.Equal("b", ToFlatAst(((ExprCast)expr).TargetType, tokens, code));
+        Assert.Equal("a", ToFlat(((ExprCast)expr).Value, tokens, code));
+        Assert.Equal("b", ToFlat(((ExprCast)expr).TargetType, tokens, code));
         Assert.Equal("(a as b)", flat);
     }
 
@@ -111,19 +111,19 @@ public class ParserTest
         Parser parser = new(code, tokens, diag);
         Expr expr = parser.RunExpr();
 
-        string flat = ToFlatAst(expr, tokens, code);
+        string flat = ToFlat(expr, tokens, code);
 
         return (expr, flat, diag, tokens);
     }
 
-    private static string ToFlatAst(Expr expr, List<Token> tokens, string code)
+    private static string ToFlat(Expr expr, List<Token> tokens, string code)
     {
         AstPrinter printer = new(tokens, code);
         string flat = printer.PrettyExpr(expr);
         return flat;
     }
 
-    private static string ToFlatAst(TypeNode node, List<Token> tokens, string code)
+    private static string ToFlat(TypeNode node, List<Token> tokens, string code)
     {
         AstPrinter printer = new(tokens, code);
         string flat = printer.PrettyTypeNode(node);
