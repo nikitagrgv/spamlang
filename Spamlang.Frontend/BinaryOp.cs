@@ -27,7 +27,7 @@ public enum BinaryOp
 
 public static partial class TokenUtils
 {
-    public static string ToString(this BinaryOp op)
+    public static string AsString(this BinaryOp op)
     {
         return op switch
         {

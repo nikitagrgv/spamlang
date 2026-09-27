@@ -14,7 +14,7 @@ public enum UnaryOp
 
 public static partial class TokenUtils
 {
-    public static string ToString(this UnaryOp op)
+    public static string AsString(this UnaryOp op)
     {
         return op switch
         {
