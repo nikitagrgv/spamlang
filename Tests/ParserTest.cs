@@ -100,6 +100,21 @@ public class ParserTest
         Assert.Equal("(a as b)", analyzer.Flat);
     }
 
+    [Fact]
+    public void Parser_ParsesCall()
+    {
+        string code = "a(b)";
+
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+
+        Assert.False(analyzer.HasErrors);
+        Assert.IsType<ExprCall>(analyzer.Result);
+        Assert.Equal("a", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Callee));
+        Assert.Single(analyzer.ResultAs<ExprCall>().Args);
+        Assert.Equal("b", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Args.First()));
+        Assert.Equal("(a(b))", analyzer.Flat);
+    }
+
     [Theory]
     [MemberData(nameof(AllBinaryOpsData))]
     public void Parser_AllBinaryOpsAreLeftAssoc(BinaryOp op)
