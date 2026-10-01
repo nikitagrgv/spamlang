@@ -46,7 +46,7 @@ public class ParserTest
     [Fact]
     public void Parser_CoversAllBinaryOps()
     {
-        HashSet<BinaryOp> covered = AllBinaryOps.ToHashSet();
+        HashSet<BinaryOp> covered = AllBinaryOpsWithPrecedence.Select(v => v.op).ToHashSet();
         List<BinaryOp> missing = Enum.GetValues<BinaryOp>()
             .Where(t => !covered.Contains(t))
             .ToList();
@@ -213,15 +213,35 @@ public class ParserTest
         Assert.Equal($"(({opStr}a) as b)", analyzer.Flat);
     }
 
-    // [Fact]
-    // public void Parser_CheckPrecedenceTableOfBinaryOps(string code, string expectedFlat)
-    // {
-    //     List<(BinaryOp op, int prec)> ops;
-    //
-    //     ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
-    //     Assert.False(analyzer.HasErrors);
-    //     Assert.Equal(expectedFlat, analyzer.Flat);
-    // }
+    [Fact]
+    public void Parser_CheckPrecedenceTableOfBinaryOps()
+    {
+        foreach ((BinaryOp op, int prec) v1 in AllBinaryOpsWithPrecedence)
+        {
+            foreach ((BinaryOp op, int prec) v2 in AllBinaryOpsWithPrecedence)
+            {
+                string op1Str = v1.op.AsString();
+                string op2Str = v2.op.AsString();
+
+                string code = $"a {op1Str} b {op2Str} c";
+
+                ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+                Assert.False(analyzer.HasErrors);
+
+                string expected;
+                if (v1.prec <= v2.prec)
+                {
+                    expected = $"((a {op1Str} b) {op2Str} c)";
+                }
+                else
+                {
+                    expected = $"(a {op1Str} (b {op2Str} c))";
+                }
+
+                Assert.Equal(expected, analyzer.Flat);
+            }
+        }
+    }
 
     [Theory]
     [InlineData("a + b * c", "(a + (b * c))")]
