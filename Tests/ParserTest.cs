@@ -124,6 +124,17 @@ public class ParserTest
         Assert.Equal($"(((a(b))(c))(d))", analyzer.Flat);
     }
 
+    [Fact]
+    public void Parser_AsCastsAreLeftAssoc()
+    {
+        string code = $"a as b as c as d";
+
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+
+        Assert.Equal($"(((a as b) as c) as d)", analyzer.Flat);
+    }
+
     [Theory]
     [InlineData("a + b * c", "(a + (b * c))")]
     [InlineData("a * b + c", "((a * b) + c)")]
