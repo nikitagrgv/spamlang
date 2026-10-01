@@ -210,6 +210,9 @@ public class ParserTest
 
     [Theory]
     [InlineData(BinaryOp.Mul, BinaryOp.Div, BinaryOp.Rem)]
+    [InlineData(BinaryOp.Plus, BinaryOp.Minus)]
+    [InlineData(BinaryOp.BitShiftLeft, BinaryOp.BitShiftRight, BinaryOp.BitAnd, BinaryOp.BitOr, BinaryOp.BitXor)]
+    [InlineData(BinaryOp.Equal, BinaryOp.NotEqual, BinaryOp.Less, BinaryOp.LessEqual, BinaryOp.Greater, BinaryOp.GreaterEqual)]
     public void Parser_HaveSamePrecedence(params BinaryOp[] ops)
     {
         foreach (BinaryOp op1 in ops)
