@@ -198,7 +198,7 @@ public class ParserTest
 
     [Theory]
     [MemberData(nameof(AllUnaryOpsData))]
-    public void UnaryAreTighterThanAsCast(UnaryOp op)
+    public void Parser_UnaryAreTighterThanAsCast(UnaryOp op)
     {
         string opStr = op.AsString();
         string code = $"{opStr}a as b";
