@@ -185,8 +185,33 @@ public class ParserTest
     }
 
     [Theory]
+    [MemberData(nameof(AllUnaryOpsData))]
+    public void Parser_PostfixesAreTighterThanUnary(UnaryOp op)
+    {
+        string opStr = op.AsString();
+        string code = $"{opStr}a(b)";
+
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+        Assert.Equal($"({opStr}(a(b)))", analyzer.Flat);
+    }
+
+    [Theory]
+    [InlineData("-a as b", "((-a) as b)")]
+    [InlineData("!a as b", "((-a) as b)")]
+    [InlineData("+a as b", "((-a) as b)")]
+    [InlineData("~a as b", "((-a) as b)")]
+    public void Parser_PrefixesAreTighterThanAsCast(string code, string expectedFlat)
+    {
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+        Assert.Equal(expectedFlat, analyzer.Flat);
+    }
+
+    [Theory]
     [InlineData("a + b * c", "(a + (b * c))")]
     [InlineData("a * b + c", "((a * b) + c)")]
+    [InlineData("-a(b)", "")]
     public void Parser_ParsesAccordingToPrecedence(string code, string expectedFlat)
     {
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
