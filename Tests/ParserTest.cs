@@ -172,7 +172,7 @@ public class ParserTest
 
         Assert.Equal("(((a as b) as c) as d)", analyzer.Flat);
     }
-    
+
     [Fact]
     public void Parser_PrefixesAreRightAssoc()
     {
