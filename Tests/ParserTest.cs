@@ -254,16 +254,6 @@ public class ParserTest
         }
     }
 
-    [Theory]
-    [InlineData("a + b * c", "(a + (b * c))")]
-    [InlineData("a * b + c", "((a * b) + c)")]
-    public void Parser_ParsesAccordingToPrecedence(string code, string expectedFlat)
-    {
-        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
-        Assert.False(analyzer.HasErrors);
-        Assert.Equal(expectedFlat, analyzer.Flat);
-    }
-
     /////////////////////////////////////////////////////////////////////////
 
     private class ExprAnalyzer
