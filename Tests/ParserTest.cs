@@ -159,7 +159,7 @@ public class ParserTest
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
         Assert.False(analyzer.HasErrors);
 
-        Assert.Equal($"(((a(b))(c))(d))", analyzer.Flat);
+        Assert.Equal("(((a(b))(c))(d))", analyzer.Flat);
     }
 
     [Fact]
@@ -170,7 +170,18 @@ public class ParserTest
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
         Assert.False(analyzer.HasErrors);
 
-        Assert.Equal($"(((a as b) as c) as d)", analyzer.Flat);
+        Assert.Equal("(((a as b) as c) as d)", analyzer.Flat);
+    }
+    
+    [Fact]
+    public void Parser_PrefixesAreRightAssoc()
+    {
+        string code = "-+!~a";
+
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+
+        Assert.Equal("(-(+(!(~a))))", analyzer.Flat);
     }
 
     [Theory]
