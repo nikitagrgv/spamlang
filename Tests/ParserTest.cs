@@ -111,7 +111,7 @@ public class ParserTest
         Assert.IsType<ExprCall>(analyzer.Result);
         Assert.Equal("a", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Callee));
         Assert.Single(analyzer.ResultAs<ExprCall>().Args);
-        Assert.Equal("b", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Args.First()));
+        Assert.Equal("b", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Args.First().Value));
         Assert.Equal("(a(b))", analyzer.Flat);
     }
 
