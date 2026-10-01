@@ -110,10 +110,19 @@ public class ParserTest
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
         Assert.False(analyzer.HasErrors);
 
-        string expectedFlat = $"(((a {opStr} b) {opStr} c) {opStr} d)";
-        Assert.Equal(expectedFlat, analyzer.Flat);
+        Assert.Equal($"(((a {opStr} b) {opStr} c) {opStr} d)", analyzer.Flat);
     }
 
+    [Fact]
+    public void Parser_CallsArelLeftAssoc()
+    {
+        string code = $"a(b)(c)(d)";
+
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+
+        Assert.Equal($"(((a(b))(c))(d))", analyzer.Flat);
+    }
 
     [Theory]
     [InlineData("a + b * c", "(a + (b * c))")]
