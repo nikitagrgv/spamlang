@@ -103,16 +103,39 @@ public class ParserTest
     [Fact]
     public void Parser_ParsesCall()
     {
-        string code = "a(b)";
+        string code = "f(a)";
 
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
 
         Assert.False(analyzer.HasErrors);
         Assert.IsType<ExprCall>(analyzer.Result);
-        Assert.Equal("a", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Callee));
+        Assert.Equal("f", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Callee));
         Assert.Single(analyzer.ResultAs<ExprCall>().Args);
-        Assert.Equal("b", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Args.First().Value));
-        Assert.Equal("(a(b))", analyzer.Flat);
+        Assert.Equal("a", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Args.First().Value));
+        Assert.Equal("(f(a))", analyzer.Flat);
+    }
+
+    [Fact]
+    public void Parser_ParsesNamedArgs()
+    {
+        string code = "f(a: b, c: d)";
+
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+
+        Assert.False(analyzer.HasErrors);
+        Assert.IsType<ExprCall>(analyzer.Result);
+
+        Assert.Equal(2, analyzer.ResultAs<ExprCall>().Args.Count);
+
+        Assert.Equal("b", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Args[0].Value));
+        Assert.True(analyzer.ResultAs<ExprCall>().Args[0].ArgNameToken.HasValue);
+        Assert.Equal("a", analyzer.TokenToString(analyzer.ResultAs<ExprCall>().Args[0].ArgNameToken!.Value));
+
+        Assert.Equal("d", analyzer.ToFlat(analyzer.ResultAs<ExprCall>().Args[1].Value));
+        Assert.True(analyzer.ResultAs<ExprCall>().Args[1].ArgNameToken.HasValue);
+        Assert.Equal("c", analyzer.TokenToString(analyzer.ResultAs<ExprCall>().Args[1].ArgNameToken!.Value));
+
+        Assert.Equal("(f(a: b, c: d))", analyzer.Flat);
     }
 
     [Theory]
@@ -209,6 +232,11 @@ public class ParserTest
                 default:
                     throw new ArgumentOutOfRangeException(nameof(node));
             }
+        }
+
+        public string TokenToString(int tokenIndex)
+        {
+            return _tokens[tokenIndex].Value(_code).ToString();
         }
 
         private static string ToFlat(Expr expr, List<Token> tokens, string code)
