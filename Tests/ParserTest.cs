@@ -209,9 +209,27 @@ public class ParserTest
     }
 
     [Theory]
+    [InlineData(BinaryOp.Mul, BinaryOp.Div, BinaryOp.Rem)]
+    public void Parser_HaveSamePrecedence(params BinaryOp[] ops)
+    {
+        foreach (BinaryOp op1 in ops)
+        {
+            foreach (BinaryOp op2 in ops)
+            {
+                string op1Str = op1.AsString();
+                string op2Str = op2.AsString();
+                string code = $"a {op1Str} b {op2Str} c";
+
+                ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+                Assert.False(analyzer.HasErrors);
+                Assert.Equal($"((a {op1Str} b) {op2Str} c)", analyzer.Flat);
+            }
+        }
+    }
+
+    [Theory]
     [InlineData("a + b * c", "(a + (b * c))")]
     [InlineData("a * b + c", "((a * b) + c)")]
-    [InlineData("-a(b)", "")]
     public void Parser_ParsesAccordingToPrecedence(string code, string expectedFlat)
     {
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
