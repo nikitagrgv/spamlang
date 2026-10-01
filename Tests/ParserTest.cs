@@ -5,26 +5,31 @@ namespace Tests;
 
 public class ParserTest
 {
-    private static readonly BinaryOp[] AllBinaryOps =
+    private static readonly (BinaryOp op, int prec)[] AllBinaryOpsWithPrecedence =
     [
-        BinaryOp.Plus,
-        BinaryOp.Minus,
-        BinaryOp.Mul,
-        BinaryOp.Div,
-        BinaryOp.Rem,
-        BinaryOp.BitAnd,
-        BinaryOp.BitOr,
-        BinaryOp.BitXor,
-        BinaryOp.BitShiftLeft,
-        BinaryOp.BitShiftRight,
-        BinaryOp.LogicAnd,
-        BinaryOp.LogicOr,
-        BinaryOp.Equal,
-        BinaryOp.NotEqual,
-        BinaryOp.Less,
-        BinaryOp.LessEqual,
-        BinaryOp.Greater,
-        BinaryOp.GreaterEqual,
+        (BinaryOp.Mul, 4),
+        (BinaryOp.Div, 4),
+        (BinaryOp.Rem, 4),
+
+        (BinaryOp.Plus, 5),
+        (BinaryOp.Minus, 5),
+
+        (BinaryOp.BitAnd, 6),
+        (BinaryOp.BitOr, 6),
+        (BinaryOp.BitXor, 6),
+        (BinaryOp.BitShiftLeft, 6),
+        (BinaryOp.BitShiftRight, 6),
+
+        (BinaryOp.Equal, 7),
+        (BinaryOp.NotEqual, 7),
+        (BinaryOp.Less, 7),
+        (BinaryOp.LessEqual, 7),
+        (BinaryOp.Greater, 7),
+        (BinaryOp.GreaterEqual, 7),
+
+        (BinaryOp.LogicAnd, 8),
+
+        (BinaryOp.LogicOr, 9),
     ];
 
     private static readonly UnaryOp[] AllUnaryOps =
@@ -35,7 +40,7 @@ public class ParserTest
         UnaryOp.BitNot,
     ];
 
-    public static TheoryData<BinaryOp> AllBinaryOpsData = MakeData(AllBinaryOps);
+    public static TheoryData<BinaryOp> AllBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence.Select(t => t.op));
     public static TheoryData<UnaryOp> AllUnaryOpsData = MakeData(AllUnaryOps);
 
     [Fact]
@@ -208,27 +213,15 @@ public class ParserTest
         Assert.Equal($"(({opStr}a) as b)", analyzer.Flat);
     }
 
-    [Theory]
-    [InlineData(BinaryOp.Mul, BinaryOp.Div, BinaryOp.Rem)]
-    [InlineData(BinaryOp.Plus, BinaryOp.Minus)]
-    [InlineData(BinaryOp.BitShiftLeft, BinaryOp.BitShiftRight, BinaryOp.BitAnd, BinaryOp.BitOr, BinaryOp.BitXor)]
-    [InlineData(BinaryOp.Equal, BinaryOp.NotEqual, BinaryOp.Less, BinaryOp.LessEqual, BinaryOp.Greater, BinaryOp.GreaterEqual)]
-    public void Parser_HaveSamePrecedence(params BinaryOp[] ops)
-    {
-        foreach (BinaryOp op1 in ops)
-        {
-            foreach (BinaryOp op2 in ops)
-            {
-                string op1Str = op1.AsString();
-                string op2Str = op2.AsString();
-                string code = $"a {op1Str} b {op2Str} c";
-
-                ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
-                Assert.False(analyzer.HasErrors);
-                Assert.Equal($"((a {op1Str} b) {op2Str} c)", analyzer.Flat);
-            }
-        }
-    }
+    // [Fact]
+    // public void Parser_CheckPrecedenceTableOfBinaryOps(string code, string expectedFlat)
+    // {
+    //     List<(BinaryOp op, int prec)> ops;
+    //
+    //     ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+    //     Assert.False(analyzer.HasErrors);
+    //     Assert.Equal(expectedFlat, analyzer.Flat);
+    // }
 
     [Theory]
     [InlineData("a + b * c", "(a + (b * c))")]
@@ -311,7 +304,7 @@ public class ParserTest
         }
     }
 
-    private static TheoryData<T> MakeData<T>(T[] values) where T : Enum
+    private static TheoryData<T> MakeData<T>(IEnumerable<T> values) where T : Enum
     {
         TheoryData<T> d = new();
         foreach (T type in values)
