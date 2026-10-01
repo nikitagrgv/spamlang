@@ -40,6 +40,7 @@ public class ParserTest
         UnaryOp.BitNot,
     ];
 
+    public static TheoryData<(BinaryOp, int)> AllBinaryOpsWithPrecedenceData = MakeData(AllBinaryOpsWithPrecedence);
     public static TheoryData<BinaryOp> AllBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence.Select(t => t.op));
     public static TheoryData<UnaryOp> AllUnaryOpsData = MakeData(AllUnaryOps);
 
@@ -213,33 +214,31 @@ public class ParserTest
         Assert.Equal($"(({opStr}a) as b)", analyzer.Flat);
     }
 
-    [Fact]
-    public void Parser_CheckPrecedenceTableOfBinaryOps()
+    [Theory]
+    [MemberData(nameof(AllBinaryOpsWithPrecedenceData))]
+    public void Parser_CheckPrecedenceTableOfBinaryOps((BinaryOp op, int prec) v1)
     {
-        foreach ((BinaryOp op, int prec) v1 in AllBinaryOpsWithPrecedence)
+        foreach ((BinaryOp op, int prec) v2 in AllBinaryOpsWithPrecedence)
         {
-            foreach ((BinaryOp op, int prec) v2 in AllBinaryOpsWithPrecedence)
+            string op1Str = v1.op.AsString();
+            string op2Str = v2.op.AsString();
+
+            string code = $"a {op1Str} b {op2Str} c";
+
+            ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+            Assert.False(analyzer.HasErrors);
+
+            string expected;
+            if (v1.prec <= v2.prec)
             {
-                string op1Str = v1.op.AsString();
-                string op2Str = v2.op.AsString();
-
-                string code = $"a {op1Str} b {op2Str} c";
-
-                ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
-                Assert.False(analyzer.HasErrors);
-
-                string expected;
-                if (v1.prec <= v2.prec)
-                {
-                    expected = $"((a {op1Str} b) {op2Str} c)";
-                }
-                else
-                {
-                    expected = $"(a {op1Str} (b {op2Str} c))";
-                }
-
-                Assert.Equal(expected, analyzer.Flat);
+                expected = $"((a {op1Str} b) {op2Str} c)";
             }
+            else
+            {
+                expected = $"(a {op1Str} (b {op2Str} c))";
+            }
+
+            Assert.Equal(expected, analyzer.Flat);
         }
     }
 
@@ -324,7 +323,7 @@ public class ParserTest
         }
     }
 
-    private static TheoryData<T> MakeData<T>(IEnumerable<T> values) where T : Enum
+    private static TheoryData<T> MakeData<T>(IEnumerable<T> values)
     {
         TheoryData<T> d = new();
         foreach (T type in values)
