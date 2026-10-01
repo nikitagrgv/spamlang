@@ -116,7 +116,7 @@ public class ParserTest
     [Fact]
     public void Parser_CallsArelLeftAssoc()
     {
-        string code = $"a(b)(c)(d)";
+        string code = "a(b)(c)(d)";
 
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
         Assert.False(analyzer.HasErrors);
@@ -127,7 +127,7 @@ public class ParserTest
     [Fact]
     public void Parser_AsCastsAreLeftAssoc()
     {
-        string code = $"a as b as c as d";
+        string code = "a as b as c as d";
 
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
         Assert.False(analyzer.HasErrors);
