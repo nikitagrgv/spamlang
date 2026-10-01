@@ -197,15 +197,15 @@ public class ParserTest
     }
 
     [Theory]
-    [InlineData("-a as b", "((-a) as b)")]
-    [InlineData("!a as b", "((-a) as b)")]
-    [InlineData("+a as b", "((-a) as b)")]
-    [InlineData("~a as b", "((-a) as b)")]
-    public void Parser_PrefixesAreTighterThanAsCast(string code, string expectedFlat)
+    [MemberData(nameof(AllUnaryOpsData))]
+    public void UnaryAreTighterThanAsCast(UnaryOp op)
     {
+        string opStr = op.AsString();
+        string code = $"{opStr}a as b";
+
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
         Assert.False(analyzer.HasErrors);
-        Assert.Equal(expectedFlat, analyzer.Flat);
+        Assert.Equal($"(({opStr}a) as b)", analyzer.Flat);
     }
 
     [Theory]
