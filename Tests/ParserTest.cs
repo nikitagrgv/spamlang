@@ -227,6 +227,27 @@ public class ParserTest
     }
 
     [Theory]
+    [MemberData(nameof(AllBinaryOpsData))]
+    public void Parser_UnaryAreTighterThanBinary(BinaryOp binaryOp)
+    {
+        foreach (UnaryOp unaryOp in AllUnaryOps)
+        {
+            string op = binaryOp.AsString();
+            string u = unaryOp.AsString();
+
+            string code = $"a {op} {u}c";
+            ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+            Assert.False(analyzer.HasErrors);
+            Assert.Equal($"(a {op} ({u}c))", analyzer.Flat);
+
+            code = $"{u}a {op} c";
+            analyzer = ExprAnalyzer.Parse(code);
+            Assert.False(analyzer.HasErrors);
+            Assert.Equal($"(({u}a) {op} c)", analyzer.Flat);
+        }
+    }
+
+    [Theory]
     [MemberData(nameof(AllBinaryOpsWithPrecedenceData))]
     public void Parser_CheckPrecedenceTableOfBinaryOps((BinaryOp op, int prec) v1)
     {
