@@ -335,6 +335,8 @@ public class ParserTest
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////
+
     private static TheoryData<T> MakeData<T>(IEnumerable<T> values)
     {
         TheoryData<T> d = new();
