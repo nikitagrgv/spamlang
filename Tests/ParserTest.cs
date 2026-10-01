@@ -215,6 +215,18 @@ public class ParserTest
     }
 
     [Theory]
+    [MemberData(nameof(AllBinaryOpsData))]
+    public void Parser_AsCastsIsTighterThanBinary(BinaryOp op)
+    {
+        string opStr = op.AsString();
+        string code = $"a {opStr} b as c";
+
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+        Assert.Equal($"(a {opStr} (b as c))", analyzer.Flat);
+    }
+
+    [Theory]
     [MemberData(nameof(AllBinaryOpsWithPrecedenceData))]
     public void Parser_CheckPrecedenceTableOfBinaryOps((BinaryOp op, int prec) v1)
     {
