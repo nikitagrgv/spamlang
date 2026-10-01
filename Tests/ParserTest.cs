@@ -102,7 +102,7 @@ public class ParserTest
 
     [Theory]
     [MemberData(nameof(AllBinaryOpsData))]
-    public void Parser_AnyBinaryOpParsesLeftAssoc(BinaryOp op)
+    public void Parser_AllBinaryOpsAreLeftAssoc(BinaryOp op)
     {
         string opStr = op.AsString();
         string code = $"a {opStr} b {opStr} c {opStr} d";
@@ -113,6 +113,7 @@ public class ParserTest
         string expectedFlat = $"(((a {opStr} b) {opStr} c) {opStr} d)";
         Assert.Equal(expectedFlat, analyzer.Flat);
     }
+
 
     [Theory]
     [InlineData("a + b * c", "(a + (b * c))")]
