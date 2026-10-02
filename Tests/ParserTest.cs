@@ -56,7 +56,7 @@ public class ParserTest
         .Where(t => t.prec == CompBinaryOpPrec)
         .Select(t => t.op));
 
-    public static TheoryData<BinaryOp> LeftAssocBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
+    public static TheoryData<BinaryOp> NonCompBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
         .Where(t => t.prec != CompBinaryOpPrec)
         .Select(t => t.op));
 
@@ -161,7 +161,7 @@ public class ParserTest
     }
 
     [Theory]
-    [MemberData(nameof(LeftAssocBinaryOpsData))]
+    [MemberData(nameof(NonCompBinaryOpsData))]
     public void Parser_AllBinaryOpsExceptComparisonsAreLeftAssoc(BinaryOp op)
     {
         string opStr = op.AsString();
