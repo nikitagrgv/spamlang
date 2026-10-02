@@ -571,7 +571,7 @@ public class Parser
                 EndToken = end,
                 Left = left,
                 Right = right,
-                Op = op,
+                Op = op.Value,
             };
         }
 
