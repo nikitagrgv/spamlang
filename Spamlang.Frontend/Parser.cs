@@ -585,7 +585,7 @@ public class Parser
             {
                 _diag.AddError("Comparison operators are not associative!", token);
             }
-            if (isBit && prevBinaryOp != op)
+            if (isBit && prevBinaryOp != null && prevBinaryOp != op)
             {
                 _diag.AddError("Cannot mix bit operations - parentheses are needed!", token);
             }
