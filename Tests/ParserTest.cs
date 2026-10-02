@@ -5,8 +5,8 @@ namespace Tests;
 
 public class ParserTest
 {
-    private const int BitBinaryOpPrec = 6;
-    private const int CompBinaryOpPrec = 7;
+    private const int BitOpPrec = 6;
+    private const int CompOpPrec = 7;
 
     private static readonly (BinaryOp op, int prec)[] AllBinaryOpsWithPrecedence =
     [
@@ -17,18 +17,18 @@ public class ParserTest
         (BinaryOp.Plus, 5),
         (BinaryOp.Minus, 5),
 
-        (BinaryOp.BitAnd, BitBinaryOpPrec),
-        (BinaryOp.BitOr, BitBinaryOpPrec),
-        (BinaryOp.BitXor, BitBinaryOpPrec),
-        (BinaryOp.BitShiftLeft, BitBinaryOpPrec),
-        (BinaryOp.BitShiftRight, BitBinaryOpPrec),
+        (BinaryOp.BitAnd, BitOpPrec),
+        (BinaryOp.BitOr, BitOpPrec),
+        (BinaryOp.BitXor, BitOpPrec),
+        (BinaryOp.BitShiftLeft, BitOpPrec),
+        (BinaryOp.BitShiftRight, BitOpPrec),
 
-        (BinaryOp.Equal, CompBinaryOpPrec),
-        (BinaryOp.NotEqual, CompBinaryOpPrec),
-        (BinaryOp.Less, CompBinaryOpPrec),
-        (BinaryOp.LessEqual, CompBinaryOpPrec),
-        (BinaryOp.Greater, CompBinaryOpPrec),
-        (BinaryOp.GreaterEqual, CompBinaryOpPrec),
+        (BinaryOp.Equal, CompOpPrec),
+        (BinaryOp.NotEqual, CompOpPrec),
+        (BinaryOp.Less, CompOpPrec),
+        (BinaryOp.LessEqual, CompOpPrec),
+        (BinaryOp.Greater, CompOpPrec),
+        (BinaryOp.GreaterEqual, CompOpPrec),
 
         (BinaryOp.LogicAnd, 8),
 
@@ -49,15 +49,15 @@ public class ParserTest
     public static TheoryData<UnaryOp> AllUnaryOpsData = MakeData(AllUnaryOps);
 
     public static TheoryData<BinaryOp> BitBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
-        .Where(t => t.prec == BitBinaryOpPrec)
+        .Where(t => t.prec == BitOpPrec)
         .Select(t => t.op));
 
     public static TheoryData<BinaryOp> CompBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
-        .Where(t => t.prec == CompBinaryOpPrec)
+        .Where(t => t.prec == CompOpPrec)
         .Select(t => t.op));
 
     public static TheoryData<BinaryOp> NonCompBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
-        .Where(t => t.prec != CompBinaryOpPrec)
+        .Where(t => t.prec != CompOpPrec)
         .Select(t => t.op));
 
     [Fact]
@@ -269,13 +269,13 @@ public class ParserTest
     {
         foreach ((BinaryOp op, int prec) v2 in AllBinaryOpsWithPrecedence)
         {
-            if (v1.prec == CompBinaryOpPrec && v2.prec == CompBinaryOpPrec)
+            if (v1.prec == CompOpPrec && v2.prec == CompOpPrec)
             {
                 // Comparisons are not associative
                 continue;
             }
 
-            if (v1.prec == BitBinaryOpPrec && v2.prec == BitBinaryOpPrec && v1.op != v2.op)
+            if (v1.prec == BitOpPrec && v2.prec == BitOpPrec && v1.op != v2.op)
             {
                 // Cannot mix bit binary ops without parentheses
                 continue;

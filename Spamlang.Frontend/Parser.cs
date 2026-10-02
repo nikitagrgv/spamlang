@@ -507,6 +507,9 @@ public class Parser
         return stmt;
     }
 
+    private const int BitOpPrec = 6;
+    private const int CompOpPrec = 7;
+
     private int GetPrecedence(BinaryOp op)
     {
         switch (op)
@@ -522,7 +525,7 @@ public class Parser
             case BinaryOp.BitOr:
             case BinaryOp.BitXor:
             case BinaryOp.BitShiftLeft:
-            case BinaryOp.BitShiftRight: return 6;
+            case BinaryOp.BitShiftRight: return BitOpPrec;
 
             case BinaryOp.Equal:
             case BinaryOp.NotEqual:
