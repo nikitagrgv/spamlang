@@ -543,14 +543,26 @@ public class Parser
     // TODO: Use precedence parsing
     private Expr ParseExpr()
     {
+        // TODO# WTF
+        return ParseExpr(prec: 9);
+    }
+
+    private Expr ParseExpr(int prec)
+    {
         int begin = _cursor;
-        Expr left = ParseTerm();
-        while (Check(TokenType.Plus) || Check(TokenType.Minus))
+        Expr left = ParseExpr(prec - 1);
+        while (true)
         {
             int opPos = _cursor;
+            BinaryOp? op = TokenUtils.ToBinaryOp(Peek().Type);
+            if (op == null)
+            {
+                break;
+            }
+
             Advance();
 
-            Expr right = ParseTerm();
+            Expr right = ParseExpr(prec - 1);
             int end = End(begin);
 
             left = new ExprBinary
@@ -559,12 +571,13 @@ public class Parser
                 EndToken = end,
                 Left = left,
                 Right = right,
-                Op = TokenUtils.ToBinaryOp(_tokens[opPos].Type)!.Value,
+                Op = op,
             };
         }
 
         return left;
     }
+
 
     private Expr ParseTerm()
     {
