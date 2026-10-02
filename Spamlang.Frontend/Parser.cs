@@ -598,7 +598,7 @@ public class Parser
                 Right = right,
                 Op = op.Value,
             };
-            ++count;
+            prevBinaryOp = op;
         }
 
         return left;
