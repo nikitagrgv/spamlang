@@ -562,9 +562,15 @@ public class Parser
         int begin = _cursor;
         Expr left = ParseExpr(prec - 1);
 
+
+        BinaryOp? prevBinaryOp = null;
+
+        bool isComp = prec == CompOpPrec;
+        bool isBit = prec == BitOpPrec;
         while (true)
         {
-            BinaryOp? op = TokenUtils.ToBinaryOp(Peek().Type);
+            Token token = Peek();
+            BinaryOp? op = TokenUtils.ToBinaryOp(token.Type);
             if (op == null || GetPrecedence(op.Value) != prec)
             {
                 break;
@@ -575,6 +581,15 @@ public class Parser
             Expr right = ParseExpr(prec - 1);
             int end = End(begin);
 
+            if (isComp && prevBinaryOp != null)
+            {
+                _diag.AddError("Comparison operators are not associative!", token);
+            }
+            if (isBit && prevBinaryOp != op)
+            {
+                _diag.AddError("Cannot mix bit operations - parentheses are needed!", token);
+            }
+
             left = new ExprBinary
             {
                 StartToken = begin,
@@ -583,6 +598,7 @@ public class Parser
                 Right = right,
                 Op = op.Value,
             };
+            ++count;
         }
 
         return left;
