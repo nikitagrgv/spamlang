@@ -265,6 +265,18 @@ public class ParserTest
     {
         foreach ((BinaryOp op, int prec) v2 in AllBinaryOpsWithPrecedence)
         {
+            if (v1.prec == CompBinaryOpPrec && v2.prec == CompBinaryOpPrec)
+            {
+                // Comparisons are not associative
+                continue;
+            }
+
+            if (v1.prec == BitBinaryOpPrec && v2.prec == BitBinaryOpPrec && v1.op != v2.op)
+            {
+                // Cannot mix bit binary ops without parentheses
+                continue;
+            }
+
             string op1Str = v1.op.AsString();
             string op2Str = v2.op.AsString();
 
