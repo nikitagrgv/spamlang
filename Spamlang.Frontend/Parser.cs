@@ -532,7 +532,7 @@ public class Parser
             case BinaryOp.Less:
             case BinaryOp.LessEqual:
             case BinaryOp.Greater:
-            case BinaryOp.GreaterEqual: return 7;
+            case BinaryOp.GreaterEqual: return CompOpPrec;
 
             case BinaryOp.LogicAnd: return 8;
 
