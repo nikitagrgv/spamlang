@@ -77,7 +77,7 @@ public class ParserTest
         List<UnaryOp> missing = Enum.GetValues<UnaryOp>()
             .Where(t => !covered.Contains(t))
             .ToList();
-        Assert.True(missing.Count == 0, $"Missing binary ops: {string.Join(", ", missing)}");
+        Assert.True(missing.Count == 0, $"Missing unary ops: {string.Join(", ", missing)}");
     }
 
     [Theory]
