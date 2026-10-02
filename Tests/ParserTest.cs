@@ -162,7 +162,7 @@ public class ParserTest
 
     [Theory]
     [MemberData(nameof(LeftAssocBinaryOpsData))]
-    public void Parser_AllBinaryOpsExceptComparisonsAndBitOpsAreLeftAssoc(BinaryOp op)
+    public void Parser_AllBinaryOpsExceptComparisonsAreLeftAssoc(BinaryOp op)
     {
         string opStr = op.AsString();
         string code = $"a {opStr} b {opStr} c {opStr} d";
