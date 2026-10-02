@@ -56,6 +56,10 @@ public class ParserTest
         .Where(t => t.prec == CompBinaryOpPrec)
         .Select(t => t.op));
 
+    public static TheoryData<BinaryOp> LeftAssocBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
+        .Where(t => t.prec != CompBinaryOpPrec && t.prec != BitBinaryOpPrec)
+        .Select(t => t.op));
+
     [Fact]
     public void Parser_CoversAllBinaryOps()
     {
@@ -157,8 +161,8 @@ public class ParserTest
     }
 
     [Theory]
-    [MemberData(nameof(AllBinaryOpsData))]
-    public void Parser_AllBinaryOpsAreLeftAssoc(BinaryOp op)
+    [MemberData(nameof(LeftAssocBinaryOpsData))]
+    public void Parser_AllBinaryOpsExceptComparisonsAndBitOpsAreLeftAssoc(BinaryOp op)
     {
         string opStr = op.AsString();
         string code = $"a {opStr} b {opStr} c {opStr} d";
