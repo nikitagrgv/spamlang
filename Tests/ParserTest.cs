@@ -299,6 +299,68 @@ public class ParserTest
         }
     }
 
+    [Theory]
+    [MemberData(nameof(CompBinaryOpsData))]
+    public void Parser_ComparisonsAreNotAssociative(BinaryOp op1)
+    {
+        foreach (BinaryOp op2 in CompBinaryOpsData)
+        {
+            string op1Str = op1.AsString();
+            string op2Str = op2.AsString();
+            string code = $"a {op1Str} b {op2Str} c";
+            ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+            Assert.True(analyzer.HasErrors);
+
+            // Still can combine them with parentheses
+            code = $"(a {op1Str} b) {op2Str} c";
+            analyzer = ExprAnalyzer.Parse(code);
+            Assert.False(analyzer.HasErrors);
+            Assert.Equal($"((a {op1Str} b) {op2Str} c)", analyzer.Flat);
+
+            code = $"a {op1Str} (b {op2Str} c)";
+            analyzer = ExprAnalyzer.Parse(code);
+            Assert.False(analyzer.HasErrors);
+            Assert.Equal($"(a {op1Str} (b {op2Str} c))", analyzer.Flat);
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(BitBinaryOpsData))]
+    public void Parser_CannotMixBitBinaryOpsWithoutParentheses(BinaryOp op1)
+    {
+        foreach (BinaryOp op2 in BitBinaryOpsData)
+        {
+            string op1Str = op1.AsString();
+            string op2Str = op2.AsString();
+            string code = $"a {op1Str} b {op2Str} c";
+
+            ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+
+            if (op1 == op2)
+            {
+                // Same bit binary ops are associative
+                Assert.False(analyzer.HasErrors);
+                Assert.Equal($"((a {op1Str} b) {op2Str} c)", analyzer.Flat);
+            }
+            else
+            {
+                // Can't combine different binary ops, parentheses are needed
+                Assert.True(analyzer.HasErrors);
+            }
+
+            // Still can combine them with parentheses
+            code = $"(a {op1Str} b) {op2Str} c";
+            analyzer = ExprAnalyzer.Parse(code);
+            Assert.False(analyzer.HasErrors);
+            Assert.Equal($"((a {op1Str} b) {op2Str} c)", analyzer.Flat);
+
+            code = $"a {op1Str} (b {op2Str} c)";
+            analyzer = ExprAnalyzer.Parse(code);
+            Assert.False(analyzer.HasErrors);
+            Assert.Equal($"(a {op1Str} (b {op2Str} c))", analyzer.Flat);
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////////
 
     private class ExprAnalyzer
