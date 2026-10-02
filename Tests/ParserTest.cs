@@ -365,6 +365,15 @@ public class ParserTest
         }
     }
 
+    [Theory]
+    [InlineData("123", "123")]
+    public void Parser_ParsesComplexExpressions(string code, string expectedFlat)
+    {
+        ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
+        Assert.False(analyzer.HasErrors);
+        Assert.Equal(expectedFlat, analyzer.Flat);
+    }
+
     /////////////////////////////////////////////////////////////////////////
 
     private class ExprAnalyzer
