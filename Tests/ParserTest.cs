@@ -5,6 +5,9 @@ namespace Tests;
 
 public class ParserTest
 {
+    private const int BitBinaryOpPrec = 6;
+    private const int CompBinaryOpPrec = 7;
+
     private static readonly (BinaryOp op, int prec)[] AllBinaryOpsWithPrecedence =
     [
         (BinaryOp.Mul, 4),
@@ -14,23 +17,24 @@ public class ParserTest
         (BinaryOp.Plus, 5),
         (BinaryOp.Minus, 5),
 
-        (BinaryOp.BitAnd, 6),
-        (BinaryOp.BitOr, 6),
-        (BinaryOp.BitXor, 6),
-        (BinaryOp.BitShiftLeft, 6),
-        (BinaryOp.BitShiftRight, 6),
+        (BinaryOp.BitAnd, BitBinaryOpPrec),
+        (BinaryOp.BitOr, BitBinaryOpPrec),
+        (BinaryOp.BitXor, BitBinaryOpPrec),
+        (BinaryOp.BitShiftLeft, BitBinaryOpPrec),
+        (BinaryOp.BitShiftRight, BitBinaryOpPrec),
 
-        (BinaryOp.Equal, 7),
-        (BinaryOp.NotEqual, 7),
-        (BinaryOp.Less, 7),
-        (BinaryOp.LessEqual, 7),
-        (BinaryOp.Greater, 7),
-        (BinaryOp.GreaterEqual, 7),
+        (BinaryOp.Equal, CompBinaryOpPrec),
+        (BinaryOp.NotEqual, CompBinaryOpPrec),
+        (BinaryOp.Less, CompBinaryOpPrec),
+        (BinaryOp.LessEqual, CompBinaryOpPrec),
+        (BinaryOp.Greater, CompBinaryOpPrec),
+        (BinaryOp.GreaterEqual, CompBinaryOpPrec),
 
         (BinaryOp.LogicAnd, 8),
 
         (BinaryOp.LogicOr, 9),
     ];
+
 
     private static readonly UnaryOp[] AllUnaryOps =
     [
@@ -43,6 +47,14 @@ public class ParserTest
     public static TheoryData<(BinaryOp, int)> AllBinaryOpsWithPrecedenceData = MakeData(AllBinaryOpsWithPrecedence);
     public static TheoryData<BinaryOp> AllBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence.Select(t => t.op));
     public static TheoryData<UnaryOp> AllUnaryOpsData = MakeData(AllUnaryOps);
+
+    public static TheoryData<BinaryOp> BitBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
+        .Where(t => t.prec == BitBinaryOpPrec)
+        .Select(t => t.op));
+
+    public static TheoryData<BinaryOp> CompBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
+        .Where(t => t.prec == CompBinaryOpPrec)
+        .Select(t => t.op));
 
     [Fact]
     public void Parser_CoversAllBinaryOps()
