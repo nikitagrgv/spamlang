@@ -507,6 +507,39 @@ public class Parser
         return stmt;
     }
 
+    private int GetPrecedence(BinaryOp op)
+    {
+        switch (op)
+        {
+            case BinaryOp.Mul:
+            case BinaryOp.Div:
+            case BinaryOp.Rem: return 4;
+
+            case BinaryOp.Plus:
+            case BinaryOp.Minus: return 5;
+
+            case BinaryOp.BitAnd:
+            case BinaryOp.BitOr:
+            case BinaryOp.BitXor:
+            case BinaryOp.BitShiftLeft:
+            case BinaryOp.BitShiftRight: return 6;
+
+            case BinaryOp.Equal:
+            case BinaryOp.NotEqual:
+            case BinaryOp.Less:
+            case BinaryOp.LessEqual:
+            case BinaryOp.Greater:
+            case BinaryOp.GreaterEqual: return 7;
+
+            case BinaryOp.LogicAnd: return 8;
+
+            case BinaryOp.LogicOr: return 9;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(op), op, null);
+        }
+    }
+
     // TODO: Use precedence parsing
     private Expr ParseExpr()
     {
