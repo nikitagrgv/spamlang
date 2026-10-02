@@ -549,8 +549,20 @@ public class Parser
 
     private Expr ParseExpr(int prec)
     {
+        Debug.Assert(prec > 0);
+
+        if (prec == 1)
+        {
+            ParsePostfix();
+        }
+
+        if (prec == 2)
+        {
+        }
+
         int begin = _cursor;
         Expr left = ParseExpr(prec - 1);
+
         while (true)
         {
             BinaryOp? op = TokenUtils.ToBinaryOp(Peek().Type);
