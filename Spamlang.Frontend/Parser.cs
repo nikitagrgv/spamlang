@@ -549,15 +549,21 @@ public class Parser
 
     private Expr ParseExpr(int prec)
     {
-        Debug.Assert(prec > 0);
+        Debug.Assert(prec >= 0);
+
+        if (prec == 0)
+        {
+            return ParsePrimary();
+        }
 
         if (prec == 1)
         {
-            ParsePostfix();
+            return ParsePostfix();
         }
 
         if (prec == 2)
         {
+            return ParseAsCast();
         }
 
         int begin = _cursor;
@@ -593,7 +599,7 @@ public class Parser
     private Expr ParseTerm()
     {
         int begin = _cursor;
-        Expr left = ParseCast();
+        Expr left = ParseAsCast();
         while (Check(TokenType.Star) ||
                Check(TokenType.Slash) ||
                Check(TokenType.Percent))
@@ -601,7 +607,7 @@ public class Parser
             int opPos = _cursor;
             Advance();
 
-            Expr right = ParseCast();
+            Expr right = ParseAsCast();
             int end = End(begin);
 
             left = new ExprBinary
@@ -617,7 +623,7 @@ public class Parser
         return left;
     }
 
-    private Expr ParseCast()
+    private Expr ParseAsCast()
     {
         int begin = _cursor;
         Expr value = ParseUnary();
