@@ -412,7 +412,7 @@ public class ParserTest
                 case TypeNode typeNode:
                     return ToFlat(typeNode, _tokens, _code);
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(node));
+                    throw new ArgumentException($"Unsupported node type: {node.GetType().Name}", nameof(node))
             }
         }
 
