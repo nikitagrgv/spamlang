@@ -57,7 +57,7 @@ public class ParserTest
         .Select(t => t.op));
 
     public static TheoryData<BinaryOp> LeftAssocBinaryOpsData = MakeData(AllBinaryOpsWithPrecedence
-        .Where(t => t.prec != CompBinaryOpPrec && t.prec != BitBinaryOpPrec)
+        .Where(t => t.prec != CompBinaryOpPrec)
         .Select(t => t.op));
 
     [Fact]
