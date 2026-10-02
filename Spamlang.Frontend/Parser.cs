@@ -549,17 +549,7 @@ public class Parser
 
     private Expr ParseExpr(int prec)
     {
-        Debug.Assert(prec >= 0);
-
-        if (prec == 0)
-        {
-            return ParsePrimary();
-        }
-
-        if (prec == 1)
-        {
-            return ParsePostfix();
-        }
+        Debug.Assert(prec >= 2);
 
         if (prec == 2)
         {
@@ -572,7 +562,7 @@ public class Parser
         while (true)
         {
             BinaryOp? op = TokenUtils.ToBinaryOp(Peek().Type);
-            if (op == null)
+            if (op == null || GetPrecedence(op.Value) != prec)
             {
                 break;
             }
@@ -589,34 +579,6 @@ public class Parser
                 Left = left,
                 Right = right,
                 Op = op.Value,
-            };
-        }
-
-        return left;
-    }
-
-
-    private Expr ParseTerm()
-    {
-        int begin = _cursor;
-        Expr left = ParseAsCast();
-        while (Check(TokenType.Star) ||
-               Check(TokenType.Slash) ||
-               Check(TokenType.Percent))
-        {
-            int opPos = _cursor;
-            Advance();
-
-            Expr right = ParseAsCast();
-            int end = End(begin);
-
-            left = new ExprBinary
-            {
-                StartToken = begin,
-                EndToken = end,
-                Left = left,
-                Right = right,
-                Op = TokenUtils.ToBinaryOp(_tokens[opPos].Type)!.Value,
             };
         }
 
@@ -646,49 +608,52 @@ public class Parser
     private Expr ParseUnary()
     {
         int begin = _cursor;
-        bool numeric = TryConsume(TokenType.Plus) || TryConsume(TokenType.Minus);
-        if (numeric || TryConsume(TokenType.Exclamation))
+
+        TokenType type = Peek().Type;
+        UnaryOp? op = TokenUtils.ToUnaryOp(type);
+        if (op == null)
         {
-            int opPos = _cursor - 1;
-            TokenType opTokType = _tokens[opPos].Type;
-            bool negated = opTokType == TokenType.Minus;
-
-            if (numeric)
-            {
-                if (TryConsume(TokenType.LiteralInt))
-                {
-                    return new ExprIntConst
-                    {
-                        StartToken = begin,
-                        EndToken = End(begin),
-                        LiteralToken = _cursor - 1,
-                        IsNegative = negated,
-                    };
-                }
-
-                if (TryConsume(TokenType.LiteralFloat))
-                {
-                    return new ExprFloatConst
-                    {
-                        StartToken = begin,
-                        EndToken = End(begin),
-                        LiteralToken = _cursor - 1,
-                        IsNegative = negated,
-                    };
-                }
-            }
-
-            Expr expr = ParseUnary();
-            return new ExprUnary
-            {
-                StartToken = begin,
-                EndToken = End(begin),
-                Operand = expr,
-                Op = TokenUtils.ToUnaryOp(opTokType)!.Value,
-            };
+            return ParsePostfix();
         }
 
-        return ParsePostfix();
+        Advance();
+
+        bool plus = op == UnaryOp.Plus;
+        bool minus = op == UnaryOp.Minus;
+        if (plus || minus)
+        {
+            // Embed +/- into const
+            if (TryConsume(TokenType.LiteralInt))
+            {
+                return new ExprIntConst
+                {
+                    StartToken = begin,
+                    EndToken = End(begin),
+                    LiteralToken = _cursor - 1,
+                    IsNegative = minus,
+                };
+            }
+
+            if (TryConsume(TokenType.LiteralFloat))
+            {
+                return new ExprFloatConst
+                {
+                    StartToken = begin,
+                    EndToken = End(begin),
+                    LiteralToken = _cursor - 1,
+                    IsNegative = minus,
+                };
+            }
+        }
+
+        Expr expr = ParseUnary();
+        return new ExprUnary
+        {
+            StartToken = begin,
+            EndToken = End(begin),
+            Operand = expr,
+            Op = op.Value,
+        };
     }
 
     private Expr ParsePostfix()
