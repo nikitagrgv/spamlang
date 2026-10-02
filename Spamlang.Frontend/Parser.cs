@@ -553,7 +553,6 @@ public class Parser
         Expr left = ParseExpr(prec - 1);
         while (true)
         {
-            int opPos = _cursor;
             BinaryOp? op = TokenUtils.ToBinaryOp(Peek().Type);
             if (op == null)
             {
