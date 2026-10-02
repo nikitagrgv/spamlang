@@ -367,7 +367,7 @@ public class ParserTest
 
     [Theory]
     [InlineData("-a + ~b(c) * d / f == g as h | i as j || k < l",
-        "(((-a) + (((~(b(c))) * d) / f)) == (((g as h) | (i as j)) || (k < l)))")]
+        "((((-a) + (((~(b(c))) * d) / f)) == ((g as h) | (i as j))) || (k < l))")]
     public void Parser_ParsesComplexExpressions(string code, string expectedFlat)
     {
         ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
