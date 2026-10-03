@@ -366,6 +366,7 @@ public class ParserTest
     }
 
     [Theory]
+    [InlineData("a & (b | c) & d", "((a & (b | c)) & d)")]
     [InlineData("-a + ~b(c)", "((-a) + (~(b(c))))")]
     [InlineData("-a + ~b(c) * d / f == g as h | i as j || k < l",
         "((((-a) + (((~(b(c))) * d) / f)) == ((g as h) | (i as j))) || (k < l))")]

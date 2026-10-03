@@ -562,7 +562,6 @@ public class Parser
         int begin = _cursor;
         Expr left = ParseExpr(prec - 1);
 
-
         BinaryOp? prevBinaryOp = null;
 
         bool isComp = prec == CompOpPrec;
