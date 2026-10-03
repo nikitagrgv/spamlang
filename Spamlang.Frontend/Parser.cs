@@ -543,24 +543,32 @@ public class Parser
         }
     }
 
+    private static int GetMaxPrecedence()
+    {
+        return 9;
+    }
+
     // TODO: Use precedence parsing
     private Expr ParseExpr()
     {
         // TODO# WTF
-        return ParseExpr(prec: 9);
+        return ParseExpr(0);
     }
 
     private Expr ParseExpr(int prec)
     {
-        Debug.Assert(prec >= 2);
+        if (prec > GetMaxPrecedence())
+        {
+            return ParsePrimary();
+        }
 
-        if (prec == 2)
+        if (prec == 7)
         {
             return ParseAsCast();
         }
 
         int begin = _cursor;
-        Expr left = ParseExpr(prec - 1);
+        Expr left = ParseExpr(prec + 1);
 
         BinaryOp? prevBinaryOp = null;
 
@@ -577,7 +585,7 @@ public class Parser
 
             Advance();
 
-            Expr right = ParseExpr(prec - 1);
+            Expr right = ParseExpr(prec + 1);
             int end = End(begin);
 
             if (isComp && prevBinaryOp != null)
