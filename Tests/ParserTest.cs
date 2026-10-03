@@ -290,7 +290,7 @@ public class ParserTest
             Assert.False(analyzer.HasErrors);
 
             string expected;
-            if (v1.prec <= v2.prec)
+            if (v1.prec >= v2.prec)
             {
                 expected = $"((a {op1Str} b) {op2Str} c)";
             }
