@@ -5,14 +5,14 @@ namespace Tests;
 
 public class ParserTest
 {
-    private const int BitOpPrec = 6;
-    private const int CompOpPrec = 7;
+    private const int BitOpPrec = 4;
+    private const int CompOpPrec = 3;
 
     private static readonly (BinaryOp op, int prec)[] AllBinaryOpsWithPrecedence =
     [
-        (BinaryOp.Mul, 4),
-        (BinaryOp.Div, 4),
-        (BinaryOp.Rem, 4),
+        (BinaryOp.Mul, 6),
+        (BinaryOp.Div, 6),
+        (BinaryOp.Rem, 6),
 
         (BinaryOp.Plus, 5),
         (BinaryOp.Minus, 5),
@@ -30,9 +30,9 @@ public class ParserTest
         (BinaryOp.Greater, CompOpPrec),
         (BinaryOp.GreaterEqual, CompOpPrec),
 
-        (BinaryOp.LogicAnd, 8),
+        (BinaryOp.LogicAnd, 2),
 
-        (BinaryOp.LogicOr, 9),
+        (BinaryOp.LogicOr, 1),
     ];
 
 

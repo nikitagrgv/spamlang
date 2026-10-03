@@ -507,8 +507,8 @@ public class Parser
         return stmt;
     }
 
-    private const int BitOpPrec = 6;
-    private const int CompOpPrec = 7;
+    private const int BitOpPrec = 4;
+    private const int CompOpPrec = 3;
 
     private int GetPrecedence(BinaryOp op)
     {
@@ -516,7 +516,7 @@ public class Parser
         {
             case BinaryOp.Mul:
             case BinaryOp.Div:
-            case BinaryOp.Rem: return 4;
+            case BinaryOp.Rem: return 6;
 
             case BinaryOp.Plus:
             case BinaryOp.Minus: return 5;
@@ -534,9 +534,9 @@ public class Parser
             case BinaryOp.Greater:
             case BinaryOp.GreaterEqual: return CompOpPrec;
 
-            case BinaryOp.LogicAnd: return 8;
+            case BinaryOp.LogicAnd: return 2;
 
-            case BinaryOp.LogicOr: return 9;
+            case BinaryOp.LogicOr: return 1;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(op), op, null);
@@ -584,6 +584,7 @@ public class Parser
             {
                 _diag.AddError("Comparison operators are not associative!", token);
             }
+
             if (isBit && prevBinaryOp != null && prevBinaryOp != op)
             {
                 _diag.AddError("Cannot mix bit operations - parentheses are needed!", token);
