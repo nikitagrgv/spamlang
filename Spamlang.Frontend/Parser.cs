@@ -560,7 +560,7 @@ public class Parser
 
     private Expr ParseExpr(int prec)
     {
-        if (prec > GetMaxPrecedence())
+        if (prec >= MaxPrec)
         {
             return ParsePrimary();
         }
