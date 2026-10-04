@@ -551,6 +551,28 @@ public class Parser
         }
     }
 
+    private bool CanBeCombinedWithoutParentheses(BinaryOp op, BinaryOp other)
+    {
+        int opPrec = GetPrecedence(op);
+        int otherPrec = GetPrecedence(other);
+        if (opPrec == ComparisonPrec && otherPrec == ComparisonPrec)
+        {
+            return false;
+        }
+
+        if (otherPrec == BitwisePrec)
+        {
+            return opPrec != BitwisePrec && opPrec != AddictivePrec && opPrec != MultiplicativePrec;
+        }
+
+        if (opPrec == BitwisePrec)
+        {
+            return otherPrec != BitwisePrec && otherPrec != AddictivePrec && otherPrec != MultiplicativePrec;
+        }
+
+        return true;
+    }
+
     // TODO: Use precedence parsing
     private Expr ParseExpr()
     {
@@ -575,13 +597,17 @@ public class Parser
 
         BinaryOp? prevBinaryOp = null;
 
-        bool isComp = prec == ComparisonPrec;
-        bool isBit = prec == BitwisePrec;
         while (true)
         {
             Token token = Peek();
             BinaryOp? op = TokenUtils.ToBinaryOp(token.Type);
-            if (op == null || GetPrecedence(op.Value) != prec)
+            if (op == null)
+            {
+                break;
+            }
+
+            int opPrec = GetPrecedence(op.Value);
+            if (opPrec < prec)
             {
                 break;
             }
@@ -590,6 +616,9 @@ public class Parser
 
             Expr right = ParseExpr(prec + 1);
             int end = End(begin);
+
+            // bool isComp = prec == ComparisonPrec;
+            // bool isBit = prec == BitwisePrec;
 
             if (isComp && prevBinaryOp != null)
             {
