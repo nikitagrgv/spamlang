@@ -337,7 +337,7 @@ public class ParserTest
 
             ExprAnalyzer analyzer = ExprAnalyzer.Parse(code);
 
-            if (op1 == op2)
+            if (op1 == op2 || (IsBitShift(op1) && IsBitShift(op2)))
             {
                 // Same bit binary ops are associative
                 Assert.False(analyzer.HasErrors);
@@ -456,5 +456,10 @@ public class ParserTest
         }
 
         return d;
+    }
+
+    private bool IsBitShift(BinaryOp op)
+    {
+        return op == BinaryOp.BitShiftLeft || op == BinaryOp.BitShiftRight;
     }
 }
