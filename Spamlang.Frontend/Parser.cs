@@ -578,14 +578,20 @@ public class Parser
         {
             Token token = Peek();
             BinaryOp? op = TokenUtils.ToBinaryOp(token.Type);
-            if (op == null || GetPrecedence(op.Value) != prec)
+            if (op == null)
+            {
+                break;
+            }
+
+            int opPrec = GetPrecedence(op.Value);
+            if (opPrec < prec)
             {
                 break;
             }
 
             Advance();
 
-            Expr right = ParseExpr(prec + 1);
+            Expr right = ParseExpr(opPrec + 1);
             int end = End(begin);
 
             if (isComp && prevBinaryOp != null)
