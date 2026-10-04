@@ -16,6 +16,9 @@ public class Parser
         public TokenType? Expected { get; } = expected;
     }
 
+    public const int MaxPrec = PostfixPrec;
+    public const int PostfixPrec = 9;
+    public const int UnaryPrec = 8;
     public const int AsCastPrec = 7;
     public const int MultiplicativePrec = 6;
     public const int AddictivePrec = 5;
