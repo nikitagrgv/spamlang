@@ -551,36 +551,32 @@ public class Parser
         }
     }
 
-    private bool CanBeCombinedWithoutParentheses(BinaryOp op, BinaryOp other)
+    private bool CanBeCombinedWithoutParentheses(BinaryOp op, BinaryOp other, out string? error)
     {
         int opPrec = GetPrecedence(op);
         int otherPrec = GetPrecedence(other);
         if (opPrec == ComparisonPrec && otherPrec == ComparisonPrec)
         {
+            error = "Cannot combine comparison operators without parentheses!";
             return false;
         }
 
-        if (op == other)
-        {
-            return true;
-        }
-
-        if (op == BinaryOp.BitShiftLeft && other == BinaryOp.BitShiftRight ||
+        if (op == other ||
+            op == BinaryOp.BitShiftLeft && other == BinaryOp.BitShiftRight ||
             op == BinaryOp.BitShiftRight && other == BinaryOp.BitShiftLeft)
         {
+            error = null;
             return true;
         }
 
-        if (otherPrec == BitwisePrec)
+        if ((otherPrec == BitwisePrec && opPrec is BitwisePrec or AddictivePrec or MultiplicativePrec) ||
+            (opPrec == BitwisePrec && otherPrec is BitwisePrec or AddictivePrec or MultiplicativePrec))
         {
-            return opPrec != BitwisePrec && opPrec != AddictivePrec && opPrec != MultiplicativePrec;
+            error = "Cannot mix bit operations - parentheses are needed!";
+            return false;
         }
 
-        if (opPrec == BitwisePrec)
-        {
-            return otherPrec != BitwisePrec && otherPrec != AddictivePrec && otherPrec != MultiplicativePrec;
-        }
-
+        error = null;
         return true;
     }
 
@@ -628,17 +624,9 @@ public class Parser
             Expr right = ParseExpr(prec + 1);
             int end = End(begin);
 
-            // bool isComp = prec == ComparisonPrec;
-            // bool isBit = prec == BitwisePrec;
-
-            if (isComp && prevBinaryOp != null)
+            if (prevBinaryOp != null && !CanBeCombinedWithoutParentheses(op.Value, prevBinaryOp.Value, out string? error))
             {
-                _diag.AddError("Comparison operators are not associative!", token);
-            }
-
-            if (isBit && prevBinaryOp != null && prevBinaryOp != op)
-            {
-                _diag.AddError("Cannot mix bit operations - parentheses are needed!", token);
+                _diag.AddError(error!, token);
             }
 
             left = new ExprBinary
