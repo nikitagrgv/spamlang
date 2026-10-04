@@ -16,6 +16,7 @@ public class Parser
         public TokenType? Expected { get; } = expected;
     }
 
+    public const int AsCastPrec = 7;
     public const int MultiplicativePrec = 6;
     public const int AddictivePrec = 5;
     public const int BitwisePrec = 4;
@@ -547,11 +548,6 @@ public class Parser
         }
     }
 
-    private static int GetMaxPrecedence()
-    {
-        return 9;
-    }
-
     // TODO: Use precedence parsing
     private Expr ParseExpr()
     {
@@ -566,7 +562,7 @@ public class Parser
             return ParsePrimary();
         }
 
-        if (prec == 7)
+        if (prec == AsCastPrec)
         {
             return ParseAsCast();
         }
