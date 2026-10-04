@@ -16,6 +16,13 @@ public class Parser
         public TokenType? Expected { get; } = expected;
     }
 
+    public const int MultiplicativePrec = 6;
+    public const int AddictivePrec = 5;
+    public const int BitwisePrec = 4;
+    public const int ComparisonPrec = 3;
+    public const int LogicAndPrec = 2;
+    public const int LogicOrPrec = 1;
+
     public Parser(string code, List<Token> tokens, Diagnostic diag)
     {
         _code = code;
@@ -507,36 +514,33 @@ public class Parser
         return stmt;
     }
 
-    private const int BitOpPrec = 4;
-    private const int CompOpPrec = 3;
-
     private int GetPrecedence(BinaryOp op)
     {
         switch (op)
         {
             case BinaryOp.Mul:
             case BinaryOp.Div:
-            case BinaryOp.Rem: return 6;
+            case BinaryOp.Rem: return MultiplicativePrec;
 
             case BinaryOp.Plus:
-            case BinaryOp.Minus: return 5;
+            case BinaryOp.Minus: return AddictivePrec;
 
             case BinaryOp.BitAnd:
             case BinaryOp.BitOr:
             case BinaryOp.BitXor:
             case BinaryOp.BitShiftLeft:
-            case BinaryOp.BitShiftRight: return BitOpPrec;
+            case BinaryOp.BitShiftRight: return BitwisePrec;
 
             case BinaryOp.Equal:
             case BinaryOp.NotEqual:
             case BinaryOp.Less:
             case BinaryOp.LessEqual:
             case BinaryOp.Greater:
-            case BinaryOp.GreaterEqual: return CompOpPrec;
+            case BinaryOp.GreaterEqual: return ComparisonPrec;
 
-            case BinaryOp.LogicAnd: return 2;
+            case BinaryOp.LogicAnd: return LogicAndPrec;
 
-            case BinaryOp.LogicOr: return 1;
+            case BinaryOp.LogicOr: return LogicOrPrec;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(op), op, null);
@@ -572,8 +576,8 @@ public class Parser
 
         BinaryOp? prevBinaryOp = null;
 
-        bool isComp = prec == CompOpPrec;
-        bool isBit = prec == BitOpPrec;
+        bool isComp = prec == ComparisonPrec;
+        bool isBit = prec == BitwisePrec;
         while (true)
         {
             Token token = Peek();
