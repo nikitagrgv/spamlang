@@ -560,6 +560,17 @@ public class Parser
             return false;
         }
 
+        if (op == other)
+        {
+            return true;
+        }
+
+        if (op == BinaryOp.BitShiftLeft && other == BinaryOp.BitShiftRight ||
+            op == BinaryOp.BitShiftRight && other == BinaryOp.BitShiftLeft)
+        {
+            return true;
+        }
+
         if (otherPrec == BitwisePrec)
         {
             return opPrec != BitwisePrec && opPrec != AddictivePrec && opPrec != MultiplicativePrec;
