@@ -580,15 +580,10 @@ public class Parser
         return true;
     }
 
-    // TODO: Use precedence parsing
-    private Expr ParseExpr()
+    private Expr ParseExpr(int prec = 0)
     {
-        // TODO# WTF
-        return ParseExpr(0);
-    }
+        // TODO: Optimize
 
-    private Expr ParseExpr(int prec)
-    {
         Debug.Assert(prec <= MaxPrec);
 
         if (prec == AsCastPrec)
