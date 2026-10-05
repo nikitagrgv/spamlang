@@ -589,10 +589,7 @@ public class Parser
 
     private Expr ParseExpr(int prec)
     {
-        if (prec >= MaxPrec)
-        {
-            return ParsePrimary();
-        }
+        Debug.Assert(prec <= MaxPrec);
 
         if (prec == AsCastPrec)
         {
