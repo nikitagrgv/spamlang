@@ -9,8 +9,8 @@ public enum TypeKind
     UnsignedInteger,
     Float,
     Bool,
-    Pointer,
     Function,
+    OpaquePtr,
 }
 
 // NOTE: Interning is used for types like FuncType. TypeRegistry provides that. Compare by reference
@@ -48,7 +48,7 @@ public sealed class BuiltinType : SpamType
 
     public static readonly BuiltinType Void = new(TypeKind.Void, "void", 0, 1);
 
-    public static readonly BuiltinType Ptr = new(TypeKind.Pointer, "ptr", 8, 8);
+    public static readonly BuiltinType Ptr = new(TypeKind.OpaquePtr, "ptr", 8, 8);
 
     public static readonly BuiltinType AbstractNumber = new(TypeKind.AbstractNumber, "abstract_number", 0, 1);
 
