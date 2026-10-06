@@ -1303,6 +1303,11 @@ public class Sema
     {
         Debug.Assert(from != to, "Must be different types!");
 
+        if (CanImplicitlyCast(from, to))
+        {
+            return true;
+        }
+
         if (to.IsInteger())
         {
             return from.Kind == TypeKind.AbstractNumber || from.IsInteger() || from.IsFloat() || from.IsBool();
