@@ -1163,7 +1163,9 @@ public class Sema
     private SpamType? GetArithmeticOpResultType(SpamType a, SpamType b)
     {
         // TODO#
-        if (!a.IsInteger() || !b.IsInteger())
+        TypeKind kindA = a.Kind;
+        TypeKind kindB = b.Kind;
+        if ()
         {
             return null;
         }
@@ -1224,7 +1226,6 @@ public class Sema
                        kind == TypeKind.SignedInteger ||
                        kind == TypeKind.UnsignedInteger;
             default:
-                Debug.Assert(type is not BuiltinType);
                 return false;
         }
     }
