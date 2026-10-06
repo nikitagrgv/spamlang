@@ -1144,6 +1144,21 @@ public class Sema
     {
         Debug.Assert(a != BuiltinType.Error && b != BuiltinType.Error);
 
+        OpFamily family = op.GetFamily();
+        switch (family)
+        {
+            case OpFamily.Arithmetic:
+                break;
+            case OpFamily.Bit:
+                break;
+            case OpFamily.Logic:
+                break;
+            case OpFamily.Comparison:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
         if (!a.IsInteger() || !b.IsInteger())
         {
             return null;
@@ -1169,14 +1184,29 @@ public class Sema
 
     private bool CanUseUnary(SpamType type, UnaryOp op)
     {
-        // TODO: Put this info in type
-
-        if (type == BuiltinType.I32)
+        // TODO: Put this info in type?
+        TypeKind kind = type.Kind;
+        switch (op)
         {
-            return op == UnaryOp.Plus || op == UnaryOp.Minus;
+            case UnaryOp.Plus:
+                return kind == TypeKind.AbstractNumber ||
+                       kind == TypeKind.Float ||
+                       kind == TypeKind.SignedInteger;
+            case UnaryOp.Minus:
+                return kind == TypeKind.AbstractNumber ||
+                       kind == TypeKind.Float ||
+                       kind == TypeKind.SignedInteger ||
+                       kind == TypeKind.UnsignedInteger;
+            case UnaryOp.Not:
+                return kind == TypeKind.Bool;
+            case UnaryOp.BitNot:
+                return kind == TypeKind.AbstractNumber ||
+                       kind == TypeKind.SignedInteger ||
+                       kind == TypeKind.UnsignedInteger;
+            default:
+                Debug.Assert(type is not BuiltinType);
+                return false;
         }
-
-        return false;
     }
 
     private bool CanImplicitlyCast(SpamType from, SpamType to)

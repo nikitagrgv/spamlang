@@ -14,6 +14,21 @@ public enum UnaryOp
 
 public static partial class Utils
 {
+    public static OpFamily GetFamily(this UnaryOp op)
+    {
+        switch (op)
+        {
+            case UnaryOp.Plus:
+            case UnaryOp.Minus:
+                return OpFamily.Arithmetic;
+            case UnaryOp.Not:
+                return OpFamily.Logic;
+            case UnaryOp.BitNot:
+                return OpFamily.Bit;
+            default: throw new UnreachableException();
+        }
+    }
+
     public static string AsString(this UnaryOp op)
     {
         return op switch
