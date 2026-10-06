@@ -812,22 +812,15 @@ public class Sema
         int radix = 10;
         if (str[0] == '0' && str.Length > 1)
         {
-            switch (str[1])
+            radix = str[1] switch
             {
-                case 'x' or 'X':
-                    radix = 16;
-                    str = str[2..];
-                    break;
-                case 'b' or 'B':
-                    radix = 2;
-                    str = str[2..];
-                    break;
-                default:
-                    Debug.Assert(char.IsAsciiDigit(str[1]), "Must be guaranteed by lexer");
-                    radix = 8;
-                    str = str[1..];
-                    break;
-            }
+                'x' => 16,
+                'b' => 2,
+                'o' => 8,
+                _ => throw new FormatException(),
+            };
+
+            str = str[2..];
         }
 
         Int128 value = 0;
