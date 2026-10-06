@@ -1240,7 +1240,10 @@ public class Sema
 
     private SpamType? GetLogicOpResultType(SpamType a, SpamType b)
     {
-        // TODO#
+        if (a == b && a == BuiltinType.Bool)
+        {
+            return a;
+        }
         return null;
     }
 
