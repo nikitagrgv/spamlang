@@ -1162,10 +1162,21 @@ public class Sema
 
     private SpamType? GetArithmeticOpResultType(SpamType a, SpamType b)
     {
-        // TODO#
-        TypeKind kindA = a.Kind;
-        TypeKind kindB = b.Kind;
-        if ()
+        bool CanUseArithmetic(TypeKind kind)
+        {
+            switch (kind)
+            {
+                case TypeKind.AbstractNumber:
+                case TypeKind.SignedInteger:
+                case TypeKind.UnsignedInteger:
+                case TypeKind.Float:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        if (!CanUseArithmetic(a.Kind) || !CanUseArithmetic(b.Kind))
         {
             return null;
         }
