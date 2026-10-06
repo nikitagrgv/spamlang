@@ -326,9 +326,11 @@ public class LexerTest
         Lexer lexer = new(code, diag);
         List<Token> tokens = lexer.Run();
 
-        Assert.False(diag.HasErrors, diag.PrettyString());
-        Assert.Equal(2, tokens.Count);
-        Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
+        Assert.True(diag.HasErrors);
+        Assert.Single(diag.Entries);
+        Assert.Equal(TokenType.Invalid, tokens[0].Type);
+        Assert.Equal(0, diag.Entries[0].Position);
+        Assert.Equal(str.Length, diag.Entries[0].Length);
     }
 
     [Theory]
