@@ -1152,7 +1152,7 @@ public class Sema
             case OpFamily.Bit:
                 return GetBitOpResultType(a, b);
             case OpFamily.Logic:
-                return GetLogicpResultType(a, b);
+                return GetLogicOpResultType(a, b);
             case OpFamily.Comparison:
                 return GetComparisonOpResultType(a, b);
             default:
@@ -1193,7 +1193,7 @@ public class Sema
         // TODO#
     }
 
-    private SpamType? GetLogicpResultType(SpamType a, SpamType b)
+    private SpamType? GetLogicOpResultType(SpamType a, SpamType b)
     {
         // TODO#
     }
