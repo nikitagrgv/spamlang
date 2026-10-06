@@ -582,7 +582,7 @@ public class Parser
 
     private Expr ParseExpr(int prec = 0)
     {
-        // TODO: Optimize
+        // TODO: Optimize. Now visits all prec levels even if there are no such ops
 
         Debug.Assert(prec <= MaxPrec);
 
