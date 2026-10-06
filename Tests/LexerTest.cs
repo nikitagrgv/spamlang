@@ -263,13 +263,13 @@ public class LexerTest
     }
 
     [Theory]
-    [InlineData("00")]
-    [InlineData("000")]
-    [InlineData("01")]
-    [InlineData("0123")]
-    [InlineData("01234567")]
-    [InlineData("0123456701234567")]
-    [InlineData("012345670123456701234567")]
+    [InlineData("0o0")]
+    [InlineData("0o00")]
+    [InlineData("0o1")]
+    [InlineData("0o123")]
+    [InlineData("0o1234567")]
+    [InlineData("0o123456701234567")]
+    [InlineData("0o12345670123456701234567")]
     public void Lexer_ParsesLiteralIntOctal(string str)
     {
         string code = str;
@@ -285,13 +285,11 @@ public class LexerTest
 
     [Theory]
     [InlineData("0x0")]
-    [InlineData("0X0")]
     [InlineData("0x00")]
     [InlineData("0x01")]
     [InlineData("0x0123")]
     [InlineData("0x0123456789abcdef")]
     [InlineData("0x0123456789ABCDEF")]
-    [InlineData("0X0123456789ABCDEF")]
     public void Lexer_ParsesLiteralIntHex(string str)
     {
         Diagnostic diag = new();
@@ -309,6 +307,44 @@ public class LexerTest
     [InlineData("018")]
     [InlineData("0xfg")]
     public void Lexer_ReportsErrorForInvalidIntLiteral(string str)
+    {
+        Diagnostic diag = new();
+        Lexer lexer = new(str, diag);
+        List<Token> tokens = lexer.Run();
+
+        Assert.True(diag.HasErrors);
+        Assert.Single(diag.Entries);
+        Assert.Equal(TokenType.Invalid, tokens[0].Type);
+        Assert.Equal(0, diag.Entries[0].Position);
+        Assert.Equal(str.Length, diag.Entries[0].Length);
+    }
+
+    [Theory]
+    [InlineData("000")]
+    [InlineData("01")]
+    [InlineData("0123")]
+    [InlineData("01234567")]
+    public void Lexer_ReportsErrorIfLiteralStartsWith0(string str)
+    {
+        // Octal literals start with 0o
+        // Forbid c-like octal literals for safety
+
+        string code = str;
+        Diagnostic diag = new();
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
+
+        Assert.False(diag.HasErrors);
+        Assert.False(diag.HasErrors);
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
+    }
+
+    [Theory]
+    [InlineData("0B01")]
+    [InlineData("0X12")]
+    [InlineData("0O12")]
+    public void Lexer_ReportsErrorIfLiteralPrefixIsInUppercase(string str)
     {
         Diagnostic diag = new();
         Lexer lexer = new(str, diag);

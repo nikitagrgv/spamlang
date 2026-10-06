@@ -320,7 +320,7 @@ public class Lexer
     {
         // Examples:
         // 123 - dec
-        // 0123 - oct
+        // 0o123 - oct
         // 0b0101 - bin
         // 0x12f - hex
         ReadOnlySpan<char> str = _code.AsSpan(_cursor);
