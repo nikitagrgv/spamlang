@@ -1208,6 +1208,7 @@ public class Sema
                 case TypeKind.AbstractNumber:
                 case TypeKind.SignedInteger:
                 case TypeKind.UnsignedInteger:
+                case TypeKind.Bool:
                     return true;
                 default:
                     return false;
