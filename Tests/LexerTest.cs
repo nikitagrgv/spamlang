@@ -87,7 +87,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.Equal(expected, tokens[0].Type);
         Assert.Equal(token, tokens[0].Value(code));
     }
@@ -102,7 +101,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.NotEmpty(tokens);
         Assert.Equal(TokenType.Eof, tokens.Last().Type);
     }
@@ -114,7 +112,6 @@ public class LexerTest
         Lexer lexer = new("", diag);
         List<Token> tokens = lexer.Run();
 
-        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
         Assert.Single(tokens);
         Assert.Equal(TokenType.Eof, tokens.Last().Type);
@@ -234,7 +231,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.Empty(diag.Entries);
 
         Assert.Equal(3, tokens.Count);
@@ -257,7 +253,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
     }
@@ -278,7 +273,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
     }
@@ -296,7 +290,6 @@ public class LexerTest
         Lexer lexer = new(str, diag);
         List<Token> tokens = lexer.Run();
 
-        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
@@ -333,7 +326,6 @@ public class LexerTest
         Lexer lexer = new(code, diag);
         List<Token> tokens = lexer.Run();
 
-        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
@@ -372,7 +364,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.LiteralFloat, tokens[0].Type);
     }
@@ -399,7 +390,6 @@ public class LexerTest
         Lexer lexer = new(code, diag);
         List<Token> tokens = lexer.Run();
 
-        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.LiteralBool, tokens[0].Type);
@@ -438,7 +428,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.Empty(diag.Entries);
 
         Assert.Equal(count + 1, tokens.Count); // + eof
@@ -467,7 +456,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.Identifier, tokens[0].Type);
     }
@@ -485,7 +473,6 @@ public class LexerTest
         Lexer lexer = new(code, diag);
         List<Token> tokens = lexer.Run();
 
-        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.Identifier, tokens[0].Type);
@@ -575,7 +562,6 @@ public class LexerTest
         List<Token> tokens = lexer.Run();
 
         Assert.False(diag.HasErrors);
-        Assert.False(diag.HasErrors);
         Assert.Equal(AllTokens.Length + 1, tokens.Count);
 
         for (int i = 0; i < AllTokens.Length; i++)
@@ -594,7 +580,6 @@ public class LexerTest
         Lexer lexer = new(code, diag);
         List<Token> tokens = lexer.Run();
 
-        Assert.False(diag.HasErrors);
         Assert.False(diag.HasErrors);
 
         int cur = 0;

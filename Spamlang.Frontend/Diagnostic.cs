@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Spamlang.Frontend;
 
 public enum DiagnosticSeverity
@@ -82,5 +84,22 @@ public class Diagnostic
     public void AddWarning(string message, Token token)
     {
         AddWarning(message, token.Position, token.Length, token.Line, token.Column);
+    }
+
+    public string PrettyString()
+    {
+        StringBuilder b = new();
+        for (int i = 0; i < _entries.Count; i++)
+        {
+            if (i != 0)
+            {
+                b.AppendLine();
+            }
+
+            DiagnosticEntry e = _entries[i];
+            b.Append(e.PrettyString());
+        }
+
+        return b.ToString();
     }
 }
