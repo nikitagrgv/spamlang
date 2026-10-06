@@ -1124,7 +1124,7 @@ public class Sema
         };
     }
 
-    private HIRExpr ToRValue(HIRExpr expr)
+    private static HIRExpr ToRValue(HIRExpr expr)
     {
         if (!expr.IsLValue || expr.Type == BuiltinType.Error)
         {
@@ -1140,7 +1140,7 @@ public class Sema
         };
     }
 
-    private SpamType? GetBinaryResultType(SpamType a, SpamType b, BinaryOp op)
+    private static SpamType? GetBinaryResultType(SpamType a, SpamType b, BinaryOp op)
     {
         Debug.Assert(a != BuiltinType.Error && b != BuiltinType.Error);
 
@@ -1160,7 +1160,7 @@ public class Sema
         }
     }
 
-    private SpamType? GetArithmeticOpResultType(SpamType a, SpamType b)
+    private static SpamType? GetArithmeticOpResultType(SpamType a, SpamType b)
     {
         bool CanUseArithmetic(TypeKind kind)
         {
@@ -1199,7 +1199,7 @@ public class Sema
         return null;
     }
 
-    private SpamType? GetBitOpResultType(SpamType a, SpamType b)
+    private static SpamType? GetBitOpResultType(SpamType a, SpamType b)
     {
         bool CanUseBitOp(TypeKind kind)
         {
@@ -1238,7 +1238,7 @@ public class Sema
         return null;
     }
 
-    private SpamType? GetLogicOpResultType(SpamType a, SpamType b)
+    private static SpamType? GetLogicOpResultType(SpamType a, SpamType b)
     {
         if (a == b && a == BuiltinType.Bool)
         {
@@ -1247,13 +1247,13 @@ public class Sema
         return null;
     }
 
-    private SpamType? GetComparisonOpResultType(SpamType a, SpamType b)
+    private static SpamType? GetComparisonOpResultType(SpamType a, SpamType b)
     {
         // TODO#
         return null;
     }
 
-    private bool CanUseUnary(SpamType type, UnaryOp op)
+    private static bool CanUseUnary(SpamType type, UnaryOp op)
     {
         // TODO: Put this info in type?
         TypeKind kind = type.Kind;
@@ -1280,7 +1280,7 @@ public class Sema
         }
     }
 
-    private bool CanImplicitlyCast(SpamType from, SpamType to)
+    private static bool CanImplicitlyCast(SpamType from, SpamType to)
     {
         Debug.Assert(from != to, "Must be different types!");
 
@@ -1349,7 +1349,7 @@ public class Sema
         return false;
     }
 
-    private bool CanExplicitlyCast(SpamType from, SpamType to)
+    private static bool CanExplicitlyCast(SpamType from, SpamType to)
     {
         Debug.Assert(from != to, "Must be different types!");
 
