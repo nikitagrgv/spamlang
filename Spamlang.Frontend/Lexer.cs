@@ -323,6 +323,7 @@ public class Lexer
         // 0o123 - oct
         // 0b0101 - bin
         // 0x12f - hex
+        // 0123 - forbidden! to prevent confusion with octal
         ReadOnlySpan<char> str = _code.AsSpan(_cursor);
 
         if (!char.IsAsciiDigit(str[0]))
