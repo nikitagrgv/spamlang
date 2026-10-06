@@ -1262,19 +1262,9 @@ public class Sema
             return null;
         }
 
-        if (a == b)
+        if (a == b || CanImplicitlyCast(b, a) || CanImplicitlyCast(a, b))
         {
-            return a;
-        }
-
-        if (CanImplicitlyCast(b, a))
-        {
-            return a;
-        }
-
-        if (CanImplicitlyCast(a, b))
-        {
-            return b;
+            return BuiltinType.Bool;
         }
 
         return null;
