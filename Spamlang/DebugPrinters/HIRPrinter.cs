@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using Spamlang.Frontend;
 
@@ -119,7 +120,7 @@ public class HIRPrinter
                 Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
                 break;
             case HIRExprFloatConst n:
-                Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
+                Console.WriteLine($"{fullPrefix} | Value = {n.Value.ToString("G", CultureInfo.InvariantCulture)}");
                 break;
             case HIRExprBoolConst n:
                 Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
