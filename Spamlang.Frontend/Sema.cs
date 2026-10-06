@@ -1249,7 +1249,40 @@ public class Sema
 
     private static SpamType? GetComparisonOpResultType(SpamType a, SpamType b)
     {
-        // TODO#
+        bool CanUseBitOp(TypeKind kind)
+        {
+            switch (kind)
+            {
+                case TypeKind.AbstractNumber:
+                case TypeKind.SignedInteger:
+                case TypeKind.UnsignedInteger:
+                case TypeKind.Bool:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        if (!CanUseBitOp(a.Kind) || !CanUseBitOp(b.Kind))
+        {
+            return null;
+        }
+
+        if (a == b)
+        {
+            return a;
+        }
+
+        if (CanImplicitlyCast(b, a))
+        {
+            return a;
+        }
+
+        if (CanImplicitlyCast(a, b))
+        {
+            return b;
+        }
+
         return null;
     }
 
