@@ -319,6 +319,8 @@ public class LexerTest
         Assert.Equal(str.Length, diag.Entries[0].Length);
     }
 
+    // Octal literals start with 0o
+    // Forbid c-like octal literals for safety
     [Theory]
     [InlineData("000")]
     [InlineData("01")]
@@ -326,9 +328,6 @@ public class LexerTest
     [InlineData("01234567")]
     public void Lexer_ReportsErrorIfLiteralStartsWith0(string str)
     {
-        // Octal literals start with 0o
-        // Forbid c-like octal literals for safety
-
         string code = str;
         Diagnostic diag = new();
         Lexer lexer = new(code, diag);
