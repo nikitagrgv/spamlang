@@ -63,7 +63,7 @@ fn demo_bool()
     let test_c = !test_a;
     let test_d = 5 == 6;
     let test_e = 5 >= 6;
-    let test_f = test_a && test_b || test_c && test_d;
+    let test_f = test_a && test_b || test_c && test_d || test_e;
     let test_g = (test_a & test_b) | test_c;
 }
 
