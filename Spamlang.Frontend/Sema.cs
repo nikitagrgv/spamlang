@@ -1162,6 +1162,7 @@ public class Sema
 
     private SpamType? GetArithmeticOpResultType(SpamType a, SpamType b)
     {
+        // TODO#
         if (!a.IsInteger() || !b.IsInteger())
         {
             return null;
@@ -1187,14 +1188,17 @@ public class Sema
 
     private SpamType? GetBitOpResultType(SpamType a, SpamType b)
     {
+        // TODO#
     }
 
     private SpamType? GetLogicpResultType(SpamType a, SpamType b)
     {
+        // TODO#
     }
 
     private SpamType? GetComparisonOpResultType(SpamType a, SpamType b)
     {
+        // TODO#
     }
 
 
