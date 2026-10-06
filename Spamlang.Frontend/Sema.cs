@@ -1148,17 +1148,20 @@ public class Sema
         switch (family)
         {
             case OpFamily.Arithmetic:
-                break;
+                return GetArithmeticOpResultType(a, b);
             case OpFamily.Bit:
-                break;
+                return GetBitOpResultType(a, b);
             case OpFamily.Logic:
-                break;
+                return GetLogicpResultType(a, b);
             case OpFamily.Comparison:
-                break;
+                return GetComparisonOpResultType(a, b);
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
 
+    private SpamType? GetArithmeticOpResultType(SpamType a, SpamType b)
+    {
         if (!a.IsInteger() || !b.IsInteger())
         {
             return null;
@@ -1181,6 +1184,19 @@ public class Sema
 
         return null;
     }
+
+    private SpamType? GetBitOpResultType(SpamType a, SpamType b)
+    {
+    }
+
+    private SpamType? GetLogicpResultType(SpamType a, SpamType b)
+    {
+    }
+
+    private SpamType? GetComparisonOpResultType(SpamType a, SpamType b)
+    {
+    }
+
 
     private bool CanUseUnary(SpamType type, UnaryOp op)
     {
