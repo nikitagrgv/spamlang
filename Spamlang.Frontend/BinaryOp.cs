@@ -27,8 +27,50 @@ public enum BinaryOp
     GreaterEqual,
 }
 
+public enum BinaryOpFamily
+{
+    Arithmetic,
+    Bit,
+    Logic,
+    Comparison,
+}
+
 public static partial class Utils
 {
+    public static BinaryOpFamily GetFamily(this BinaryOp op)
+    {
+        switch (op)
+        {
+            case BinaryOp.Plus:
+            case BinaryOp.Minus:
+            case BinaryOp.Mul:
+            case BinaryOp.Div:
+            case BinaryOp.Rem:
+                return BinaryOpFamily.Arithmetic;
+
+            case BinaryOp.BitAnd:
+            case BinaryOp.BitOr:
+            case BinaryOp.BitXor:
+            case BinaryOp.BitShiftLeft:
+            case BinaryOp.BitShiftRight:
+                return BinaryOpFamily.Bit;
+
+            case BinaryOp.LogicAnd:
+            case BinaryOp.LogicOr:
+                return BinaryOpFamily.Logic;
+
+            case BinaryOp.Equal:
+            case BinaryOp.NotEqual:
+            case BinaryOp.Less:
+            case BinaryOp.LessEqual:
+            case BinaryOp.Greater:
+            case BinaryOp.GreaterEqual:
+                return BinaryOpFamily.Comparison;
+
+            default: throw new UnreachableException();
+        }
+    }
+
     public static string AsString(this BinaryOp op)
     {
         return op switch
