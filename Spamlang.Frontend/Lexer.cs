@@ -371,6 +371,14 @@ public class Lexer
                 invalidReason ??= "Invalid radix letter";
             }
         }
+        else
+        {
+            pos = 1;
+            while (pos < str.Length && char.IsAsciiDigit(str[pos]))
+            {
+                pos++;
+            }
+        }
 
         // Word right after the number (e.g. 123spam) - consume the word and emit error
         while (pos < str.Length && IsWordPart(str[pos]))
