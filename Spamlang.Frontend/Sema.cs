@@ -1202,16 +1202,19 @@ public class Sema
     private SpamType? GetBitOpResultType(SpamType a, SpamType b)
     {
         // TODO#
+        return null;
     }
 
     private SpamType? GetLogicOpResultType(SpamType a, SpamType b)
     {
         // TODO#
+        return null;
     }
 
     private SpamType? GetComparisonOpResultType(SpamType a, SpamType b)
     {
         // TODO#
+        return null;
     }
 
     private bool CanUseUnary(SpamType type, UnaryOp op)
