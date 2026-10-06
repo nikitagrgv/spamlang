@@ -1201,7 +1201,39 @@ public class Sema
 
     private SpamType? GetBitOpResultType(SpamType a, SpamType b)
     {
-        // TODO#
+        bool CanUseBitOp(TypeKind kind)
+        {
+            switch (kind)
+            {
+                case TypeKind.AbstractNumber:
+                case TypeKind.SignedInteger:
+                case TypeKind.UnsignedInteger:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        if (!CanUseBitOp(a.Kind) || !CanUseBitOp(b.Kind))
+        {
+            return null;
+        }
+
+        if (a == b)
+        {
+            return a;
+        }
+
+        if (CanImplicitlyCast(b, a))
+        {
+            return a;
+        }
+
+        if (CanImplicitlyCast(a, b))
+        {
+            return b;
+        }
+
         return null;
     }
 
@@ -1235,7 +1267,8 @@ public class Sema
             case UnaryOp.Not:
                 return kind == TypeKind.Bool;
             case UnaryOp.BitNot:
-                return kind == TypeKind.AbstractNumber ||
+                return kind == TypeKind.Bool ||
+                       kind == TypeKind.AbstractNumber ||
                        kind == TypeKind.SignedInteger ||
                        kind == TypeKind.UnsignedInteger;
             default:
