@@ -1203,7 +1203,6 @@ public class Sema
         // TODO#
     }
 
-
     private bool CanUseUnary(SpamType type, UnaryOp op)
     {
         // TODO: Put this info in type?
