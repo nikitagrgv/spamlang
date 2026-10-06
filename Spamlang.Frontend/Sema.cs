@@ -513,7 +513,7 @@ public class Sema
             resultType = GetBinaryResultType(leftType, rightType, expr.Op);
             if (resultType == null)
             {
-                Error($"Cannot use \"{TokenUtils.AsString(expr.Op)}\" on \"{leftType}\" and \"{rightType}\"", expr);
+                Error($"Cannot use \"{expr.Op.AsString()}\" on \"{leftType}\" and \"{rightType}\"", expr);
                 resultType = BuiltinType.Error;
             }
         }

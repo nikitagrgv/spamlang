@@ -12,7 +12,7 @@ public enum UnaryOp
     BitNot,
 }
 
-public static partial class TokenUtils
+public static partial class Utils
 {
     public static string AsString(this UnaryOp op)
     {

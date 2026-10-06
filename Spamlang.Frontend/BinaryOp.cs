@@ -27,7 +27,7 @@ public enum BinaryOp
     GreaterEqual,
 }
 
-public static partial class TokenUtils
+public static partial class Utils
 {
     public static string AsString(this BinaryOp op)
     {

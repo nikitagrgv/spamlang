@@ -599,7 +599,7 @@ public class Parser
         while (true)
         {
             Token token = Peek();
-            BinaryOp? op = TokenUtils.ToBinaryOp(token.Type);
+            BinaryOp? op = Utils.ToBinaryOp(token.Type);
             if (op == null)
             {
                 break;
@@ -660,7 +660,7 @@ public class Parser
         int begin = _cursor;
 
         TokenType type = Peek().Type;
-        UnaryOp? op = TokenUtils.ToUnaryOp(type);
+        UnaryOp? op = Utils.ToUnaryOp(type);
         if (op == null)
         {
             return ParsePostfix();

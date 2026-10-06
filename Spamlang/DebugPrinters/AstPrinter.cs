@@ -167,14 +167,14 @@ public class AstPrinter
             case ExprBinary binaryExpr:
                 ret.Append(PrettyExpr(binaryExpr.Left));
                 ret.Append(' ');
-                ret.Append(TokenUtils.AsString(binaryExpr.Op));
+                ret.Append(binaryExpr.Op.AsString());
                 ret.Append(' ');
                 ret.Append(PrettyExpr(binaryExpr.Right));
                 break;
             case ExprBoolConst exprBoolConst:
                 return TokenValue(exprBoolConst.LiteralToken);
             case ExprUnary unaryExpr:
-                ret.Append(TokenUtils.AsString(unaryExpr.Op));
+                ret.Append(unaryExpr.Op.AsString());
                 ret.Append(PrettyExpr(unaryExpr.Operand));
                 break;
             case ExprCall exprCall:

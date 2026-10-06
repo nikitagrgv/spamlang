@@ -142,12 +142,12 @@ public class HIRPrinter
             case HIRExprBinary e:
                 ret.Append(PrettyExpr(e.Left));
                 ret.Append(' ');
-                ret.Append(TokenUtils.AsString(e.Op));
+                ret.Append(e.Op.AsString());
                 ret.Append(' ');
                 ret.Append(PrettyExpr(e.Right));
                 break;
             case HIRExprUnary e:
-                ret.Append(TokenUtils.AsString(e.Op));
+                ret.Append(e.Op.AsString());
                 ret.Append(PrettyExpr(e.Operand));
                 break;
             case HIRExprZeroInit:
