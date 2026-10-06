@@ -331,44 +331,47 @@ public class Lexer
             return false;
         }
 
+        string? invalidReason = null;
+
         int pos = 0;
-        bool hex = false;
-        bool binary = false;
-        if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+        char? radixCh = null;
+        if (str.StartsWith('0') && str.Length > 1)
         {
-            hex = true;
+            radixCh = str[1];
             pos = 2;
-            while (pos < str.Length && char.IsAsciiHexDigit(str[pos]))
+            if (radixCh == 'x' || radixCh == 'X')
             {
-                pos++;
+                while (pos < str.Length && char.IsAsciiHexDigit(str[pos]))
+                {
+                    pos++;
+                }
             }
-        }
-        else if (str.StartsWith("0b", StringComparison.OrdinalIgnoreCase))
-        {
-            binary = true;
-            pos = 2;
-            while (pos < str.Length && (str[pos] == '0' || str[pos] == '1'))
+            else if (radixCh == 'b' || radixCh == 'B')
             {
-                pos++;
+                while (pos < str.Length && (str[pos] == '0' || str[pos] == '1'))
+                {
+                    pos++;
+                }
             }
-        }
-        else if (str[0] == '0')
-        {
-            pos = 1;
-            while (pos < str.Length && (str[pos] >= '0' && str[pos] <= '7'))
+            else if (radixCh == 'o' || radixCh == 'O')
             {
-                pos++;
+                while (pos < str.Length && (str[pos] >= '0' && str[pos] <= '7'))
+                {
+                    pos++;
+                }
             }
-        }
-        else
-        {
-            while (pos < str.Length && char.IsAsciiDigit(str[pos]))
+            else if (char.IsAsciiDigit(radixCh.Value))
             {
-                pos++;
+                radixCh = null;
+                invalidReason ??= "C-like octal literals are forbidden, use '0o' prefix instead";
+            }
+            else
+            {
+                radixCh = null;
+                invalidReason ??= "Invalid radix letter";
             }
         }
 
-        string? invalidReason = null;
         // Word right after the number (e.g. 123spam) - consume the word and emit error
         while (pos < str.Length && IsWordPart(str[pos]))
         {
@@ -376,13 +379,14 @@ public class Lexer
             pos++;
         }
 
-        if (hex && pos <= 2)
+        if (radixCh != null && !char.IsAsciiLetterLower(radixCh.Value))
         {
-            invalidReason ??= "Missing digits after '0x'";
+            invalidReason ??= "Radix letter must be lowercase";
         }
-        else if (binary && pos <= 2)
+
+        if (radixCh != null && pos <= 2)
         {
-            invalidReason ??= "Missing digits after '0b'";
+            invalidReason ??= $"Missing digits after '0{radixCh.Value}'";
         }
 
         int len = pos;
