@@ -1271,15 +1271,26 @@ public class Sema
 
         if (!CanUseComparisonOp(a.Kind) || !CanUseComparisonOp(b.Kind))
         {
-            return null;
+            commonType = null;
         }
-
-        if (a == b || CanImplicitlyCast(b, a) || CanImplicitlyCast(a, b))
+        else if (a == b)
         {
-            return BuiltinType.Bool;
+            commonType = a;
+        }
+        else if (CanImplicitlyCast(b, a))
+        {
+            commonType = a;
+        }
+        else if (CanImplicitlyCast(a, b))
+        {
+            commonType = b;
+        }
+        else
+        {
+            commonType = null;
         }
 
-        return null;
+        return BuiltinType.Bool;
     }
 
     private static bool CanUseUnary(SpamType type, UnaryOp op)
