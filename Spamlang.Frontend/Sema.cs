@@ -1159,7 +1159,7 @@ public class Sema
         }
     }
 
-    private static SpamType? wGetArithmeticOpResultType(SpamType a, SpamType b, out SpamType? commonType)
+    private static SpamType? GetArithmeticOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
         bool CanUseArithmetic(TypeKind kind)
         {
