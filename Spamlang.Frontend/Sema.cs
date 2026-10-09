@@ -1177,25 +1177,26 @@ public class Sema
 
         if (!CanUseArithmetic(a.Kind) || !CanUseArithmetic(b.Kind))
         {
-            return null;
+            commonType = null;
         }
-
-        if (a == b)
+        else if (a == b)
         {
-            return a;
+            commonType = a;
         }
-
-        if (CanImplicitlyCast(b, a))
+        else if (CanImplicitlyCast(b, a))
         {
-            return a;
+            commonType = a;
         }
-
-        if (CanImplicitlyCast(a, b))
+        else if (CanImplicitlyCast(a, b))
         {
-            return b;
+            commonType = b;
+        }
+        else
+        {
+            commonType = null;
         }
 
-        return null;
+        return commonType;
     }
 
     private static SpamType? GetBitOpResultType(SpamType a, SpamType b, out SpamType? commonType)
@@ -1216,35 +1217,40 @@ public class Sema
 
         if (!CanUseBitOp(a.Kind) || !CanUseBitOp(b.Kind))
         {
-            return null;
+            commonType = null;
         }
-
-        if (a == b)
+        else if (a == b)
         {
-            return a;
+            commonType = a;
         }
-
-        if (CanImplicitlyCast(b, a))
+        else if (CanImplicitlyCast(b, a))
         {
-            return a;
+            commonType = a;
         }
-
-        if (CanImplicitlyCast(a, b))
+        else if (CanImplicitlyCast(a, b))
         {
-            return b;
+            commonType = b;
+        }
+        else
+        {
+            commonType = null;
         }
 
-        return null;
+        return commonType;
     }
 
     private static SpamType? GetLogicOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
         if (a == b && a == BuiltinType.Bool)
         {
-            return a;
+            commonType = a;
+        }
+        else
+        {
+            commonType = null;
         }
 
-        return null;
+        return commonType;
     }
 
     private static SpamType? GetComparisonOpResultType(SpamType a, SpamType b, out SpamType? commonType)
