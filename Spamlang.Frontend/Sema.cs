@@ -1161,7 +1161,7 @@ public class Sema
 
     private static SpamType? GetArithmeticOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
-        bool CanUseArithmetic(TypeKind kind)
+        bool CanUseOp(TypeKind kind)
         {
             switch (kind)
             {
@@ -1175,33 +1175,13 @@ public class Sema
             }
         }
 
-        if (!CanUseArithmetic(a.Kind) || !CanUseArithmetic(b.Kind))
-        {
-            commonType = null;
-        }
-        else if (a == b)
-        {
-            commonType = a;
-        }
-        else if (CanImplicitlyCast(b, a))
-        {
-            commonType = a;
-        }
-        else if (CanImplicitlyCast(a, b))
-        {
-            commonType = b;
-        }
-        else
-        {
-            commonType = null;
-        }
-
+        commonType = TryGetBinaryOpCommonType(a, b, CanUseOp);
         return commonType;
     }
 
     private static SpamType? GetBitOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
-        bool CanUseBitOp(TypeKind kind)
+        bool CanUseOp(TypeKind kind)
         {
             switch (kind)
             {
@@ -1215,27 +1195,7 @@ public class Sema
             }
         }
 
-        if (!CanUseBitOp(a.Kind) || !CanUseBitOp(b.Kind))
-        {
-            commonType = null;
-        }
-        else if (a == b)
-        {
-            commonType = a;
-        }
-        else if (CanImplicitlyCast(b, a))
-        {
-            commonType = a;
-        }
-        else if (CanImplicitlyCast(a, b))
-        {
-            commonType = b;
-        }
-        else
-        {
-            commonType = null;
-        }
-
+        commonType = TryGetBinaryOpCommonType(a, b, CanUseOp);
         return commonType;
     }
 
@@ -1255,7 +1215,7 @@ public class Sema
 
     private static SpamType? GetComparisonOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
-        bool CanUseComparisonOp(TypeKind kind)
+        bool CanUseOp(TypeKind kind)
         {
             switch (kind)
             {
@@ -1269,28 +1229,33 @@ public class Sema
             }
         }
 
-        if (!CanUseComparisonOp(a.Kind) || !CanUseComparisonOp(b.Kind))
+        commonType = TryGetBinaryOpCommonType(a, b, CanUseOp);
+        return BuiltinType.Bool;
+    }
+
+    private static SpamType? TryGetBinaryOpCommonType(SpamType a, SpamType b, Func<TypeKind, bool> canUseOp)
+    {
+        if (!canUseOp(a.Kind) || !canUseOp(b.Kind))
         {
-            commonType = null;
-        }
-        else if (a == b)
-        {
-            commonType = a;
-        }
-        else if (CanImplicitlyCast(b, a))
-        {
-            commonType = a;
-        }
-        else if (CanImplicitlyCast(a, b))
-        {
-            commonType = b;
-        }
-        else
-        {
-            commonType = null;
+            return null;
         }
 
-        return BuiltinType.Bool;
+        if (a == b)
+        {
+            return a;
+        }
+
+        if (CanImplicitlyCast(b, a))
+        {
+            return a;
+        }
+
+        if (CanImplicitlyCast(a, b))
+        {
+            return b;
+        }
+
+        return null;
     }
 
     private static bool CanUseUnary(SpamType type, UnaryOp op)
