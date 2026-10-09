@@ -504,13 +504,15 @@ public class Sema
         SpamType rightType = right.Type;
 
         SpamType? resultType;
+        SpamType? commonType;
         if (leftType == BuiltinType.Error || rightType == BuiltinType.Error)
         {
             resultType = BuiltinType.Error;
+            commonType = null;
         }
         else
         {
-            resultType = GetBinaryResultType(leftType, rightType, expr.Op);
+            resultType = GetBinaryResultType(leftType, rightType, expr.Op, out commonType);
             if (resultType == null)
             {
                 Error($"Cannot use \"{expr.Op.AsString()}\" on \"{leftType}\" and \"{rightType}\"", expr);
@@ -518,8 +520,12 @@ public class Sema
             }
         }
 
-        left = Adapt(left, resultType);
-        right = Adapt(right, resultType);
+        if (commonType != null)
+        {
+            left = Adapt(left, commonType);
+            right = Adapt(right, commonType);
+        }
+
         return new HIRExprBinary
         {
             Left = left,
@@ -1133,7 +1139,7 @@ public class Sema
         };
     }
 
-    private static SpamType? GetBinaryResultType(SpamType a, SpamType b, BinaryOp op)
+    private static SpamType? GetBinaryResultType(SpamType a, SpamType b, BinaryOp op, out SpamType? commonType)
     {
         Debug.Assert(a != BuiltinType.Error && b != BuiltinType.Error);
 
@@ -1141,19 +1147,19 @@ public class Sema
         switch (family)
         {
             case OpFamily.Arithmetic:
-                return GetArithmeticOpResultType(a, b);
+                return GetArithmeticOpResultType(a, b, out commonType);
             case OpFamily.Bit:
-                return GetBitOpResultType(a, b);
+                return GetBitOpResultType(a, b, out commonType);
             case OpFamily.Logic:
-                return GetLogicOpResultType(a, b);
+                return GetLogicOpResultType(a, b, out commonType);
             case OpFamily.Comparison:
-                return GetComparisonOpResultType(a, b);
+                return GetComparisonOpResultType(a, b, out commonType);
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
-    private static SpamType? GetArithmeticOpResultType(SpamType a, SpamType b)
+    private static SpamType? wGetArithmeticOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
         bool CanUseArithmetic(TypeKind kind)
         {
@@ -1192,7 +1198,7 @@ public class Sema
         return null;
     }
 
-    private static SpamType? GetBitOpResultType(SpamType a, SpamType b)
+    private static SpamType? GetBitOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
         bool CanUseBitOp(TypeKind kind)
         {
@@ -1231,7 +1237,7 @@ public class Sema
         return null;
     }
 
-    private static SpamType? GetLogicOpResultType(SpamType a, SpamType b)
+    private static SpamType? GetLogicOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
         if (a == b && a == BuiltinType.Bool)
         {
@@ -1241,7 +1247,7 @@ public class Sema
         return null;
     }
 
-    private static SpamType? GetComparisonOpResultType(SpamType a, SpamType b)
+    private static SpamType? GetComparisonOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
         bool CanUseBitOp(TypeKind kind)
         {
