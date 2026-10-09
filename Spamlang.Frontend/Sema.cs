@@ -1146,14 +1146,14 @@ public class Sema
         OpFamily family = op.GetFamily();
         switch (family)
         {
-            case OpFamily.Comparison:
-                return GetComparisonOpResultType(a, b, out commonType);
+            case OpFamily.Logic:
+                return GetLogicOpResultType(a, b, out commonType);
             case OpFamily.Arithmetic:
                 return GetArithmeticOpResultType(a, b, out commonType);
             case OpFamily.Bit:
                 return GetBitOpResultType(a, b, out commonType);
-            case OpFamily.Logic:
-                return GetLogicOpResultType(a, b, out commonType);
+            case OpFamily.Comparison:
+                return GetComparisonOpResultType(a, b, out commonType);
             default:
                 throw new ArgumentOutOfRangeException();
         }
