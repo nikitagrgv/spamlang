@@ -1146,17 +1146,31 @@ public class Sema
         OpFamily family = op.GetFamily();
         switch (family)
         {
+            case OpFamily.Comparison:
+                return GetComparisonOpResultType(a, b, out commonType);
             case OpFamily.Arithmetic:
                 return GetArithmeticOpResultType(a, b, out commonType);
             case OpFamily.Bit:
                 return GetBitOpResultType(a, b, out commonType);
             case OpFamily.Logic:
                 return GetLogicOpResultType(a, b, out commonType);
-            case OpFamily.Comparison:
-                return GetComparisonOpResultType(a, b, out commonType);
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private static SpamType? GetLogicOpResultType(SpamType a, SpamType b, out SpamType? commonType)
+    {
+        if (a == b && a == BuiltinType.Bool)
+        {
+            commonType = a;
+        }
+        else
+        {
+            commonType = null;
+        }
+
+        return commonType;
     }
 
     private static SpamType? GetArithmeticOpResultType(SpamType a, SpamType b, out SpamType? commonType)
@@ -1196,20 +1210,6 @@ public class Sema
         }
 
         commonType = TryGetBinaryOpCommonType(a, b, CanUseOp);
-        return commonType;
-    }
-
-    private static SpamType? GetLogicOpResultType(SpamType a, SpamType b, out SpamType? commonType)
-    {
-        if (a == b && a == BuiltinType.Bool)
-        {
-            commonType = a;
-        }
-        else
-        {
-            commonType = null;
-        }
-
         return commonType;
     }
 
