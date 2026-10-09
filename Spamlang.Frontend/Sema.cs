@@ -1255,7 +1255,7 @@ public class Sema
 
     private static SpamType? GetComparisonOpResultType(SpamType a, SpamType b, out SpamType? commonType)
     {
-        bool CanUseBitOp(TypeKind kind)
+        bool CanUseComparisonOp(TypeKind kind)
         {
             switch (kind)
             {
@@ -1269,7 +1269,7 @@ public class Sema
             }
         }
 
-        if (!CanUseBitOp(a.Kind) || !CanUseBitOp(b.Kind))
+        if (!CanUseComparisonOp(a.Kind) || !CanUseComparisonOp(b.Kind))
         {
             return null;
         }
