@@ -1134,28 +1134,20 @@ public class Sema
         {
             case HIRExprBinary e:
                 break;
-            case HIRExprBoolConst e:
-                break;
-            case HIRExprCall e:
-                break;
-            case HIRExprCast e:
-                break;
-            case HIRExprError e:
-                break;
             case HIRExprFloatConst e:
-                break;
-            case HIRExprFuncRef e:
                 break;
             case HIRExprIntConst e:
                 break;
-            case HIRExprLoad e:
-                break;
-            case HIRExprLocalRef e:
-                break;
             case HIRExprUnary e:
                 break;
-            case HIRExprZeroInit e:
-                break;
+
+            case HIRExprCast:
+            case HIRExprLoad:
+            case HIRExprZeroInit:
+            case HIRExprBoolConst:
+            case HIRExprLocalRef:
+            case HIRExprFuncRef:
+                return expr;
             default:
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
