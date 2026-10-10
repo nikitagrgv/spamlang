@@ -1235,8 +1235,48 @@ public class Sema
 
     private bool IsValidValueForType(Int128 value, SpamType type)
     {
-    }
+        if (type == BuiltinType.I8)
+        {
+            return value >= -128 && value <= 127;
+        }
 
+        if (type == BuiltinType.I16)
+        {
+            return value >= Int16.MinValue && value <= Int16.MaxValue;
+        }
+
+        if (type == BuiltinType.I32)
+        {
+            return value >= Int32.MinValue && value <= Int32.MaxValue;
+        }
+
+        if (type == BuiltinType.I64)
+        {
+            return value >= Int64.MinValue && value <= Int64.MaxValue;
+        }
+
+        if (type == BuiltinType.U8)
+        {
+            return value >= 0 && value <= 255;
+        }
+
+        if (type == BuiltinType.U16)
+        {
+            return value >= UInt16.MinValue && value <= UInt16.MaxValue;
+        }
+
+        if (type == BuiltinType.U32)
+        {
+            return value >= UInt32.MinValue && value <= UInt32.MaxValue;
+        }
+
+        if (type == BuiltinType.U64)
+        {
+            return value >= UInt64.MinValue && value <= UInt64.MaxValue;
+        }
+
+        return false;
+    }
 
     private static HIRExpr ToRValue(HIRExpr expr)
     {
