@@ -1159,12 +1159,13 @@ public class Sema
             {
                 if (e.Type.Kind == TypeKind.AbstractNumber)
                 {
-                    Error($"Value \"{e.Value}\" cannot be used as type \"{targetType}\"", e.Syntax);
                     return expr;
                 }
 
                 if (!IsValidValueForType(e.Value, targetType))
                 {
+                    Error($"Value \"{e.Value}\" cannot be used as type \"{targetType}\"", e.Syntax);
+                    return expr;
                 }
 
                 HIRExprIntConst newExpr = new()
