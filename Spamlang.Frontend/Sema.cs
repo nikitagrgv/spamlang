@@ -1134,8 +1134,18 @@ public class Sema
         switch (expr)
         {
             case HIRExprFloatConst e:
+                if (e.Type.Kind == TypeKind.AbstractNumber)
+                {
+                    return expr;
+                }
+
                 break;
             case HIRExprIntConst e:
+                if (e.Type.Kind == TypeKind.AbstractNumber)
+                {
+                    return expr;
+                }
+
                 break;
             case HIRExprBinary e:
             {
