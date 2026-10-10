@@ -1103,6 +1103,8 @@ public class Sema
             return expr;
         }
 
+        Debug.Assert(targetType != BuiltinType.AbstractNumber);
+
         if (!CanImplicitlyCast(type, targetType))
         {
             Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr.Syntax);
