@@ -513,7 +513,7 @@ public class Sema
         else
         {
             resultType = GetBinaryResultType(leftType, rightType, expr.Op, out commonType);
-            if (resultType == null)
+            if (commonType == null || resultType == null)
             {
                 Error($"Cannot use \"{expr.Op.AsString()}\" on \"{leftType}\" and \"{rightType}\"", expr);
                 resultType = BuiltinType.Error;
