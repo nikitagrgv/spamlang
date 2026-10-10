@@ -1132,11 +1132,11 @@ public class Sema
     {
         switch (expr)
         {
-            case HIRExprBinary e:
-                break;
             case HIRExprFloatConst e:
                 break;
             case HIRExprIntConst e:
+                break;
+            case HIRExprBinary e:
                 break;
             case HIRExprUnary e:
                 break;
