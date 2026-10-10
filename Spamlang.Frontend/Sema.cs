@@ -1105,6 +1105,8 @@ public class Sema
 
         Debug.Assert(targetType != BuiltinType.AbstractNumber);
 
+        expr = ResolveAbstractNumbers(expr, targetType);
+
         if (!CanImplicitlyCast(type, targetType))
         {
             Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr.Syntax);
@@ -1124,6 +1126,39 @@ public class Sema
             Syntax = expr.Syntax,
             IsSynthesized = true,
         };
+    }
+
+    private HIRExpr ResolveAbstractNumbers(HIRExpr expr, SpamType targetType)
+    {
+        switch (expr)
+        {
+            case HIRExprBinary e:
+                break;
+            case HIRExprBoolConst e:
+                break;
+            case HIRExprCall e:
+                break;
+            case HIRExprCast e:
+                break;
+            case HIRExprError e:
+                break;
+            case HIRExprFloatConst e:
+                break;
+            case HIRExprFuncRef e:
+                break;
+            case HIRExprIntConst e:
+                break;
+            case HIRExprLoad e:
+                break;
+            case HIRExprLocalRef e:
+                break;
+            case HIRExprUnary e:
+                break;
+            case HIRExprZeroInit e:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(expr));
+        }
     }
 
     private static HIRExpr ToRValue(HIRExpr expr)
