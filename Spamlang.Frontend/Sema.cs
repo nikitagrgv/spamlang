@@ -1230,14 +1230,15 @@ public class Sema
 
     private bool IsValidValueForType(double value, SpamType type)
     {
+        // TODO: Allow nans and infinities?
         if (type == BuiltinType.F32)
         {
-            return !double.IsFinite(value) || (value <= float.MaxValue && value >= float.MinValue);
+            return value <= float.MaxValue && value >= float.MinValue;
         }
 
         if (type == BuiltinType.F64)
         {
-            return !double.IsFinite(value) || (value <= double.MaxValue && value >= double.MinValue);
+            return value <= double.MaxValue && value >= double.MinValue;
         }
 
         return true;
