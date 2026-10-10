@@ -1230,7 +1230,17 @@ public class Sema
 
     private bool IsValidValueForType(double value, SpamType type)
     {
-        return type.Kind == TypeKind.Float;
+        if (type == BuiltinType.F32)
+        {
+            return !double.IsFinite(value) || (value <= float.MaxValue && value >= float.MinValue);
+        }
+
+        if (type == BuiltinType.F64)
+        {
+            return !double.IsFinite(value) || (value <= double.MaxValue && value >= double.MinValue);
+        }
+
+        return true;
     }
 
     private bool IsValidValueForType(Int128 value, SpamType type)
