@@ -1230,6 +1230,7 @@ public class Sema
 
     private bool IsValidValueForType(double value, SpamType type)
     {
+        return type.Kind == TypeKind.Float;
     }
 
     private bool IsValidValueForType(Int128 value, SpamType type)
