@@ -1134,19 +1134,48 @@ public class Sema
         switch (expr)
         {
             case HIRExprFloatConst e:
+            {
                 if (e.Type.Kind == TypeKind.AbstractNumber)
                 {
                     return expr;
                 }
 
-                break;
+                if (!IsValidValueForType(e.Value, targetType))
+                {
+                    Error($"Value \"{e.Value}\" cannot be used as type \"{targetType}\"", e.Syntax);
+                    return expr;
+                }
+
+                HIRExprFloatConst newExpr = new()
+                {
+                    Value = e.Value,
+                    Syntax = e.Syntax,
+                    IsSynthesized = true,
+                    Type = targetType,
+                };
+                return newExpr;
+            }
             case HIRExprIntConst e:
+            {
                 if (e.Type.Kind == TypeKind.AbstractNumber)
                 {
+                    Error($"Value \"{e.Value}\" cannot be used as type \"{targetType}\"", e.Syntax);
                     return expr;
                 }
 
-                break;
+                if (!IsValidValueForType(e.Value, targetType))
+                {
+                }
+
+                HIRExprIntConst newExpr = new()
+                {
+                    Value = e.Value,
+                    Syntax = e.Syntax,
+                    IsSynthesized = true,
+                    Type = targetType,
+                };
+                return newExpr;
+            }
             case HIRExprBinary e:
             {
                 HIRExpr left = Adapt(e.Left, targetType);
@@ -1197,6 +1226,15 @@ public class Sema
                 throw new ArgumentOutOfRangeException(nameof(expr));
         }
     }
+
+    private bool IsValidValueForType(double value, SpamType type)
+    {
+    }
+
+    private bool IsValidValueForType(Int128 value, SpamType type)
+    {
+    }
+
 
     private static HIRExpr ToRValue(HIRExpr expr)
     {
