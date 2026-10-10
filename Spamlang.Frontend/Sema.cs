@@ -1267,12 +1267,12 @@ public class Sema
             case UnaryOp.Plus:
                 return kind == TypeKind.AbstractNumber ||
                        kind == TypeKind.Float ||
-                       kind == TypeKind.SignedInteger;
+                       kind == TypeKind.SignedInteger ||
+                       kind == TypeKind.UnsignedInteger;
             case UnaryOp.Minus:
                 return kind == TypeKind.AbstractNumber ||
                        kind == TypeKind.Float ||
-                       kind == TypeKind.SignedInteger ||
-                       kind == TypeKind.UnsignedInteger;
+                       kind == TypeKind.SignedInteger;
             case UnaryOp.Not:
                 return kind == TypeKind.Bool;
             case UnaryOp.BitNot:
