@@ -1130,6 +1130,7 @@ public class Sema
 
     private HIRExpr ResolveAbstractNumbers(HIRExpr expr, SpamType targetType)
     {
+        Debug.Assert(targetType.Kind != TypeKind.AbstractNumber);
         switch (expr)
         {
             case HIRExprFloatConst e:
@@ -1137,10 +1138,44 @@ public class Sema
             case HIRExprIntConst e:
                 break;
             case HIRExprBinary e:
-                break;
-            case HIRExprUnary e:
-                break;
+            {
+                HIRExpr left = Adapt(e.Left, targetType);
+                HIRExpr right = Adapt(e.Right, targetType);
+                if (left == e.Left && right == e.Right)
+                {
+                    return expr;
+                }
 
+                HIRExprBinary newExpr = new()
+                {
+                    Left = left,
+                    Right = right,
+                    Op = e.Op,
+                    Type = targetType,
+                    Syntax = expr.Syntax,
+                    IsSynthesized = true,
+                };
+                return newExpr;
+            }
+
+            case HIRExprUnary e:
+            {
+                HIRExpr operand = Adapt(e.Operand, targetType);
+                if (operand == e.Operand)
+                {
+                    return expr;
+                }
+
+                HIRExprUnary newExpr = new()
+                {
+                    Operand = operand,
+                    Op = e.Op,
+                    Type = targetType,
+                    Syntax = expr.Syntax,
+                    IsSynthesized = true,
+                };
+                return newExpr;
+            }
             case HIRExprCast:
             case HIRExprLoad:
             case HIRExprZeroInit:
