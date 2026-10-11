@@ -1135,7 +1135,7 @@ public class Sema
         {
             case HIRExprFloatConst e:
             {
-                if (e.Type.Kind == TypeKind.AbstractNumber)
+                if (e.Type.Kind != TypeKind.AbstractNumber)
                 {
                     return expr;
                 }
@@ -1157,7 +1157,7 @@ public class Sema
             }
             case HIRExprIntConst e:
             {
-                if (e.Type.Kind == TypeKind.AbstractNumber)
+                if (e.Type.Kind != TypeKind.AbstractNumber)
                 {
                     return expr;
                 }
