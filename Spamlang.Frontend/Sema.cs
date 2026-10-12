@@ -1143,17 +1143,11 @@ public class Sema
 
         if (left.Type == BuiltinType.AbstractFloat || right.Type == BuiltinType.AbstractFloat)
         {
-            double leftValue = GetFloatValue(left);
-            double rightValue = GetFloatValue(right);
-            return ApplyBinaryOp(leftValue, rightValue, op);
+            return ApplyBinaryOp(GetFloatValue(left), GetFloatValue(right), op);
         }
-        else
-        {
-            Debug.Assert(left.Type == BuiltinType.AbstractInt && right.Type == BuiltinType.AbstractInt);
-            Int128 leftValue = GetIntValue(left);
-            Int128 rightValue = GetIntValue(right);
-            return ApplyBinaryOp(leftValue, rightValue, op);
-        }
+
+        Debug.Assert(left.Type == BuiltinType.AbstractInt && right.Type == BuiltinType.AbstractInt);
+        return ApplyBinaryOp(GetIntValue(left), GetIntValue(right), op);
     }
 
     private static double GetFloatValue(HIRExpr expr)
