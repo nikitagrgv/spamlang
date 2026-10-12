@@ -1643,6 +1643,7 @@ public class Sema
                 case TypeKind.AbstractNumber:
                 case TypeKind.SignedInteger:
                 case TypeKind.UnsignedInteger:
+                case TypeKind.Float:
                 case TypeKind.Bool:
                     return true;
                 default:
