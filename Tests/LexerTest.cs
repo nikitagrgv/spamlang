@@ -316,6 +316,8 @@ public class LexerTest
     [Theory]
     [InlineData("123ab")]
     [InlineData("018")]
+    [InlineData("0a")]
+    [InlineData("0a0")]
     [InlineData("0xfg")]
     public void Lexer_ReportsErrorForInvalidIntLiteral(string str)
     {
