@@ -50,7 +50,8 @@ public sealed class BuiltinType : SpamType
 
     public static readonly BuiltinType Ptr = new(TypeKind.OpaquePtr, "ptr", 8, 8);
 
-    public static readonly BuiltinType AbstractNumber = new(TypeKind.AbstractNumber, "abstract_number", 0, 1);
+    public static readonly BuiltinType AbstractInt = new(TypeKind.AbstractNumber, "abstract_number", 0, 1);
+    public static readonly BuiltinType AbstractFloat = new(TypeKind.AbstractNumber, "abstract_number", 0, 1);
 
     public static readonly BuiltinType I8 = new(TypeKind.SignedInteger, "i8", 1, 1);
     public static readonly BuiltinType I16 = new(TypeKind.SignedInteger, "i16", 2, 2);

@@ -493,7 +493,7 @@ public class Sema
         }
     }
 
-    private HIRExprBinary VisitExprBinary(ExprBinary expr)
+    private HIRExpr VisitExprBinary(ExprBinary expr)
     {
         HIRExpr left = VisitExpr(expr.Left);
         HIRExpr right = VisitExpr(expr.Right);
@@ -503,6 +503,12 @@ public class Sema
 
         SpamType leftType = left.Type;
         SpamType rightType = right.Type;
+
+        HIRExpr? folded = TryConstFold(left, right,);
+        if (folded != null)
+        {
+            return folded;
+        }
 
         SpamType? resultType;
         SpamType? commonType;
@@ -808,7 +814,7 @@ public class Sema
         return new HIRExprIntConst
         {
             Value = value,
-            Type = BuiltinType.AbstractNumber,
+            Type = BuiltinType.AbstractInt,
             Syntax = expr,
             IsSynthesized = false,
         };
@@ -883,7 +889,7 @@ public class Sema
         return new HIRExprFloatConst
         {
             Value = value,
-            Type = BuiltinType.AbstractNumber,
+            Type = BuiltinType.AbstractFloat,
             Syntax = expr,
             IsSynthesized = false,
         };
@@ -1103,7 +1109,7 @@ public class Sema
             return expr;
         }
 
-        Debug.Assert(targetType != BuiltinType.AbstractNumber);
+        Debug.Assert(targetType.Kind != TypeKind.AbstractNumber);
 
         if (!CanImplicitlyCast(type, targetType))
         {
