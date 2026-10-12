@@ -1105,8 +1105,6 @@ public class Sema
 
         Debug.Assert(targetType != BuiltinType.AbstractNumber);
 
-        expr = ResolveAbstractNumbers(expr, targetType);
-
         if (!CanImplicitlyCast(type, targetType))
         {
             Error($"Cannot implicitly cast \"{type}\" to \"{targetType}\"", expr.Syntax);
