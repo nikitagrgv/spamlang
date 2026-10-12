@@ -1294,10 +1294,10 @@ public class Sema
                     intResult = checked(left ^ right);
                     break;
                 case BinaryOp.BitShiftLeft:
-                    intResult = checked(left << (int)right);
+                    intResult = checked(left << int.CreateChecked(right));
                     break;
                 case BinaryOp.BitShiftRight:
-                    intResult = checked(left >> (int)right);
+                    intResult = checked(left >> int.CreateChecked(right));
                     break;
                 case BinaryOp.LogicAnd:
                 case BinaryOp.LogicOr:
