@@ -1132,7 +1132,7 @@ public class Sema
         };
     }
 
-    private static HIRExpr? TryConstFold(HIRExpr left, HIRExpr right, BinaryOp op, Node syntax)
+    private HIRExpr? TryConstFold(HIRExpr left, HIRExpr right, BinaryOp op, Node syntax)
     {
         if (left.Type.Kind != TypeKind.AbstractNumber || right.Type.Kind != TypeKind.AbstractNumber)
         {
