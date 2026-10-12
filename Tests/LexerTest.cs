@@ -278,24 +278,6 @@ public class LexerTest
     }
 
     [Theory]
-    [InlineData("0;")]
-    [InlineData("0+")]
-    [InlineData("0!")]
-    [InlineData("0/")]
-    public void Lexer_ParsesSymbolsRightAfterZeroLiteralOk(string str)
-    {
-        string code = str;
-        Diagnostic diag = new();
-        Lexer lexer = new(code, diag);
-        List<Token> tokens = lexer.Run();
-
-        Assert.False(diag.HasErrors, diag.PrettyString());
-        Assert.Equal(3, tokens.Count);
-        Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
-        Assert.NotEqual(TokenType.Invalid, tokens[1].Type);
-    }
-
-    [Theory]
     [InlineData("0x0")]
     [InlineData("0x00")]
     [InlineData("0x01")]
@@ -311,6 +293,24 @@ public class LexerTest
         Assert.False(diag.HasErrors, diag.PrettyString());
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
+    }
+
+    [Theory]
+    [InlineData("0;")]
+    [InlineData("0+")]
+    [InlineData("0!")]
+    [InlineData("0/")]
+    public void Lexer_ParsesSymbolsRightAfterZeroLiteralOk(string str)
+    {
+        string code = str;
+        Diagnostic diag = new();
+        Lexer lexer = new(code, diag);
+        List<Token> tokens = lexer.Run();
+
+        Assert.False(diag.HasErrors, diag.PrettyString());
+        Assert.Equal(3, tokens.Count);
+        Assert.Equal(TokenType.LiteralInt, tokens[0].Type);
+        Assert.NotEqual(TokenType.Invalid, tokens[1].Type);
     }
 
     [Theory]
