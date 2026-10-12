@@ -300,7 +300,12 @@ public class LexerTest
     [InlineData("0+")]
     [InlineData("0!")]
     [InlineData("0/")]
-    public void Lexer_ParsesSymbolsRightAfterZeroLiteral(string str)
+    [InlineData("1;")]
+    [InlineData("12;")]
+    [InlineData("0x120;")]
+    [InlineData("0b010;")]
+    [InlineData("0o010;")]
+    public void Lexer_ParsesSymbolsRightAfterIntegerLiteral(string str)
     {
         string code = str;
         Diagnostic diag = new();
