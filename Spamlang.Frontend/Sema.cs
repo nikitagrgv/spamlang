@@ -1143,11 +1143,11 @@ public class Sema
 
         if (left.Type == BuiltinType.AbstractFloat || right.Type == BuiltinType.AbstractFloat)
         {
-            return ApplyBinaryOp(GetFloatValue(left), GetFloatValue(right), op, syntax);
+            return ComputeBinaryOp(GetFloatValue(left), GetFloatValue(right), op, syntax);
         }
 
         Debug.Assert(left.Type == BuiltinType.AbstractInt && right.Type == BuiltinType.AbstractInt);
-        return ApplyBinaryOp(GetIntValue(left), GetIntValue(right), op, syntax);
+        return ComputeBinaryOp(GetIntValue(left), GetIntValue(right), op, syntax);
     }
 
     private static double GetFloatValue(HIRExpr expr)
@@ -1171,7 +1171,7 @@ public class Sema
         }
     }
 
-    private HIRExpr ApplyBinaryOp(double left, double right, BinaryOp op, Node syntax)
+    private HIRExpr ComputeBinaryOp(double left, double right, BinaryOp op, Node syntax)
     {
         double? floatResult = null;
         bool? boolResult = null;
@@ -1276,7 +1276,7 @@ public class Sema
         throw new UnreachableException();
     }
 
-    private HIRExpr ApplyBinaryOp(Int128 left, Int128 right, BinaryOp op, Node syntax)
+    private HIRExpr ComputeBinaryOp(Int128 left, Int128 right, BinaryOp op, Node syntax)
     {
         Int128? intResult = null;
         bool? boolResult = null;
