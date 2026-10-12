@@ -1171,7 +1171,7 @@ public class Sema
         }
     }
 
-    private HIRExpr? ApplyBinaryOp(double left, double right, BinaryOp op, Node syntax)
+    private HIRExpr ApplyBinaryOp(double left, double right, BinaryOp op, Node syntax)
     {
         double? floatResult = null;
         bool? boolResult = null;
@@ -1276,56 +1276,74 @@ public class Sema
         throw new UnreachableException();
     }
 
-    private static HIRExpr? ApplyBinaryOp(Int128 left, Int128 right, BinaryOp op)
+    private HIRExpr ApplyBinaryOp(Int128 left, Int128 right, BinaryOp op, Node syntax)
     {
-        Int128? bitwiseOp;
-        switch (op)
-        {
-            case BinaryOp.BitAnd:
-            case BinaryOp.BitOr:
-            case BinaryOp.BitXor:
-            case BinaryOp.BitShiftLeft:
-            case BinaryOp.BitShiftRight:
-                Error("Cannot use bitwise operators on float numbers", syntax);
-                return new HIRExprError
-                {
-                    Children = [],
-                    Type = BuiltinType.AbstractFloat,
-                    Syntax = syntax,
-                    IsSynthesized = true,
-                };
-            case BinaryOp.LogicAnd:
-            case BinaryOp.LogicOr:
-                Error("Cannot use logic operators on float numbers", syntax);
-                return new HIRExprError
-                {
-                    Children = [],
-                    Type = BuiltinType.Bool,
-                    Syntax = syntax,
-                    IsSynthesized = true,
-                };
-        }
-
-        double? result = null;
+        Int128? intResult = null;
+        bool? boolResult = null;
         try
         {
             switch (op)
             {
+                case BinaryOp.BitAnd:
+                    intResult = checked(left & right);
+                    break;
+                case BinaryOp.BitOr:
+                    intResult = checked(left | right);
+                    break;
+                case BinaryOp.BitXor:
+                    intResult = checked(left ^ right);
+                    break;
+                case BinaryOp.BitShiftLeft:
+                    intResult = checked(left << (int)right);
+                    break;
+                case BinaryOp.BitShiftRight:
+                    intResult = checked(left >> (int)right);
+                    break;
+                case BinaryOp.LogicAnd:
+                case BinaryOp.LogicOr:
+                    Error("Cannot use logic operators on integer numbers", syntax);
+                    return new HIRExprError
+                    {
+                        Children = [],
+                        Type = BuiltinType.Bool,
+                        Syntax = syntax,
+                        IsSynthesized = true,
+                    };
                 case BinaryOp.Plus:
-                    result = checked(left + right);
+                    intResult = checked(left + right);
                     break;
                 case BinaryOp.Minus:
-                    result = checked(left - right);
+                    intResult = checked(left - right);
                     break;
                 case BinaryOp.Mul:
-                    result = checked(left * right);
+                    intResult = checked(left * right);
                     break;
                 case BinaryOp.Div:
-                    result = checked(left / right);
+                    intResult = checked(left / right);
                     break;
                 case BinaryOp.Rem:
-                    result = checked(left % right);
+                    intResult = checked(left % right);
                     break;
+                case BinaryOp.Equal:
+                    boolResult = left == right;
+                    break;
+                case BinaryOp.NotEqual:
+                    boolResult = left != right;
+                    break;
+                case BinaryOp.Less:
+                    boolResult = left < right;
+                    break;
+                case BinaryOp.LessEqual:
+                    boolResult = left <= right;
+                    break;
+                case BinaryOp.Greater:
+                    boolResult = left > right;
+                    break;
+                case BinaryOp.GreaterEqual:
+                    boolResult = left >= right;
+                    break;
+                default:
+                    throw new UnreachableException();
             }
         }
         catch (OverflowException)
@@ -1334,55 +1352,35 @@ public class Sema
             return new HIRExprError
             {
                 Children = [],
-                Type = BuiltinType.AbstractFloat,
+                Type = BuiltinType.AbstractInt,
                 Syntax = syntax,
                 IsSynthesized = true,
             };
         }
 
-        if (result != null)
+        if (intResult != null)
         {
-            return new HIRExprFloatConst
+            return new HIRExprIntConst
             {
-                Value = result.Value,
-                Type = BuiltinType.AbstractFloat,
+                Value = intResult.Value,
+                Type = BuiltinType.AbstractInt,
                 Syntax = syntax,
                 IsSynthesized = true,
             };
         }
 
-        bool boolResult;
-        switch (op)
+        if (boolResult != null)
         {
-            case BinaryOp.Equal:
-                boolResult = left == right;
-                break;
-            case BinaryOp.NotEqual:
-                boolResult = left != right;
-                break;
-            case BinaryOp.Less:
-                boolResult = left < right;
-                break;
-            case BinaryOp.LessEqual:
-                boolResult = left <= right;
-                break;
-            case BinaryOp.Greater:
-                boolResult = left > right;
-                break;
-            case BinaryOp.GreaterEqual:
-                boolResult = left >= right;
-                break;
-            default:
-                throw new UnreachableException();
+            return new HIRExprBoolConst
+            {
+                Value = boolResult.Value,
+                Type = BuiltinType.Bool,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
         }
 
-        return new HIRExprBoolConst
-        {
-            Value = boolResult,
-            Type = BuiltinType.Bool,
-            Syntax = syntax,
-            IsSynthesized = true,
-        };
+        throw new UnreachableException();
     }
 
     private HIRExpr ResolveAbstractNumbers(HIRExpr expr, SpamType targetType)
