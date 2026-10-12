@@ -1173,6 +1173,112 @@ public class Sema
 
     private HIRExpr? ApplyBinaryOp(double left, double right, BinaryOp op, Node syntax)
     {
+        double? floatResult = null;
+        bool? boolResult = null;
+        try
+        {
+            switch (op)
+            {
+                case BinaryOp.BitAnd:
+                case BinaryOp.BitOr:
+                case BinaryOp.BitXor:
+                case BinaryOp.BitShiftLeft:
+                case BinaryOp.BitShiftRight:
+                    Error("Cannot use bitwise operators on float numbers", syntax);
+                    return new HIRExprError
+                    {
+                        Children = [],
+                        Type = BuiltinType.AbstractFloat,
+                        Syntax = syntax,
+                        IsSynthesized = true,
+                    };
+                case BinaryOp.LogicAnd:
+                case BinaryOp.LogicOr:
+                    Error("Cannot use logic operators on float numbers", syntax);
+                    return new HIRExprError
+                    {
+                        Children = [],
+                        Type = BuiltinType.Bool,
+                        Syntax = syntax,
+                        IsSynthesized = true,
+                    };
+                case BinaryOp.Plus:
+                    floatResult = checked(left + right);
+                    break;
+                case BinaryOp.Minus:
+                    floatResult = checked(left - right);
+                    break;
+                case BinaryOp.Mul:
+                    floatResult = checked(left * right);
+                    break;
+                case BinaryOp.Div:
+                    floatResult = checked(left / right);
+                    break;
+                case BinaryOp.Rem:
+                    floatResult = checked(left % right);
+                    break;
+                case BinaryOp.Equal:
+                    boolResult = left == right;
+                    break;
+                case BinaryOp.NotEqual:
+                    boolResult = left != right;
+                    break;
+                case BinaryOp.Less:
+                    boolResult = left < right;
+                    break;
+                case BinaryOp.LessEqual:
+                    boolResult = left <= right;
+                    break;
+                case BinaryOp.Greater:
+                    boolResult = left > right;
+                    break;
+                case BinaryOp.GreaterEqual:
+                    boolResult = left >= right;
+                    break;
+                default:
+                    throw new UnreachableException();
+            }
+        }
+        catch (OverflowException)
+        {
+            Error("Result is out of range", syntax);
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.AbstractFloat,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (floatResult != null)
+        {
+            return new HIRExprFloatConst
+            {
+                Value = floatResult.Value,
+                Type = BuiltinType.AbstractFloat,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (boolResult != null)
+        {
+            return new HIRExprBoolConst
+            {
+                Value = boolResult.Value,
+                Type = BuiltinType.Bool,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        throw new UnreachableException();
+    }
+
+    private static HIRExpr? ApplyBinaryOp(Int128 left, Int128 right, BinaryOp op)
+    {
+        Int128? bitwiseOp;
         switch (op)
         {
             case BinaryOp.BitAnd:
@@ -1277,10 +1383,6 @@ public class Sema
             Syntax = syntax,
             IsSynthesized = true,
         };
-    }
-
-    private static HIRExpr? ApplyBinaryOp(Int128 left, Int128 right, BinaryOp op)
-    {
     }
 
     private HIRExpr ResolveAbstractNumbers(HIRExpr expr, SpamType targetType)
