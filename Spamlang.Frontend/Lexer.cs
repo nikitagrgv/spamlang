@@ -365,7 +365,7 @@ public class Lexer
                 radixCh = null;
                 invalidReason ??= "C-like octal literals are forbidden, use '0o' prefix instead";
             }
-            else
+            else if (char.IsAsciiLetter(radixCh.Value))
             {
                 radixCh = null;
                 invalidReason ??= "Invalid radix letter";
