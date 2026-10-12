@@ -504,7 +504,7 @@ public class Sema
         SpamType leftType = left.Type;
         SpamType rightType = right.Type;
 
-        HIRExpr? folded = TryConstFold(left, right, expr.Op);
+        HIRExpr? folded = TryConstFold(left, right, expr.Op, expr);
         if (folded != null)
         {
             return folded;
@@ -1132,7 +1132,7 @@ public class Sema
         };
     }
 
-    private static HIRExpr? TryConstFold(HIRExpr left, HIRExpr right, BinaryOp op)
+    private static HIRExpr? TryConstFold(HIRExpr left, HIRExpr right, BinaryOp op, Node syntax)
     {
         if (left.Type.Kind != TypeKind.AbstractNumber || right.Type.Kind != TypeKind.AbstractNumber)
         {
@@ -1143,11 +1143,11 @@ public class Sema
 
         if (left.Type == BuiltinType.AbstractFloat || right.Type == BuiltinType.AbstractFloat)
         {
-            return ApplyBinaryOp(GetFloatValue(left), GetFloatValue(right), op);
+            return ApplyBinaryOp(GetFloatValue(left), GetFloatValue(right), op, syntax);
         }
 
         Debug.Assert(left.Type == BuiltinType.AbstractInt && right.Type == BuiltinType.AbstractInt);
-        return ApplyBinaryOp(GetIntValue(left), GetIntValue(right), op);
+        return ApplyBinaryOp(GetIntValue(left), GetIntValue(right), op, syntax);
     }
 
     private static double GetFloatValue(HIRExpr expr)
@@ -1171,8 +1171,112 @@ public class Sema
         }
     }
 
-    private static HIRExpr? ApplyBinaryOp(double left, double right, BinaryOp op)
+    private HIRExpr? ApplyBinaryOp(double left, double right, BinaryOp op, Node syntax)
     {
+        switch (op)
+        {
+            case BinaryOp.BitAnd:
+            case BinaryOp.BitOr:
+            case BinaryOp.BitXor:
+            case BinaryOp.BitShiftLeft:
+            case BinaryOp.BitShiftRight:
+                Error("Cannot use bitwise operators on float numbers", syntax);
+                return new HIRExprError
+                {
+                    Children = [],
+                    Type = BuiltinType.AbstractFloat,
+                    Syntax = syntax,
+                    IsSynthesized = true,
+                };
+            case BinaryOp.LogicAnd:
+            case BinaryOp.LogicOr:
+                Error("Cannot use logic operators on float numbers", syntax);
+                return new HIRExprError
+                {
+                    Children = [],
+                    Type = BuiltinType.Bool,
+                    Syntax = syntax,
+                    IsSynthesized = true,
+                };
+        }
+
+        double? result = null;
+        try
+        {
+            switch (op)
+            {
+                case BinaryOp.Plus:
+                    result = checked(left + right);
+                    break;
+                case BinaryOp.Minus:
+                    result = checked(left - right);
+                    break;
+                case BinaryOp.Mul:
+                    result = checked(left * right);
+                    break;
+                case BinaryOp.Div:
+                    result = checked(left / right);
+                    break;
+                case BinaryOp.Rem:
+                    result = checked(left % right);
+                    break;
+            }
+        }
+        catch (OverflowException)
+        {
+            Error("Result is out of range", syntax);
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.AbstractFloat,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (result != null)
+        {
+            return new HIRExprFloatConst
+            {
+                Value = result.Value,
+                Type = BuiltinType.AbstractFloat,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        bool boolResult;
+        switch (op)
+        {
+            case BinaryOp.Equal:
+                boolResult = left == right;
+                break;
+            case BinaryOp.NotEqual:
+                boolResult = left != right;
+                break;
+            case BinaryOp.Less:
+                boolResult = left < right;
+                break;
+            case BinaryOp.LessEqual:
+                boolResult = left <= right;
+                break;
+            case BinaryOp.Greater:
+                boolResult = left > right;
+                break;
+            case BinaryOp.GreaterEqual:
+                boolResult = left >= right;
+                break;
+            default:
+                throw new UnreachableException();
+        }
+
+        return new HIRExprBoolConst
+        {
+            Value = boolResult,
+            Type = BuiltinType.Bool,
+            Syntax = syntax,
+            IsSynthesized = true,
+        };
     }
 
     private static HIRExpr? ApplyBinaryOp(Int128 left, Int128 right, BinaryOp op)
@@ -1620,7 +1724,7 @@ public class Sema
 
     private void ErrorOutOfRange(bool negative, ReadOnlySpan<char> str, Node node)
     {
-        Error($"Integer literal out of range: {(negative ? "-" : "")}{str}", node);
+        Error($"Literal out of range: {(negative ? "-" : "")}{str}", node);
     }
 
     private void ErrorRedeclaration(Symbol newSymbol, Symbol oldSymbol)
