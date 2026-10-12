@@ -1132,6 +1132,59 @@ public class Sema
         };
     }
 
+    private static HIRExpr? TryConstFold(HIRExpr left, HIRExpr right, BinaryOp op)
+    {
+        if (left.Type.Kind != TypeKind.AbstractNumber || right.Type.Kind != TypeKind.AbstractNumber)
+        {
+            return null;
+        }
+
+        Debug.Assert(left is HIRExprIntConst or HIRExprFloatConst && right is HIRExprIntConst or HIRExprFloatConst, "Only consts can be abstract numbers");
+
+        if (left.Type == BuiltinType.AbstractFloat || right.Type == BuiltinType.AbstractFloat)
+        {
+            double leftValue = GetFloatValue(left);
+            double rightValue = GetFloatValue(right);
+            return ApplyBinaryOp(leftValue, rightValue, op);
+        }
+        else
+        {
+            Debug.Assert(left.Type == BuiltinType.AbstractInt && right.Type == BuiltinType.AbstractInt);
+            Int128 leftValue = GetIntValue(left);
+            Int128 rightValue = GetIntValue(right);
+            return ApplyBinaryOp(leftValue, rightValue, op);
+        }
+    }
+
+    private static double GetFloatValue(HIRExpr expr)
+    {
+        Debug.Assert(expr is HIRExprFloatConst or HIRExprIntConst);
+        switch (expr)
+        {
+            case HIRExprFloatConst e: return e.Value;
+            case HIRExprIntConst e: return (double)e.Value;
+            default: throw new UnreachableException();
+        }
+    }
+
+    private static Int128 GetIntValue(HIRExpr expr)
+    {
+        Debug.Assert(expr is HIRExprIntConst);
+        switch (expr)
+        {
+            case HIRExprIntConst e: return e.Value;
+            default: throw new UnreachableException();
+        }
+    }
+
+    private static HIRExpr? ApplyBinaryOp(double left, double right, BinaryOp op)
+    {
+    }
+
+    private static HIRExpr? ApplyBinaryOp(Int128 left, Int128 right, BinaryOp op)
+    {
+    }
+
     private HIRExpr ResolveAbstractNumbers(HIRExpr expr, SpamType targetType)
     {
         Debug.Assert(targetType.Kind != TypeKind.AbstractNumber);
