@@ -504,7 +504,7 @@ public class Sema
         SpamType leftType = left.Type;
         SpamType rightType = right.Type;
 
-        HIRExpr? folded = TryConstFold(left, right,);
+        HIRExpr? folded = TryConstFold(left, right, expr.Op);
         if (folded != null)
         {
             return folded;
