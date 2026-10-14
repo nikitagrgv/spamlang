@@ -1177,66 +1177,69 @@ public class Sema
         bool? boolResult = null;
         try
         {
-            switch (op)
+            checked
             {
-                case BinaryOp.BitAnd:
-                case BinaryOp.BitOr:
-                case BinaryOp.BitXor:
-                case BinaryOp.BitShiftLeft:
-                case BinaryOp.BitShiftRight:
-                    Error("Cannot use bitwise operators on float numbers", syntax);
-                    return new HIRExprError
-                    {
-                        Children = [],
-                        Type = BuiltinType.AbstractFloat,
-                        Syntax = syntax,
-                        IsSynthesized = true,
-                    };
-                case BinaryOp.LogicAnd:
-                case BinaryOp.LogicOr:
-                    Error("Cannot use logic operators on float numbers", syntax);
-                    return new HIRExprError
-                    {
-                        Children = [],
-                        Type = BuiltinType.Bool,
-                        Syntax = syntax,
-                        IsSynthesized = true,
-                    };
-                case BinaryOp.Plus:
-                    floatResult = checked(left + right);
-                    break;
-                case BinaryOp.Minus:
-                    floatResult = checked(left - right);
-                    break;
-                case BinaryOp.Mul:
-                    floatResult = checked(left * right);
-                    break;
-                case BinaryOp.Div:
-                    floatResult = checked(left / right);
-                    break;
-                case BinaryOp.Rem:
-                    floatResult = checked(left % right);
-                    break;
-                case BinaryOp.Equal:
-                    boolResult = left == right;
-                    break;
-                case BinaryOp.NotEqual:
-                    boolResult = left != right;
-                    break;
-                case BinaryOp.Less:
-                    boolResult = left < right;
-                    break;
-                case BinaryOp.LessEqual:
-                    boolResult = left <= right;
-                    break;
-                case BinaryOp.Greater:
-                    boolResult = left > right;
-                    break;
-                case BinaryOp.GreaterEqual:
-                    boolResult = left >= right;
-                    break;
-                default:
-                    throw new UnreachableException();
+                switch (op)
+                {
+                    case BinaryOp.BitAnd:
+                    case BinaryOp.BitOr:
+                    case BinaryOp.BitXor:
+                    case BinaryOp.BitShiftLeft:
+                    case BinaryOp.BitShiftRight:
+                        Error("Cannot use bitwise operators on float numbers", syntax);
+                        return new HIRExprError
+                        {
+                            Children = [],
+                            Type = BuiltinType.AbstractFloat,
+                            Syntax = syntax,
+                            IsSynthesized = true,
+                        };
+                    case BinaryOp.LogicAnd:
+                    case BinaryOp.LogicOr:
+                        Error("Cannot use logic operators on float numbers", syntax);
+                        return new HIRExprError
+                        {
+                            Children = [],
+                            Type = BuiltinType.Bool,
+                            Syntax = syntax,
+                            IsSynthesized = true,
+                        };
+                    case BinaryOp.Plus:
+                        floatResult = left + right;
+                        break;
+                    case BinaryOp.Minus:
+                        floatResult = left - right;
+                        break;
+                    case BinaryOp.Mul:
+                        floatResult = left * right;
+                        break;
+                    case BinaryOp.Div:
+                        floatResult = left / right;
+                        break;
+                    case BinaryOp.Rem:
+                        floatResult = left % right;
+                        break;
+                    case BinaryOp.Equal:
+                        boolResult = left == right;
+                        break;
+                    case BinaryOp.NotEqual:
+                        boolResult = left != right;
+                        break;
+                    case BinaryOp.Less:
+                        boolResult = left < right;
+                        break;
+                    case BinaryOp.LessEqual:
+                        boolResult = left <= right;
+                        break;
+                    case BinaryOp.Greater:
+                        boolResult = left > right;
+                        break;
+                    case BinaryOp.GreaterEqual:
+                        boolResult = left >= right;
+                        break;
+                    default:
+                        throw new UnreachableException();
+                }
             }
         }
         catch (OverflowException)
@@ -1282,68 +1285,71 @@ public class Sema
         bool? boolResult = null;
         try
         {
-            switch (op)
+            checked
             {
-                case BinaryOp.BitAnd:
-                    intResult = checked(left & right);
-                    break;
-                case BinaryOp.BitOr:
-                    intResult = checked(left | right);
-                    break;
-                case BinaryOp.BitXor:
-                    intResult = checked(left ^ right);
-                    break;
-                case BinaryOp.BitShiftLeft:
-                    intResult = checked(left << int.CreateChecked(right));
-                    break;
-                case BinaryOp.BitShiftRight:
-                    intResult = checked(left >> int.CreateChecked(right));
-                    break;
-                case BinaryOp.LogicAnd:
-                case BinaryOp.LogicOr:
-                    Error("Cannot use logic operators on integer numbers", syntax);
-                    return new HIRExprError
-                    {
-                        Children = [],
-                        Type = BuiltinType.Bool,
-                        Syntax = syntax,
-                        IsSynthesized = true,
-                    };
-                case BinaryOp.Plus:
-                    intResult = checked(left + right);
-                    break;
-                case BinaryOp.Minus:
-                    intResult = checked(left - right);
-                    break;
-                case BinaryOp.Mul:
-                    intResult = checked(left * right);
-                    break;
-                case BinaryOp.Div:
-                    intResult = checked(left / right);
-                    break;
-                case BinaryOp.Rem:
-                    intResult = checked(left % right);
-                    break;
-                case BinaryOp.Equal:
-                    boolResult = left == right;
-                    break;
-                case BinaryOp.NotEqual:
-                    boolResult = left != right;
-                    break;
-                case BinaryOp.Less:
-                    boolResult = left < right;
-                    break;
-                case BinaryOp.LessEqual:
-                    boolResult = left <= right;
-                    break;
-                case BinaryOp.Greater:
-                    boolResult = left > right;
-                    break;
-                case BinaryOp.GreaterEqual:
-                    boolResult = left >= right;
-                    break;
-                default:
-                    throw new UnreachableException();
+                switch (op)
+                {
+                    case BinaryOp.BitAnd:
+                        intResult = left & right;
+                        break;
+                    case BinaryOp.BitOr:
+                        intResult = left | right;
+                        break;
+                    case BinaryOp.BitXor:
+                        intResult = left ^ right;
+                        break;
+                    case BinaryOp.BitShiftLeft:
+                        intResult = left << int.CreateChecked(right);
+                        break;
+                    case BinaryOp.BitShiftRight:
+                        intResult = left >> int.CreateChecked(right);
+                        break;
+                    case BinaryOp.LogicAnd:
+                    case BinaryOp.LogicOr:
+                        Error("Cannot use logic operators on integer numbers", syntax);
+                        return new HIRExprError
+                        {
+                            Children = [],
+                            Type = BuiltinType.Bool,
+                            Syntax = syntax,
+                            IsSynthesized = true,
+                        };
+                    case BinaryOp.Plus:
+                        intResult = left + right;
+                        break;
+                    case BinaryOp.Minus:
+                        intResult = left - right;
+                        break;
+                    case BinaryOp.Mul:
+                        intResult = left * right;
+                        break;
+                    case BinaryOp.Div:
+                        intResult = left / right;
+                        break;
+                    case BinaryOp.Rem:
+                        intResult = left % right;
+                        break;
+                    case BinaryOp.Equal:
+                        boolResult = left == right;
+                        break;
+                    case BinaryOp.NotEqual:
+                        boolResult = left != right;
+                        break;
+                    case BinaryOp.Less:
+                        boolResult = left < right;
+                        break;
+                    case BinaryOp.LessEqual:
+                        boolResult = left <= right;
+                        break;
+                    case BinaryOp.Greater:
+                        boolResult = left > right;
+                        break;
+                    case BinaryOp.GreaterEqual:
+                        boolResult = left >= right;
+                        break;
+                    default:
+                        throw new UnreachableException();
+                }
             }
         }
         catch (OverflowException)
