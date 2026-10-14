@@ -504,7 +504,7 @@ public class Sema
         SpamType leftType = left.Type;
         SpamType rightType = right.Type;
 
-        HIRExpr? folded = TryConstFold(left, right, expr.Op, expr);
+        HIRExpr? folded = TryConstFoldBinary(left, right, expr.Op, expr);
         if (folded != null)
         {
             return folded;
@@ -922,10 +922,16 @@ public class Sema
         };
     }
 
-    private HIRExprUnary VisitExprUnary(ExprUnary expr)
+    private HIRExpr VisitExprUnary(ExprUnary expr)
     {
         HIRExpr operand = VisitExpr(expr.Operand);
         operand = ToRValue(operand);
+
+        HIRExpr? folded = TryConstFoldUnary(operand, expr.Op, expr);
+        if (folded != null)
+        {
+            return folded;
+        }
 
         SpamType type;
         if (operand.Type == BuiltinType.Error)
@@ -1132,7 +1138,7 @@ public class Sema
         };
     }
 
-    private HIRExpr? TryConstFold(HIRExpr left, HIRExpr right, BinaryOp op, Node syntax)
+    private HIRExpr? TryConstFoldBinary(HIRExpr left, HIRExpr right, BinaryOp op, Node syntax)
     {
         if (left.Type.Kind != TypeKind.AbstractNumber || right.Type.Kind != TypeKind.AbstractNumber)
         {
@@ -1148,6 +1154,10 @@ public class Sema
 
         Debug.Assert(left.Type == BuiltinType.AbstractInt && right.Type == BuiltinType.AbstractInt);
         return ComputeBinaryOp(GetIntValue(left), GetIntValue(right), op, syntax);
+    }
+
+    private HIRExpr? TryConstFoldUnary(HIRExpr operand, UnaryOp op, Node syntax)
+    {
     }
 
     private static double GetFloatValue(HIRExpr expr)
