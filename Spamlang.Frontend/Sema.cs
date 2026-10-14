@@ -1158,6 +1158,20 @@ public class Sema
 
     private HIRExpr? TryConstFoldUnary(HIRExpr operand, UnaryOp op, Node syntax)
     {
+        if (operand.Type.Kind != TypeKind.AbstractNumber)
+        {
+            return null;
+        }
+
+        Debug.Assert(operand is HIRExprIntConst or HIRExprFloatConst, "Only consts can be abstract numbers");
+
+        if (operand.Type == BuiltinType.AbstractFloat)
+        {
+            return ComputeUnaryOp(GetFloatValue(operand), op, syntax);
+        }
+
+        Debug.Assert(operand.Type == BuiltinType.AbstractInt);
+        return ComputeUnaryOp(GetIntValue(operand), op, syntax);
     }
 
     private static double GetFloatValue(HIRExpr expr)
@@ -1356,6 +1370,152 @@ public class Sema
                         break;
                     case BinaryOp.GreaterEqual:
                         boolResult = left >= right;
+                        break;
+                    default:
+                        throw new UnreachableException();
+                }
+            }
+        }
+        catch (OverflowException)
+        {
+            Error("Result is out of range", syntax);
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.Error,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (intResult != null)
+        {
+            return new HIRExprIntConst
+            {
+                Value = intResult.Value,
+                Type = BuiltinType.AbstractInt,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (boolResult != null)
+        {
+            return new HIRExprBoolConst
+            {
+                Value = boolResult.Value,
+                Type = BuiltinType.Bool,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        throw new UnreachableException();
+    }
+
+    private HIRExpr ComputeUnaryOp(double operand, UnaryOp op, Node syntax)
+    {
+        double? floatResult = null;
+        bool? boolResult = null;
+        try
+        {
+            checked
+            {
+                switch (op)
+                {
+                    case UnaryOp.BitNot:
+                        Error("Cannot use bitwise operators on float numbers", syntax);
+                        return new HIRExprError
+                        {
+                            Children = [],
+                            Type = BuiltinType.Error,
+                            Syntax = syntax,
+                            IsSynthesized = true,
+                        };
+                    case UnaryOp.Not:
+                        Error("Cannot use logic operators on float numbers", syntax);
+                        return new HIRExprError
+                        {
+                            Children = [],
+                            Type = BuiltinType.Bool,
+                            Syntax = syntax,
+                            IsSynthesized = true,
+                        };
+                    case UnaryOp.Plus:
+                        floatResult = operand;
+                        break;
+                    case UnaryOp.Minus:
+                        floatResult = -operand;
+                        break;
+                    default:
+                        throw new UnreachableException();
+                }
+            }
+        }
+        catch (OverflowException)
+        {
+            Error("Result is out of range", syntax);
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.Error,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (floatResult != null)
+        {
+            return new HIRExprFloatConst
+            {
+                Value = floatResult.Value,
+                Type = BuiltinType.AbstractFloat,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (boolResult != null)
+        {
+            return new HIRExprBoolConst
+            {
+                Value = boolResult.Value,
+                Type = BuiltinType.Bool,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        throw new UnreachableException();
+    }
+
+    private HIRExpr ComputeUnaryOp(Int128 operand, UnaryOp op, Node syntax)
+    {
+        Int128? intResult = null;
+        bool? boolResult = null;
+        try
+        {
+            checked
+            {
+                switch (op)
+                {
+                    case UnaryOp.BitNot:
+                        intResult = ~operand;
+                        break;
+                    case UnaryOp.Not:
+                        Error("Cannot use logic operators on integer numbers", syntax);
+                        return new HIRExprError
+                        {
+                            Children = [],
+                            Type = BuiltinType.Bool,
+                            Syntax = syntax,
+                            IsSynthesized = true,
+                        };
+                    case UnaryOp.Plus:
+                        intResult = operand;
+                        break;
+                    case UnaryOp.Minus:
+                        intResult = -operand;
                         break;
                     default:
                         throw new UnreachableException();
