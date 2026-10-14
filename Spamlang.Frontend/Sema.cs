@@ -1190,7 +1190,7 @@ public class Sema
                         return new HIRExprError
                         {
                             Children = [],
-                            Type = BuiltinType.AbstractFloat,
+                            Type = BuiltinType.Error,
                             Syntax = syntax,
                             IsSynthesized = true,
                         };
@@ -1248,7 +1248,7 @@ public class Sema
             return new HIRExprError
             {
                 Children = [],
-                Type = BuiltinType.AbstractFloat,
+                Type = BuiltinType.Error,
                 Syntax = syntax,
                 IsSynthesized = true,
             };
@@ -1358,7 +1358,7 @@ public class Sema
             return new HIRExprError
             {
                 Children = [],
-                Type = BuiltinType.AbstractInt,
+                Type = BuiltinType.Error,
                 Syntax = syntax,
                 IsSynthesized = true,
             };
