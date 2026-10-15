@@ -1160,7 +1160,38 @@ public class Sema
 
         HIRExpr MakeError()
         {
-            Error($"Cannot cast \"{expr.Type}\" to \"{targetType}\"", syntax);
+            string? typeStr = null;
+            if (expr.Type.Kind != TypeKind.AbstractNumber)
+            {
+                typeStr = expr.Type.Name;
+            }
+
+            string? valueStr = null;
+            if (expr is HIRExprIntConst intConst)
+            {
+                valueStr = intConst.Value.ToString();
+            }
+            else if (expr is HIRExprFloatConst floatConst)
+            {
+                valueStr = floatConst.Value.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (expr is HIRExprBoolConst boolConst)
+            {
+                valueStr = boolConst.Value ? "true" : "false";
+            }
+
+            string message = "Cannot cast";
+            if (valueStr != null)
+            {
+                message += $" value {valueStr} ";
+            }
+
+            if (typeStr != null && valueStr != null)
+            {
+                message = $"Cannot cast \"{expr.Type}\" to \"{targetType}\"";
+            }
+
+            Error(message, syntax);
             return new HIRExprError
             {
                 Children = [expr],
@@ -1192,35 +1223,51 @@ public class Sema
 
         Debug.Assert(valueInt.HasValue || valueDouble.HasValue);
 
-        TypeKind kind = targetType.Kind;
-        if (kind == TypeKind.Float)
+        TypeKind targetKind = targetType.Kind;
+        if (targetKind == TypeKind.Float)
         {
-            double value = valueDouble ?? double.CreateChecked(valueInt!.Value);
-            if (!IsValidValueForType(value, targetType))
+            double? value = null;
+            try
+            {
+                value = valueDouble ?? double.CreateChecked(valueInt!.Value);
+            }
+            catch (OverflowException)
+            {
+            }
+
+            if (value == null || !IsValidValueForType(value.Value, targetType))
             {
                 return MakeError();
             }
 
             return new HIRExprFloatConst
             {
-                Value = value,
+                Value = value.Value,
                 Type = targetType,
                 Syntax = syntax,
                 IsSynthesized = true,
             };
         }
 
-        if (kind == TypeKind.SignedInteger || kind == TypeKind.UnsignedInteger)
+        if (targetKind == TypeKind.SignedInteger || targetKind == TypeKind.UnsignedInteger)
         {
-            Int128 value = valueInt ?? Int128.CreateChecked(valueDouble!.Value);
-            if (!IsValidValueForType(value, targetType))
+            Int128? value = null;
+            try
+            {
+                value = valueInt ?? Int128.CreateChecked(valueDouble!.Value);
+            }
+            catch (OverflowException)
+            {
+            }
+
+            if (value == null || !IsValidValueForType(value.Value, targetType))
             {
                 return MakeError();
             }
 
-            return new HIRExprIntConst()
+            return new HIRExprIntConst
             {
-                Value = value,
+                Value = value.Value,
                 Type = targetType,
                 Syntax = syntax,
                 IsSynthesized = true,
