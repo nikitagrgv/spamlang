@@ -1140,6 +1140,16 @@ public class Sema
 
     private HIRExpr? TryConstFoldBinary(HIRExpr left, HIRExpr right, BinaryOp op, Node syntax)
     {
+        if (left.Type == BuiltinType.Bool && right.Type == BuiltinType.Bool)
+        {
+            if (left is HIRExprBoolConst boolConstLeft && right is HIRExprBoolConst boolConstRight)
+            {
+                return ComputeBinaryOp(boolConstLeft.Value, boolConstRight.Value, op, syntax);
+            }
+
+            return null;
+        }
+
         if (left.Type.Kind != TypeKind.AbstractNumber || right.Type.Kind != TypeKind.AbstractNumber)
         {
             return null;
@@ -1158,6 +1168,16 @@ public class Sema
 
     private HIRExpr? TryConstFoldUnary(HIRExpr operand, UnaryOp op, Node syntax)
     {
+        if (operand.Type == BuiltinType.Bool)
+        {
+            if (operand is HIRExprBoolConst boolConst)
+            {
+                return ComputeUnaryOp(boolConst.Value, op, syntax);
+            }
+
+            return null;
+        }
+
         if (operand.Type.Kind != TypeKind.AbstractNumber)
         {
             return null;
