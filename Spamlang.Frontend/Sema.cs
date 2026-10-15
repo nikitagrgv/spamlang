@@ -1427,116 +1427,20 @@ public class Sema
 
     private HIRExpr ComputeUnaryOp(double operand, UnaryOp op, Node syntax)
     {
-        double? floatResult = null;
-        bool? boolResult = null;
-        try
-        {
-            checked
-            {
-                switch (op)
-                {
-                    case UnaryOp.BitNot:
-                        Error("Cannot use bitwise operators on float numbers", syntax);
-                        return new HIRExprError
-                        {
-                            Children = [],
-                            Type = BuiltinType.Error,
-                            Syntax = syntax,
-                            IsSynthesized = true,
-                        };
-                    case UnaryOp.Not:
-                        Error("Cannot use logic operators on float numbers", syntax);
-                        return new HIRExprError
-                        {
-                            Children = [],
-                            Type = BuiltinType.Bool,
-                            Syntax = syntax,
-                            IsSynthesized = true,
-                        };
-                    case UnaryOp.Plus:
-                        floatResult = operand;
-                        break;
-                    case UnaryOp.Minus:
-                        floatResult = -operand;
-                        break;
-                    default:
-                        throw new UnreachableException();
-                }
-            }
-        }
-        catch (OverflowException)
-        {
-            Error("Result is out of range", syntax);
-            return new HIRExprError
-            {
-                Children = [],
-                Type = BuiltinType.Error,
-                Syntax = syntax,
-                IsSynthesized = true,
-            };
-        }
-
-        if (floatResult != null)
+        HIRExpr MakeFloatValue(double value)
         {
             return new HIRExprFloatConst
             {
-                Value = floatResult.Value,
+                Value = value,
                 Type = BuiltinType.AbstractFloat,
                 Syntax = syntax,
                 IsSynthesized = true,
             };
         }
 
-        if (boolResult != null)
+        HIRExpr MakeErrorAndReport(string message)
         {
-            return new HIRExprBoolConst
-            {
-                Value = boolResult.Value,
-                Type = BuiltinType.Bool,
-                Syntax = syntax,
-                IsSynthesized = true,
-            };
-        }
-
-        throw new UnreachableException();
-    }
-
-    private HIRExpr ComputeUnaryOp(Int128 operand, UnaryOp op, Node syntax)
-    {
-        Int128? intResult = null;
-        bool? boolResult = null;
-        try
-        {
-            checked
-            {
-                switch (op)
-                {
-                    case UnaryOp.BitNot:
-                        intResult = ~operand;
-                        break;
-                    case UnaryOp.Not:
-                        Error("Cannot use logic operators on integer numbers", syntax);
-                        return new HIRExprError
-                        {
-                            Children = [],
-                            Type = BuiltinType.Bool,
-                            Syntax = syntax,
-                            IsSynthesized = true,
-                        };
-                    case UnaryOp.Plus:
-                        intResult = operand;
-                        break;
-                    case UnaryOp.Minus:
-                        intResult = -operand;
-                        break;
-                    default:
-                        throw new UnreachableException();
-                }
-            }
-        }
-        catch (OverflowException)
-        {
-            Error("Result is out of range", syntax);
+            Error(message, syntax);
             return new HIRExprError
             {
                 Children = [],
@@ -1546,29 +1450,118 @@ public class Sema
             };
         }
 
-        if (intResult != null)
+        try
+        {
+            checked
+            {
+                switch (op)
+                {
+                    case UnaryOp.BitNot:
+                        return MakeErrorAndReport("Cannot use bitwise operators on float numbers");
+                    case UnaryOp.Not:
+                        return MakeErrorAndReport("Cannot use logic operators on float numbers");
+                    case UnaryOp.Plus:
+                        return MakeFloatValue(operand);
+                    case UnaryOp.Minus:
+                        return MakeFloatValue(-operand);
+                    default:
+                        throw new UnreachableException();
+                }
+            }
+        }
+        catch (OverflowException)
+        {
+            return MakeErrorAndReport("Result is out of range");
+        }
+    }
+
+    private HIRExpr ComputeUnaryOp(Int128 operand, UnaryOp op, Node syntax)
+    {
+        HIRExpr MakeIntValue(Int128 value)
         {
             return new HIRExprIntConst
             {
-                Value = intResult.Value,
+                Value = value,
                 Type = BuiltinType.AbstractInt,
                 Syntax = syntax,
                 IsSynthesized = true,
             };
         }
 
-        if (boolResult != null)
+        HIRExpr MakeErrorAndReport(string message)
+        {
+            Error(message, syntax);
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.Error,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        try
+        {
+            checked
+            {
+                switch (op)
+                {
+                    case UnaryOp.BitNot:
+                        return MakeIntValue(~operand);
+                    case UnaryOp.Not:
+                        return MakeErrorAndReport("Cannot use logic operators on integer numbers");
+                    case UnaryOp.Plus:
+                        return MakeIntValue(operand);
+                    case UnaryOp.Minus:
+                        return MakeIntValue(-operand);
+                    default:
+                        throw new UnreachableException();
+                }
+            }
+        }
+        catch (OverflowException)
+        {
+            return MakeErrorAndReport("Result is out of range");
+        }
+    }
+
+    private HIRExpr ComputeUnaryOp(bool operand, UnaryOp op, Node syntax)
+    {
+        HIRExpr MakeBoolValue(bool value)
         {
             return new HIRExprBoolConst
             {
-                Value = boolResult.Value,
+                Value = value,
                 Type = BuiltinType.Bool,
                 Syntax = syntax,
                 IsSynthesized = true,
             };
         }
 
-        throw new UnreachableException();
+        HIRExpr MakeErrorAndReport(string message)
+        {
+            Error(message, syntax);
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.Error,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        switch (op)
+        {
+            case UnaryOp.BitNot:
+                return MakeErrorAndReport("Cannot use bitwise operators on bools");
+            case UnaryOp.Not:
+                return MakeBoolValue(!operand);
+            case UnaryOp.Plus:
+            case UnaryOp.Minus:
+                return MakeErrorAndReport("Cannot use arithmetic operators on bools");
+            default:
+                throw new UnreachableException();
+        }
     }
 
     private HIRExpr ResolveAbstractNumbers(HIRExpr expr, SpamType targetType)
