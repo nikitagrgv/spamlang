@@ -1231,51 +1231,41 @@ public class Sema
             };
         }
 
-        try
+        switch (op)
         {
-            checked
-            {
-                switch (op)
-                {
-                    case BinaryOp.BitAnd:
-                    case BinaryOp.BitOr:
-                    case BinaryOp.BitXor:
-                    case BinaryOp.BitShiftLeft:
-                    case BinaryOp.BitShiftRight:
-                        return MakeErrorAndReport("Cannot use bitwise operators on float numbers");
-                    case BinaryOp.LogicAnd:
-                    case BinaryOp.LogicOr:
-                        return MakeErrorAndReport("Cannot use logic operators on float numbers");
-                    case BinaryOp.Plus:
-                        return MakeFloatValue(left + right);
-                    case BinaryOp.Minus:
-                        return MakeFloatValue(left - right);
-                    case BinaryOp.Mul:
-                        return MakeFloatValue(left * right);
-                    case BinaryOp.Div:
-                        return MakeFloatValue(left / right);
-                    case BinaryOp.Rem:
-                        return MakeFloatValue(left % right);
-                    case BinaryOp.Equal:
-                        return MakeBoolValue(left == right);
-                    case BinaryOp.NotEqual:
-                        return MakeBoolValue(left != right);
-                    case BinaryOp.Less:
-                        return MakeBoolValue(left < right);
-                    case BinaryOp.LessEqual:
-                        return MakeBoolValue(left <= right);
-                    case BinaryOp.Greater:
-                        return MakeBoolValue(left > right);
-                    case BinaryOp.GreaterEqual:
-                        return MakeBoolValue(left >= right);
-                    default:
-                        throw new UnreachableException();
-                }
-            }
-        }
-        catch (OverflowException)
-        {
-            return MakeErrorAndReport("Result is out of range");
+            case BinaryOp.BitAnd:
+            case BinaryOp.BitOr:
+            case BinaryOp.BitXor:
+            case BinaryOp.BitShiftLeft:
+            case BinaryOp.BitShiftRight:
+                return MakeErrorAndReport("Cannot use bitwise operators on float numbers");
+            case BinaryOp.LogicAnd:
+            case BinaryOp.LogicOr:
+                return MakeErrorAndReport("Cannot use logic operators on float numbers");
+            case BinaryOp.Plus:
+                return MakeFloatValue(left + right);
+            case BinaryOp.Minus:
+                return MakeFloatValue(left - right);
+            case BinaryOp.Mul:
+                return MakeFloatValue(left * right);
+            case BinaryOp.Div:
+                return MakeFloatValue(left / right);
+            case BinaryOp.Rem:
+                return MakeFloatValue(left % right);
+            case BinaryOp.Equal:
+                return MakeBoolValue(left == right);
+            case BinaryOp.NotEqual:
+                return MakeBoolValue(left != right);
+            case BinaryOp.Less:
+                return MakeBoolValue(left < right);
+            case BinaryOp.LessEqual:
+                return MakeBoolValue(left <= right);
+            case BinaryOp.Greater:
+                return MakeBoolValue(left > right);
+            case BinaryOp.GreaterEqual:
+                return MakeBoolValue(left >= right);
+            default:
+                throw new UnreachableException();
         }
     }
 
