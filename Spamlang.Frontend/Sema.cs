@@ -1283,7 +1283,7 @@ public class Sema
             Error(message, syntax);
             return new HIRExprError
             {
-                Children = [],
+                Children = [], // TODO: Add children! And below
                 Type = BuiltinType.Error,
                 Syntax = syntax,
                 IsSynthesized = true,
