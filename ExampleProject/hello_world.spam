@@ -44,6 +44,7 @@ fn demo_types()
 
 fn demo_int()
 {
+    123;
     let test_a: i16 = 123;
     let test_b = test_a + 123;
     123 + test_a;
