@@ -369,6 +369,7 @@ public class Sema
             }
             else
             {
+                init = AbstractNumberToDefaultType(init);
                 declType = init.Type;
             }
         }
@@ -376,8 +377,8 @@ public class Sema
         {
             if (declType == null)
             {
-                // Either type or default value must be specified
                 declType = BuiltinType.Error;
+                Error("Either type or default value must be specified", stmt);
                 init = new HIRExprError
                 {
                     Children = [],
@@ -1701,104 +1702,64 @@ public class Sema
         }
     }
 
-    private HIRExpr ResolveAbstractNumbers(HIRExpr expr, SpamType targetType)
+    private HIRExpr AbstractNumberToDefaultType(HIRExpr expr)
     {
-        Debug.Assert(targetType.Kind != TypeKind.AbstractNumber);
-        switch (expr)
+        if (expr.Type.Kind != TypeKind.AbstractNumber)
         {
-            case HIRExprFloatConst e:
-            {
-                if (e.Type.Kind != TypeKind.AbstractNumber)
-                {
-                    return expr;
-                }
-
-                if (!IsValidValueForType(e.Value, targetType))
-                {
-                    Error($"Value \"{e.Value}\" cannot be used as type \"{targetType}\"", e.Syntax);
-                    return expr;
-                }
-
-                HIRExprFloatConst newExpr = new()
-                {
-                    Value = e.Value,
-                    Syntax = e.Syntax,
-                    IsSynthesized = true,
-                    Type = targetType,
-                };
-                return newExpr;
-            }
-            case HIRExprIntConst e:
-            {
-                if (e.Type.Kind != TypeKind.AbstractNumber)
-                {
-                    return expr;
-                }
-
-                if (!IsValidValueForType(e.Value, targetType))
-                {
-                    Error($"Value \"{e.Value}\" cannot be used as type \"{targetType}\"", e.Syntax);
-                    return expr;
-                }
-
-                HIRExprIntConst newExpr = new()
-                {
-                    Value = e.Value,
-                    Syntax = e.Syntax,
-                    IsSynthesized = true,
-                    Type = targetType,
-                };
-                return newExpr;
-            }
-            case HIRExprBinary e:
-            {
-                HIRExpr left = Adapt(e.Left, targetType);
-                HIRExpr right = Adapt(e.Right, targetType);
-                if (left == e.Left && right == e.Right)
-                {
-                    return expr;
-                }
-
-                HIRExprBinary newExpr = new()
-                {
-                    Left = left,
-                    Right = right,
-                    Op = e.Op,
-                    Type = targetType,
-                    Syntax = expr.Syntax,
-                    IsSynthesized = true,
-                };
-                return newExpr;
-            }
-
-            case HIRExprUnary e:
-            {
-                HIRExpr operand = Adapt(e.Operand, targetType);
-                if (operand == e.Operand)
-                {
-                    return expr;
-                }
-
-                HIRExprUnary newExpr = new()
-                {
-                    Operand = operand,
-                    Op = e.Op,
-                    Type = targetType,
-                    Syntax = expr.Syntax,
-                    IsSynthesized = true,
-                };
-                return newExpr;
-            }
-            case HIRExprCast:
-            case HIRExprLoad:
-            case HIRExprZeroInit:
-            case HIRExprBoolConst:
-            case HIRExprLocalRef:
-            case HIRExprFuncRef:
-                return expr;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(expr));
+            return expr;
         }
+
+        HIRExpr MakeError(string number, SpamType type)
+        {
+            Error($"Cannot convert number \"{number}\" to default type \"{type.Name}\"", expr.Syntax);
+            return new HIRExprError
+            {
+                Children = [expr],
+                Type = BuiltinType.Error,
+                Syntax = expr.Syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (expr.Type == BuiltinType.AbstractFloat)
+        {
+            BuiltinType defaultFloatType = BuiltinType.F64;
+
+            double value = GetFloatValue(expr);
+            if (!IsValidValueForType(value, defaultFloatType))
+            {
+                return MakeError(value.ToString(CultureInfo.InvariantCulture), defaultFloatType);
+            }
+
+            return new HIRExprFloatConst
+            {
+                Value = value,
+                Type = defaultFloatType,
+                Syntax = expr.Syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (expr.Type == BuiltinType.AbstractInt)
+        {
+            BuiltinType defaultIntType = BuiltinType.I32;
+
+            Int128 value = GetIntValue(expr);
+            if (!IsValidValueForType(value, defaultIntType))
+            {
+                return MakeError(value.ToString(), defaultIntType);
+            }
+
+            return new HIRExprIntConst
+            {
+                Value = value,
+                Type = defaultIntType,
+                Syntax = expr.Syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        throw new UnreachableException();
     }
 
     private bool IsValidValueForType(double value, SpamType type)
