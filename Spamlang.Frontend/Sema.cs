@@ -1160,12 +1160,6 @@ public class Sema
 
         HIRExpr MakeError()
         {
-            string? typeStr = null;
-            if (expr.Type.Kind != TypeKind.AbstractNumber)
-            {
-                typeStr = expr.Type.Name;
-            }
-
             string? valueStr = null;
             if (expr is HIRExprIntConst intConst)
             {
@@ -1180,16 +1174,14 @@ public class Sema
                 valueStr = boolConst.Value ? "true" : "false";
             }
 
-            string message = "Cannot cast";
+            string message = "Cannot cast ";
             if (valueStr != null)
             {
-                message += $" value {valueStr} ";
+                message += $"value \"{valueStr}\" of type ";
             }
 
-            if (typeStr != null && valueStr != null)
-            {
-                message = $"Cannot cast \"{expr.Type}\" to \"{targetType}\"";
-            }
+            message += expr.Type.Name;
+            message += $" to {targetType.Name}";
 
             Error(message, syntax);
             return new HIRExprError
