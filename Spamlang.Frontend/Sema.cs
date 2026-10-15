@@ -1152,6 +1152,22 @@ public class Sema
 
     private HIRExpr? TryConstFoldCast(HIRExpr expr, SpamType targetType, Node syntax)
     {
+        if (expr.Type == BuiltinType.Error || targetType == BuiltinType.Error)
+        {
+            return null;
+        }
+
+        if (!CanExplicitlyCast(expr.Type, targetType))
+        {
+            Error($"Cannot cast \"{expr.Type}\" to \"{targetType}\"", syntax);
+            return new HIRExprError
+            {
+                Children = [expr],
+                Type = BuiltinType.Error,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
     }
 
     // TODO: Const folding for non-abstract int/float!
