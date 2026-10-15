@@ -1413,6 +1413,64 @@ public class Sema
         throw new UnreachableException();
     }
 
+    private HIRExpr ComputeBinaryOp(bool left, bool right, BinaryOp op, Node syntax)
+    {
+        HIRExpr MakeValue(bool value)
+        {
+            return new HIRExprBoolConst
+            {
+                Value = value,
+                Type = BuiltinType.Bool,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        HIRExpr MakeErrorAndReport(string message)
+        {
+            Error(message, syntax);
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.Error,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        switch (op)
+        {
+            case BinaryOp.BitShiftLeft:
+            case BinaryOp.BitShiftRight:
+                return MakeErrorAndReport("Cannot use bitwise operators on bools");
+            case BinaryOp.BitAnd:
+            case BinaryOp.LogicAnd:
+                return MakeValue(left && right);
+            case BinaryOp.LogicOr:
+            case BinaryOp.BitOr:
+                return MakeValue(left || right);
+            case BinaryOp.BitXor:
+                return MakeValue(left ^ right);
+            case BinaryOp.Plus:
+            case BinaryOp.Minus:
+            case BinaryOp.Mul:
+            case BinaryOp.Div:
+            case BinaryOp.Rem:
+                return MakeErrorAndReport("Cannot use arithmetic operators on bools");
+            case BinaryOp.Equal:
+                return MakeValue(left == right);
+            case BinaryOp.NotEqual:
+                return MakeValue(left != right);
+            case BinaryOp.Less:
+            case BinaryOp.LessEqual:
+            case BinaryOp.Greater:
+            case BinaryOp.GreaterEqual:
+                return MakeErrorAndReport($"Cannot use \"{op.AsString()}\" on bools");
+            default:
+                throw new UnreachableException();
+        }
+    }
+
     private HIRExpr ComputeUnaryOp(double operand, UnaryOp op, Node syntax)
     {
         double? floatResult = null;
