@@ -1305,80 +1305,31 @@ public class Sema
 
     private HIRExpr ComputeBinaryOp(Int128 left, Int128 right, BinaryOp op, Node syntax)
     {
-        Int128? intResult = null;
-        bool? boolResult = null;
-        try
+        HIRExpr MakeIntValue(Int128 value)
         {
-            checked
+            return new HIRExprIntConst
             {
-                switch (op)
-                {
-                    case BinaryOp.BitAnd:
-                        intResult = left & right;
-                        break;
-                    case BinaryOp.BitOr:
-                        intResult = left | right;
-                        break;
-                    case BinaryOp.BitXor:
-                        intResult = left ^ right;
-                        break;
-                    case BinaryOp.BitShiftLeft:
-                        intResult = left << int.CreateChecked(right);
-                        break;
-                    case BinaryOp.BitShiftRight:
-                        intResult = left >> int.CreateChecked(right);
-                        break;
-                    case BinaryOp.LogicAnd:
-                    case BinaryOp.LogicOr:
-                        Error("Cannot use logic operators on integer numbers", syntax);
-                        return new HIRExprError
-                        {
-                            Children = [],
-                            Type = BuiltinType.Bool,
-                            Syntax = syntax,
-                            IsSynthesized = true,
-                        };
-                    case BinaryOp.Plus:
-                        intResult = left + right;
-                        break;
-                    case BinaryOp.Minus:
-                        intResult = left - right;
-                        break;
-                    case BinaryOp.Mul:
-                        intResult = left * right;
-                        break;
-                    case BinaryOp.Div:
-                        intResult = left / right;
-                        break;
-                    case BinaryOp.Rem:
-                        intResult = left % right;
-                        break;
-                    case BinaryOp.Equal:
-                        boolResult = left == right;
-                        break;
-                    case BinaryOp.NotEqual:
-                        boolResult = left != right;
-                        break;
-                    case BinaryOp.Less:
-                        boolResult = left < right;
-                        break;
-                    case BinaryOp.LessEqual:
-                        boolResult = left <= right;
-                        break;
-                    case BinaryOp.Greater:
-                        boolResult = left > right;
-                        break;
-                    case BinaryOp.GreaterEqual:
-                        boolResult = left >= right;
-                        break;
-                    default:
-                        throw new UnreachableException();
-                }
-            }
+                Value = value,
+                Type = BuiltinType.AbstractInt,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
         }
-        catch (OverflowException)
+
+        HIRExpr MakeBoolValue(bool value)
         {
-            Error("Result is out of range", syntax);
+            return new HIRExprBoolConst
+            {
+                Value = value,
+                Type = BuiltinType.Bool,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        HIRExpr MakeErrorAndReport(string message)
+        {
+            Error(message, syntax);
             return new HIRExprError
             {
                 Children = [],
@@ -1388,34 +1339,61 @@ public class Sema
             };
         }
 
-        if (intResult != null)
+        try
         {
-            return new HIRExprIntConst
+            checked
             {
-                Value = intResult.Value,
-                Type = BuiltinType.AbstractInt,
-                Syntax = syntax,
-                IsSynthesized = true,
-            };
+                switch (op)
+                {
+                    case BinaryOp.BitAnd:
+                        return MakeIntValue(left & right);
+                    case BinaryOp.BitOr:
+                        return MakeIntValue(left | right);
+                    case BinaryOp.BitXor:
+                        return MakeIntValue(left ^ right);
+                    case BinaryOp.BitShiftLeft:
+                        return MakeIntValue(left << int.CreateChecked(right));
+                    case BinaryOp.BitShiftRight:
+                        return MakeIntValue(left >> int.CreateChecked(right));
+                    case BinaryOp.LogicAnd:
+                    case BinaryOp.LogicOr:
+                        return MakeErrorAndReport("Cannot use logic operators on integer numbers");
+                    case BinaryOp.Plus:
+                        return MakeIntValue(left + right);
+                    case BinaryOp.Minus:
+                        return MakeIntValue(left - right);
+                    case BinaryOp.Mul:
+                        return MakeIntValue(left * right);
+                    case BinaryOp.Div:
+                        return MakeIntValue(left / right);
+                    case BinaryOp.Rem:
+                        return MakeIntValue(left % right);
+                    case BinaryOp.Equal:
+                        return MakeBoolValue(left == right);
+                    case BinaryOp.NotEqual:
+                        return MakeBoolValue(left != right);
+                    case BinaryOp.Less:
+                        return MakeBoolValue(left < right);
+                    case BinaryOp.LessEqual:
+                        return MakeBoolValue(left <= right);
+                    case BinaryOp.Greater:
+                        return MakeBoolValue(left > right);
+                    case BinaryOp.GreaterEqual:
+                        return MakeBoolValue(left >= right);
+                    default:
+                        throw new UnreachableException();
+                }
+            }
         }
-
-        if (boolResult != null)
+        catch (OverflowException)
         {
-            return new HIRExprBoolConst
-            {
-                Value = boolResult.Value,
-                Type = BuiltinType.Bool,
-                Syntax = syntax,
-                IsSynthesized = true,
-            };
+            return MakeErrorAndReport("Result is out of range");
         }
-
-        throw new UnreachableException();
     }
 
     private HIRExpr ComputeBinaryOp(bool left, bool right, BinaryOp op, Node syntax)
     {
-        HIRExpr MakeValue(bool value)
+        HIRExpr MakeBoolValue(bool value)
         {
             return new HIRExprBoolConst
             {
@@ -1445,12 +1423,12 @@ public class Sema
                 return MakeErrorAndReport("Cannot use bitwise operators on bools");
             case BinaryOp.BitAnd:
             case BinaryOp.LogicAnd:
-                return MakeValue(left && right);
+                return MakeBoolValue(left && right);
             case BinaryOp.LogicOr:
             case BinaryOp.BitOr:
-                return MakeValue(left || right);
+                return MakeBoolValue(left || right);
             case BinaryOp.BitXor:
-                return MakeValue(left ^ right);
+                return MakeBoolValue(left ^ right);
             case BinaryOp.Plus:
             case BinaryOp.Minus:
             case BinaryOp.Mul:
@@ -1458,9 +1436,9 @@ public class Sema
             case BinaryOp.Rem:
                 return MakeErrorAndReport("Cannot use arithmetic operators on bools");
             case BinaryOp.Equal:
-                return MakeValue(left == right);
+                return MakeBoolValue(left == right);
             case BinaryOp.NotEqual:
-                return MakeValue(left != right);
+                return MakeBoolValue(left != right);
             case BinaryOp.Less:
             case BinaryOp.LessEqual:
             case BinaryOp.Greater:
