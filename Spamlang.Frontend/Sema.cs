@@ -1199,6 +1199,11 @@ public class Sema
     {
         HIRExpr MakeFloatValue(double value)
         {
+            if (!double.IsFinite(value))
+            {
+                return MakeErrorAndReport("Result is not a number");
+            }
+
             return new HIRExprFloatConst
             {
                 Value = value,
@@ -1419,6 +1424,11 @@ public class Sema
     {
         HIRExpr MakeFloatValue(double value)
         {
+            if (!double.IsFinite(value))
+            {
+                return MakeErrorAndReport("Result is not a number");
+            }
+
             return new HIRExprFloatConst
             {
                 Value = value,
