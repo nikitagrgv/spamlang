@@ -1197,8 +1197,40 @@ public class Sema
 
     private HIRExpr ComputeBinaryOp(double left, double right, BinaryOp op, Node syntax)
     {
-        double? floatResult = null;
-        bool? boolResult = null;
+        HIRExpr MakeFloatValue(double value)
+        {
+            return new HIRExprFloatConst
+            {
+                Value = value,
+                Type = BuiltinType.AbstractFloat,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        HIRExpr MakeBoolValue(bool value)
+        {
+            return new HIRExprBoolConst
+            {
+                Value = value,
+                Type = BuiltinType.Bool,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        HIRExpr MakeErrorAndReport(string message)
+        {
+            Error(message, syntax);
+            return new HIRExprError
+            {
+                Children = [],
+                Type = BuiltinType.Error,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
         try
         {
             checked
@@ -1210,57 +1242,32 @@ public class Sema
                     case BinaryOp.BitXor:
                     case BinaryOp.BitShiftLeft:
                     case BinaryOp.BitShiftRight:
-                        Error("Cannot use bitwise operators on float numbers", syntax);
-                        return new HIRExprError
-                        {
-                            Children = [],
-                            Type = BuiltinType.Error,
-                            Syntax = syntax,
-                            IsSynthesized = true,
-                        };
+                        return MakeErrorAndReport("Cannot use bitwise operators on float numbers");
                     case BinaryOp.LogicAnd:
                     case BinaryOp.LogicOr:
-                        Error("Cannot use logic operators on float numbers", syntax);
-                        return new HIRExprError
-                        {
-                            Children = [],
-                            Type = BuiltinType.Bool,
-                            Syntax = syntax,
-                            IsSynthesized = true,
-                        };
+                        return MakeErrorAndReport("Cannot use logic operators on float numbers");
                     case BinaryOp.Plus:
-                        floatResult = left + right;
-                        break;
+                        return MakeFloatValue(left + right);
                     case BinaryOp.Minus:
-                        floatResult = left - right;
-                        break;
+                        return MakeFloatValue(left - right);
                     case BinaryOp.Mul:
-                        floatResult = left * right;
-                        break;
+                        return MakeFloatValue(left * right);
                     case BinaryOp.Div:
-                        floatResult = left / right;
-                        break;
+                        return MakeFloatValue(left / right);
                     case BinaryOp.Rem:
-                        floatResult = left % right;
-                        break;
+                        return MakeFloatValue(left % right);
                     case BinaryOp.Equal:
-                        boolResult = left == right;
-                        break;
+                        return MakeBoolValue(left == right);
                     case BinaryOp.NotEqual:
-                        boolResult = left != right;
-                        break;
+                        return MakeBoolValue(left != right);
                     case BinaryOp.Less:
-                        boolResult = left < right;
-                        break;
+                        return MakeBoolValue(left < right);
                     case BinaryOp.LessEqual:
-                        boolResult = left <= right;
-                        break;
+                        return MakeBoolValue(left <= right);
                     case BinaryOp.Greater:
-                        boolResult = left > right;
-                        break;
+                        return MakeBoolValue(left > right);
                     case BinaryOp.GreaterEqual:
-                        boolResult = left >= right;
-                        break;
+                        return MakeBoolValue(left >= right);
                     default:
                         throw new UnreachableException();
                 }
@@ -1268,39 +1275,8 @@ public class Sema
         }
         catch (OverflowException)
         {
-            Error("Result is out of range", syntax);
-            return new HIRExprError
-            {
-                Children = [],
-                Type = BuiltinType.Error,
-                Syntax = syntax,
-                IsSynthesized = true,
-            };
+            return MakeErrorAndReport("Result is out of range");
         }
-
-        if (floatResult != null)
-        {
-            return new HIRExprFloatConst
-            {
-                Value = floatResult.Value,
-                Type = BuiltinType.AbstractFloat,
-                Syntax = syntax,
-                IsSynthesized = true,
-            };
-        }
-
-        if (boolResult != null)
-        {
-            return new HIRExprBoolConst
-            {
-                Value = boolResult.Value,
-                Type = BuiltinType.Bool,
-                Syntax = syntax,
-                IsSynthesized = true,
-            };
-        }
-
-        throw new UnreachableException();
     }
 
     private HIRExpr ComputeBinaryOp(Int128 left, Int128 right, BinaryOp op, Node syntax)
