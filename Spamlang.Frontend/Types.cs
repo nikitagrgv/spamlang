@@ -63,8 +63,8 @@ public sealed class BuiltinType : SpamType
     public static readonly BuiltinType U32 = new(TypeKind.UnsignedInteger, "u32", 4, 4);
     public static readonly BuiltinType U64 = new(TypeKind.UnsignedInteger, "u64", 8, 8);
 
-    public static readonly BuiltinType F32 = new(TypeKind.UnsignedInteger, "f32", 4, 4);
-    public static readonly BuiltinType F64 = new(TypeKind.UnsignedInteger, "f64", 8, 8);
+    public static readonly BuiltinType F32 = new(TypeKind.Float, "f32", 4, 4);
+    public static readonly BuiltinType F64 = new(TypeKind.Float, "f64", 8, 8);
 
     public static readonly BuiltinType Bool = new(TypeKind.Bool, "bool", 1, 1);
 }
