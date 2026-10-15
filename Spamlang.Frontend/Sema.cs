@@ -327,6 +327,7 @@ public class Sema
     {
         HIRExpr expr = VisitExpr(stmt.Expr);
         expr = ToRValue(expr);
+        expr = AbstractNumberToDefaultType(expr);
         return new HIRStmtExpr
         {
             Expr = expr,
