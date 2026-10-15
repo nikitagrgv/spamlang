@@ -1138,6 +1138,7 @@ public class Sema
         };
     }
 
+    // TODO: Const folding for non-abstract int/float!
     private HIRExpr? TryConstFoldBinary(HIRExpr left, HIRExpr right, BinaryOp op, Node syntax)
     {
         if (left.Type == BuiltinType.Bool && right.Type == BuiltinType.Bool)
@@ -1166,6 +1167,7 @@ public class Sema
         return ComputeBinaryOp(GetIntValue(left), GetIntValue(right), op, syntax);
     }
 
+    // TODO: Const folding for non-abstract int/float!
     private HIRExpr? TryConstFoldUnary(HIRExpr operand, UnaryOp op, Node syntax)
     {
         if (operand.Type == BuiltinType.Bool)
