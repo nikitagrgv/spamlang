@@ -1440,28 +1440,18 @@ public class Sema
             };
         }
 
-        try
+        switch (op)
         {
-            checked
-            {
-                switch (op)
-                {
-                    case UnaryOp.BitNot:
-                        return MakeErrorAndReport("Cannot use bitwise operators on float numbers");
-                    case UnaryOp.Not:
-                        return MakeErrorAndReport("Cannot use logic operators on float numbers");
-                    case UnaryOp.Plus:
-                        return MakeFloatValue(operand);
-                    case UnaryOp.Minus:
-                        return MakeFloatValue(-operand);
-                    default:
-                        throw new UnreachableException();
-                }
-            }
-        }
-        catch (OverflowException)
-        {
-            return MakeErrorAndReport("Result is out of range");
+            case UnaryOp.BitNot:
+                return MakeErrorAndReport("Cannot use bitwise operators on float numbers");
+            case UnaryOp.Not:
+                return MakeErrorAndReport("Cannot use logic operators on float numbers");
+            case UnaryOp.Plus:
+                return MakeFloatValue(operand);
+            case UnaryOp.Minus:
+                return MakeFloatValue(-operand);
+            default:
+                throw new UnreachableException();
         }
     }
 
