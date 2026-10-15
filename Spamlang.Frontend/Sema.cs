@@ -1152,12 +1152,13 @@ public class Sema
 
     private HIRExpr? TryConstFoldCast(HIRExpr expr, SpamType targetType, Node syntax)
     {
+        Debug.Assert(targetType.Kind != TypeKind.AbstractNumber);
         if (expr.Type == BuiltinType.Error || targetType == BuiltinType.Error)
         {
             return null;
         }
 
-        if (!CanExplicitlyCast(expr.Type, targetType))
+        HIRExpr MakeError()
         {
             Error($"Cannot cast \"{expr.Type}\" to \"{targetType}\"", syntax);
             return new HIRExprError
@@ -1168,6 +1169,65 @@ public class Sema
                 IsSynthesized = true,
             };
         }
+
+        if (!CanExplicitlyCast(expr.Type, targetType))
+        {
+            return MakeError();
+        }
+
+        Int128? valueInt = null;
+        double? valueDouble = null;
+        if (expr is HIRExprIntConst exprIntConst)
+        {
+            valueInt = exprIntConst.Value;
+        }
+        else if (expr is HIRExprFloatConst exprFloatConst)
+        {
+            valueDouble = exprFloatConst.Value;
+        }
+        else
+        {
+            return null;
+        }
+
+        Debug.Assert(valueInt.HasValue || valueDouble.HasValue);
+
+        TypeKind kind = targetType.Kind;
+        if (kind == TypeKind.Float)
+        {
+            double value = valueDouble ?? double.CreateChecked(valueInt!.Value);
+            if (!IsValidValueForType(value, targetType))
+            {
+                return MakeError();
+            }
+
+            return new HIRExprFloatConst
+            {
+                Value = value,
+                Type = targetType,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        if (kind == TypeKind.SignedInteger || kind == TypeKind.UnsignedInteger)
+        {
+            Int128 value = valueInt ?? Int128.CreateChecked(valueDouble!.Value);
+            if (!IsValidValueForType(value, targetType))
+            {
+                return MakeError();
+            }
+
+            return new HIRExprIntConst()
+            {
+                Value = value,
+                Type = targetType,
+                Syntax = syntax,
+                IsSynthesized = true,
+            };
+        }
+
+        return null;
     }
 
     // TODO: Const folding for non-abstract int/float!
@@ -1718,6 +1778,7 @@ public class Sema
 
         if (type == BuiltinType.F64)
         {
+            // TODO: Wtf? Useless check?
             return value <= double.MaxValue && value >= double.MinValue;
         }
 
