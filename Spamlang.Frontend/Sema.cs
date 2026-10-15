@@ -733,6 +733,12 @@ public class Sema
             };
         }
 
+        HIRExpr? folded = TryConstFoldCast(value, targetType, expr);
+        if (folded != null)
+        {
+            return folded;
+        }
+
         return new HIRExprCast
         {
             Value = value,
@@ -1129,6 +1135,12 @@ public class Sema
             };
         }
 
+        HIRExpr? folded = TryConstFoldCast(expr, targetType, expr.Syntax);
+        if (folded != null)
+        {
+            return folded;
+        }
+
         return new HIRExprCast
         {
             Value = expr,
@@ -1136,6 +1148,10 @@ public class Sema
             Syntax = expr.Syntax,
             IsSynthesized = true,
         };
+    }
+
+    private HIRExpr? TryConstFoldCast(HIRExpr expr, SpamType targetType, Node syntax)
+    {
     }
 
     // TODO: Const folding for non-abstract int/float!
