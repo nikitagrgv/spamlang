@@ -1160,19 +1160,13 @@ public class Sema
 
         HIRExpr MakeError()
         {
-            string? valueStr = null;
-            if (expr is HIRExprIntConst intConst)
+            string? valueStr = expr switch
             {
-                valueStr = intConst.Value.ToString();
-            }
-            else if (expr is HIRExprFloatConst floatConst)
-            {
-                valueStr = floatConst.Value.ToString(CultureInfo.InvariantCulture);
-            }
-            else if (expr is HIRExprBoolConst boolConst)
-            {
-                valueStr = boolConst.Value ? "true" : "false";
-            }
+                HIRExprIntConst intConst => intConst.Value.ToString(),
+                HIRExprFloatConst floatConst => floatConst.Value.ToString(CultureInfo.InvariantCulture),
+                HIRExprBoolConst boolConst => boolConst.Value ? "true" : "false",
+                _ => null,
+            };
 
             string message = "Cannot cast ";
             if (valueStr != null)
