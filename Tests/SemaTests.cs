@@ -69,8 +69,18 @@ public class SemaTests
 
         HIRExprBinary assignACallArgValue = Assert.IsType<HIRExprBinary>(assignACallArg.Value);
         Assert.Equal(BuiltinType.I64, assignACallArgValue.Type);
-    }
 
+        HIRExprCast leftCast = Assert.IsType<HIRExprCast>(assignACallArgValue);
+        Assert.True(leftCast.IsSynthesized);
+        Assert.Equal(BuiltinType.I64, leftCast.Type);
+
+        HIRExprLoad leftLoad = Assert.IsType<HIRExprLoad>(leftCast.Value);
+        Assert.Equal(BuiltinType.I16, leftLoad.Type);
+
+        HIRExprLocalRef leftRef = Assert.IsType<HIRExprLocalRef>(leftLoad.Address);
+        Assert.Equal(BuiltinType.I16, leftRef.Type);
+        Assert.Equal(letA.VariableSymbol, leftRef.Symbol);
+    }
 
     private class Tester
     {
