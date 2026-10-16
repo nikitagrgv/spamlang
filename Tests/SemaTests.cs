@@ -18,7 +18,7 @@ public class SemaTests
 
                       fn foo(value: i64) -> i8
                       {
-                          return value as i8 + 10;
+                          return value as i8;
                       }
                       """;
         Tester tester = Tester.BuildCode(code);
