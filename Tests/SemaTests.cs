@@ -8,19 +8,19 @@ public class SemaTests
     [Fact]
     public void Sema_BuildsSimpleProgram()
     {
-        string code = $$"""
-                        fn main() -> i32
-                        {
-                            let a: i16 = 111;
-                            a = foo(value: a + 222);
-                            return 333;
-                        }
+        string code = """
+                      fn main() -> i32
+                      {
+                          let a: i16 = 111;
+                          a = foo(value: a + 222);
+                          return 333;
+                      }
 
-                        fn foo(value: i64) -> i8
-                        {
-                            return value as i8 + 10;
-                        }
-                        """;
+                      fn foo(value: i64) -> i8
+                      {
+                          return value as i8 + 10;
+                      }
+                      """;
         Tester tester = Tester.BuildCode(code);
         Assert.False(tester.HasErrors, tester.DumpErrors);
 
