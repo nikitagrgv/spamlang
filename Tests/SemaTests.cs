@@ -84,6 +84,12 @@ public class SemaTests
         HIRExprIntConst rightConst = Assert.IsType<HIRExprIntConst>(assignABinary.Right);
         Assert.Equal(BuiltinType.I16, rightConst.Type);
         Assert.Equal(222, rightConst.Value);
+
+        // return 333;
+        HIRStmtReturn returnStmt = Assert.IsType<HIRStmtReturn>(main.Body.Stmts[2]);
+        HIRExprIntConst returnExpr = Assert.IsType<HIRExprIntConst>(returnStmt.Value);
+        Assert.Equal(BuiltinType.I32, returnExpr.Type);
+        Assert.Equal(333, returnExpr.Value);
     }
 
     private class Tester
