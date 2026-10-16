@@ -80,6 +80,10 @@ public class SemaTests
         HIRExprLocalRef leftRef = Assert.IsType<HIRExprLocalRef>(leftLoad.Address);
         Assert.Equal(BuiltinType.I16, leftRef.Type);
         Assert.Equal(letA.VariableSymbol, leftRef.Symbol);
+
+        HIRExprIntConst rightConst = Assert.IsType<HIRExprIntConst>(assignABinary.Right);
+        Assert.Equal(BuiltinType.I16, rightConst.Type);
+        Assert.Equal(222, rightConst.Value);
     }
 
     private class Tester
