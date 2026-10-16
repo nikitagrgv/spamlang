@@ -5,31 +5,100 @@ namespace Tests;
 
 public class SemaTests
 {
+    [Fact]
+    public void Sema_BuildsSimpleProgram()
+    {
+        string code = $$"""
+                        fn main() -> i32
+                        {
+                            let a: i16 = 123;
+                            a = foo(a + 456);
+                        }
+
+                        fn foo(value: i64) -> i8
+                        {
+                            return value as i8 + 1;
+                        }
+                        """;
+        Tester tester = Tester.BuildCode(code);
+        
+        
+    }
+
     private class Tester
     {
         private readonly string _code;
         private readonly Diagnostic _diag;
         private readonly List<Token> _tokens;
-        private readonly HIRStmt _stmt;
+        private readonly HIRStmt? _stmt;
+        private readonly HIRCompilationUnit _unit;
+
+        private enum Kind
+        {
+            Code,
+            Stmt,
+        }
 
         public string Code => _code;
         public Diagnostic Diag => _diag;
+        public HIRCompilationUnit Unit => _unit;
         public bool HasErrors => _diag.HasErrors;
 
-        public static Tester AnalyzeStmt(string stmtCode)
+        public HIRStmt Stmt
         {
-            Tester tester = new(stmtCode);
+            get
+            {
+                Assert.NotNull(_stmt);
+                return _stmt;
+            }
+        }
+
+        public HIRStmtLet StmtLet
+        {
+            get
+            {
+                Assert.IsType<HIRStmtLet>(_stmt);
+                return (HIRStmtLet)_stmt;
+            }
+        }
+
+        public HIRStmtExpr StmtExpr
+        {
+            get
+            {
+                Assert.IsType<HIRStmtExpr>(_stmt);
+                return (HIRStmtExpr)_stmt;
+            }
+        }
+
+        public static Tester BuildCode(string code)
+        {
+            Tester tester = new(code, Kind.Code);
             return tester;
         }
 
-        private Tester(string stmtCode)
+        public static Tester BuildStmt(string stmtCode)
         {
-            _code = $$"""
-                      fn main() -> i32
-                      {
-                          {{stmtCode}};
-                      }
-                      """;
+            Tester tester = new(stmtCode, Kind.Stmt);
+            return tester;
+        }
+
+        private Tester(string code, Kind kind)
+        {
+            if (kind == Kind.Stmt)
+            {
+                _code = $$"""
+                          fn main() -> i32
+                          {
+                              {{code}};
+                          }
+                          """;
+            }
+            else
+            {
+                _code = code;
+            }
+
             _diag = new Diagnostic();
 
             Lexer lexer = new(_code, _diag);
@@ -40,16 +109,19 @@ public class SemaTests
 
             TypeRegistry tr = new();
             Sema sema = new(_code, _tokens, _diag, tr);
-            HIRCompilationUnit hirUnit = sema.Run(unit);
+            _unit = sema.Run(unit);
 
-            Assert.Single(hirUnit.FuncDecls);
-            HIRFuncDecl main = hirUnit.FuncDecls[0];
-            Assert.Equal("main", main.Symbol.Name);
+            if (kind == Kind.Stmt)
+            {
+                Assert.Single(_unit.FuncDecls);
+                HIRFuncDecl main = _unit.FuncDecls[0];
+                Assert.Equal("main", main.Symbol.Name);
 
-            Assert.Single(main.Body.Stmts);
-            HIRStmt stmt = main.Body.Stmts[0];
+                Assert.Single(main.Body.Stmts);
+                HIRStmt stmt = main.Body.Stmts[0];
 
-            _stmt = stmt;
+                _stmt = stmt;
+            }
         }
     }
 }
