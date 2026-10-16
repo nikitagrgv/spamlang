@@ -55,6 +55,8 @@ public class SemaTests
         Assert.IsType<HIRExprLocalRef>(assignA.Target);
         HIRExprLocalRef assignATarget = (HIRExprLocalRef)assignA.Target;
         Assert.Equal(letA.VariableSymbol, assignATarget.Symbol);
+        Assert.IsType<HIRExprCall>(assignA.Value);
+        HIRExprCall assignAValue = (HIRExprCall)assignA.Value;
     }
 
     private class Tester
