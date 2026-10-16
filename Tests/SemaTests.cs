@@ -21,6 +21,9 @@ public class SemaTests
                         }
                         """;
         Tester tester = Tester.BuildCode(code);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+
+        HIRCompilationUnit unit = tester.Unit;
     }
 
     private class Tester
@@ -41,6 +44,7 @@ public class SemaTests
         public Diagnostic Diag => _diag;
         public HIRCompilationUnit Unit => _unit;
         public bool HasErrors => _diag.HasErrors;
+        public string DumpErrors => _diag.PrettyString();
 
         public HIRStmt Stmt
         {

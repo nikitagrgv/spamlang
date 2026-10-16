@@ -85,7 +85,7 @@ public class ParserTest
 
         ExprTester tester = ExprTester.Parse(code);
 
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.IsType<ExprBinary>(tester.Result);
         Assert.Equal(op, tester.ResultAs<ExprBinary>().Op);
         Assert.Equal($"(a {op.AsString()} b)", tester.Flat);
@@ -99,7 +99,7 @@ public class ParserTest
 
         ExprTester tester = ExprTester.Parse(code);
 
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.IsType<ExprUnary>(tester.Result);
         Assert.Equal(op, tester.ResultAs<ExprUnary>().Op);
         Assert.Equal($"({op.AsString()}a)", tester.Flat);
@@ -112,7 +112,7 @@ public class ParserTest
 
         ExprTester tester = ExprTester.Parse(code);
 
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.IsType<ExprCast>(tester.Result);
         Assert.Equal("a", tester.ToFlat(tester.ResultAs<ExprCast>().Value));
         Assert.Equal("b", tester.ToFlat(tester.ResultAs<ExprCast>().TargetType));
@@ -126,7 +126,7 @@ public class ParserTest
 
         ExprTester tester = ExprTester.Parse(code);
 
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.IsType<ExprCall>(tester.Result);
         Assert.Equal("f", tester.ToFlat(tester.ResultAs<ExprCall>().Callee));
         Assert.Single(tester.ResultAs<ExprCall>().Args);
@@ -141,7 +141,7 @@ public class ParserTest
 
         ExprTester tester = ExprTester.Parse(code);
 
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.IsType<ExprCall>(tester.Result);
 
         Assert.Equal(2, tester.ResultAs<ExprCall>().Args.Count);
@@ -165,7 +165,7 @@ public class ParserTest
         string code = $"a {opStr} b {opStr} c {opStr} d";
 
         ExprTester tester = ExprTester.Parse(code);
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
 
         Assert.Equal($"(((a {opStr} b) {opStr} c) {opStr} d)", tester.Flat);
     }
@@ -176,7 +176,7 @@ public class ParserTest
         string code = "a(b)(c)(d)";
 
         ExprTester tester = ExprTester.Parse(code);
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
 
         Assert.Equal("(((a(b))(c))(d))", tester.Flat);
     }
@@ -187,7 +187,7 @@ public class ParserTest
         string code = "a as b as c as d";
 
         ExprTester tester = ExprTester.Parse(code);
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
 
         Assert.Equal("(((a as b) as c) as d)", tester.Flat);
     }
@@ -198,7 +198,7 @@ public class ParserTest
         string code = "-+!~a";
 
         ExprTester tester = ExprTester.Parse(code);
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
 
         Assert.Equal("(-(+(!(~a))))", tester.Flat);
     }
@@ -211,7 +211,7 @@ public class ParserTest
         string code = $"{opStr}a(b)";
 
         ExprTester tester = ExprTester.Parse(code);
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.Equal($"({opStr}(a(b)))", tester.Flat);
     }
 
@@ -223,7 +223,7 @@ public class ParserTest
         string code = $"{opStr}a as b";
 
         ExprTester tester = ExprTester.Parse(code);
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.Equal($"(({opStr}a) as b)", tester.Flat);
     }
 
@@ -235,7 +235,7 @@ public class ParserTest
         string code = $"a {opStr} b as c";
 
         ExprTester tester = ExprTester.Parse(code);
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.Equal($"(a {opStr} (b as c))", tester.Flat);
     }
 
@@ -250,12 +250,12 @@ public class ParserTest
 
             string code = $"a {op} {u}c";
             ExprTester tester = ExprTester.Parse(code);
-            Assert.False(tester.HasErrors);
+            Assert.False(tester.HasErrors, tester.DumpErrors);
             Assert.Equal($"(a {op} ({u}c))", tester.Flat);
 
             code = $"{u}a {op} c";
             tester = ExprTester.Parse(code);
-            Assert.False(tester.HasErrors);
+            Assert.False(tester.HasErrors, tester.DumpErrors);
             Assert.Equal($"(({u}a) {op} c)", tester.Flat);
         }
     }
@@ -284,7 +284,7 @@ public class ParserTest
             string code = $"a {op1Str} b {op2Str} c";
 
             ExprTester tester = ExprTester.Parse(code);
-            Assert.False(tester.HasErrors);
+            Assert.False(tester.HasErrors, tester.DumpErrors);
 
             string expected;
             if (v1.prec >= v2.prec)
@@ -315,12 +315,12 @@ public class ParserTest
             // Still can combine them with parentheses
             code = $"(a {op1Str} b) {op2Str} c";
             tester = ExprTester.Parse(code);
-            Assert.False(tester.HasErrors);
+            Assert.False(tester.HasErrors, tester.DumpErrors);
             Assert.Equal($"((a {op1Str} b) {op2Str} c)", tester.Flat);
 
             code = $"a {op1Str} (b {op2Str} c)";
             tester = ExprTester.Parse(code);
-            Assert.False(tester.HasErrors);
+            Assert.False(tester.HasErrors, tester.DumpErrors);
             Assert.Equal($"(a {op1Str} (b {op2Str} c))", tester.Flat);
         }
     }
@@ -340,7 +340,7 @@ public class ParserTest
             if (op1 == op2 || (IsBitShift(op1) && IsBitShift(op2)))
             {
                 // Same bit binary ops are associative
-                Assert.False(tester.HasErrors);
+                Assert.False(tester.HasErrors, tester.DumpErrors);
                 Assert.Equal($"((a {op1Str} b) {op2Str} c)", tester.Flat);
             }
             else
@@ -352,12 +352,12 @@ public class ParserTest
             // Still can combine them with parentheses
             code = $"(a {op1Str} b) {op2Str} c";
             tester = ExprTester.Parse(code);
-            Assert.False(tester.HasErrors);
+            Assert.False(tester.HasErrors, tester.DumpErrors);
             Assert.Equal($"((a {op1Str} b) {op2Str} c)", tester.Flat);
 
             code = $"a {op1Str} (b {op2Str} c)";
             tester = ExprTester.Parse(code);
-            Assert.False(tester.HasErrors);
+            Assert.False(tester.HasErrors, tester.DumpErrors);
             Assert.Equal($"(a {op1Str} (b {op2Str} c))", tester.Flat);
         }
     }
@@ -370,7 +370,7 @@ public class ParserTest
     public void Parser_ParsesComplexExpressions(string code, string expectedFlat)
     {
         ExprTester tester = ExprTester.Parse(code);
-        Assert.False(tester.HasErrors);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
         Assert.Equal(expectedFlat, tester.Flat);
     }
 
@@ -389,6 +389,7 @@ public class ParserTest
         public string Flat => _flat;
         public Diagnostic Diag => _diag;
         public bool HasErrors => _diag.HasErrors;
+        public string DumpErrors => _diag.PrettyString();
 
         public T ResultAs<T>() where T : Node => (T)_result;
 
