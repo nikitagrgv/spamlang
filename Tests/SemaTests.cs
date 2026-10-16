@@ -11,13 +11,14 @@ public class SemaTests
         string code = $$"""
                         fn main() -> i32
                         {
-                            let a: i16 = 123;
-                            a = foo(a + 456);
+                            let a: i16 = 111;
+                            a = foo(a + 222);
+                            return 333;
                         }
 
                         fn foo(value: i64) -> i8
                         {
-                            return value as i8 + 1;
+                            return value as i8 + 10;
                         }
                         """;
         Tester tester = Tester.BuildCode(code);
