@@ -21,8 +21,6 @@ public class SemaTests
                         }
                         """;
         Tester tester = Tester.BuildCode(code);
-        
-        
     }
 
     private class Tester
