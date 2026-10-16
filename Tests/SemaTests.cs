@@ -18,6 +18,8 @@ public class SemaTests
 
         public static Tester Parse(string stmtCode)
         {
+            Tester tester = new(stmtCode);
+            return tester;
         }
 
         private Tester(string stmtCode)
