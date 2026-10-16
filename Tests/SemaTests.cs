@@ -50,6 +50,8 @@ public class SemaTests
         Assert.Equal(111, initA.Value);
 
         // a = foo(a + 222);
+        Assert.IsType<HIRStmtAssign>(main.Body.Stmts[1]);
+        HIRStmtAssign assignA = (HIRStmtAssign)main.Body.Stmts[1];
     }
 
     private class Tester
