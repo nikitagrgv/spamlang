@@ -52,11 +52,22 @@ public class SemaTests
         // a = foo(a + 222);
         Assert.IsType<HIRStmtAssign>(main.Body.Stmts[1]);
         HIRStmtAssign assignA = (HIRStmtAssign)main.Body.Stmts[1];
+
         Assert.IsType<HIRExprLocalRef>(assignA.Target);
         HIRExprLocalRef assignATarget = (HIRExprLocalRef)assignA.Target;
         Assert.Equal(letA.VariableSymbol, assignATarget.Symbol);
-        Assert.IsType<HIRExprCall>(assignA.Value);
-        HIRExprCall assignAValue = (HIRExprCall)assignA.Value;
+
+        Assert.IsType<HIRExprCast>(assignA.Value);
+        HIRExprCast assignACast = (HIRExprCast)assignA.Value;
+        Assert.True(assignACast.IsSynthesized);
+        Assert.Equal(BuiltinType.I16, assignACast.Type);
+
+        Assert.IsType<HIRExprCall>(assignACast.Value);
+        HIRExprCall assignACall = (HIRExprCall)assignACast.Value;
+        Assert.Equal(BuiltinType.I8, assignACall.Type);
+        Assert.IsType<HIRExprFuncRef>(assignACall.Callee);
+        HIRExprFuncRef assignACallCallee = (HIRExprFuncRef)assignACall.Callee;
+        Assert.Equal(fooSym, assignACallCallee.Symbol);
     }
 
     private class Tester
