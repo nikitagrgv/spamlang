@@ -25,6 +25,14 @@ public class SemaTests
         Assert.False(tester.HasErrors, tester.DumpErrors);
 
         HIRCompilationUnit unit = tester.Unit;
+        Assert.Equal(2, unit.FuncDecls.Count);
+
+        // Check main
+        HIRFuncDecl main = unit.FuncDecls[0];
+        Assert.Equal("main", main.Symbol.Name);
+
+        Assert.Equal(3, main.Body.Stmts.Count);
+        
     }
 
     private class Tester
