@@ -67,12 +67,12 @@ public class SemaTests
         HIRCallArg assignACallArg = assignACall.Args[0];
         Assert.Equal(0, assignACallArg.ParameterIndex);
 
-        HIRExprBinary assignACallArgValue = Assert.IsType<HIRExprBinary>(assignACallArg.Value);
-        Assert.Equal(BuiltinType.I64, assignACallArgValue.Type);
-
-        HIRExprCast leftCast = Assert.IsType<HIRExprCast>(assignACallArgValue);
+        HIRExprCast leftCast = Assert.IsType<HIRExprCast>(assignACallArg.Value);
         Assert.True(leftCast.IsSynthesized);
         Assert.Equal(BuiltinType.I64, leftCast.Type);
+
+        HIRExprBinary leftBinary = Assert.IsType<HIRExprBinary>(leftCast.Value);
+        Assert.Equal(BuiltinType.I16, leftBinary.Type);
 
         HIRExprLoad leftLoad = Assert.IsType<HIRExprLoad>(leftCast.Value);
         Assert.Equal(BuiltinType.I16, leftLoad.Type);
