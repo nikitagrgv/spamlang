@@ -62,6 +62,10 @@ public class SemaTests
 
         HIRExprFuncRef assignACallCallee = Assert.IsType<HIRExprFuncRef>(assignACall.Callee);
         Assert.Equal(fooSym, assignACallCallee.Symbol);
+
+        Assert.Single(assignACall.Args);
+        HIRCallArg assignACallArg = assignACall.Args[0];
+        Assert.Equal(0, assignACallArg.ParameterIndex);
     }
 
 
