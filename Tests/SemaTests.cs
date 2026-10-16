@@ -27,12 +27,16 @@ public class SemaTests
         HIRCompilationUnit unit = tester.Unit;
         Assert.Equal(2, unit.FuncDecls.Count);
 
-        // Check main
         HIRFuncDecl main = unit.FuncDecls[0];
-        Assert.Equal("main", main.Symbol.Name);
+        FuncSymbol mainSym = main.Symbol;
+        Assert.Equal("main", mainSym.Name);
 
+        HIRFuncDecl foo = unit.FuncDecls[1];
+        FuncSymbol fooSym = foo.Symbol;
+        Assert.Equal("foo", fooSym.Name);
+
+        // let a: i16 = 111;
         Assert.Equal(3, main.Body.Stmts.Count);
-        
     }
 
     private class Tester
