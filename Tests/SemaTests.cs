@@ -35,8 +35,18 @@ public class SemaTests
         FuncSymbol fooSym = foo.Symbol;
         Assert.Equal("foo", fooSym.Name);
 
-        // let a: i16 = 111;
+        // main
         Assert.Equal(3, main.Body.Stmts.Count);
+
+        // let a: i16 = 111;
+        Assert.IsType<HIRStmtLet>(main.Body.Stmts[0]);
+        HIRStmtLet letA = (HIRStmtLet)main.Body.Stmts[0];
+        Assert.Equal("a", letA.VariableSymbol.Name);
+        Assert.Equal(BuiltinType.I16, letA.VariableSymbol.Type);
+        Assert.IsType<HIRExprIntConst>(letA.Init);
+        HIRExprIntConst initA = (HIRExprIntConst)letA.Init;
+        Assert.Equal(BuiltinType.I16, initA.Type);
+        Assert.Equal(111, initA.Value);
     }
 
     private class Tester
