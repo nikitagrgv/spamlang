@@ -66,7 +66,9 @@ public class SemaTests
         Assert.Single(assignACall.Args);
         HIRCallArg assignACallArg = assignACall.Args[0];
         Assert.Equal(0, assignACallArg.ParameterIndex);
+
         HIRExprBinary assignACallArgValue = Assert.IsType<HIRExprBinary>(assignACallArg.Value);
+        Assert.Equal(BuiltinType.I64, assignACallArgValue.Type);
     }
 
 
