@@ -12,7 +12,7 @@ public class SemaTests
                         fn main() -> i32
                         {
                             let a: i16 = 111;
-                            a = foo(a + 222);
+                            a = foo(value: a + 222);
                             return 333;
                         }
 
