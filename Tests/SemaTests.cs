@@ -52,6 +52,7 @@ public class SemaTests
         // a = foo(a + 222);
         Assert.IsType<HIRStmtAssign>(main.Body.Stmts[1]);
         HIRStmtAssign assignA = (HIRStmtAssign)main.Body.Stmts[1];
+        Assert.IsType<HIRExprLocalRef>(assignA.Target);
     }
 
     private class Tester
