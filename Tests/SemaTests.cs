@@ -39,36 +39,31 @@ public class SemaTests
         Assert.Equal(3, main.Body.Stmts.Count);
 
         // let a: i16 = 111;
-        Assert.IsType<HIRStmtLet>(main.Body.Stmts[0]);
-        HIRStmtLet letA = (HIRStmtLet)main.Body.Stmts[0];
+        HIRStmtLet letA = Assert.IsType<HIRStmtLet>(main.Body.Stmts[0]);
         Assert.Equal("a", letA.VariableSymbol.Name);
         Assert.Equal(BuiltinType.I16, letA.VariableSymbol.Type);
 
-        Assert.IsType<HIRExprIntConst>(letA.Init);
-        HIRExprIntConst initA = (HIRExprIntConst)letA.Init;
+        HIRExprIntConst initA = Assert.IsType<HIRExprIntConst>(letA.Init);
         Assert.Equal(BuiltinType.I16, initA.Type);
         Assert.Equal(111, initA.Value);
 
         // a = foo(a + 222);
-        Assert.IsType<HIRStmtAssign>(main.Body.Stmts[1]);
-        HIRStmtAssign assignA = (HIRStmtAssign)main.Body.Stmts[1];
+        HIRStmtAssign assignA = Assert.IsType<HIRStmtAssign>(main.Body.Stmts[1]);
 
-        Assert.IsType<HIRExprLocalRef>(assignA.Target);
-        HIRExprLocalRef assignATarget = (HIRExprLocalRef)assignA.Target;
+        HIRExprLocalRef assignATarget = Assert.IsType<HIRExprLocalRef>(assignA.Target);
         Assert.Equal(letA.VariableSymbol, assignATarget.Symbol);
 
-        Assert.IsType<HIRExprCast>(assignA.Value);
-        HIRExprCast assignACast = (HIRExprCast)assignA.Value;
+        HIRExprCast assignACast = Assert.IsType<HIRExprCast>(assignA.Value);
         Assert.True(assignACast.IsSynthesized);
         Assert.Equal(BuiltinType.I16, assignACast.Type);
 
-        Assert.IsType<HIRExprCall>(assignACast.Value);
-        HIRExprCall assignACall = (HIRExprCall)assignACast.Value;
+        HIRExprCall assignACall = Assert.IsType<HIRExprCall>(assignACast.Value);
         Assert.Equal(BuiltinType.I8, assignACall.Type);
-        Assert.IsType<HIRExprFuncRef>(assignACall.Callee);
-        HIRExprFuncRef assignACallCallee = (HIRExprFuncRef)assignACall.Callee;
+
+        HIRExprFuncRef assignACallCallee = Assert.IsType<HIRExprFuncRef>(assignACall.Callee);
         Assert.Equal(fooSym, assignACallCallee.Symbol);
     }
+
 
     private class Tester
     {
