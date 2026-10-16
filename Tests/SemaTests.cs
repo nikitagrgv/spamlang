@@ -16,7 +16,7 @@ public class SemaTests
         public Diagnostic Diag => _diag;
         public bool HasErrors => _diag.HasErrors;
 
-        public static Tester Parse(string stmtCode)
+        public static Tester AnalyzeStmt(string stmtCode)
         {
             Tester tester = new(stmtCode);
             return tester;
