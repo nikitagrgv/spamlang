@@ -43,10 +43,13 @@ public class SemaTests
         HIRStmtLet letA = (HIRStmtLet)main.Body.Stmts[0];
         Assert.Equal("a", letA.VariableSymbol.Name);
         Assert.Equal(BuiltinType.I16, letA.VariableSymbol.Type);
+
         Assert.IsType<HIRExprIntConst>(letA.Init);
         HIRExprIntConst initA = (HIRExprIntConst)letA.Init;
         Assert.Equal(BuiltinType.I16, initA.Type);
         Assert.Equal(111, initA.Value);
+
+        // a = foo(a + 222);
     }
 
     private class Tester
