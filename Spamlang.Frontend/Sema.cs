@@ -714,6 +714,8 @@ public class Sema
     private HIRExpr VisitExprCast(ExprCast expr)
     {
         HIRExpr value = VisitExpr(expr.Value);
+        value = ToRValue(value);
+
         SpamType targetType = ResolveType(expr.TargetType);
         if (value.Type == BuiltinType.Error || targetType == BuiltinType.Error)
         {
