@@ -144,12 +144,12 @@ public class SemaTests
     [InlineData("(1111 | 3) + (1 * -4) * 13 | 7", (1111 | 3) + (1 * -4) * 13 | 7)]
     public void Sema_FoldsConstIntExpression(string str, Int128 expected)
     {
-        string stmtCode = $"let a: i64 = {str}";
+        string stmtCode = $"let a = {str}";
         Tester tester = Tester.BuildStmt(stmtCode);
         Assert.False(tester.HasErrors, tester.DumpErrors);
         HIRStmtLet stmt = tester.StmtLet;
-        Assert.Equal(BuiltinType.I64, stmt.Init.Type);
-        Assert.Equal(BuiltinType.I64, stmt.VariableSymbol.Type);
+        Assert.Equal(BuiltinType.I32, stmt.Init.Type);
+        Assert.Equal(BuiltinType.I32, stmt.VariableSymbol.Type);
         HIRExprIntConst init = Assert.IsType<HIRExprIntConst>(stmt.Init);
         Assert.Equal(expected, init.Value);
     }
@@ -163,7 +163,7 @@ public class SemaTests
     [InlineData("2.0 + 3.0 * 4.0 - 24.0 / 3.0", 2.0 + 3.0 * 4.0 - 24.0 / 3.0)]
     public void Sema_FoldsConstFloatExpression(string str, double expected)
     {
-        string stmtCode = $"let a: f64 = {str}";
+        string stmtCode = $"let a = {str}";
         Tester tester = Tester.BuildStmt(stmtCode);
         Assert.False(tester.HasErrors, tester.DumpErrors);
         HIRStmtLet stmt = tester.StmtLet;
@@ -189,7 +189,7 @@ public class SemaTests
     [InlineData("((1 + 3 * -4 - 7/1) & 5) == (2 - 7 | 1)", ((1 + 3 * -4 - 7 / 1) & 5) == (2 - 7 | 1))]
     public void Sema_FoldsConstBoolExpression(string str, bool expected)
     {
-        string stmtCode = $"let a: bool = {str}";
+        string stmtCode = $"let a = {str}";
         Tester tester = Tester.BuildStmt(stmtCode);
         Assert.False(tester.HasErrors, tester.DumpErrors);
         HIRStmtLet stmt = tester.StmtLet;
