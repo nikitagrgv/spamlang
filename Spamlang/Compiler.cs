@@ -372,6 +372,7 @@ public class Compiler
             writer.WriteLine($"{what}: {dt.Milliseconds}ms");
         }
 
+        writer.WriteLine();
         writer.WriteLine($"Total Time: {timers.TotalTime.Milliseconds}ms");
     }
 }
