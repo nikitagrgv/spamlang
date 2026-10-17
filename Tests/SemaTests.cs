@@ -124,6 +124,7 @@ public class SemaTests
         HIRExprIntConst exprConst = Assert.IsType<HIRExprIntConst>(stmt.Init);
         Assert.Equal(BuiltinType.I64, exprConst.Type);
         Assert.False(exprConst.IsSynthesized);
+
         Assert.Equal(expected, exprConst.Value);
     }
 
