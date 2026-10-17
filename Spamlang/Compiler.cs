@@ -353,7 +353,7 @@ public class Compiler
         if (_flags.DebugMIR)
         {
             PrintSeparator();
-            MIRPrinter.Print(mmodule, Console.Out);
+            MIRPrinter.Print(mmodule);
             PrintSeparator();
         }
     }
@@ -367,5 +367,32 @@ public class Compiler
         }
 
         Console.WriteLine("================================================");
+    }
+
+    private void PrintDebug(string name, bool needPrint, Action<TextWriter> print)
+    {
+        if (!needPrint)
+        {
+            return;
+        }
+
+        if (_debugDir == null)
+        {
+            print(Console.Out);
+            return;
+        }
+
+        string dstDir = _fs.ResolveToFullPath(_debugDir);
+        string dst = Path.Join(dstDir, name + ".txt");
+        try
+        {
+            UTF8Encoding encoding = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+            using StreamWriter stream = new(_fs.OpenWrite(dst), encoding);
+            print(stream);
+        }
+        catch
+        {
+            Console.Error.WriteLine($"Couldn't save debug file to {dst}");
+        }
     }
 }
