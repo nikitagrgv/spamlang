@@ -113,6 +113,15 @@ public class SemaTests
         Assert.Equal(BuiltinType.I64, valueRef.Type);
     }
 
+    [Theory]
+    [InlineData("0", 0)]
+    public void Sema_ParsesLiteralInt(string str, Int128 expected)
+    {
+        string stmtCode = $"let a: i64 = {str}";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+    }
+
     private class Tester
     {
         private readonly string _code;
@@ -180,6 +189,7 @@ public class SemaTests
                           fn main() -> i32
                           {
                               {{code}};
+                              return 0;
                           }
                           """;
             }
@@ -206,7 +216,7 @@ public class SemaTests
                 HIRFuncDecl main = _unit.FuncDecls[0];
                 Assert.Equal("main", main.Symbol.Name);
 
-                Assert.Single(main.Body.Stmts);
+                Assert.Equal(2, main.Body.Stmts.Count);
                 HIRStmt stmt = main.Body.Stmts[0];
 
                 _stmt = stmt;
