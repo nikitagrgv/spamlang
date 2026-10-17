@@ -8,6 +8,10 @@ public class Timers
     private readonly Stopwatch _totalSw = new();
     private readonly Stopwatch _sw = new();
 
+    public int NumRecorded => _times.Count;
+    public TimeSpan TotalTime => _totalSw.Elapsed;
+    public (string what, TimeSpan dt) TimerAt(int i) => _times[i];
+
     public Timers()
     {
         _totalSw.Start();
@@ -22,21 +26,5 @@ public class Timers
     {
         TimeSpan dt = _sw.Elapsed;
         _times.Add((what, dt));
-    }
-
-    private void ReportTimes(TextWriter writer)
-    {
-        if (_times.Count == 0)
-        {
-            return;
-        }
-
-        writer.WriteLine("------ TIMERS ------");
-        foreach ((string what, TimeSpan dt) info in _times)
-        {
-            writer.WriteLine($"{info.what}: {info.dt.Milliseconds}ms");
-        }
-
-        writer.WriteLine($"Total Time: {_totalSw.Elapsed.Milliseconds}ms");
     }
 }

@@ -41,7 +41,7 @@ public class Compiler
 
     public bool Compile(string file, string output, bool compileOnly)
     {
-        Timers timers = new(_flags.DebugTimer ? Console.Out : null);
+        Timers timers = new();
 
         string fullPathInput = _fs.ResolveToFullPath(file);
         string fullPathOutput = _fs.ResolveToFullPath(output);
@@ -356,6 +356,25 @@ public class Compiler
         catch
         {
             Console.Error.WriteLine($"Couldn't save debug file to {dst}");
+        }
+    }
+
+    private class TimersPrinter : IDisposable
+    {
+        public void Dispose()
+        {
+            if (_times.Count == 0)
+            {
+                return;
+            }
+
+            writer.WriteLine("------ TIMERS ------");
+            foreach ((string what, TimeSpan dt) info in _times)
+            {
+                writer.WriteLine($"{info.what}: {info.dt.Milliseconds}ms");
+            }
+
+            writer.WriteLine($"Total Time: {_totalSw.Elapsed.Milliseconds}ms");
         }
     }
 }
