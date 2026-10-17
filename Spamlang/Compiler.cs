@@ -328,6 +328,11 @@ public class Compiler
         PrintDebug("mir", _flags.DebugMIR, writer => MIRPrinter.Print(mmodule, writer));
     }
 
+    private void PrintTimers(Timers timers)
+    {
+        PrintDebug("timers", _flags.DebugTimer, writer => PrintTimers(timers, writer));
+    }
+
     private void PrintDebug(string name, bool needPrint, Action<TextWriter> print)
     {
         if (!needPrint)
@@ -337,10 +342,9 @@ public class Compiler
 
         if (_debugDir == null)
         {
-            string sep = "================================================";
-            Console.WriteLine(sep);
+            Console.WriteLine($"=================== {name} =============================");
             print(Console.Out);
-            Console.WriteLine(sep);
+            Console.WriteLine("====================================================");
             return;
         }
 
@@ -359,22 +363,14 @@ public class Compiler
         }
     }
 
-    private class TimersPrinter : IDisposable
+    private void PrintTimers(Timers timers, TextWriter writer)
     {
-        public void Dispose()
+        for (int i = 0; i < timers.NumRecorded; i++)
         {
-            if (_times.Count == 0)
-            {
-                return;
-            }
-
-            writer.WriteLine("------ TIMERS ------");
-            foreach ((string what, TimeSpan dt) info in _times)
-            {
-                writer.WriteLine($"{info.what}: {info.dt.Milliseconds}ms");
-            }
-
-            writer.WriteLine($"Total Time: {_totalSw.Elapsed.Milliseconds}ms");
+            (string what, TimeSpan dt) = timers.TimerAt(i);
+            writer.WriteLine($"{what}: {dt.Milliseconds}ms");
         }
+
+        writer.WriteLine($"Total Time: {timers.TotalTime.Milliseconds}ms");
     }
 }
