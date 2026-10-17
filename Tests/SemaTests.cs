@@ -120,6 +120,7 @@ public class SemaTests
         string stmtCode = $"let a: i64 = {str}";
         Tester tester = Tester.BuildStmt(stmtCode);
         Assert.False(tester.HasErrors, tester.DumpErrors);
+        HIRStmt stmt = tester.StmtLet;
     }
 
     private class Tester
@@ -151,23 +152,8 @@ public class SemaTests
             }
         }
 
-        public HIRStmtLet StmtLet
-        {
-            get
-            {
-                Assert.IsType<HIRStmtLet>(_stmt);
-                return (HIRStmtLet)_stmt;
-            }
-        }
-
-        public HIRStmtExpr StmtExpr
-        {
-            get
-            {
-                Assert.IsType<HIRStmtExpr>(_stmt);
-                return (HIRStmtExpr)_stmt;
-            }
-        }
+        public HIRStmtLet StmtLet => Assert.IsType<HIRStmtLet>(_stmt);
+        public HIRStmtExpr StmtExpr => Assert.IsType<HIRStmtExpr>(_stmt);
 
         public static Tester BuildCode(string code)
         {
