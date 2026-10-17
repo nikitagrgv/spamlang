@@ -433,14 +433,14 @@ public class ParserTest
 
         private static string ToFlat(Expr expr, List<Token> tokens, string code)
         {
-            AstPrinter printer = new(tokens, code);
+            AstPrinter printer = new(tokens, code, Console.Out);
             string flat = printer.PrettyExpr(expr);
             return flat;
         }
 
         private static string ToFlat(TypeNode node, List<Token> tokens, string code)
         {
-            AstPrinter printer = new(tokens, code);
+            AstPrinter printer = new(tokens, code, Console.Out);
             string flat = printer.PrettyTypeNode(node);
             return flat;
         }
