@@ -120,7 +120,7 @@ public class SemaTests
     [InlineData("false", "bool")]
     public void Sema_CheckDefaultTypesForLiterals(string str, string expected)
     {
-        string stmtCode = $"let a = {str};";
+        string stmtCode = $"let a = {str}";
         Tester tester = Tester.BuildStmt(stmtCode);
         Assert.False(tester.HasErrors, tester.DumpErrors);
         HIRStmtLet stmt = tester.StmtLet;
