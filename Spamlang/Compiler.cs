@@ -348,6 +348,7 @@ public class Compiler
         string dst = Path.Join(dstDir, name + ".txt");
         try
         {
+            _fs.CreateDir(dstDir);
             UTF8Encoding encoding = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
             using StreamWriter stream = new(_fs.OpenWrite(dst), encoding);
             print(stream);
