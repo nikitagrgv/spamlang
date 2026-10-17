@@ -80,8 +80,8 @@ public class Compiler
             return false;
         }
 
-        PrintLexer(frontendResult.Tokens, code);
-        PrintLexerPretty(frontendResult.Tokens, code);
+        PrintTokens(frontendResult.Tokens, code);
+        PrintTokensPretty(frontendResult.Tokens, code);
         PrintAst(frontendResult.Tokens, code, frontendResult.CompilationUnit);
         PrintHIR(frontendResult.HIRCompilationUnit);
 
@@ -298,52 +298,34 @@ public class Compiler
         Console.Error.WriteLine();
     }
 
-    private void PrintLexer(List<Token> tokens, string code)
+    private void PrintTokens(List<Token> tokens, string code)
     {
-        if (_flags.DebugTokens)
-        {
-            TokensPrinter.Print(tokens, code);
-        }
+        PrintDebug("tokens", _flags.DebugTokens, writer => TokensPrinter.Print(tokens, code, writer));
     }
 
-    private void PrintLexerPretty(List<Token> tokens, string code)
+    private void PrintTokensPretty(List<Token> tokens, string code)
     {
-        if (_flags.DebugTokensPretty)
-        {
-            TokensPrinter.PrintPretty(tokens, code);
-        }
+        PrintDebug("tokens-pretty", _flags.DebugTokensPretty, writer => TokensPrinter.PrintPretty(tokens, code, writer));
     }
 
     private void PrintAst(List<Token> tokens, string code, CompilationUnit compilationUnit)
     {
-        if (_flags.DebugAst)
-        {
-            AstPrinter.Print(compilationUnit, tokens, code);
-        }
+        PrintDebug("ast", _flags.DebugAst, writer => AstPrinter.Print(compilationUnit, tokens, code, writer));
     }
 
     private void PrintHIR(HIRCompilationUnit compilationUnit)
     {
-        if (_flags.DebugHIR)
-        {
-            HIRPrinter.Print(compilationUnit);
-        }
+        PrintDebug("hir", _flags.DebugHIR, writer => HIRPrinter.Print(compilationUnit, writer));
     }
 
     private void PrintIR(IRModule irModule)
     {
-        if (_flags.DebugIR)
-        {
-            IRPrinter.Print(irModule);
-        }
+        PrintDebug("ir", _flags.DebugIR, writer => IRPrinter.Print(irModule, writer));
     }
 
     private void PrintMIR(MModule mmodule)
     {
-        if (_flags.DebugMIR)
-        {
-            MIRPrinter.Print(mmodule);
-        }
+        PrintDebug("mir", _flags.DebugMIR, writer => MIRPrinter.Print(mmodule, writer));
     }
 
     private void PrintDebug(string name, bool needPrint, Action<TextWriter> print)
