@@ -338,7 +338,6 @@ public class Compiler
         }
     }
 
-
     private void PrintIR(IRModule irModule)
     {
         if (_flags.DebugIR)
