@@ -361,9 +361,12 @@ public class Compiler
 
     private void PrintSeparator()
     {
+        // Don't need separators when printing to file
         if (_debugDir != null)
         {
-            Console.WriteLine("================================================");
+            return;
         }
+
+        Console.WriteLine("================================================");
     }
 }
