@@ -2,16 +2,14 @@ using System.Diagnostics;
 
 namespace Spamlang.Frontend;
 
-public class Timers : IDisposable
+public class Timers
 {
     private readonly List<(string what, TimeSpan dt)> _times = new();
     private readonly Stopwatch _totalSw = new();
     private readonly Stopwatch _sw = new();
-    private readonly TextWriter? _writer;
 
-    public Timers(TextWriter? writer)
+    public Timers()
     {
-        _writer = writer;
         _totalSw.Start();
     }
 
@@ -26,24 +24,19 @@ public class Timers : IDisposable
         _times.Add((what, dt));
     }
 
-    private void ReportTimes()
+    private void ReportTimes(TextWriter writer)
     {
-        if (_writer == null || _times.Count == 0)
+        if (_times.Count == 0)
         {
             return;
         }
 
-        _writer.WriteLine("------ TIMERS ------");
+        writer.WriteLine("------ TIMERS ------");
         foreach ((string what, TimeSpan dt) info in _times)
         {
-            _writer.WriteLine($"{info.what}: {info.dt.Milliseconds}ms");
+            writer.WriteLine($"{info.what}: {info.dt.Milliseconds}ms");
         }
 
-        _writer.WriteLine($"Total Time: {_totalSw.Elapsed.Milliseconds}ms");
-    }
-
-    public void Dispose()
-    {
-        ReportTimes();
+        writer.WriteLine($"Total Time: {_totalSw.Elapsed.Milliseconds}ms");
     }
 }
