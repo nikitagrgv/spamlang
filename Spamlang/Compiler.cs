@@ -41,7 +41,7 @@ public class Compiler
 
     public bool Compile(string file, string output, bool compileOnly)
     {
-        using Timers timers = new(_flags.DebugTimer ? Console.Out : null);
+        Timers timers = new(_flags.DebugTimer ? Console.Out : null);
 
         string fullPathInput = _fs.ResolveToFullPath(file);
         string fullPathOutput = _fs.ResolveToFullPath(output);
