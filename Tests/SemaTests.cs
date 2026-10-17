@@ -146,6 +146,31 @@ public class SemaTests
         Assert.Equal(expected, exprConst.Value);
     }
 
+    [Theory]
+    [InlineData("0", 0)]
+    [InlineData("0.1", 0.1)]
+    [InlineData("0.2", 0.2)]
+    [InlineData("0.3", 0.3)]
+    [InlineData("1.2", 1.2)]
+    [InlineData("1.2e2", 1.2e2)]
+    [InlineData("1.2e-2", 1.2e-2)]
+    [InlineData("1.2E-2", 1.2E-2)]
+    [InlineData("1.2E+2", 1.2E+2)]
+    [InlineData("1e2", 1e2)]
+    [InlineData("1E2", 1E2)]
+    public void Sema_ParsesLiteralFloat(string str, double expected)
+    {
+        string stmtCode = $"let a: f64 = {str}";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+        HIRStmtLet stmt = tester.StmtLet;
+        HIRExprFloatConst exprConst = Assert.IsType<HIRExprFloatConst>(stmt.Init);
+        Assert.Equal(BuiltinType.F64, exprConst.Type);
+        Assert.False(exprConst.IsLValue);
+
+        Assert.Equal(expected, exprConst.Value);
+    }
+
     private class Tester
     {
         private readonly string _code;
