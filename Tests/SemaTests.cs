@@ -99,8 +99,9 @@ public class SemaTests
         Assert.Equal(BuiltinType.I64, foo.Symbol.Params[0].Type);
 
         // return value as i8;
-        HIRStmtReturn fooReturn = Assert.IsType<HIRStmtReturn>(foo.Body.Stmts[0]);
-        HIRExprCast valueCast = Assert.IsType<HIRExprCast>(fooReturn.Value);
+        HIRStmtReturn fooReturnStmt = Assert.IsType<HIRStmtReturn>(foo.Body.Stmts[0]);
+
+        HIRExprCast valueCast = Assert.IsType<HIRExprCast>(fooReturnStmt.Value);
         Assert.False(valueCast.IsSynthesized);
         Assert.Equal(BuiltinType.I8, valueCast.Type);
 
