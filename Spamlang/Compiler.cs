@@ -352,7 +352,6 @@ public class Compiler
     {
         if (_flags.DebugMIR)
         {
-            PrintSeparator();
             MIRPrinter.Print(mmodule);
             PrintSeparator();
         }
@@ -365,8 +364,6 @@ public class Compiler
         {
             return;
         }
-
-        Console.WriteLine("================================================");
     }
 
     private void PrintDebug(string name, bool needPrint, Action<TextWriter> print)
@@ -378,7 +375,10 @@ public class Compiler
 
         if (_debugDir == null)
         {
+            string sep = "================================================";
+            Console.WriteLine(sep);
             print(Console.Out);
+            Console.WriteLine(sep);
             return;
         }
 
