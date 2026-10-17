@@ -22,25 +22,25 @@ public static class App
         [Argument("emit-asm")]
         public string? EmitAsmPath { get; set; }
 
-        [Argument("print-tokens")]
+        [Argument("debug-tokens")]
         public bool DebugTokens { get; set; }
 
-        [Argument("print-tokens-pretty")]
+        [Argument("debug-tokens-pretty")]
         public bool DebugTokensPretty { get; set; }
 
-        [Argument("print-ast")]
+        [Argument("debug-ast")]
         public bool DebugAst { get; set; }
 
-        [Argument("print-hir")]
+        [Argument("debug-hir")]
         public bool DebugHIR { get; set; }
 
-        [Argument("print-ir")]
+        [Argument("debug-ir")]
         public bool DebugIR { get; set; }
 
-        [Argument("print-mir")]
+        [Argument("debug-mir")]
         public bool DebugMIR { get; set; }
 
-        [Argument("print-timer")]
+        [Argument("debug-timer")]
         public bool DebugTimer { get; set; }
 
         [PositionalArgsList]
