@@ -27,7 +27,7 @@ public class TokensPrinter
     {
         foreach (Token token in tokens)
         {
-            Console.WriteLine(token.ToString(code));
+            _writer.WriteLine(token.ToString(code));
         }
     }
 
@@ -41,19 +41,19 @@ public class TokensPrinter
             {
                 curLine++;
                 curColumn = 1;
-                Console.WriteLine();
-                Console.Write($"{curLine,5}:  ");
+                _writer.WriteLine();
+                _writer.Write($"{curLine,5}:  ");
             }
 
             if (curColumn >= token.Column)
             {
-                Console.Write(" ");
+                _writer.Write(" ");
                 curColumn = token.Column;
             }
 
             while (curColumn < token.Column)
             {
-                Console.Write(" ");
+                _writer.Write(" ");
                 curColumn++;
             }
 
@@ -64,10 +64,10 @@ public class TokensPrinter
                 str += token.Value(code).ToString();
             }
 
-            Console.Write(str);
+            _writer.Write(str);
             curColumn += str.Length;
         }
 
-        Console.WriteLine();
+        _writer.WriteLine();
     }
 }

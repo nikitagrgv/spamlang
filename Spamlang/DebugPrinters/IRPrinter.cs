@@ -22,41 +22,41 @@ public class IRPrinter
         foreach (IRFunction func in module.Functions)
         {
             PrintFunc(func);
-            Console.WriteLine();
+            _writer.WriteLine();
         }
     }
 
     private void PrintFunc(IRFunction func)
     {
-        Console.Write($"fn @{func.Name}(");
+        _writer.Write($"fn @{func.Name}(");
         for (int i = 0; i < func.Params.Count; i++)
         {
             IRParam param = func.Params[i];
             if (i != 0)
             {
-                Console.Write(", ");
+                _writer.Write(", ");
             }
 
-            Console.Write($"{param.Type} %{param.Id}");
+            _writer.Write($"{param.Type} %{param.Id}");
         }
 
-        Console.Write($") -> {func.LoweredSignature.ReturnType}");
-        Console.WriteLine();
-        Console.WriteLine("{");
+        _writer.Write($") -> {func.LoweredSignature.ReturnType}");
+        _writer.WriteLine();
+        _writer.WriteLine("{");
         foreach (IRBasicBlock bb in func.BasicBlocks)
         {
             PrintBlock(bb);
         }
 
-        Console.WriteLine("}");
+        _writer.WriteLine("}");
     }
 
     private void PrintBlock(IRBasicBlock bb)
     {
-        Console.WriteLine($"{bb.Name}:");
+        _writer.WriteLine($"{bb.Name}:");
         foreach (IRInstruction inst in bb.Instructions)
         {
-            Console.WriteLine($"  {inst.PrintDefinition()}");
+            _writer.WriteLine($"  {inst.PrintDefinition()}");
         }
     }
 }

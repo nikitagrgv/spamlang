@@ -50,35 +50,35 @@ public class HIRPrinter
         switch (node)
         {
             case HIRCompilationUnit n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintChildren(depth + 1, n.FuncDecls);
                 break;
             case HIRBlock n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintSymbols(depth + 1, n.Variables, "Variable");
                 PrintChildren(depth + 1, n.Stmts);
                 break;
             case HIRExprLocalRef n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintSymbol(depth + 1, n.Symbol);
                 break;
             case HIRExprFuncRef n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintSymbol(depth + 1, n.Symbol);
                 break;
             case HIRFuncDecl n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintSymbol(depth + 1, n.Symbol);
                 PrintSymbols(depth + 1, n.Locals, "Local");
                 PrintHIR(depth + 1, n.Body, "Body");
                 break;
             case HIRStmtLet n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintSymbol(depth + 1, n.VariableSymbol, "Variable");
                 PrintHIR(depth + 1, n.Init, "Init");
                 break;
             case HIRStmtReturn n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 if (n.Value != null)
                 {
                     PrintHIR(depth + 1, n.Value, "Value");
@@ -86,54 +86,54 @@ public class HIRPrinter
 
                 break;
             case HIRStmtAssign n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Target, "Target");
                 PrintHIR(depth + 1, n.Value, "Value");
                 break;
             case HIRStmtExpr n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Expr, "Expr");
                 break;
             case HIRExprBinary n:
-                Console.WriteLine($"{fullPrefix} | Op = {n.Op}");
+                _writer.WriteLine($"{fullPrefix} | Op = {n.Op}");
                 PrintHIR(depth + 1, n.Left, "Left");
                 PrintHIR(depth + 1, n.Right, "Right");
                 break;
             case HIRExprUnary n:
-                Console.WriteLine($"{fullPrefix} | Op = {n.Op}");
+                _writer.WriteLine($"{fullPrefix} | Op = {n.Op}");
                 PrintHIR(depth + 1, n.Operand, "Operand");
                 break;
             case HIRExprZeroInit n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 break;
             case HIRExprCall n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Callee, "Callee");
                 PrintChildren(depth + 1, n.Args);
                 break;
             case HIRExprCast n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Value, "Value");
                 break;
             case HIRExprError n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintChildren(depth + 1, n.Children);
                 break;
             case HIRCallArg n:
-                Console.WriteLine($"{fullPrefix} | ParameterIndex = {n.ParameterIndex}");
+                _writer.WriteLine($"{fullPrefix} | ParameterIndex = {n.ParameterIndex}");
                 PrintHIR(depth + 1, n.Value, "Value");
                 break;
             case HIRExprIntConst n:
-                Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
+                _writer.WriteLine($"{fullPrefix} | Value = {n.Value}");
                 break;
             case HIRExprFloatConst n:
-                Console.WriteLine($"{fullPrefix} | Value = {n.Value.ToString("G", CultureInfo.InvariantCulture)}");
+                _writer.WriteLine($"{fullPrefix} | Value = {n.Value.ToString("G", CultureInfo.InvariantCulture)}");
                 break;
             case HIRExprBoolConst n:
-                Console.WriteLine($"{fullPrefix} | Value = {n.Value}");
+                _writer.WriteLine($"{fullPrefix} | Value = {n.Value}");
                 break;
             case HIRExprLoad n:
-                Console.WriteLine($"{fullPrefix}");
+                _writer.WriteLine($"{fullPrefix}");
                 PrintHIR(depth + 1, n.Address, "Address");
                 break;
             default: throw new UnreachableException();
@@ -234,7 +234,7 @@ public class HIRPrinter
             prefix += "Symbol";
         }
 
-        Console.WriteLine($"{prefix}: {sym.Name} ({sym.SymbolKindName}) | Type = {sym.Type}");
+        _writer.WriteLine($"{prefix}: {sym.Name} ({sym.SymbolKindName}) | Type = {sym.Type}");
     }
 
     private void PrintSymbols(int depth, IReadOnlyList<Symbol> symbols, string name = "")
