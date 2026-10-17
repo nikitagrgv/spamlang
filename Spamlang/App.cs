@@ -43,6 +43,9 @@ public static class App
         [Argument("debug-timer")]
         public bool DebugTimer { get; set; }
 
+        [Argument("debug-dir")]
+        public string? DebugDir { get; set; }
+
         [PositionalArgsList]
         public List<string> Files { get; set; }
     }
@@ -100,7 +103,7 @@ public static class App
 
         string buildPath = CreateBuildDir(fs);
         Compiler.Flags flags = GetFlags(arguments);
-        Compiler compiler = new(fs, flags, clangPath, buildPath, arguments.EmitAsmPath);
+        Compiler compiler = new(fs, flags, clangPath, buildPath, arguments.EmitAsmPath, arguments.DebugDir);
 
         string? output = arguments.Output;
         if (string.IsNullOrEmpty(output))

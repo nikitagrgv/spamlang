@@ -28,7 +28,7 @@ public class Compiler
     private readonly string _buildPath;
     private readonly string? _emitAsmPath;
 
-    public Compiler(IFileSystem fs, Flags flags, string clangPath, string buildPath, string? emitAsmPath)
+    public Compiler(IFileSystem fs, Flags flags, string clangPath, string buildPath, string? emitAsmPath, string? debugDir)
     {
         _fs = fs;
         _flags = flags;
