@@ -120,7 +120,11 @@ public class SemaTests
         string stmtCode = $"let a: i64 = {str}";
         Tester tester = Tester.BuildStmt(stmtCode);
         Assert.False(tester.HasErrors, tester.DumpErrors);
-        HIRStmt stmt = tester.StmtLet;
+        HIRStmtLet stmt = tester.StmtLet;
+        HIRExprIntConst exprConst = Assert.IsType<HIRExprIntConst>(stmt.Init);
+        Assert.Equal(BuiltinType.I64, exprConst.Type);
+        Assert.False(exprConst.IsSynthesized);
+        Assert.Equal(expected, exprConst.Value);
     }
 
     private class Tester
