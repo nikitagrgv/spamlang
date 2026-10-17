@@ -24,7 +24,7 @@ Debug compiler stages:
 
 - `--lexer` - print tokens (spams in logs)
 - `--lexer-pretty` - pretty print tokens
-- `--parser` - print AST
+- `--ast` - print AST
 - `--hir` - print HIR
 - `--ir` - print IR
 - `--mir` - print MIR

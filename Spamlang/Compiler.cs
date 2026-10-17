@@ -11,9 +11,9 @@ public class Compiler
 {
     public class Flags
     {
-        public required bool DebugLexer = false;
-        public required bool DebugLexerPretty = false;
-        public required bool DebugParser = false;
+        public required bool DebugTokens = false;
+        public required bool DebugTokensPretty = false;
+        public required bool DebugAst = false;
         public required bool DebugHIR = false;
         public required bool DebugIR = false;
         public required bool DebugMIR = false;
@@ -298,7 +298,7 @@ public class Compiler
 
     private void PrintLexer(List<Token> tokens, string code)
     {
-        if (_flags.DebugLexer)
+        if (_flags.DebugTokens)
         {
             PrintSeparator();
             TokensPrinter.Print(tokens, code);
@@ -308,7 +308,7 @@ public class Compiler
 
     private void PrintLexerPretty(List<Token> tokens, string code)
     {
-        if (_flags.DebugLexerPretty)
+        if (_flags.DebugTokensPretty)
         {
             PrintSeparator();
             TokensPrinter.PrintPretty(tokens, code);
@@ -318,7 +318,7 @@ public class Compiler
 
     private void PrintAst(List<Token> tokens, string code, CompilationUnit compilationUnit)
     {
-        if (_flags.DebugParser)
+        if (_flags.DebugAst)
         {
             PrintSeparator();
             AstPrinter.Print(compilationUnit, tokens, code);

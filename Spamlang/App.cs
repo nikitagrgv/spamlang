@@ -22,14 +22,14 @@ public static class App
         [Argument("emit-asm")]
         public string? EmitAsmPath { get; set; }
 
-        [Argument("lexer")]
-        public bool DebugLexer { get; set; }
+        [Argument("tokens")]
+        public bool DebugTokens { get; set; }
 
-        [Argument("lexer-pretty")]
-        public bool DebugLexerPretty { get; set; }
+        [Argument("tokens-pretty")]
+        public bool DebugTokensPretty { get; set; }
 
-        [Argument("parser")]
-        public bool DebugParser { get; set; }
+        [Argument("ast")]
+        public bool DebugAst { get; set; }
 
         [Argument("hir")]
         public bool DebugHIR { get; set; }
@@ -51,9 +51,9 @@ public static class App
     {
         Compiler.Flags flags = new()
         {
-            DebugLexer = arguments.DebugLexer,
-            DebugLexerPretty = arguments.DebugLexerPretty,
-            DebugParser = arguments.DebugParser,
+            DebugTokens = arguments.DebugTokens,
+            DebugTokensPretty = arguments.DebugTokensPretty,
+            DebugAst = arguments.DebugAst,
             DebugHIR = arguments.DebugHIR,
             DebugIR = arguments.DebugIR,
             DebugMIR = arguments.DebugMIR,
