@@ -302,9 +302,7 @@ public class Compiler
     {
         if (_flags.DebugTokens)
         {
-            PrintSeparator();
             TokensPrinter.Print(tokens, code);
-            PrintSeparator();
         }
     }
 
@@ -312,9 +310,7 @@ public class Compiler
     {
         if (_flags.DebugTokensPretty)
         {
-            PrintSeparator();
             TokensPrinter.PrintPretty(tokens, code);
-            PrintSeparator();
         }
     }
 
@@ -322,9 +318,7 @@ public class Compiler
     {
         if (_flags.DebugAst)
         {
-            PrintSeparator();
             AstPrinter.Print(compilationUnit, tokens, code);
-            PrintSeparator();
         }
     }
 
@@ -332,9 +326,7 @@ public class Compiler
     {
         if (_flags.DebugHIR)
         {
-            PrintSeparator();
             HIRPrinter.Print(compilationUnit);
-            PrintSeparator();
         }
     }
 
@@ -342,9 +334,7 @@ public class Compiler
     {
         if (_flags.DebugIR)
         {
-            PrintSeparator();
             IRPrinter.Print(irModule);
-            PrintSeparator();
         }
     }
 
@@ -353,16 +343,6 @@ public class Compiler
         if (_flags.DebugMIR)
         {
             MIRPrinter.Print(mmodule);
-            PrintSeparator();
-        }
-    }
-
-    private void PrintSeparator()
-    {
-        // Don't need separators when printing to file
-        if (_debugDir != null)
-        {
-            return;
         }
     }
 
