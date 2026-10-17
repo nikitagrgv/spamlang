@@ -22,13 +22,13 @@ spamlang <source file> -o <output file>
 
 Debug compiler stages:
 
-- `--lexer` - print tokens (spams in logs)
-- `--lexer-pretty` - pretty print tokens
-- `--ast` - print AST
-- `--hir` - print HIR
-- `--ir` - print IR
-- `--mir` - print MIR
-- `--timer` - print every stage time to measure how horrible the performance is
+- `--print-tokens` - print tokens (spams in logs)
+- `--print-tokens-pretty` - pretty print tokens
+- `--print-ast` - print AST
+- `--print-hir` - print HIR
+- `--print-ir` - print IR
+- `--print-mir` - print MIR
+- `--print-timer` - print every stage time to measure how horrible the performance is
 
 ### Environment Variables
 
