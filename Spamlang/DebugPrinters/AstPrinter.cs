@@ -7,17 +7,19 @@ public class AstPrinter
 {
     private readonly IReadOnlyList<Token> _tokens;
     private readonly string _code;
+    private readonly TextWriter _writer;
 
-    public static void Print(CompilationUnit unit, IReadOnlyList<Token> tokens, string code)
+    public static void Print(CompilationUnit unit, IReadOnlyList<Token> tokens, string code, TextWriter writer)
     {
-        AstPrinter printer = new(tokens, code);
+        AstPrinter printer = new(tokens, code, writer);
         printer.PrintAst(unit);
     }
 
-    public AstPrinter(IReadOnlyList<Token> tokens, string code)
+    public AstPrinter(IReadOnlyList<Token> tokens, string code, TextWriter writer)
     {
         _code = code;
         _tokens = tokens;
+        _writer = writer;
     }
 
     private void PrintAst(CompilationUnit unit)

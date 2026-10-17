@@ -4,7 +4,26 @@ namespace Spamlang.DebugPrinters;
 
 public class TokensPrinter
 {
-    public static void Print(List<Token> tokens, string code)
+    private readonly TextWriter _writer;
+
+    public static void Print(List<Token> tokens, string code, TextWriter writer)
+    {
+        TokensPrinter printer = new(writer);
+        printer.Print(tokens, code);
+    }
+
+    public static void PrintPretty(List<Token> tokens, string code, TextWriter writer)
+    {
+        TokensPrinter printer = new(writer);
+        printer.PrintPretty(tokens, code);
+    }
+
+    private TokensPrinter(TextWriter writer)
+    {
+        _writer = writer;
+    }
+
+    private void Print(List<Token> tokens, string code)
     {
         foreach (Token token in tokens)
         {
@@ -12,7 +31,7 @@ public class TokensPrinter
         }
     }
 
-    public static void PrintPretty(List<Token> tokens, string code)
+    private void PrintPretty(List<Token> tokens, string code)
     {
         int curLine = 0;
         int curColumn = 1;

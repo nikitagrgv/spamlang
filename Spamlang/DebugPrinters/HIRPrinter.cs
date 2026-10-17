@@ -7,10 +7,17 @@ namespace Spamlang.DebugPrinters;
 
 public class HIRPrinter
 {
-    public static void Print(HIRCompilationUnit unit)
+    private readonly TextWriter _writer;
+
+    public static void Print(HIRCompilationUnit unit, TextWriter writer)
     {
-        HIRPrinter printer = new();
+        HIRPrinter printer = new(writer);
         printer.PrintHIR(unit);
+    }
+
+    private HIRPrinter(TextWriter writer)
+    {
+        _writer = writer;
     }
 
     private void PrintHIR(HIRCompilationUnit unit)

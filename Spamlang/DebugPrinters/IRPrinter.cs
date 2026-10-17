@@ -4,16 +4,29 @@ namespace Spamlang.DebugPrinters;
 
 public class IRPrinter
 {
-    public static void Print(IRModule module)
+    private readonly TextWriter _writer;
+
+    public static void Print(IRModule module, TextWriter writer)
+    {
+        IRPrinter printer = new(writer);
+        printer.Print(module);
+    }
+
+    private IRPrinter(TextWriter writer)
+    {
+        _writer = writer;
+    }
+
+    private void Print(IRModule module)
     {
         foreach (IRFunction func in module.Functions)
         {
-            PrintIR(func);
+            PrintFunc(func);
             Console.WriteLine();
         }
     }
 
-    private static void PrintIR(IRFunction func)
+    private void PrintFunc(IRFunction func)
     {
         Console.Write($"fn @{func.Name}(");
         for (int i = 0; i < func.Params.Count; i++)
@@ -32,13 +45,13 @@ public class IRPrinter
         Console.WriteLine("{");
         foreach (IRBasicBlock bb in func.BasicBlocks)
         {
-            PrintIR(bb);
+            PrintBlock(bb);
         }
 
         Console.WriteLine("}");
     }
 
-    private static void PrintIR(IRBasicBlock bb)
+    private void PrintBlock(IRBasicBlock bb)
     {
         Console.WriteLine($"{bb.Name}:");
         foreach (IRInstruction inst in bb.Instructions)
