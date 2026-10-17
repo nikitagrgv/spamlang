@@ -155,6 +155,53 @@ public class SemaTests
         Assert.Equal(expected, init.Value);
     }
 
+    [Theory]
+    [InlineData("-11.0 + 3.0", -11.0 + 3.0)]
+    [InlineData("-11.0 - 3.0", -11.0 - 3.0)]
+    [InlineData("-11.0 * 3.0", -11.0 * 3.0)]
+    [InlineData("-11.0 / 3.0", -11.0 / 3.0)]
+    [InlineData("-11.0 % 3.0", -11.0 % 3.0)]
+    [InlineData("2.0 + 3.0 * 4.0 - 24.0 / 3.0", 2.0 + 3.0 * 4.0 - 24.0 / 3.0)]
+    public void Sema_FoldsConstFloatExpression(string str, double expected)
+    {
+        string stmtCode = $"let a: f64 = {str}";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+        HIRStmtLet stmt = tester.StmtLet;
+        Assert.Equal(BuiltinType.F64, stmt.Init.Type);
+        Assert.Equal(BuiltinType.F64, stmt.VariableSymbol.Type);
+        HIRExprFloatConst init = Assert.IsType<HIRExprFloatConst>(stmt.Init);
+        Assert.Equal(BuiltinType.F64, init.Type);
+        Assert.Equal(expected, init.Value);
+    }
+
+    [Theory]
+    [InlineData("true && false", true && false)]
+    [InlineData("true || false", true || false)]
+    [InlineData("1 == 2 && 3 == 4", 1 == 2 && 3 == 4)]
+    [InlineData("1 == 2 && 3 == 3", 1 == 2 && 3 == 3)]
+    [InlineData("2 == 2 && 3 == 3", 2 == 2 && 3 == 3)]
+    [InlineData("1 == 1 && 3 == 4", 1 == 1 && 3 == 4)]
+    [InlineData("1 == 2 || 3 == 4", 1 == 2 || 3 == 4)]
+    [InlineData("1 == 2 || 3 == 3", 1 == 2 || 3 == 3)]
+    [InlineData("2 == 2 || 3 == 3", 2 == 2 || 3 == 3)]
+    [InlineData("1 == 1 || 3 == 4", 1 == 1 || 3 == 4)]
+    [InlineData("((1 + 3 * -4 - 7/1) & 5) > (2 - 7 | 1)", ((1 + 3 * -4 - 7 / 1) & 5) > (2 - 7 | 1))]
+    [InlineData("((1 + 3 * -4 - 7/1) & 5) < (2 - 7 | 1)", ((1 + 3 * -4 - 7 / 1) & 5) < (2 - 7 | 1))]
+    [InlineData("((1 + 3 * -4 - 7/1) & 5) == (2 - 7 | 1)", ((1 + 3 * -4 - 7 / 1) & 5) == (2 - 7 | 1))]
+    public void Sema_FoldsConstBoolExpression(string str, bool expected)
+    {
+        string stmtCode = $"let a: bool = {str}";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+        HIRStmtLet stmt = tester.StmtLet;
+        Assert.Equal(BuiltinType.Bool, stmt.Init.Type);
+        Assert.Equal(BuiltinType.Bool, stmt.VariableSymbol.Type);
+        HIRExprBoolConst init = Assert.IsType<HIRExprBoolConst>(stmt.Init);
+        Assert.Equal(BuiltinType.Bool, init.Type);
+        Assert.Equal(expected, init.Value);
+    }
+
     [Fact]
     public void Sema_BuildsSimpleProgram()
     {
