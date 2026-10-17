@@ -3,7 +3,7 @@ using Spamlang.Frontend;
 
 namespace Tests;
 
-public class SemaTests
+public class SemaTest
 {
     [Theory]
     // Decimal
