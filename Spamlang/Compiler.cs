@@ -359,8 +359,11 @@ public class Compiler
         }
     }
 
-    private static void PrintSeparator()
+    private void PrintSeparator()
     {
-        Console.WriteLine("================================================");
+        if (_debugDir != null)
+        {
+            Console.WriteLine("================================================");
+        }
     }
 }
