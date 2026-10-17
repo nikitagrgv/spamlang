@@ -27,6 +27,7 @@ public class Compiler
     private readonly string _clangPath;
     private readonly string _buildPath;
     private readonly string? _emitAsmPath;
+    private readonly string? _debugDir;
 
     public Compiler(IFileSystem fs, Flags flags, string clangPath, string buildPath, string? emitAsmPath, string? debugDir)
     {
@@ -35,6 +36,7 @@ public class Compiler
         _clangPath = clangPath;
         _buildPath = buildPath;
         _emitAsmPath = emitAsmPath;
+        _debugDir = debugDir;
     }
 
     public bool Compile(string file, string output, bool compileOnly)
