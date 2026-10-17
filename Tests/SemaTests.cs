@@ -203,6 +203,17 @@ public class SemaTests
     }
 
     [Fact]
+    public void Sema_FloatCombinedWithIntResultsInFloat()
+    {
+        string stmtCode = "let a = 1.0 + 2";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+        HIRStmtLet stmt = tester.StmtLet;
+        Assert.Equal(BuiltinType.F64, stmt.Init.Type);
+        Assert.Equal(BuiltinType.F64, stmt.VariableSymbol.Type);
+    }
+
+    [Fact]
     public void Sema_BuildsSimpleProgram()
     {
         string code = """
