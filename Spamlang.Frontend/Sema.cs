@@ -1507,7 +1507,7 @@ public class Sema
                 }
             }
         }
-        catch (OverflowException)
+        catch (Exception)
         {
             return MakeErrorAndReport("Result is out of range");
         }
