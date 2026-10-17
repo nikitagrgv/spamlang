@@ -11,13 +11,21 @@ public class SemaTests
     [InlineData("1", 1)]
     [InlineData("123", 123)]
     [InlineData("1234567890", 1234567890)]
+    [InlineData("-0", -0)]
+    [InlineData("-1", -1)]
+    [InlineData("-123", -123)]
+    [InlineData("-1234567890", -1234567890)]
     // Octal (C# doesn't have compile-time octal literals :( )
     [InlineData("0o0", 0)]
     [InlineData("0o00", 0)]
     [InlineData("0o1", 1)]
     [InlineData("0o123", 83)]
     [InlineData("0o1234567", 342391)]
-    [InlineData("0o123456701234567", 5744368105847)]
+    [InlineData("-0o0", -0)]
+    [InlineData("-0o00", -0)]
+    [InlineData("-0o1", -1)]
+    [InlineData("-0o123", -83)]
+    [InlineData("-0o1234567", -342391)]
     // Hex
     [InlineData("0x0", 0x0)]
     [InlineData("0x00", 0x00)]
@@ -25,6 +33,12 @@ public class SemaTests
     [InlineData("0x0123", 0x0123)]
     [InlineData("0x0123456789abcdef", 0x0123456789abcdef)]
     [InlineData("0x0123456789ABCDEF", 0x0123456789ABCDEF)]
+    [InlineData("-0x0", -0x0)]
+    [InlineData("-0x00", -0x00)]
+    [InlineData("-0x01", -0x01)]
+    [InlineData("-0x0123", -0x0123)]
+    [InlineData("-0x0123456789abcdef", -0x0123456789abcdef)]
+    [InlineData("-0x0123456789ABCDEF", -0x0123456789ABCDEF)]
     public void Sema_ParsesLiteralInt(string str, Int128 expected)
     {
         string stmtCode = $"let a: i64 = {str}";
@@ -50,6 +64,17 @@ public class SemaTests
     [InlineData("1.2E+2", 1.2E+2)]
     [InlineData("1e2", 1e2)]
     [InlineData("1E2", 1E2)]
+    [InlineData("-0", 0)]
+    [InlineData("-0.1", -0.1)]
+    [InlineData("-0.2", -0.2)]
+    [InlineData("-0.3", -0.3)]
+    [InlineData("-1.2", -1.2)]
+    [InlineData("-1.2e2", -1.2e2)]
+    [InlineData("-1.2e-2", -1.2e-2)]
+    [InlineData("-1.2E-2", -1.2E-2)]
+    [InlineData("-1.2E+2", -1.2E+2)]
+    [InlineData("-1e2", -1e2)]
+    [InlineData("-1E2", -1E2)]
     public void Sema_ParsesLiteralFloat(string str, double expected)
     {
         string stmtCode = $"let a: f64 = {str}";
@@ -77,6 +102,20 @@ public class SemaTests
         Assert.False(exprConst.IsLValue);
 
         Assert.Equal(expected, exprConst.Value);
+    }
+
+    [Theory]
+    [InlineData("0", "i32")]
+    [InlineData("123", "i32")]
+    [InlineData("-123", "i32")]
+    public void Sema_CheckDefaultTypesForLiterals(string str, string expected)
+    {
+        string stmtCode = $"let a = {str};";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+        HIRStmtLet stmt = tester.StmtLet;
+        Assert.Equal(expected, stmt.Init.Type.Name);
+        Assert.Equal(expected, stmt.VariableSymbol.Type.Name);
     }
 
     [Fact]
