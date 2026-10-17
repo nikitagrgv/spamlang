@@ -171,6 +171,22 @@ public class SemaTests
         Assert.Equal(expected, exprConst.Value);
     }
 
+    [Theory]
+    [InlineData("true", true)]
+    [InlineData("false", false)]
+    public void Sema_ParsesLiteralBool(string str, bool expected)
+    {
+        string stmtCode = $"let a: bool = {str}";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+        HIRStmtLet stmt = tester.StmtLet;
+        HIRExprBoolConst exprConst = Assert.IsType<HIRExprBoolConst>(stmt.Init);
+        Assert.Equal(BuiltinType.Bool, exprConst.Type);
+        Assert.False(exprConst.IsLValue);
+
+        Assert.Equal(expected, exprConst.Value);
+    }
+
     private class Tester
     {
         private readonly string _code;
