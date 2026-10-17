@@ -105,9 +105,19 @@ public class SemaTests
     }
 
     [Theory]
+    // i32
     [InlineData("0", "i32")]
+    [InlineData("1", "i32")]
     [InlineData("123", "i32")]
     [InlineData("-123", "i32")]
+    // f64
+    [InlineData("0.0", "f64")]
+    [InlineData("1.0", "f64")]
+    [InlineData("1.2", "f64")]
+    [InlineData("-1.2", "f64")]
+    // bool
+    [InlineData("true", "bool")]
+    [InlineData("false", "bool")]
     public void Sema_CheckDefaultTypesForLiterals(string str, string expected)
     {
         string stmtCode = $"let a = {str};";
