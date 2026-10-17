@@ -140,7 +140,7 @@ public class SemaTests
     [InlineData("1111 ^ 3", 1111 ^ 3)]
     [InlineData("1111 & 3", 1111 & 3)]
     [InlineData("1111 | 3", 1111 | 3)]
-    [InlineData("(1111 | 3) + (1 * -4) * 13 | 7)", (1111 | 3) + (1 * -4) * 13 | 7)]
+    [InlineData("(1111 | 3) + (1 * -4) * 13 | 7", (1111 | 3) + (1 * -4) * 13 | 7)]
     public void Sema_FoldsConstIntExpression(string str, Int128 expected)
     {
         string stmtCode = $"let a: i64 = {str}";
