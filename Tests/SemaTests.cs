@@ -211,6 +211,9 @@ public class SemaTests
         HIRStmtLet stmt = tester.StmtLet;
         Assert.Equal(BuiltinType.F64, stmt.Init.Type);
         Assert.Equal(BuiltinType.F64, stmt.VariableSymbol.Type);
+        HIRExprFloatConst init = Assert.IsType<HIRExprFloatConst>(stmt.Init);
+        Assert.Equal(BuiltinType.F64, init.Type);
+        Assert.Equal(3.0, init.Value);
     }
 
     [Fact]
