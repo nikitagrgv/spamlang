@@ -128,6 +128,22 @@ public class SemaTests
         Assert.Equal(expected, stmt.VariableSymbol.Type.Name);
     }
 
+
+    [Theory]
+    [InlineData("1 + 1", 1 + 1)]
+    public void Sema_FoldsConstIntExpression(string str, Int128 expected)
+    {
+        string stmtCode = $"let a: i64 = {str}";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.False(tester.HasErrors, tester.DumpErrors);
+        HIRStmtLet stmt = tester.StmtLet;
+        Assert.Equal(BuiltinType.I64, stmt.Init.Type);
+        Assert.Equal(BuiltinType.I64, stmt.VariableSymbol.Type);
+        HIRExprIntConst init = Assert.IsType<HIRExprIntConst>(stmt.Init);
+        Assert.Equal(BuiltinType.I64, init.Type);
+        Assert.Equal(expected, init.Value);
+    }
+
     [Fact]
     public void Sema_BuildsSimpleProgram()
     {
