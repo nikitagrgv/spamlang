@@ -42,6 +42,7 @@ public class Compiler
     public bool Compile(string file, string output, bool compileOnly)
     {
         Timers timers = new();
+        using ScopeExit timerPrinter = new(() => PrintTimers(timers));
 
         string fullPathInput = _fs.ResolveToFullPath(file);
         string fullPathOutput = _fs.ResolveToFullPath(output);
