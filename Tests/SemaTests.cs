@@ -151,7 +151,6 @@ public class SemaTests
         Assert.Equal(BuiltinType.I64, stmt.Init.Type);
         Assert.Equal(BuiltinType.I64, stmt.VariableSymbol.Type);
         HIRExprIntConst init = Assert.IsType<HIRExprIntConst>(stmt.Init);
-        Assert.Equal(BuiltinType.I64, init.Type);
         Assert.Equal(expected, init.Value);
     }
 
@@ -171,7 +170,6 @@ public class SemaTests
         Assert.Equal(BuiltinType.F64, stmt.Init.Type);
         Assert.Equal(BuiltinType.F64, stmt.VariableSymbol.Type);
         HIRExprFloatConst init = Assert.IsType<HIRExprFloatConst>(stmt.Init);
-        Assert.Equal(BuiltinType.F64, init.Type);
         Assert.Equal(expected, init.Value);
     }
 
@@ -198,7 +196,6 @@ public class SemaTests
         Assert.Equal(BuiltinType.Bool, stmt.Init.Type);
         Assert.Equal(BuiltinType.Bool, stmt.VariableSymbol.Type);
         HIRExprBoolConst init = Assert.IsType<HIRExprBoolConst>(stmt.Init);
-        Assert.Equal(BuiltinType.Bool, init.Type);
         Assert.Equal(expected, init.Value);
     }
 
@@ -212,7 +209,6 @@ public class SemaTests
         Assert.Equal(BuiltinType.F64, stmt.Init.Type);
         Assert.Equal(BuiltinType.F64, stmt.VariableSymbol.Type);
         HIRExprFloatConst init = Assert.IsType<HIRExprFloatConst>(stmt.Init);
-        Assert.Equal(BuiltinType.F64, init.Type);
         Assert.Equal(3.0, init.Value);
     }
 
