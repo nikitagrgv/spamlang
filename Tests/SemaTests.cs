@@ -37,6 +37,7 @@ public class SemaTests
 
         // main
         Assert.Equal(3, main.Body.Stmts.Count);
+        Assert.Empty(main.Symbol.Params);
 
         // let a: i16 = 111;
         HIRStmtLet letA = Assert.IsType<HIRStmtLet>(main.Body.Stmts[0]);
@@ -90,6 +91,25 @@ public class SemaTests
         HIRExprIntConst returnExpr = Assert.IsType<HIRExprIntConst>(returnStmt.Value);
         Assert.Equal(BuiltinType.I32, returnExpr.Type);
         Assert.Equal(333, returnExpr.Value);
+
+        // foo
+        Assert.Single(foo.Body.Stmts);
+        Assert.Single(foo.Symbol.Params);
+        Assert.Equal("value", foo.Symbol.Params[0].Name);
+        Assert.Equal(BuiltinType.I64, foo.Symbol.Params[0].Type);
+
+        // return value as i8;
+        HIRStmtReturn fooReturn = Assert.IsType<HIRStmtReturn>(foo.Body.Stmts[0]);
+        HIRExprCast valueCast = Assert.IsType<HIRExprCast>(fooReturn.Value);
+        Assert.False(valueCast.IsSynthesized);
+        Assert.Equal(BuiltinType.I8, valueCast.Type);
+
+        HIRExprLoad valueLoad = Assert.IsType<HIRExprLoad>(valueCast.Value);
+        Assert.Equal(BuiltinType.I64, valueLoad.Type);
+
+        HIRExprLocalRef valueRef = Assert.IsType<HIRExprLocalRef>(valueLoad.Address);
+        Assert.Equal(foo.Symbol.Params[0], valueRef.Symbol);
+        Assert.Equal(BuiltinType.I64, valueRef.Type);
     }
 
     private class Tester
