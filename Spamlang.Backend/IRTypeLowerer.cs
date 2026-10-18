@@ -42,16 +42,11 @@ public class IRTypeLowerer
     {
         switch (type.Kind)
         {
-            case TypeKind.AbstractNumber:
-                throw new InvalidHIRException("Unexpected abstract number. All abstract numbers must be transformed to the specific types");
-            case TypeKind.Error:
-                throw new InvalidHIRException("Unexpected error type. IRGen works with valid HIR only");
-            case TypeKind.Void:
-                return IRType.Void;
-            case TypeKind.Function:
-                return IRType.Ptr;
-            case TypeKind.Bool:
-                return IRType.Bool;
+            case TypeKind.AbstractNumber: throw new InvalidHIRException("Unexpected abstract number. All abstract numbers must be transformed to the specific types");
+            case TypeKind.Error: throw new InvalidHIRException("Unexpected error type. IRGen works with valid HIR only");
+            case TypeKind.Void: return IRType.Void;
+            case TypeKind.Function: return IRType.Ptr;
+            case TypeKind.Bool: return IRType.Bool;
             case TypeKind.SignedInteger:
             case TypeKind.UnsignedInteger:
                 // Both signed and unsigned lowered to the same type, signedness is encoded in the opcode 
