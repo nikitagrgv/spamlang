@@ -15,7 +15,7 @@ public sealed class IRFunction : IRValue
 
     public required FuncType LoweredSignature { get; init; }
 
-    public override SpamType Type => BuiltinType.Ptr;
+    public override IRType Type => IRType.Ptr;
 
     public override string PrintOperand()
     {
@@ -61,7 +61,7 @@ public sealed class IRBasicBlock
 
 public abstract class IRValue
 {
-    public abstract SpamType Type { get; }
+    public abstract IRType Type { get; }
     public int Id { get; set; } = -1;
 
     public virtual string PrintOperand()
@@ -77,10 +77,10 @@ public abstract class IRValue
 
 public sealed class IRConstantInt : IRValue
 {
-    public required SpamType IntType { get; init; }
+    public required IRType IntType { get; init; }
     public required Int128 Value { get; init; }
 
-    public override SpamType Type => IntType;
+    public override IRType Type => IntType;
 
     public override string PrintOperand()
     {
@@ -90,10 +90,10 @@ public sealed class IRConstantInt : IRValue
 
 public sealed class IRParam : IRValue
 {
-    public required SpamType ParamType { get; init; }
+    public required IRType ParamType { get; init; }
     public required int Index { get; init; }
 
-    public override SpamType Type => ParamType;
+    public override IRType Type => ParamType;
 }
 
 public abstract class IRInstruction : IRValue
@@ -105,7 +105,7 @@ public abstract class IRInstruction : IRValue
 public sealed class IRInstructionRet : IRInstruction
 {
     public required IRValue? Value { get; init; }
-    public override SpamType Type => BuiltinType.Void;
+    public override IRType Type => BuiltinType.Void;
     public override bool IsTerminator => true;
 
     public override string PrintDefinition()
@@ -121,8 +121,8 @@ public sealed class IRInstructionRet : IRInstruction
 
 public sealed class IRInstructionAlloca : IRInstruction
 {
-    public required SpamType AllocatedType { get; init; }
-    public override SpamType Type => BuiltinType.Ptr;
+    public required IRType AllocatedType { get; init; }
+    public override IRType Type => IRType.Ptr;
 
     public override string PrintDefinition()
     {
@@ -132,9 +132,9 @@ public sealed class IRInstructionAlloca : IRInstruction
 
 public sealed class IRInstructionLoad : IRInstruction
 {
-    public required SpamType LoadedType { get; init; }
+    public required IRType LoadedType { get; init; }
     public required IRValue Address { get; init; }
-    public override SpamType Type => LoadedType;
+    public override IRType Type => LoadedType;
 
     public override string PrintDefinition()
     {
@@ -146,7 +146,7 @@ public sealed class IRInstructionStore : IRInstruction
 {
     public required IRValue Value { get; init; }
     public required IRValue Address { get; init; }
-    public override SpamType Type => BuiltinType.Void;
+    public override IRType Type => BuiltinType.Void;
 
     public override string PrintDefinition()
     {
@@ -170,7 +170,7 @@ public sealed class IRInstructionBinary : IRInstruction
     public required IRBinaryOp Op { get; init; }
     public required IRValue Left { get; init; }
     public required IRValue Right { get; init; }
-    public override SpamType Type => Left.Type;
+    public override IRType Type => Left.Type;
 
     public override string PrintDefinition()
     {
@@ -184,7 +184,7 @@ public sealed class IRInstructionCall : IRInstruction
     public required List<IRValue> Args { get; init; }
     public required FuncType LoweredSignature { get; init; }
 
-    public override SpamType Type => LoweredSignature.ReturnType;
+    public override IRType Type => LoweredSignature.ReturnType;
 
     public override string PrintDefinition()
     {
@@ -212,8 +212,8 @@ public sealed class IRInstructionCall : IRInstruction
 public sealed class IRInstructionCast : IRInstruction
 {
     public required IRValue Value { get; init; }
-    public required SpamType CastTo { get; init; }
-    public override SpamType Type => CastTo;
+    public required IRType CastTo { get; init; }
+    public override IRType Type => CastTo;
 
     public override string PrintDefinition()
     {

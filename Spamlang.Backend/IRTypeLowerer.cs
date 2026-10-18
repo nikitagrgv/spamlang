@@ -7,10 +7,10 @@ public class IRTypeLowerer
 {
     private readonly struct SignatureCacheEntry : IEquatable<SignatureCacheEntry>
     {
-        public readonly IRType? ReturnType;
+        public readonly IRType ReturnType;
         public readonly IReadOnlyList<IRType> ParamTypes;
 
-        public SignatureCacheEntry(IRType? returnType, IReadOnlyList<IRType> paramTypes)
+        public SignatureCacheEntry(IRType returnType, IReadOnlyList<IRType> paramTypes)
         {
             ReturnType = returnType;
             ParamTypes = paramTypes;
@@ -26,15 +26,7 @@ public class IRTypeLowerer
         public override int GetHashCode()
         {
             HashCode hc = new();
-            if (ReturnType != null)
-            {
-                hc.Add(ReturnType);
-            }
-            else
-            {
-                hc.Add(0);
-            }
-
+            hc.Add(ReturnType);
             foreach (IRType t in ParamTypes)
             {
                 hc.Add(t);
@@ -48,8 +40,6 @@ public class IRTypeLowerer
 
     public IRType ToLowerType(SpamType type)
     {
-        Debug.Assert(type.Kind != TypeKind.Void, "Must be handled separately, IR has no void type");
-
         if (type.Kind == TypeKind.AbstractNumber)
         {
             throw new InvalidHIRException("Unexpected abstract number. All abstract numbers must be transformed to the specific types");
@@ -58,6 +48,11 @@ public class IRTypeLowerer
         if (type.Kind == TypeKind.Error)
         {
             throw new InvalidHIRException("Unexpected error type. IRGen works with valid HIR only");
+        }
+
+        if (type.Kind == TypeKind.Void)
+        {
+            return IRType.Void;
         }
 
         if (type.Kind == TypeKind.Function)
@@ -116,7 +111,7 @@ public class IRTypeLowerer
         return GetInterned(lowerRetType, lowerParams);
     }
 
-    private IRSignature GetInterned(IRType? returnType, IReadOnlyList<IRType> paramTypes)
+    private IRSignature GetInterned(IRType returnType, IReadOnlyList<IRType> paramTypes)
     {
         SignatureCacheEntry lookupSignature = new(returnType, paramTypes);
         if (_signatureCache.TryGetValue(lookupSignature, out IRSignature? type))
