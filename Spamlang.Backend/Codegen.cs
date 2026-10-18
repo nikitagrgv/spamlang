@@ -15,8 +15,13 @@ public class Codegen
         public required Dictionary<int, int> InstrIdToOffset { get; init; }
     }
 
-    private Dictionary<IRSignature, FuncABI> _signatureToAbi = new();
-    private FuncABIGen _funcABIGen = new();
+    private readonly Dictionary<IRSignature, FuncABI> _signatureToAbi = new();
+    private readonly ITargetABI _targetABI;
+
+    public Codegen(ITargetABI targetABI)
+    {
+        _targetABI = targetABI;
+    }
 
     public MModule Run(IRModule irmodule)
     {
@@ -286,8 +291,8 @@ public class Codegen
 
         EmitCall(ctx, instructions, instr.Callee, comment);
 
-        SpamType returnType = instr.Type;
-        if (returnType == BuiltinType.Void)
+        IRType returnType = instr.Type;
+        if (returnType == IRType.Void)
         {
             return;
         }
@@ -524,7 +529,7 @@ public class Codegen
             return abi;
         }
 
-        abi = _funcABIGen.Generate(signature);
+        abi = _targetABI.Generate(signature);
         _signatureToAbi[signature] = abi;
         return abi;
     }

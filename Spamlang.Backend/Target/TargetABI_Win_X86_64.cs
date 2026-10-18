@@ -1,18 +1,11 @@
 using System.Diagnostics;
-using Spamlang.Frontend;
 
-namespace Spamlang.Backend;
-
-public class FuncABI
-{
-    public required List<MValueLocation> ParamLocations { get; init; }
-    public required MValueLocation? ReturnLocation { get; init; }
-}
+namespace Spamlang.Backend.Target;
 
 // TODO: Full ABI for params! stack/floats/structs
 // TODO: SRet ABI (should probably be in IR)
 // TODO: SystemV ABI
-public sealed class FuncABIGen
+public sealed class TargetABI_Win_X86_64 : ITargetABI
 {
     private static readonly Reg[] ParamsRegs = [Reg.Rcx, Reg.Rdx, Reg.R8, Reg.R9];
 

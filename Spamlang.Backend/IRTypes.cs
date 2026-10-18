@@ -1,5 +1,3 @@
-using Spamlang.Frontend;
-
 namespace Spamlang.Backend;
 
 public sealed class IRModule
@@ -13,7 +11,7 @@ public sealed class IRFunction : IRValue
     public required List<IRParam> Params { get; init; }
     public required List<IRBasicBlock> BasicBlocks { get; init; }
 
-    public required FuncType LoweredSignature { get; init; }
+    public required IRSignature LoweredSignature { get; init; }
 
     public override IRType Type => IRType.Ptr;
 
