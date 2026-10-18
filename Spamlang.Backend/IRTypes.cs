@@ -162,7 +162,7 @@ public sealed class IRConstantInt : IRValue
         _type = type;
     }
 
-    public IRConstantInt Create(Int128 value, IRType type)
+    public static IRConstantInt Create(Int128 value, IRType type)
     {
         Int128 canonical;
         switch (type.Kind)
