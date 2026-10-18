@@ -220,7 +220,7 @@ public class IRGen
 
     private IRValue GenExprUnaryValue(IRBasicBlock block, HIRExprUnary expr)
     {
-        // TODO: Handle directly, not through binary op! E.g. now we have problems with float +0.0 and -0.0 
+        // TODO: Handle directly, not through binary op! E.g. now we have problems with float +0.0 and -0.0
 
         IRValue operand = GenExprValue(block, expr.Operand);
         BinaryOp op;
