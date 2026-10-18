@@ -55,6 +55,11 @@ public sealed class IRSignature
         ReturnType = returnType;
     }
 
+    public override string ToString()
+    {
+        return $"fn({string.Join(", ", ParamTypes.Select(t => t.Name))})->{ReturnType.Name}";
+    }
+
     internal static IRSignature CreateInterned(IRType returnType, IReadOnlyList<IRType> paramTypes)
     {
         return new IRSignature(returnType, paramTypes);
