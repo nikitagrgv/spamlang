@@ -6,11 +6,11 @@ namespace Spamlang.Backend;
 public class IRGen
 {
     private readonly List<Dictionary<Symbol, IRValue>> _symbolScopes = new();
-    private readonly TypeRegistry _typeRegistry;
+    private readonly IRTypeLowerer _lowerer;
 
-    public IRGen(TypeRegistry typeRegistry)
+    public IRGen(IRTypeLowerer lowerer)
     {
-        _typeRegistry = typeRegistry;
+        _lowerer = lowerer;
     }
 
     public IRModule Run(HIRCompilationUnit unit)
@@ -22,7 +22,7 @@ public class IRGen
         foreach (HIRFuncDecl funcDecl in unit.FuncDecls)
         {
             FuncType signature = funcDecl.Symbol.FuncType;
-            FuncType lowerSignature = IRUtils.ToLowerSignature(signature, _typeRegistry);
+            IRSignature lowerSignature = _lowerer.ToLowerSignature(signature);
             IRFunction func = new()
             {
                 BasicBlocks = new List<IRBasicBlock>(),
@@ -70,7 +70,7 @@ public class IRGen
 
         GenStmts(entry, funcDecl.Body.Stmts);
 
-        if (function.LoweredSignature.ReturnType == BuiltinType.Void && entry.Terminator == null)
+        if (function.LoweredSignature.ReturnType == IRType.Void && entry.Terminator == null)
         {
             IRInstructionRet ret = new()
             {
@@ -201,7 +201,7 @@ public class IRGen
         }
 
         IRValue addr = GenExprAddr(block, expr.Address);
-        SpamType type = IRUtils.ToLowerType(expr.Type);
+        IRType type = _lowerer.ToLowerType(expr.Type);
         IRInstructionLoad load = new()
         {
             LoadedType = type,
@@ -315,7 +315,7 @@ public class IRGen
     private IRValue GenExprCastValue(IRBasicBlock block, HIRExprCast expr)
     {
         IRValue value = GenExprValue(block, expr.Value);
-        SpamType type = IRUtils.ToLowerType(expr.Type);
+        SpamType type = _lowerer.ToLowerType(expr.Type);
         IRInstructionCast cast = new()
         {
             Value = value,
@@ -333,7 +333,7 @@ public class IRGen
 
     private IRValue GenExprIntValue(HIRExprIntConst expr)
     {
-        SpamType type = IRUtils.ToLowerType(expr.Type);
+        SpamType type = _lowerer.ToLowerType(expr.Type);
         IRConstantInt value = new()
         {
             Value = expr.Value,
@@ -365,31 +365,36 @@ public class IRGen
         }
     }
 
-    private IRValue MakeZeroInitialized(SpamType type)
+    private IRValue MakeZeroInitialized(IRType type)
     {
-        if (type is FuncType)
-        {
-            throw new InvalidHIRException("Cannot make a function zero initialized");
-        }
+        Debug.Assert(type.Kind != IRTypeKind.Void, "Unexpected void type in MakeZeroInitialized");
 
-        // TODO: Don't allocate, put in static fields
-        if (type == BuiltinType.I32 || type == BuiltinType.Ptr)
+        switch (type.Kind)
         {
-            return new IRConstantInt
-            {
-                Value = 0,
-                IntType = type,
-            };
+            case IRTypeKind.Int:
+            case IRTypeKind.Ptr:
+            case IRTypeKind.Bool:
+                return new IRConstantInt
+                {
+                    Value = 0,
+                    IntType = type,
+                };
+            case IRTypeKind.Float:
+                return new IRConstantFloat
+                {
+                    Value = 0.0,
+                    FloatType = type,
+                };
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-
-        throw new NotImplementedException();
     }
 
     private void GenLocals(IRBasicBlock entry, IReadOnlyList<VariableSymbol> locals)
     {
         foreach (VariableSymbol sym in locals)
         {
-            SpamType type = IRUtils.ToLowerType(sym.Type);
+            SpamType type = _lowerer.ToLowerType(sym.Type);
 
             IRInstructionAlloca alloca = new()
             {
@@ -413,7 +418,7 @@ public class IRGen
         int initialNumInstructions = entry.Instructions.Count;
         foreach (ParamSymbol sym in funcParams)
         {
-            SpamType type = IRUtils.ToLowerType(sym.Type);
+            SpamType type = _lowerer.ToLowerType(sym.Type);
             IRParam irParam = new()
             {
                 ParamType = type,

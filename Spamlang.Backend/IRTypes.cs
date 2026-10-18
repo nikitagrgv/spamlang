@@ -86,6 +86,19 @@ public sealed class IRConstantInt : IRValue
     }
 }
 
+public sealed class IRConstantFloat : IRValue
+{
+    public required IRType FloatType { get; init; }
+    public required double Value { get; init; }
+
+    public override IRType Type => FloatType;
+
+    public override string PrintOperand()
+    {
+        return $"{Type} {Value}";
+    }
+}
+
 public sealed class IRParam : IRValue
 {
     public required IRType ParamType { get; init; }

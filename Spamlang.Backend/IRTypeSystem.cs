@@ -4,9 +4,9 @@ public enum IRTypeKind
 {
     Void,
     Int,
-    Float,
-    Bool,
     Ptr,
+    Bool,
+    Float,
 }
 
 public sealed class IRType
