@@ -1,20 +1,33 @@
+using System.Diagnostics;
 using Spamlang.Frontend;
 
 namespace Spamlang.Backend;
 
-public static class IRUtils
+public class IRTypeLowerer
 {
-    public static SpamType ToLowerType(SpamType type)
+    public IRType ToLowerType(SpamType type)
     {
         if (type is FuncType)
         {
-            return BuiltinType.Ptr;
+            return IRType.Ptr;
+        }
+
+        if (type.Kind == TypeKind.SignedInteger)
+        {
+            switch (type.Size)
+            {
+                case 1: return IRType.I8;
+                case 2: return IRType.I16;
+                case 4: return IRType.I32;
+                case 8: return IRType.I64;
+                default: throw new UnreachableException();
+            }
         }
 
         return type;
     }
 
-    public static FuncType ToLowerSignature(FuncType funcType, TypeRegistry typeRegistry)
+    public FuncType ToLowerSignature(FuncType funcType)
     {
         // TODO: Cache!
 

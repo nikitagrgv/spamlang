@@ -212,6 +212,16 @@ public class SemaTest
         Assert.Equal(3.0, init.Value);
     }
 
+    [Theory]
+    [InlineData("1 / 0")]
+    [InlineData("1.0 / 0.0")]
+    public void Sema_ReportsErrorOnDivisionByZero(string str)
+    {
+        string stmtCode = $"let a = {str}";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.True(tester.HasErrors);
+    }
+
     [Fact]
     public void Sema_BuildsSimpleProgram()
     {
