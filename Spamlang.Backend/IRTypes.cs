@@ -156,6 +156,16 @@ public sealed class IRConstantInt : IRValue
 
     public override IRType Type => IntType;
 
+    private IRConstantInt(Int128 value, IRType type)
+    {
+        Value = value;
+        IntType = type;
+    }
+
+    public IRConstantInt Create(Int128 value, IRType type)
+    {
+    }
+
     public override string PrintOperand()
     {
         return $"{Type} {Value.ToString(CultureInfo.InvariantCulture)}";
