@@ -151,7 +151,7 @@ public sealed class IRConstantInt : IRValue
 {
     public required IRType IntType { get; init; }
 
-    // Canonical form: extended sign for both signed/unsigned
+    // Canonical form: extended sign for both signed/unsigned, so 255 and -1 are the same for i8/u8
     public required Int128 Value { get; init; }
 
     public override IRType Type => IntType;
@@ -164,6 +164,18 @@ public sealed class IRConstantInt : IRValue
 
     public IRConstantInt Create(Int128 value, IRType type)
     {
+        if (type.Kind == IRTypeKind.Bool)
+        {
+            if (value != 0 && value != 1)
+            {
+                throw new Exception("Invalid bool value");
+            }
+        }
+
+        if (type.Kind != IRTypeKind.Int && type.Kind != IRTypeKind.Bool && type.Kind != IRTypeKind.Ptr)
+        {
+            throw new Exception($"Cannot use type {type} for {nameof(IRConstantInt)}");
+        }
     }
 
     public override string PrintOperand()
