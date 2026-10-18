@@ -40,55 +40,39 @@ public class IRTypeLowerer
 
     public IRType ToLowerType(SpamType type)
     {
-        if (type.Kind == TypeKind.AbstractNumber)
+        switch (type.Kind)
         {
-            throw new InvalidHIRException("Unexpected abstract number. All abstract numbers must be transformed to the specific types");
+            case TypeKind.AbstractNumber:
+                throw new InvalidHIRException("Unexpected abstract number. All abstract numbers must be transformed to the specific types");
+            case TypeKind.Error:
+                throw new InvalidHIRException("Unexpected error type. IRGen works with valid HIR only");
+            case TypeKind.Void:
+                return IRType.Void;
+            case TypeKind.Function:
+                return IRType.Ptr;
+            case TypeKind.Bool:
+                return IRType.Bool;
+            case TypeKind.SignedInteger:
+            case TypeKind.UnsignedInteger:
+                // Both signed and unsigned lowered to the same type, signedness is encoded in the opcode 
+                switch (type.Size)
+                {
+                    case 1: return IRType.I8;
+                    case 2: return IRType.I16;
+                    case 4: return IRType.I32;
+                    case 8: return IRType.I64;
+                    default: throw new UnexpectedTypeException(type);
+                }
+            case TypeKind.Float:
+                switch (type.Size)
+                {
+                    case 4: return IRType.F32;
+                    case 8: return IRType.F64;
+                    default: throw new UnexpectedTypeException(type);
+                }
+            default:
+                throw new UnexpectedTypeException(type);
         }
-
-        if (type.Kind == TypeKind.Error)
-        {
-            throw new InvalidHIRException("Unexpected error type. IRGen works with valid HIR only");
-        }
-
-        if (type.Kind == TypeKind.Void)
-        {
-            return IRType.Void;
-        }
-
-        if (type.Kind == TypeKind.Function)
-        {
-            return IRType.Ptr;
-        }
-
-        if (type.Kind == TypeKind.Bool)
-        {
-            return IRType.Bool;
-        }
-
-        if (type.Kind == TypeKind.SignedInteger || type.Kind == TypeKind.UnsignedInteger)
-        {
-            // Both signed and unsigned lowered to the same type, signedness is encoded in the opcode 
-            switch (type.Size)
-            {
-                case 1: return IRType.I8;
-                case 2: return IRType.I16;
-                case 4: return IRType.I32;
-                case 8: return IRType.I64;
-                default: throw new UnexpectedTypeException(type);
-            }
-        }
-
-        if (type.Kind == TypeKind.Float)
-        {
-            switch (type.Size)
-            {
-                case 4: return IRType.F32;
-                case 8: return IRType.F64;
-                default: throw new UnexpectedTypeException(type);
-            }
-        }
-
-        throw new UnexpectedTypeException(type);
     }
 
     public IRSignature ToLowerSignature(FuncType funcType)
