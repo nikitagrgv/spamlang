@@ -156,25 +156,31 @@ public sealed class IRConstantInt : IRValue
 
     public override IRType Type => IntType;
 
-    private IRConstantInt(Int128 value, IRType type)
+    private IRConstantInt()
     {
-        Value = value;
-        IntType = type;
     }
 
     public IRConstantInt Create(Int128 value, IRType type)
     {
-        if (type.Kind == IRTypeKind.Bool)
+        switch (type.Kind)
         {
-            if (value != 0 && value != 1)
-            {
-                throw new Exception("Invalid bool value");
-            }
-        }
+            case IRTypeKind.Bool:
+                if (value != 0 && value != 1)
+                {
+                    throw new Exception("Invalid bool value");
+                }
 
-        if (type.Kind != IRTypeKind.Int && type.Kind != IRTypeKind.Bool && type.Kind != IRTypeKind.Ptr)
-        {
-            throw new Exception($"Cannot use type {type} for {nameof(IRConstantInt)}");
+                return new IRConstantInt
+                {
+                    IntType = type,
+                    Value = value,
+                };
+
+            case IRTypeKind.Int:
+            case IRTypeKind.Ptr:
+
+            default:
+                throw new Exception($"Cannot use type {type} for {nameof(IRConstantInt)}");
         }
     }
 
