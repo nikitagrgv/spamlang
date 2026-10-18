@@ -394,7 +394,7 @@ public class IRGen
     {
         foreach (VariableSymbol sym in locals)
         {
-            SpamType type = _lowerer.ToLowerType(sym.Type);
+            IRType type = _lowerer.ToLowerType(sym.Type);
 
             IRInstructionAlloca alloca = new()
             {
@@ -418,7 +418,7 @@ public class IRGen
         int initialNumInstructions = entry.Instructions.Count;
         foreach (ParamSymbol sym in funcParams)
         {
-            SpamType type = _lowerer.ToLowerType(sym.Type);
+            IRType type = _lowerer.ToLowerType(sym.Type);
             IRParam irParam = new()
             {
                 ParamType = type,
@@ -509,7 +509,7 @@ public class IRGen
             {
                 foreach (IRInstruction inst in bb.Instructions)
                 {
-                    if (inst.Type != BuiltinType.Void)
+                    if (inst.Type != IRType.Void)
                     {
                         inst.Id = ++cur;
                     }
