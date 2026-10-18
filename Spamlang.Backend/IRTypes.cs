@@ -62,7 +62,7 @@ public enum IRCastOp
 {
     ZeroExtend,
     SignExtend,
-    Trunc,
+    Truncate,
 }
 
 public sealed class IRModule
