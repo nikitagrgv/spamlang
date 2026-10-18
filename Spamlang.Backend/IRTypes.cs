@@ -1,5 +1,61 @@
 namespace Spamlang.Backend;
 
+public enum IRBinaryOp
+{
+    Add,
+    Sub,
+    Mul,
+    SDiv,
+    UDiv,
+    SRem,
+    URem,
+
+    And,
+    Or,
+    Xor,
+    ShiftLeft,
+    LogicalShiftRight,
+    ArithmeticShiftRight,
+
+    FAdd,
+    FSub,
+    FMul,
+    FDiv,
+}
+
+public enum IRUnaryOp
+{
+    Neg,
+    Not,
+    FNeg,
+}
+
+public enum IRCompareOp
+{
+    Equal,
+    NotEqual,
+
+    SLess,
+    SLessEqual,
+    SGreater,
+    SGreaterEqual,
+
+    ULess,
+    ULessEqual,
+    UGreater,
+    UGreaterEqual,
+
+    // NOTE: false on NaN-s
+    FEqual,
+    FLess,
+    FLessEqual,
+    FGreater,
+    FGreaterEqual,
+
+    // NOTE: true on NaN-s
+    FNotEqual,
+}
+
 public sealed class IRModule
 {
     public required List<IRFunction> Functions { get; init; }
@@ -165,29 +221,6 @@ public sealed class IRInstructionStore : IRInstruction
     }
 }
 
-public enum IRBinaryOp
-{
-    Add,
-    Sub,
-    Mul,
-    SDiv,
-    UDiv,
-    SRem,
-    URem,
-
-    And,
-    Or,
-    Xor,
-    ShiftLeft,
-    LogicalShiftRight,
-    ArithmeticShiftRight,
-
-    FAdd,
-    FSub,
-    FMul,
-    FDiv,
-}
-
 public sealed class IRInstructionBinary : IRInstruction
 {
     public required IRBinaryOp Op { get; init; }
@@ -199,13 +232,6 @@ public sealed class IRInstructionBinary : IRInstruction
     {
         return $"%{Id} = {Op} {Left.PrintOperand()}, {Right.PrintOperand()}";
     }
-}
-
-public enum IRUnaryOp
-{
-    Neg,
-    Not,
-    FNeg,
 }
 
 public sealed class IRInstructionUnary : IRInstruction
@@ -220,30 +246,17 @@ public sealed class IRInstructionUnary : IRInstruction
     }
 }
 
-public enum IRCompareOp
+public sealed class IRInstructionCompare : IRInstruction
 {
-    Equal,
-    NotEqual,
+    public required IRCompareOp Op { get; init; }
+    public required IRValue Left { get; init; }
+    public required IRValue Right { get; init; }
+    public override IRType Type => IRType.Bool;
 
-    SLess,
-    SLessEqual,
-    SGreater,
-    SGreaterEqual,
-
-    ULess,
-    ULessEqual,
-    UGreater,
-    UGreaterEqual,
-
-    // NOTE: false on NaN-s
-    FEqual,
-    FLess,
-    FLessEqual,
-    FGreater,
-    FGreaterEqual,
-
-    // NOTE: true on NaN-s
-    FNotEqual,
+    public override string PrintDefinition()
+    {
+        return $"%{Id} = {Op} {Left.PrintOperand()}, {Right.PrintOperand()}";
+    }
 }
 
 public sealed class IRInstructionCall : IRInstruction
