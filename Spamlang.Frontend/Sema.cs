@@ -1855,7 +1855,7 @@ public class Sema
             case OpFamily.Arithmetic:
                 return GetArithmeticOpResultType(a, b, out commonType);
             case OpFamily.Bit:
-                return GetBitOpResultType(a, b, out commonType);
+                return GetBitOpResultType(a, b, op, out commonType);
             case OpFamily.Comparison:
                 return GetComparisonOpResultType(a, b, out commonType);
             default:
@@ -1897,7 +1897,7 @@ public class Sema
         return commonType;
     }
 
-    private static SpamType? GetBitOpResultType(SpamType a, SpamType b, out SpamType? commonType)
+    private static SpamType? GetBitOpResultType(SpamType a, SpamType b, BinaryOp op, out SpamType? commonType)
     {
         bool CanUseOp(TypeKind kind)
         {
@@ -1906,8 +1906,9 @@ public class Sema
                 case TypeKind.AbstractNumber:
                 case TypeKind.SignedInteger:
                 case TypeKind.UnsignedInteger:
-                case TypeKind.Bool:
                     return true;
+                case TypeKind.Bool:
+                    return op == BinaryOp.BitAnd || op == BinaryOp.BitOr || op == BinaryOp.BitXor;
                 default:
                     return false;
             }
