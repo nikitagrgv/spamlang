@@ -170,7 +170,7 @@ public sealed class IRConstantInt : IRValue
             case IRTypeKind.Bool:
                 if (value != 0 && value != 1)
                 {
-                    throw new Exception("Invalid bool value");
+                    throw new InvalidHIRException("Invalid bool value");
                 }
 
                 canonical = value;
@@ -179,13 +179,17 @@ public sealed class IRConstantInt : IRValue
             case IRTypeKind.Int:
             case IRTypeKind.Ptr:
                 int bits = type.Size * 8;
+                if (value < -(Int128.One << (bits - 1)) || value > ((Int128.One << (bits - 1)) - Int128.One))
+                {
+                }
+
                 int shift = 128 - bits;
                 // Extend sign to the width of the type. So 255 and -1 are the same for i8/u8
                 canonical = (value << shift) >> shift;
                 break;
 
             default:
-                throw new Exception($"Cannot use type {type} for {nameof(IRConstantInt)}");
+                throw new InvalidHIRException($"Cannot use type {type} for {nameof(IRConstantInt)}");
         }
 
         return new IRConstantInt(canonical, type);
