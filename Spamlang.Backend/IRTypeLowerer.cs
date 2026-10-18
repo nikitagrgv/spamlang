@@ -49,7 +49,7 @@ public class IRTypeLowerer
             case TypeKind.Bool: return IRType.Bool;
             case TypeKind.SignedInteger:
             case TypeKind.UnsignedInteger:
-                // Both signed and unsigned lowered to the same type, signedness is encoded in the opcode 
+                // Both signed and unsigned lowered to the same type, signedness is encoded in opcodes
                 switch (type.Size)
                 {
                     case 1: return IRType.I8;
@@ -81,12 +81,7 @@ public class IRTypeLowerer
             lowerParams.Add(lower);
         }
 
-        IRType? lowerRetType = null;
-        if (funcType.ReturnType != BuiltinType.Void)
-        {
-            lowerRetType = ToLowerType(funcType.ReturnType);
-        }
-
+        IRType lowerRetType = ToLowerType(funcType.ReturnType);
         return GetInterned(lowerRetType, lowerParams);
     }
 
