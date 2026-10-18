@@ -149,19 +149,22 @@ public abstract class IRValue
 
 public sealed class IRConstantInt : IRValue
 {
-    public required IRType IntType { get; init; }
+    private readonly Int128 _canonical;
+    private readonly IRType _type;
 
     // Canonical form: extended sign for both signed/unsigned, so 255 and -1 are the same for i8/u8
-    public required Int128 Value { get; init; }
+    public Int128 Canonical => _canonical;
+    public override IRType Type => _type;
 
-    public override IRType Type => IntType;
-
-    private IRConstantInt()
+    private IRConstantInt(Int128 canonical, IRType type)
     {
+        _canonical = canonical;
+        _type = type;
     }
 
     public IRConstantInt Create(Int128 value, IRType type)
     {
+        Int128 canonical;
         switch (type.Kind)
         {
             case IRTypeKind.Bool:
@@ -170,18 +173,22 @@ public sealed class IRConstantInt : IRValue
                     throw new Exception("Invalid bool value");
                 }
 
-                return new IRConstantInt
-                {
-                    IntType = type,
-                    Value = value,
-                };
+                canonical = value;
+                break;
 
             case IRTypeKind.Int:
             case IRTypeKind.Ptr:
+                int bits = type.Size * 8;
+                int shift = 128 - bits;
+                // Extend sign to the width of the type. So 255 and -1 are the same for i8/u8
+                canonical = (value << shift) >> shift;
+                break;
 
             default:
                 throw new Exception($"Cannot use type {type} for {nameof(IRConstantInt)}");
         }
+
+        return new IRConstantInt(canonical, type);
     }
 
     public override string PrintOperand()
