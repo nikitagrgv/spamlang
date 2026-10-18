@@ -1407,7 +1407,7 @@ public class Sema
             case BinaryOp.Div:
                 return MakeFloatValue(left / right);
             case BinaryOp.Rem:
-                return MakeFloatValue(left % right);
+                return MakeErrorAndReport("Cannot use remainder operator on float numbers");
             case BinaryOp.Equal:
                 return MakeBoolValue(left == right);
             case BinaryOp.NotEqual:
@@ -1853,7 +1853,7 @@ public class Sema
             case OpFamily.Logic:
                 return GetLogicOpResultType(a, b, out commonType);
             case OpFamily.Arithmetic:
-                return GetArithmeticOpResultType(a, b, out commonType);
+                return GetArithmeticOpResultType(a, b, op, out commonType);
             case OpFamily.Bit:
                 return GetBitOpResultType(a, b, op, out commonType);
             case OpFamily.Comparison:
@@ -1877,7 +1877,7 @@ public class Sema
         return commonType;
     }
 
-    private static SpamType? GetArithmeticOpResultType(SpamType a, SpamType b, out SpamType? commonType)
+    private static SpamType? GetArithmeticOpResultType(SpamType a, SpamType b, BinaryOp op, out SpamType? commonType)
     {
         bool CanUseOp(TypeKind kind)
         {
@@ -1886,8 +1886,10 @@ public class Sema
                 case TypeKind.AbstractNumber:
                 case TypeKind.SignedInteger:
                 case TypeKind.UnsignedInteger:
-                case TypeKind.Float:
                     return true;
+                case TypeKind.Float:
+                    // % is not allowed on floats
+                    return op is BinaryOp.Plus or BinaryOp.Minus or BinaryOp.Mul or BinaryOp.Div;
                 default:
                     return false;
             }

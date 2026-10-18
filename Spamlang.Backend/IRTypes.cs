@@ -175,6 +175,10 @@ public enum IRBinaryOp
     SRem,
     URem,
 
+    And,
+    Or,
+    Xor,
+
     FAdd,
     FSub,
     FMul,
@@ -191,6 +195,25 @@ public sealed class IRInstructionBinary : IRInstruction
     public override string PrintDefinition()
     {
         return $"%{Id} = {Op} {Left.PrintOperand()}, {Right.PrintOperand()}";
+    }
+}
+
+public enum IRUnaryOp
+{
+    Neg,
+    Not,
+    FNeg,
+}
+
+public sealed class IRInstructionUnary : IRInstruction
+{
+    public required IRUnaryOp Op { get; init; }
+    public required IRValue Value { get; init; }
+    public override IRType Type => Value.Type;
+
+    public override string PrintDefinition()
+    {
+        return $"%{Id} = {Op} {Value.PrintOperand()}";
     }
 }
 
