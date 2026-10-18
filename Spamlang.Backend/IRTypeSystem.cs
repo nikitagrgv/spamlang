@@ -40,3 +40,20 @@ public sealed class IRType
         return Name;
     }
 }
+
+public sealed class IRSignature
+{
+    public IRType? ReturnType { get; }
+    public IReadOnlyList<IRType> ParamTypes { get; }
+
+    private IRSignature(IRType? returnType, IReadOnlyList<IRType> paramTypes)
+    {
+        ParamTypes = paramTypes;
+        ReturnType = returnType;
+    }
+
+    internal static IRSignature CreateInterned(IRType? returnType, IReadOnlyList<IRType> paramTypes)
+    {
+        return new IRSignature(returnType, paramTypes);
+    }
+}

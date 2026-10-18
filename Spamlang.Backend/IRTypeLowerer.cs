@@ -5,6 +5,47 @@ namespace Spamlang.Backend;
 
 public class IRTypeLowerer
 {
+    private readonly struct SignatureCacheEntry : IEquatable<SignatureCacheEntry>
+    {
+        public readonly IRType? ReturnType;
+        public readonly IReadOnlyList<IRType> ParamTypes;
+
+        public SignatureCacheEntry(IRType? returnType, IReadOnlyList<IRType> paramTypes)
+        {
+            ReturnType = returnType;
+            ParamTypes = paramTypes;
+        }
+
+        public bool Equals(SignatureCacheEntry other)
+        {
+            return ReturnType == other.ReturnType && ParamTypes.SequenceEqual(other.ParamTypes);
+        }
+
+        public override bool Equals(object? obj) => obj is SignatureCacheEntry other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            HashCode hc = new();
+            if (ReturnType != null)
+            {
+                hc.Add(ReturnType);
+            }
+            else
+            {
+                hc.Add(0);
+            }
+
+            foreach (IRType t in ParamTypes)
+            {
+                hc.Add(t);
+            }
+
+            return hc.ToHashCode();
+        }
+    }
+
+    private readonly Dictionary<SignatureCacheEntry, IRSignature> _signatureCache = new();
+
     public IRType ToLowerType(SpamType type)
     {
         Debug.Assert(type.Kind != TypeKind.Void, "Must be handled separately, IR has no void type");
@@ -55,19 +96,39 @@ public class IRTypeLowerer
         throw new UnexpectedTypeException(type);
     }
 
-    public FuncType ToLowerSignature(FuncType funcType)
+    public IRSignature ToLowerSignature(FuncType funcType)
     {
-        // TODO: Cache!
-
-        List<SpamType> lowerParams = new();
+        // TODO: Reuse lists
+        List<IRType> lowerParams = new();
         lowerParams.EnsureCapacity(funcType.ParamTypes.Count);
         foreach (SpamType paramType in funcType.ParamTypes)
         {
-            SpamType lower = ToLowerType(paramType);
+            IRType lower = ToLowerType(paramType);
             lowerParams.Add(lower);
         }
 
-        SpamType lowerRetType = ToLowerType(funcType.ReturnType);
-        return typeRegistry.GetFuncType(lowerRetType, lowerParams);
+        IRType? lowerRetType = null;
+        if (funcType.ReturnType != BuiltinType.Void)
+        {
+            lowerRetType = ToLowerType(funcType.ReturnType);
+        }
+
+        return GetInterned(lowerRetType, lowerParams);
+    }
+
+    private IRSignature GetInterned(IRType? returnType, IReadOnlyList<IRType> paramTypes)
+    {
+        SignatureCacheEntry lookupSignature = new(returnType, paramTypes);
+        if (_signatureCache.TryGetValue(lookupSignature, out IRSignature? type))
+        {
+            return type;
+        }
+
+        // copy the list, ensure immutability
+        SignatureCacheEntry signature = new(returnType, [.. paramTypes]);
+
+        type = IRSignature.CreateInterned(signature.ReturnType, signature.ParamTypes);
+        _signatureCache.Add(signature, type);
+        return type;
     }
 }
