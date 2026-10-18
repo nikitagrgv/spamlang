@@ -10,7 +10,6 @@ public enum TypeKind
     Float,
     Bool,
     Function,
-    OpaquePtr,
 }
 
 // NOTE: Interning is used for types like FuncType. TypeRegistry provides that. Compare by reference
@@ -18,7 +17,7 @@ public abstract class SpamType
 {
     public abstract string Name { get; }
     public abstract int Size { get; }
-    public abstract int Alignment { get; }
+    public abstract int Alignment { get; } // TODO: Shouldn't be here? Move to target?
     public abstract TypeKind Kind { get; }
 
     public override string ToString()
@@ -47,8 +46,6 @@ public sealed class BuiltinType : SpamType
     public static readonly BuiltinType Error = new(TypeKind.Error, "<error>", 0, 1);
 
     public static readonly BuiltinType Void = new(TypeKind.Void, "void", 0, 1);
-
-    public static readonly BuiltinType Ptr = new(TypeKind.OpaquePtr, "ptr", 8, 8);
 
     public static readonly BuiltinType AbstractInt = new(TypeKind.AbstractNumber, "abstract_number", 0, 1);
     public static readonly BuiltinType AbstractFloat = new(TypeKind.AbstractNumber, "abstract_number", 0, 1);
