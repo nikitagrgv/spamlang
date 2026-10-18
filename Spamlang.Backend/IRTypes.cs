@@ -179,7 +179,7 @@ public sealed class IRConstantInt : IRValue
             case IRTypeKind.Int:
             case IRTypeKind.Ptr:
                 int bits = type.Size * 8;
-                if (value < -(Int128.One << (bits - 1)) || value > (Int128.One << (bits - 1)))
+                if (value < -(Int128.One << (bits - 1)) || value >= (Int128.One << bits))
                 {
                     throw new InvalidHIRException("Integer value out of range");
                 }
