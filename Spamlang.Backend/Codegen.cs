@@ -15,7 +15,7 @@ public class Codegen
         public required Dictionary<int, int> InstrIdToOffset { get; init; }
     }
 
-    private Dictionary<FuncType, FuncABI> _funcTypeToAbi = new();
+    private Dictionary<IRSignature, FuncABI> _signatureToAbi = new();
     private FuncABIGen _funcABIGen = new();
 
     public MModule Run(IRModule irmodule)
@@ -517,15 +517,15 @@ public class Codegen
         }
     }
 
-    private FuncABI GetFuncABI(FuncType funcType)
+    private FuncABI GetFuncABI(IRSignature signature)
     {
-        if (_funcTypeToAbi.TryGetValue(funcType, out FuncABI? abi))
+        if (_signatureToAbi.TryGetValue(signature, out FuncABI? abi))
         {
             return abi;
         }
 
-        abi = _funcABIGen.Generate(funcType);
-        _funcTypeToAbi[funcType] = abi;
+        abi = _funcABIGen.Generate(signature);
+        _signatureToAbi[signature] = abi;
         return abi;
     }
 

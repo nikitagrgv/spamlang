@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Spamlang.Frontend;
 
 namespace Spamlang.Backend;
@@ -15,15 +16,15 @@ public sealed class FuncABIGen
 {
     private static readonly Reg[] ParamsRegs = [Reg.Rcx, Reg.Rdx, Reg.R8, Reg.R9];
 
-    public FuncABI Generate(FuncType signature)
+    public FuncABI Generate(IRSignature signature)
     {
         MValueLocation? retLoc = null;
         List<MValueLocation> paramsLocs = new();
 
-        SpamType retType = IRUtils.ToLowerType(signature.ReturnType);
-        if (retType != BuiltinType.Void)
+        IRType retType = signature.ReturnType;
+        if (retType != IRType.Void)
         {
-            if (retType.Size > 8 || !IsPowerOrTwo(retType.Size) || GetClass(retType) != RegClass.Int)
+            if (retType.Size > 8 || !IsPowerOrTwo(retType.Size) || GetRegClass(retType) != RegClass.Int)
             {
                 throw new NotImplementedException();
             }
@@ -38,8 +39,8 @@ public sealed class FuncABIGen
                 throw new NotImplementedException();
             }
 
-            SpamType paramType = IRUtils.ToLowerType(signature.ParamTypes[i]);
-            if (paramType.Size > 8 || !IsPowerOrTwo(paramType.Size) || GetClass(paramType) != RegClass.Int)
+            IRType paramType = signature.ParamTypes[i];
+            if (paramType.Size > 8 || !IsPowerOrTwo(paramType.Size) || GetRegClass(paramType) != RegClass.Int)
             {
                 throw new NotImplementedException();
             }
@@ -55,14 +56,21 @@ public sealed class FuncABIGen
         };
     }
 
-    private static RegClass GetClass(SpamType type)
+    private static RegClass GetRegClass(IRType type)
     {
-        if (type == BuiltinType.I32 || type == BuiltinType.Ptr)
-        {
-            return RegClass.Int;
-        }
+        Debug.Assert(type.Kind != IRTypeKind.Void, "Unexpected void type");
 
-        throw new NotImplementedException();
+        switch (type.Kind)
+        {
+            case IRTypeKind.Int:
+            case IRTypeKind.Bool:
+            case IRTypeKind.Ptr:
+                return RegClass.Int;
+            case IRTypeKind.Float:
+                return RegClass.Float;
+            default:
+                throw new UnreachableException();
+        }
     }
 
     private static bool IsPowerOrTwo(int n)
