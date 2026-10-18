@@ -193,7 +193,7 @@ public sealed class IRConstantInt : IRValue
 
     public override string PrintOperand()
     {
-        return $"{Type} {Value.ToString(CultureInfo.InvariantCulture)}";
+        return $"{Type} {Canonical.ToString(CultureInfo.InvariantCulture)}";
     }
 }
 
