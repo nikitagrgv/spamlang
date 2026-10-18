@@ -215,11 +215,13 @@ public class IRGen
     {
         IRValue left = GenExprValue(block, expr.Left);
         IRValue right = GenExprValue(block, expr.Right);
-        return GenBinaryOp(block, left, right, expr.Op);
+        return GenBinaryOp(block, left, right, expr.Op, expr.Type);
     }
 
     private IRValue GenExprUnaryValue(IRBasicBlock block, HIRExprUnary expr)
     {
+        // TODO: Handle directly, not through binary op! E.g. now we have problems with float +0.0 and -0.0 
+
         IRValue operand = GenExprValue(block, expr.Operand);
         BinaryOp op;
         switch (expr.Op)
@@ -231,10 +233,10 @@ public class IRGen
         }
 
         IRValue zero = MakeZeroInitialized(operand.Type);
-        return GenBinaryOp(block, zero, operand, op);
+        return GenBinaryOp(block, zero, operand, op, expr.Type);
     }
 
-    private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
+    private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op, SpamType origType)
     {
         if (left.Type != right.Type)
         {

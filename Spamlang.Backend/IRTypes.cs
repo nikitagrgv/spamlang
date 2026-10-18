@@ -174,6 +174,11 @@ public enum IRBinaryOp
     UDiv,
     SRem,
     URem,
+
+    FAdd,
+    FSub,
+    FMul,
+    FDiv,
 }
 
 public sealed class IRInstructionBinary : IRInstruction
