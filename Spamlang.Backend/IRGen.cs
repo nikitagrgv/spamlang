@@ -303,7 +303,7 @@ public class IRGen
             throw new InvalidHIRException("Not all arguments were set in call");
         }
 
-        FuncType lowerSignature = IRUtils.ToLowerSignature(funcType, _typeRegistry);
+        IRSignature lowerSignature = _lowerer.ToLowerSignature(funcType);
         IRInstructionCall call = new()
         {
             Args = args!,
@@ -317,7 +317,7 @@ public class IRGen
     private IRValue GenExprCastValue(IRBasicBlock block, HIRExprCast expr)
     {
         IRValue value = GenExprValue(block, expr.Value);
-        SpamType type = _lowerer.ToLowerType(expr.Type);
+        IRType type = _lowerer.ToLowerType(expr.Type);
         IRInstructionCast cast = new()
         {
             Value = value,
@@ -335,7 +335,7 @@ public class IRGen
 
     private IRValue GenExprIntValue(HIRExprIntConst expr)
     {
-        SpamType type = _lowerer.ToLowerType(expr.Type);
+        IRType type = _lowerer.ToLowerType(expr.Type);
         IRConstantInt value = new()
         {
             Value = expr.Value,
