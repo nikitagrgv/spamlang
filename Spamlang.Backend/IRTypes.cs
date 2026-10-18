@@ -60,9 +60,18 @@ public enum IRCompareOp
 
 public enum IRCastOp
 {
-    ZeroExtend,
-    SignExtend,
     Truncate,
+    SignExtend,
+    ZeroExtend,
+
+    FloatExtend,
+    FloatTruncate,
+
+    UnsignedToFloat,
+    SignedToFloat,
+
+    FloatToUnsigned,
+    FloatToSigned,
 }
 
 public sealed class IRModule
