@@ -186,7 +186,7 @@ public sealed class IRConstantInt : IRValue
                 }
 
                 int shift = 128 - bits;
-                // Extend sign to the width of the type. So 255 and -1 are the same for i8/u8
+                // Extend the sign to the width of the type. So 255 and -1 are the same for i8/u8
                 canonical = (value << shift) >> shift;
                 break;
 
