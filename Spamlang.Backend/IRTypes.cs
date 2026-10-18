@@ -56,6 +56,13 @@ public enum IRCompareOp
     FNotEqual,
 }
 
+public enum IRCastOp
+{
+    ZeroExtend,
+    SignExtend,
+    Trunc,
+}
+
 public sealed class IRModule
 {
     public required List<IRFunction> Functions { get; init; }
@@ -259,6 +266,19 @@ public sealed class IRInstructionCompare : IRInstruction
     }
 }
 
+public sealed class IRInstructionCast : IRInstruction
+{
+    public required IRCastOp Op { get; init; }
+    public required IRValue Value { get; init; }
+    public required IRType CastTo { get; init; }
+    public override IRType Type => CastTo;
+
+    public override string PrintDefinition()
+    {
+        return $"%{Id} = cast {Op} {CastTo}, {Value.PrintOperand()}";
+    }
+}
+
 public sealed class IRInstructionCall : IRInstruction
 {
     public required IRValue Callee { get; init; }
@@ -287,17 +307,5 @@ public sealed class IRInstructionCall : IRInstruction
 
         ret += $"call {Type} {name}({string.Join(", ", Args.Select(a => a.PrintOperand()))})";
         return ret;
-    }
-}
-
-public sealed class IRInstructionCast : IRInstruction
-{
-    public required IRValue Value { get; init; }
-    public required IRType CastTo { get; init; }
-    public override IRType Type => CastTo;
-
-    public override string PrintDefinition()
-    {
-        return $"%{Id} = cast {CastTo}, {Value.PrintOperand()}";
     }
 }
