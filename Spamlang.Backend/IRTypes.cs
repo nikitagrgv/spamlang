@@ -105,7 +105,7 @@ public abstract class IRInstruction : IRValue
 public sealed class IRInstructionRet : IRInstruction
 {
     public required IRValue? Value { get; init; }
-    public override IRType Type => BuiltinType.Void;
+    public override IRType Type => IRType.Void;
     public override bool IsTerminator => true;
 
     public override string PrintDefinition()
@@ -146,7 +146,7 @@ public sealed class IRInstructionStore : IRInstruction
 {
     public required IRValue Value { get; init; }
     public required IRValue Address { get; init; }
-    public override IRType Type => BuiltinType.Void;
+    public override IRType Type => IRType.Void;
 
     public override string PrintDefinition()
     {
@@ -182,14 +182,14 @@ public sealed class IRInstructionCall : IRInstruction
 {
     public required IRValue Callee { get; init; }
     public required List<IRValue> Args { get; init; }
-    public required FuncType LoweredSignature { get; init; }
+    public required IRSignature LoweredSignature { get; init; }
 
     public override IRType Type => LoweredSignature.ReturnType;
 
     public override string PrintDefinition()
     {
         string ret = "";
-        if (Type != BuiltinType.Void)
+        if (Type != IRType.Void)
         {
             ret += $"%{Id} = ";
         }
