@@ -178,6 +178,9 @@ public enum IRBinaryOp
     And,
     Or,
     Xor,
+    ShiftLeft,
+    LogicalShiftRight,
+    ArithmeticShiftRight,
 
     FAdd,
     FSub,
@@ -215,6 +218,32 @@ public sealed class IRInstructionUnary : IRInstruction
     {
         return $"%{Id} = {Op} {Value.PrintOperand()}";
     }
+}
+
+public enum IRCompareOp
+{
+    Equal,
+    NotEqual,
+
+    SLess,
+    SLessEqual,
+    SGreater,
+    SGreaterEqual,
+
+    ULess,
+    ULessEqual,
+    UGreater,
+    UGreaterEqual,
+
+    // NOTE: false on NaN-s
+    FEqual,
+    FLess,
+    FLessEqual,
+    FGreater,
+    FGreaterEqual,
+
+    // NOTE: true on NaN-s
+    FNotEqual,
 }
 
 public sealed class IRInstructionCall : IRInstruction
