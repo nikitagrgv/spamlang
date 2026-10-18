@@ -150,6 +150,7 @@ public abstract class IRValue
 public sealed class IRConstantInt : IRValue
 {
     public required IRType IntType { get; init; }
+    // Canonical form: extended sign for both signed/unsigned
     public required Int128 Value { get; init; }
 
     public override IRType Type => IntType;

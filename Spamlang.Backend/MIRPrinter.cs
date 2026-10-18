@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Spamlang.Backend;
 
 public class MIRPrinter
@@ -119,7 +121,7 @@ public class MIRPrinter
         switch (operand)
         {
             case MOpImm op:
-                Write(op.Value.ToString());
+                Write(op.Value.ToString(CultureInfo.InvariantCulture));
                 break;
             case MOpLabel op:
                 Write(op.Label);
