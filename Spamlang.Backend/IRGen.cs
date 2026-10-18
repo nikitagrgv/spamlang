@@ -3,13 +3,6 @@ using Spamlang.Frontend;
 
 namespace Spamlang.Backend;
 
-public class InvalidHIRException : Exception
-{
-    public InvalidHIRException(string message) : base(message)
-    {
-    }
-}
-
 public class IRGen
 {
     private readonly List<Dictionary<Symbol, IRValue>> _symbolScopes = new();
