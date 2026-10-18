@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Spamlang.Backend;
 
 public enum IRBinaryOp
@@ -158,7 +160,7 @@ public sealed class IRConstantFloat : IRValue
 
     public override string PrintOperand()
     {
-        return $"{Type} {Value}";
+        return $"{Type} {Value.ToString(CultureInfo.InvariantCulture)}";
     }
 }
 
