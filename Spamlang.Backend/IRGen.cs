@@ -626,11 +626,14 @@ public class IRGen
     private IRValue GenExprCastValue(IRBasicBlock block, HIRExprCast expr)
     {
         IRValue value = GenExprValue(block, expr.Value);
-        IRType type = _lowerer.ToLowerType(expr.Type);
+
+        SpamType origType = expr.Type;
+        IRType targetType = _lowerer.ToLowerType(expr.Type);
+
         IRInstructionCast cast = new()
         {
             Value = value,
-            CastTo = type,
+            CastTo = targetType,
         };
         block.Add(cast);
         return cast;
