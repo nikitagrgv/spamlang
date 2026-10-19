@@ -642,6 +642,27 @@ public class IRGen
 
         SpamType origType = expr.Value.Type;
         SpamType targetType = expr.Type;
+
+        if (origType.Kind == targetType.Kind && origType.Size == targetType.Size)
+        {
+            return value;
+        }
+
+
+        // Truncate,
+        // SignExtend,
+        // ZeroExtend,
+        //
+        // FloatExtend,
+        // FloatTruncate,
+        //
+        // UnsignedToFloat,
+        // SignedToFloat,
+        //
+        // FloatToUnsigned,
+        // FloatToSigned,
+
+
         switch (origType.Kind)
         {
             case TypeKind.SignedInteger:
