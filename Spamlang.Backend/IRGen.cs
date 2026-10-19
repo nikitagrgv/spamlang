@@ -266,11 +266,6 @@ public class IRGen
         }
     }
 
-    private InvalidHIRException MakeCannotPerformOpException(BinaryOp op, string type)
-    {
-        return new InvalidHIRException($"Cannot perform operation \"{op.AsString()}\" on {type}");
-    }
-
     private IRValue GenBinaryOpSigned(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
         IRValue AddBinaryInstruction(IRBinaryOp binaryOp)
@@ -726,5 +721,10 @@ public class IRGen
                 }
             }
         }
+    }
+
+    private static InvalidHIRException MakeCannotPerformOpException(BinaryOp op, string type)
+    {
+        return new InvalidHIRException($"Cannot perform operation \"{op.AsString()}\" on {type}");
     }
 }
