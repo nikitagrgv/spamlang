@@ -687,12 +687,6 @@ public class IRGen
                 {
                     case TypeKind.SignedInteger:
                     case TypeKind.UnsignedInteger:
-                        if (loweredOrigType.Size == loweredTargetType.Size)
-                        {
-                            return value;
-                        }
-
-                        Debug.Assert(loweredTargetType.Size > loweredOrigType.Size);
                         return AddCastInstruction(IRCastOp.ZeroExtend);
                     default:
                         throw MakeInvalidCastException();
