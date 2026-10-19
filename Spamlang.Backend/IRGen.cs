@@ -352,14 +352,14 @@ public class IRGen
             case BinaryOp.Plus: return AddBinaryInstruction(IRBinaryOp.Add);
             case BinaryOp.Minus: return AddBinaryInstruction(IRBinaryOp.Sub);
             case BinaryOp.Mul: return AddBinaryInstruction(IRBinaryOp.Mul);
-            case BinaryOp.Div: return AddBinaryInstruction(IRBinaryOp.SDiv);
-            case BinaryOp.Rem: return AddBinaryInstruction(IRBinaryOp.SRem);
+            case BinaryOp.Div: return AddBinaryInstruction(IRBinaryOp.UDiv);
+            case BinaryOp.Rem: return AddBinaryInstruction(IRBinaryOp.URem);
 
             case BinaryOp.BitAnd: return AddBinaryInstruction(IRBinaryOp.And);
             case BinaryOp.BitOr: return AddBinaryInstruction(IRBinaryOp.Or);
             case BinaryOp.BitXor: return AddBinaryInstruction(IRBinaryOp.Xor);
             case BinaryOp.BitShiftLeft: return AddBinaryInstruction(IRBinaryOp.ShiftLeft);
-            case BinaryOp.BitShiftRight: return AddBinaryInstruction(IRBinaryOp.ArithmeticShiftRight);
+            case BinaryOp.BitShiftRight: return AddBinaryInstruction(IRBinaryOp.LogicalShiftRight);
 
             case BinaryOp.LogicAnd:
             case BinaryOp.LogicOr:
