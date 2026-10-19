@@ -627,25 +627,27 @@ public class IRGen
     {
         IRValue value = GenExprValue(block, expr.Value);
 
+        SpamType origType = expr.Value.Type;
+        SpamType targetType = expr.Type;
+
+        IRType loweredOrigType = _lowerer.ToLowerType(origType);
+        IRType loweredTargetType = _lowerer.ToLowerType(targetType);
+
+        if (loweredOrigType.Kind == loweredTargetType.Kind && loweredOrigType.Size == loweredTargetType.Size)
+        {
+            return value;
+        }
+
         IRValue AddCastInstruction(IRCastOp castOp)
         {
-            IRType lowered = _lowerer.ToLowerType(expr.Type);
             IRInstructionCast instr = new()
             {
                 Value = value,
                 Op = castOp,
-                CastTo = lowered,
+                CastTo = loweredTargetType,
             };
             block.Add(instr);
             return instr;
-        }
-
-        SpamType origType = expr.Value.Type;
-        SpamType targetType = expr.Type;
-
-        if (origType.Kind == targetType.Kind && origType.Size == targetType.Size)
-        {
-            return value;
         }
 
         // Truncate,
@@ -692,10 +694,8 @@ public class IRGen
                 switch (targetType.Kind)
                 {
                     case TypeKind.SignedInteger:
-                        break;
                     case TypeKind.UnsignedInteger:
-                        break;
-                    case TypeKind.Float:
+                        return AddCastInstruction(extended ? IRCastOp.ZeroExtend : IRCastOp.Truncate);
                         break;
                     default:
                         throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
