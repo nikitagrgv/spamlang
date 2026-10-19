@@ -266,6 +266,11 @@ public class IRGen
         }
     }
 
+    private InvalidHIRException MakeCannotPerformOpException(BinaryOp op, string type)
+    {
+        return new InvalidHIRException($"Cannot perform operation \"{op.AsString()}\" on {type}");
+    }
+
     private IRValue GenBinaryOpSigned(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
         IRValue AddBinaryInstruction(IRBinaryOp binaryOp)
@@ -307,8 +312,7 @@ public class IRGen
             case BinaryOp.BitShiftRight: return AddBinaryInstruction(IRBinaryOp.ArithmeticShiftRight);
 
             case BinaryOp.LogicAnd:
-            case BinaryOp.LogicOr:
-                throw new InvalidHIRException("Cannot perform logical operation on signed integer");
+            case BinaryOp.LogicOr: throw MakeCannotPerformOpException(op, "signed integer");
 
             case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.Equal);
             case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.NotEqual);
@@ -362,8 +366,7 @@ public class IRGen
             case BinaryOp.BitShiftRight: return AddBinaryInstruction(IRBinaryOp.LogicalShiftRight);
 
             case BinaryOp.LogicAnd:
-            case BinaryOp.LogicOr:
-                throw new InvalidHIRException("Cannot perform logical operation on unsigned integer");
+            case BinaryOp.LogicOr: throw MakeCannotPerformOpException(op, "unsigned integer");
 
             case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.Equal);
             case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.NotEqual);
@@ -408,19 +411,17 @@ public class IRGen
             case BinaryOp.Minus: return AddBinaryInstruction(IRBinaryOp.FSub);
             case BinaryOp.Mul: return AddBinaryInstruction(IRBinaryOp.FMul);
             case BinaryOp.Div: return AddBinaryInstruction(IRBinaryOp.FDiv);
-            case BinaryOp.Rem:
-                throw new InvalidHIRException("Cannot perform % operation on float");
+
+            case BinaryOp.Rem: throw MakeCannotPerformOpException(op, "unsigned float");
 
             case BinaryOp.BitAnd:
             case BinaryOp.BitOr:
             case BinaryOp.BitXor:
             case BinaryOp.BitShiftLeft:
-            case BinaryOp.BitShiftRight:
-                throw new InvalidHIRException("Cannot perform bit operation on float");
+            case BinaryOp.BitShiftRight: throw MakeCannotPerformOpException(op, "unsigned float");
 
             case BinaryOp.LogicAnd:
-            case BinaryOp.LogicOr:
-                throw new InvalidHIRException("Cannot perform logical operation on float");
+            case BinaryOp.LogicOr: throw MakeCannotPerformOpException(op, "unsigned float");
 
             case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.FEqual);
             case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.FNotEqual);
@@ -435,6 +436,57 @@ public class IRGen
 
     private IRValue GenBinaryOpBool(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
+        IRValue AddBinaryInstruction(IRBinaryOp binaryOp)
+        {
+            IRInstructionBinary instr = new()
+            {
+                Left = left,
+                Right = right,
+                Op = binaryOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        IRValue AddCompareInstruction(IRCompareOp compareOp)
+        {
+            IRInstructionCompare instr = new()
+            {
+                Left = left,
+                Right = right,
+                Op = compareOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        switch (op)
+        {
+            case BinaryOp.Plus:
+            case BinaryOp.Minus:
+            case BinaryOp.Mul:
+            case BinaryOp.Div:
+            case BinaryOp.Rem: throw MakeCannotPerformOpException(op, "bool");
+
+            case BinaryOp.BitAnd:
+            case BinaryOp.BitOr:
+            case BinaryOp.BitXor:
+            case BinaryOp.BitShiftLeft:
+            case BinaryOp.BitShiftRight: throw MakeCannotPerformOpException(op, "bool");
+
+            // TODO: Short-circuiting
+            case BinaryOp.LogicAnd: return AddBinaryInstruction(IRBinaryOp.And);
+            case BinaryOp.LogicOr: return AddBinaryInstruction(IRBinaryOp.Or);
+
+            case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.Equal);
+            case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.NotEqual);
+            case BinaryOp.Less:
+            case BinaryOp.LessEqual:
+            case BinaryOp.Greater:
+            case BinaryOp.GreaterEqual: throw MakeCannotPerformOpException(op, "bool");
+
+            default: throw new UnreachableException();
+        }
     }
 
     private IRValue GenExprCallValue(IRBasicBlock block, HIRExprCall expr)
