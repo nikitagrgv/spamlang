@@ -650,6 +650,11 @@ public class IRGen
             return instr;
         }
 
+        InvalidHIRException MakeInvalidCastException()
+        {
+            return new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
+        }
+
         // NOTE: When extending, orig type decides signedness, not target type!
 
         bool extended = targetType.Size > origType.Size;
@@ -664,7 +669,7 @@ public class IRGen
                     case TypeKind.Float:
                         return AddCastInstruction(IRCastOp.SignedToFloat);
                     default:
-                        throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
+                        throw MakeInvalidCastException();
                 }
             case TypeKind.UnsignedInteger:
                 switch (targetType.Kind)
@@ -675,7 +680,7 @@ public class IRGen
                     case TypeKind.Float:
                         return AddCastInstruction(IRCastOp.UnsignedToFloat);
                     default:
-                        throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
+                        throw MakeInvalidCastException();
                 }
             case TypeKind.Bool:
                 switch (targetType.Kind)
@@ -690,7 +695,7 @@ public class IRGen
                         Debug.Assert(loweredTargetType.Size > loweredOrigType.Size);
                         return AddCastInstruction(IRCastOp.ZeroExtend);
                     default:
-                        throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
+                        throw MakeInvalidCastException();
                 }
             case TypeKind.Float:
                 switch (targetType.Kind)
@@ -702,10 +707,10 @@ public class IRGen
                     case TypeKind.Float:
                         return AddCastInstruction(extended ? IRCastOp.FloatExtend : IRCastOp.FloatTruncate);
                     default:
-                        throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
+                        throw MakeInvalidCastException();
                 }
             default:
-                throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
+                throw MakeInvalidCastException();
         }
     }
 
