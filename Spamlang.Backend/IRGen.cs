@@ -662,14 +662,14 @@ public class IRGen
         // FloatToUnsigned,
         // FloatToSigned,
 
-
+        bool extended = targetType.Size > origType.Size;
         switch (origType.Kind)
         {
             case TypeKind.SignedInteger:
                 switch (targetType.Kind)
                 {
                     case TypeKind.SignedInteger:
-                        break;
+                        return AddCastInstruction(extended ? IRCastOp.SignExtend : IRCastOp.Truncate);
                     case TypeKind.UnsignedInteger:
                     case TypeKind.Bool:
                         break;
