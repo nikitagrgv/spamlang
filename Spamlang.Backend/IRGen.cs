@@ -644,19 +644,9 @@ public class IRGen
         SpamType targetType = expr.Type;
         switch (origType.Kind)
         {
-            case TypeKind.Error:
-            case TypeKind.Void:
-            case TypeKind.AbstractNumber:
-            case TypeKind.Function:
-                throw new InvalidHIRException($"Unexpected type: {origType.Name}");
             case TypeKind.SignedInteger:
                 switch (targetType.Kind)
                 {
-                    case TypeKind.Error:
-                    case TypeKind.Void:
-                    case TypeKind.AbstractNumber:
-                    case TypeKind.Function:
-                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
                     case TypeKind.SignedInteger:
                         break;
                     case TypeKind.UnsignedInteger:
@@ -665,17 +655,12 @@ public class IRGen
                     case TypeKind.Float:
                         break;
                     default:
-                        throw new UnreachableException();
+                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
                 }
             case TypeKind.UnsignedInteger:
             case TypeKind.Bool:
                 switch (targetType.Kind)
                 {
-                    case TypeKind.Error:
-                    case TypeKind.Void:
-                    case TypeKind.AbstractNumber:
-                    case TypeKind.Function:
-                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
                     case TypeKind.SignedInteger:
                         break;
                     case TypeKind.UnsignedInteger:
@@ -684,16 +669,11 @@ public class IRGen
                     case TypeKind.Float:
                         break;
                     default:
-                        throw new UnreachableException();
+                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
                 }
             case TypeKind.Float:
                 switch (targetType.Kind)
                 {
-                    case TypeKind.Error:
-                    case TypeKind.Void:
-                    case TypeKind.AbstractNumber:
-                    case TypeKind.Function:
-                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
                     case TypeKind.SignedInteger:
                         break;
                     case TypeKind.UnsignedInteger:
@@ -702,10 +682,10 @@ public class IRGen
                     case TypeKind.Float:
                         break;
                     default:
-                        throw new UnreachableException();
+                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
                 }
             default:
-                throw new UnreachableException();
+                throw new InvalidHIRException($"Unexpected type: {origType.Name}");
         }
     }
 
