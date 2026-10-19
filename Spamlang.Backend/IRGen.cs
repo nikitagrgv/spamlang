@@ -627,7 +627,7 @@ public class IRGen
     {
         IRValue value = GenExprValue(block, expr.Value);
 
-        SpamType origType = expr.Type;
+        SpamType origType = expr.Value.Type;
         IRType targetType = _lowerer.ToLowerType(expr.Type);
 
         IRInstructionCast cast = new()
