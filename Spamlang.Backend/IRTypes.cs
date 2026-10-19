@@ -295,18 +295,6 @@ public sealed class IRInstructionBinary : IRInstruction
     }
 }
 
-public sealed class IRInstructionUnary : IRInstruction
-{
-    public required IRUnaryOp Op { get; init; }
-    public required IRValue Value { get; init; }
-    public override IRType Type => Value.Type;
-
-    public override string PrintDefinition()
-    {
-        return $"%{Id} = {Op} {Value.PrintOperand()}";
-    }
-}
-
 public sealed class IRInstructionCompare : IRInstruction
 {
     public required IRCompareOp Op { get; init; }
@@ -317,6 +305,18 @@ public sealed class IRInstructionCompare : IRInstruction
     public override string PrintDefinition()
     {
         return $"%{Id} = {Op} {Left.PrintOperand()}, {Right.PrintOperand()}";
+    }
+}
+
+public sealed class IRInstructionUnary : IRInstruction
+{
+    public required IRUnaryOp Op { get; init; }
+    public required IRValue Value { get; init; }
+    public override IRType Type => Value.Type;
+
+    public override string PrintDefinition()
+    {
+        return $"%{Id} = {Op} {Value.PrintOperand()}";
     }
 }
 

@@ -268,25 +268,57 @@ public class IRGen
 
     private IRValue GenBinaryOpSigned(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
-        IRBinaryOp irOp;
-        switch (op)
+        IRValue AddBinaryInstruction(IRBinaryOp binaryOp)
         {
-            case BinaryOp.Plus: irOp = IRBinaryOp.Add; break;
-            case BinaryOp.Minus: irOp = IRBinaryOp.Sub; break;
-            case BinaryOp.Mul: irOp = IRBinaryOp.Mul; break;
-            case BinaryOp.Div: irOp = signed ? IRBinaryOp.SDiv : IRBinaryOp.UDiv; break;
-            case BinaryOp.Rem: irOp = signed ? IRBinaryOp.SRem : IRBinaryOp.URem; break;
-            default: throw new UnreachableException();
+            IRInstructionBinary instr = new()
+            {
+                Left = left,
+                Right = right,
+                Op = binaryOp,
+            };
+            block.Add(instr);
+            return instr;
         }
 
-        IRInstructionBinary instr = new()
+        IRValue AddCompareInstruction(IRCompareOp compareOp)
         {
-            Left = left,
-            Right = right,
-            Op = irOp,
-        };
-        block.Add(instr);
-        return instr;
+            IRInstructionCompare instr = new()
+            {
+                Left = left,
+                Right = right,
+                Op = compareOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        switch (op)
+        {
+            case BinaryOp.Plus: return AddBinaryInstruction(IRBinaryOp.Add);
+            case BinaryOp.Minus: return AddBinaryInstruction(IRBinaryOp.Sub);
+            case BinaryOp.Mul: return AddBinaryInstruction(IRBinaryOp.Mul);
+            case BinaryOp.Div: return AddBinaryInstruction(IRBinaryOp.SDiv);
+            case BinaryOp.Rem: return AddBinaryInstruction(IRBinaryOp.SRem);
+
+            case BinaryOp.BitAnd: return AddBinaryInstruction(IRBinaryOp.And);
+            case BinaryOp.BitOr: return AddBinaryInstruction(IRBinaryOp.Or);
+            case BinaryOp.BitXor: return AddBinaryInstruction(IRBinaryOp.Xor);
+            case BinaryOp.BitShiftLeft: return AddBinaryInstruction(IRBinaryOp.ShiftLeft);
+            case BinaryOp.BitShiftRight: return AddBinaryInstruction(IRBinaryOp.ArithmeticShiftRight);
+
+            case BinaryOp.LogicAnd:
+            case BinaryOp.LogicOr:
+                throw new InvalidHIRException("Cannot perform logical operation on signed integer");
+
+            case BinaryOp.Equal:
+            case BinaryOp.NotEqual:
+            case BinaryOp.Less:
+            case BinaryOp.LessEqual:
+            case BinaryOp.Greater:
+            case BinaryOp.GreaterEqual:
+
+            default: throw new UnreachableException();
+        }
     }
 
     private IRValue GenBinaryOpUnsigned(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
