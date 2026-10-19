@@ -588,11 +588,7 @@ public class IRGen
             case IRTypeKind.Int:
             case IRTypeKind.Ptr:
             case IRTypeKind.Bool:
-                return new IRConstantInt
-                {
-                    Value = 0,
-                    IntType = type,
-                };
+                return IRConstantInt.Create(0, type);
             case IRTypeKind.Float:
                 return new IRConstantFloat
                 {
