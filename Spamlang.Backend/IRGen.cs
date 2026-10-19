@@ -662,6 +662,8 @@ public class IRGen
         // FloatToUnsigned,
         // FloatToSigned,
 
+        // NOTE: When extending, orig type decides signedness, not target type!
+
         bool extended = targetType.Size > origType.Size;
         switch (origType.Kind)
         {
@@ -669,9 +671,8 @@ public class IRGen
                 switch (targetType.Kind)
                 {
                     case TypeKind.SignedInteger:
-                        return AddCastInstruction(extended ? IRCastOp.SignExtend : IRCastOp.Truncate);
                     case TypeKind.UnsignedInteger:
-                        return AddCastInstruction(extended ? IRCastOp.ZeroExtend : IRCastOp.Truncate);
+                        return AddCastInstruction(extended ? IRCastOp.SignExtend : IRCastOp.Truncate);
                     case TypeKind.Float:
                         return AddCastInstruction(IRCastOp.SignedToFloat);
                     default:
