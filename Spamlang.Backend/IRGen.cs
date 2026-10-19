@@ -409,18 +409,18 @@ public class IRGen
             case BinaryOp.Mul: return AddBinaryInstruction(IRBinaryOp.FMul);
             case BinaryOp.Div: return AddBinaryInstruction(IRBinaryOp.FDiv);
             case BinaryOp.Rem:
-                throw new InvalidHIRException("Cannot perform % operation on float integer");
+                throw new InvalidHIRException("Cannot perform % operation on float");
 
             case BinaryOp.BitAnd:
             case BinaryOp.BitOr:
             case BinaryOp.BitXor:
             case BinaryOp.BitShiftLeft:
             case BinaryOp.BitShiftRight:
-                throw new InvalidHIRException("Cannot perform bit operation on float integer");
+                throw new InvalidHIRException("Cannot perform bit operation on float");
 
             case BinaryOp.LogicAnd:
             case BinaryOp.LogicOr:
-                throw new InvalidHIRException("Cannot perform logical operation on float integer");
+                throw new InvalidHIRException("Cannot perform logical operation on float");
 
             case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.Equal);
             case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.NotEqual);
