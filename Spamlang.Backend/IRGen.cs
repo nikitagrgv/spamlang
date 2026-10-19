@@ -211,18 +211,15 @@ public class IRGen
         return load;
     }
 
-    private IRValue GenExprBinaryValue(IRBasicBlock block, HIRExprBinary expr)
-    {
-        IRValue left = GenExprValue(block, expr.Left);
-        IRValue right = GenExprValue(block, expr.Right);
-        return GenBinaryOp(block, left, right, expr.Op, expr.Type);
-    }
-
     private IRValue GenExprUnaryValue(IRBasicBlock block, HIRExprUnary expr)
     {
         // TODO: Handle directly, not through binary op! E.g. now we have problems with float +0.0 and -0.0
 
         IRValue operand = GenExprValue(block, expr.Operand);
+
+        TypeKind kind = origType.Kind;
+
+
         BinaryOp op;
         switch (expr.Op)
         {
@@ -236,17 +233,20 @@ public class IRGen
         return GenBinaryOp(block, zero, operand, op, expr.Type);
     }
 
-    private IRValue GenBinaryOp(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op, SpamType origType)
+    private IRValue GenExprBinaryValue(IRBasicBlock block, HIRExprBinary expr)
     {
-        if (left.Type != right.Type)
+        if (expr.Left.Type != expr.Right.Type)
         {
             throw new InvalidHIRException("Cannot perform binary operation on different types");
         }
 
-        Debug.Assert(_lowerer.ToLowerType(origType) == left.Type);
+        IRValue left = GenExprValue(block, expr.Left);
+        IRValue right = GenExprValue(block, expr.Right);
+        Debug.Assert(left.Type == right.Type, "Types must be the same");
 
-        TypeKind kind = origType.Kind;
-        switch (kind)
+        BinaryOp op = expr.Op;
+        SpamType operandsType = expr.Left.Type;
+        switch (operandsType.Kind)
         {
             case TypeKind.SignedInteger:
                 return GenBinaryOpSigned(block, left, right, op);
@@ -260,7 +260,7 @@ public class IRGen
             case TypeKind.Void:
             case TypeKind.AbstractNumber:
             case TypeKind.Function:
-                throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                throw new InvalidHIRException($"Unexpected type: {operandsType.Name}");
             default:
                 throw new UnreachableException();
         }
