@@ -671,7 +671,6 @@ public class IRGen
                     case TypeKind.SignedInteger:
                         return AddCastInstruction(extended ? IRCastOp.SignExtend : IRCastOp.Truncate);
                     case TypeKind.UnsignedInteger:
-                    case TypeKind.Bool:
                         return AddCastInstruction(extended ? IRCastOp.ZeroExtend : IRCastOp.Truncate);
                     case TypeKind.Float:
                         return AddCastInstruction(IRCastOp.SignedToFloat);
@@ -679,13 +678,23 @@ public class IRGen
                         throw new InvalidHIRException($"Unexpected type: {origType.Name}");
                 }
             case TypeKind.UnsignedInteger:
+                switch (targetType.Kind)
+                {
+                    case TypeKind.SignedInteger:
+                        break;
+                    case TypeKind.UnsignedInteger:
+                        break;
+                    case TypeKind.Float:
+                        break;
+                    default:
+                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                }
             case TypeKind.Bool:
                 switch (targetType.Kind)
                 {
                     case TypeKind.SignedInteger:
                         break;
                     case TypeKind.UnsignedInteger:
-                    case TypeKind.Bool:
                         break;
                     case TypeKind.Float:
                         break;
@@ -698,7 +707,6 @@ public class IRGen
                     case TypeKind.SignedInteger:
                         break;
                     case TypeKind.UnsignedInteger:
-                    case TypeKind.Bool:
                         break;
                     case TypeKind.Float:
                         break;
