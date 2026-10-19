@@ -363,7 +363,7 @@ public class IRGen
 
             case BinaryOp.LogicAnd:
             case BinaryOp.LogicOr:
-                throw new InvalidHIRException("Cannot perform logical operation on signed integer");
+                throw new InvalidHIRException("Cannot perform logical operation on unsigned integer");
 
             case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.Equal);
             case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.NotEqual);
@@ -378,6 +378,59 @@ public class IRGen
 
     private IRValue GenBinaryOpFloat(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
+        IRValue AddBinaryInstruction(IRBinaryOp binaryOp)
+        {
+            IRInstructionBinary instr = new()
+            {
+                Left = left,
+                Right = right,
+                Op = binaryOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        IRValue AddCompareInstruction(IRCompareOp compareOp)
+        {
+            IRInstructionCompare instr = new()
+            {
+                Left = left,
+                Right = right,
+                Op = compareOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        switch (op)
+        {
+            case BinaryOp.Plus: return AddBinaryInstruction(IRBinaryOp.FAdd);
+            case BinaryOp.Minus: return AddBinaryInstruction(IRBinaryOp.FSub);
+            case BinaryOp.Mul: return AddBinaryInstruction(IRBinaryOp.FMul);
+            case BinaryOp.Div: return AddBinaryInstruction(IRBinaryOp.FDiv);
+            case BinaryOp.Rem:
+                throw new InvalidHIRException("Cannot perform % operation on float integer");
+
+            case BinaryOp.BitAnd:
+            case BinaryOp.BitOr:
+            case BinaryOp.BitXor:
+            case BinaryOp.BitShiftLeft:
+            case BinaryOp.BitShiftRight:
+                throw new InvalidHIRException("Cannot perform bit operation on float integer");
+
+            case BinaryOp.LogicAnd:
+            case BinaryOp.LogicOr:
+                throw new InvalidHIRException("Cannot perform logical operation on float integer");
+
+            case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.Equal);
+            case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.NotEqual);
+            case BinaryOp.Less: return AddCompareInstruction(IRCompareOp.ULess);
+            case BinaryOp.LessEqual: return AddCompareInstruction(IRCompareOp.ULessEqual);
+            case BinaryOp.Greater: return AddCompareInstruction(IRCompareOp.UGreater);
+            case BinaryOp.GreaterEqual: return AddCompareInstruction(IRCompareOp.UGreaterEqual);
+
+            default: throw new UnreachableException();
+        }
     }
 
     private IRValue GenBinaryOpBool(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
