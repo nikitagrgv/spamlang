@@ -37,7 +37,7 @@ public class ParserTest
     [
         UnaryOp.Plus,
         UnaryOp.Minus,
-        UnaryOp.Not,
+        UnaryOp.LogicNot,
         UnaryOp.BitNot,
     ];
 

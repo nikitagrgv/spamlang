@@ -253,8 +253,8 @@ public class IRGen
         {
             case UnaryOp.Plus: return operand;
             case UnaryOp.Minus: return AddUnaryInstruction(IRUnaryOp.Neg);
-            case UnaryOp.BitNot: return AddUnaryInstruction(IRUnaryOp.Not);
-            case UnaryOp.Not: throw MakeCannotPerformOpException(op, "signed integer");
+            case UnaryOp.BitNot: return AddUnaryInstruction(IRUnaryOp.BitNot);
+            case UnaryOp.LogicNot: throw MakeCannotPerformOpException(op, "signed integer");
 
             default: throw new UnreachableException();
         }
@@ -277,8 +277,8 @@ public class IRGen
         {
             case UnaryOp.Plus: return operand;
             case UnaryOp.Minus: throw MakeCannotPerformOpException(op, "unsigned integer");
-            case UnaryOp.BitNot: return AddUnaryInstruction(IRUnaryOp.Not);
-            case UnaryOp.Not: throw MakeCannotPerformOpException(op, "unsigned integer");
+            case UnaryOp.BitNot: return AddUnaryInstruction(IRUnaryOp.BitNot);
+            case UnaryOp.LogicNot: throw MakeCannotPerformOpException(op, "unsigned integer");
 
             default: throw new UnreachableException();
         }
@@ -302,7 +302,7 @@ public class IRGen
             case UnaryOp.Plus: return operand;
             case UnaryOp.Minus: return AddUnaryInstruction(IRUnaryOp.FNeg);
             case UnaryOp.BitNot:
-            case UnaryOp.Not: throw MakeCannotPerformOpException(op, "float");
+            case UnaryOp.LogicNot: throw MakeCannotPerformOpException(op, "float");
 
             default: throw new UnreachableException();
         }
@@ -326,7 +326,7 @@ public class IRGen
             case UnaryOp.Plus:
             case UnaryOp.Minus:
             case UnaryOp.BitNot: throw MakeCannotPerformOpException(op, "bool");
-            case UnaryOp.Not: return AddUnaryInstruction(IRUnaryOp.Not);
+            case UnaryOp.LogicNot: return AddUnaryInstruction(IRUnaryOp.BoolNot);
 
             default: throw new UnreachableException();
         }

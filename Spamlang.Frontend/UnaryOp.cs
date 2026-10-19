@@ -7,7 +7,7 @@ public enum UnaryOp
     Plus,
     Minus,
 
-    Not,
+    LogicNot,
 
     BitNot,
 }
@@ -21,7 +21,7 @@ public static partial class Utils
             case UnaryOp.Plus:
             case UnaryOp.Minus:
                 return OpFamily.Arithmetic;
-            case UnaryOp.Not:
+            case UnaryOp.LogicNot:
                 return OpFamily.Logic;
             case UnaryOp.BitNot:
                 return OpFamily.Bit;
@@ -35,7 +35,7 @@ public static partial class Utils
         {
             UnaryOp.Plus => "+",
             UnaryOp.Minus => "-",
-            UnaryOp.Not => "!",
+            UnaryOp.LogicNot => "!",
             UnaryOp.BitNot => "~",
             _ => throw new UnreachableException(),
         };
@@ -47,7 +47,7 @@ public static partial class Utils
         {
             TokenType.Plus => UnaryOp.Plus,
             TokenType.Minus => UnaryOp.Minus,
-            TokenType.Exclamation => UnaryOp.Not,
+            TokenType.Exclamation => UnaryOp.LogicNot,
             TokenType.Tilde => UnaryOp.BitNot,
             _ => null,
         };

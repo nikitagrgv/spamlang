@@ -29,7 +29,8 @@ public enum IRUnaryOp
 {
     Neg,
     FNeg,
-    Not,
+    BitNot,
+    BoolNot,
 }
 
 public enum IRCompareOp

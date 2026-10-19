@@ -1605,7 +1605,7 @@ public class Sema
         {
             case UnaryOp.BitNot:
                 return MakeErrorAndReport("Cannot use bitwise operators on float numbers");
-            case UnaryOp.Not:
+            case UnaryOp.LogicNot:
                 return MakeErrorAndReport("Cannot use logic operators on float numbers");
             case UnaryOp.Plus:
                 return MakeFloatValue(operand);
@@ -1649,7 +1649,7 @@ public class Sema
                 {
                     case UnaryOp.BitNot:
                         return MakeIntValue(~operand);
-                    case UnaryOp.Not:
+                    case UnaryOp.LogicNot:
                         return MakeErrorAndReport("Cannot use logic operators on integer numbers");
                     case UnaryOp.Plus:
                         return MakeIntValue(operand);
@@ -1695,7 +1695,7 @@ public class Sema
         {
             case UnaryOp.BitNot:
                 return MakeErrorAndReport("Cannot use bitwise operators on bools");
-            case UnaryOp.Not:
+            case UnaryOp.LogicNot:
                 return MakeBoolValue(!operand);
             case UnaryOp.Plus:
             case UnaryOp.Minus:
@@ -1981,7 +1981,7 @@ public class Sema
                 return kind == TypeKind.AbstractNumber ||
                        kind == TypeKind.Float ||
                        kind == TypeKind.SignedInteger;
-            case UnaryOp.Not:
+            case UnaryOp.LogicNot:
                 return kind == TypeKind.Bool;
             case UnaryOp.BitNot:
                 return kind == TypeKind.AbstractNumber ||
