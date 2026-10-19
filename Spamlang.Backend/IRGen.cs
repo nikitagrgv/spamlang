@@ -652,7 +652,7 @@ public class IRGen
 
         InvalidHIRException MakeInvalidCastException()
         {
-            return new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
+            return new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{targetType.Name}\"");
         }
 
         // NOTE: When extending, orig type decides signedness, not target type!
