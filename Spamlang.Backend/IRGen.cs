@@ -213,24 +213,123 @@ public class IRGen
 
     private IRValue GenExprUnaryValue(IRBasicBlock block, HIRExprUnary expr)
     {
-        // TODO: Handle directly, not through binary op! E.g. now we have problems with float +0.0 and -0.0
-
         IRValue operand = GenExprValue(block, expr.Operand);
-
-        TypeKind kind = origType.Kind;
-
-
-        BinaryOp op;
-        switch (expr.Op)
+        UnaryOp op = expr.Op;
+        SpamType operandsType = expr.Operand.Type;
+        switch (operandsType.Kind)
         {
-            case UnaryOp.Minus: op = BinaryOp.Minus; break;
-            case UnaryOp.Plus: op = BinaryOp.Plus; break;
+            case TypeKind.SignedInteger:
+                return GenUnaryOpSigned(block, operand, op);
+            case TypeKind.UnsignedInteger:
+                return GenUnaryOpUnsigned(block, operand, op);
+            case TypeKind.Float:
+                return GenUnaryOpFloat(block, operand, op);
+            case TypeKind.Bool:
+                return GenUnaryOpBool(block, operand, op);
+            case TypeKind.Error:
+            case TypeKind.Void:
+            case TypeKind.AbstractNumber:
+            case TypeKind.Function:
+                throw new InvalidHIRException($"Unexpected type: {operandsType.Name}");
             default:
                 throw new UnreachableException();
         }
+    }
 
-        IRValue zero = MakeZeroInitialized(operand.Type);
-        return GenBinaryOp(block, zero, operand, op, expr.Type);
+    private IRValue GenUnaryOpSigned(IRBasicBlock block, IRValue operand, UnaryOp op)
+    {
+        IRValue AddUnaryInstruction(IRUnaryOp unaryOp)
+        {
+            IRInstructionUnary instr = new()
+            {
+                Value = operand,
+                Op = unaryOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        switch (op)
+        {
+            case UnaryOp.Plus: return operand;
+            case UnaryOp.Minus: return AddUnaryInstruction(IRUnaryOp.Neg);
+            case UnaryOp.BitNot: return AddUnaryInstruction(IRUnaryOp.Not);
+            case UnaryOp.Not: throw MakeCannotPerformOpException(op, "signed integer");
+
+            default: throw new UnreachableException();
+        }
+    }
+
+    private IRValue GenUnaryOpUnsigned(IRBasicBlock block, IRValue operand, UnaryOp op)
+    {
+        IRValue AddUnaryInstruction(IRUnaryOp unaryOp)
+        {
+            IRInstructionUnary instr = new()
+            {
+                Value = operand,
+                Op = unaryOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        switch (op)
+        {
+            case UnaryOp.Plus: return operand;
+            case UnaryOp.Minus: throw MakeCannotPerformOpException(op, "unsigned integer");
+            case UnaryOp.BitNot: return AddUnaryInstruction(IRUnaryOp.Not);
+            case UnaryOp.Not: throw MakeCannotPerformOpException(op, "unsigned integer");
+
+            default: throw new UnreachableException();
+        }
+    }
+
+    private IRValue GenUnaryOpFloat(IRBasicBlock block, IRValue operand, UnaryOp op)
+    {
+        IRValue AddUnaryInstruction(IRUnaryOp unaryOp)
+        {
+            IRInstructionUnary instr = new()
+            {
+                Value = operand,
+                Op = unaryOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        switch (op)
+        {
+            case UnaryOp.Plus: return operand;
+            case UnaryOp.Minus: return AddUnaryInstruction(IRUnaryOp.FNeg);
+            case UnaryOp.BitNot:
+            case UnaryOp.Not: throw MakeCannotPerformOpException(op, "float");
+
+            default: throw new UnreachableException();
+        }
+    }
+
+    private IRValue GenUnaryOpBool(IRBasicBlock block, IRValue operand, UnaryOp op)
+    {
+        IRValue AddUnaryInstruction(IRUnaryOp unaryOp)
+        {
+            IRInstructionUnary instr = new()
+            {
+                Value = operand,
+                Op = unaryOp,
+            };
+            block.Add(instr);
+            return instr;
+        }
+
+        switch (op)
+        {
+            case UnaryOp.Plus:
+            case UnaryOp.Minus:
+            case UnaryOp.BitNot: throw MakeCannotPerformOpException(op, "bool");
+            case UnaryOp.Not: return AddUnaryInstruction(IRUnaryOp.Not);
+
+            default: throw new UnreachableException();
+        }
     }
 
     private IRValue GenExprBinaryValue(IRBasicBlock block, HIRExprBinary expr)
@@ -407,16 +506,16 @@ public class IRGen
             case BinaryOp.Mul: return AddBinaryInstruction(IRBinaryOp.FMul);
             case BinaryOp.Div: return AddBinaryInstruction(IRBinaryOp.FDiv);
 
-            case BinaryOp.Rem: throw MakeCannotPerformOpException(op, "unsigned float");
+            case BinaryOp.Rem: throw MakeCannotPerformOpException(op, "float");
 
             case BinaryOp.BitAnd:
             case BinaryOp.BitOr:
             case BinaryOp.BitXor:
             case BinaryOp.BitShiftLeft:
-            case BinaryOp.BitShiftRight: throw MakeCannotPerformOpException(op, "unsigned float");
+            case BinaryOp.BitShiftRight: throw MakeCannotPerformOpException(op, "float");
 
             case BinaryOp.LogicAnd:
-            case BinaryOp.LogicOr: throw MakeCannotPerformOpException(op, "unsigned float");
+            case BinaryOp.LogicOr: throw MakeCannotPerformOpException(op, "float");
 
             case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.FEqual);
             case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.FNotEqual);
@@ -724,6 +823,11 @@ public class IRGen
     }
 
     private static InvalidHIRException MakeCannotPerformOpException(BinaryOp op, string type)
+    {
+        return new InvalidHIRException($"Cannot perform operation \"{op.AsString()}\" on {type}");
+    }
+
+    private static InvalidHIRException MakeCannotPerformOpException(UnaryOp op, string type)
     {
         return new InvalidHIRException($"Cannot perform operation \"{op.AsString()}\" on {type}");
     }

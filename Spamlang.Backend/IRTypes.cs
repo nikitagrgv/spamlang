@@ -28,8 +28,8 @@ public enum IRBinaryOp
 public enum IRUnaryOp
 {
     Neg,
-    Not,
     FNeg,
+    Not,
 }
 
 public enum IRCompareOp
