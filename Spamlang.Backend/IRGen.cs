@@ -674,7 +674,7 @@ public class IRGen
                     case TypeKind.Bool:
                         return AddCastInstruction(extended ? IRCastOp.ZeroExtend : IRCastOp.Truncate);
                     case TypeKind.Float:
-                        break;
+                        return AddCastInstruction(IRCastOp.SignedToFloat);
                     default:
                         throw new InvalidHIRException($"Unexpected type: {origType.Name}");
                 }
