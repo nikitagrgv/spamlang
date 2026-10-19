@@ -243,14 +243,26 @@ public class IRGen
             throw new InvalidHIRException("Cannot perform binary operation on different types");
         }
 
-        bool signed;
-        if (left.Type == BuiltinType.I32)
+        Debug.Assert(_lowerer.ToLowerType(origType) == left.Type);
+
+        TypeKind kind = origType.Kind;
+        switch (kind)
         {
-            signed = true;
-        }
-        else
-        {
-            throw new UnreachableException();
+            case TypeKind.SignedInteger:
+                break;
+            case TypeKind.UnsignedInteger:
+                break;
+            case TypeKind.Float:
+                break;
+            case TypeKind.Bool:
+                break;
+            case TypeKind.Error:
+            case TypeKind.Void:
+            case TypeKind.AbstractNumber:
+            case TypeKind.Function:
+                throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+            default:
+                throw new UnreachableException();
         }
 
         IRBinaryOp irOp;
