@@ -367,10 +367,10 @@ public class IRGen
 
             case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.Equal);
             case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.NotEqual);
-            case BinaryOp.Less: return AddCompareInstruction(IRCompareOp.SLess);
-            case BinaryOp.LessEqual: return AddCompareInstruction(IRCompareOp.SLessEqual);
-            case BinaryOp.Greater: return AddCompareInstruction(IRCompareOp.SGreater);
-            case BinaryOp.GreaterEqual: return AddCompareInstruction(IRCompareOp.SGreaterEqual);
+            case BinaryOp.Less: return AddCompareInstruction(IRCompareOp.ULess);
+            case BinaryOp.LessEqual: return AddCompareInstruction(IRCompareOp.ULessEqual);
+            case BinaryOp.Greater: return AddCompareInstruction(IRCompareOp.UGreater);
+            case BinaryOp.GreaterEqual: return AddCompareInstruction(IRCompareOp.UGreaterEqual);
 
             default: throw new UnreachableException();
         }
