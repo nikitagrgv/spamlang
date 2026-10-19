@@ -672,7 +672,7 @@ public class IRGen
                         return AddCastInstruction(extended ? IRCastOp.SignExtend : IRCastOp.Truncate);
                     case TypeKind.UnsignedInteger:
                     case TypeKind.Bool:
-                        break;
+                        return AddCastInstruction(extended ? IRCastOp.ZeroExtend : IRCastOp.Truncate);
                     case TypeKind.Float:
                         break;
                     default:
