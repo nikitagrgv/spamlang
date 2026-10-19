@@ -551,17 +551,14 @@ public class IRGen
     private IRValue GenExprIntValue(HIRExprIntConst expr)
     {
         IRType type = _lowerer.ToLowerType(expr.Type);
-        IRConstantInt value = new()
-        {
-            Value = expr.Value,
-            IntType = type,
-        };
+        IRConstantInt value = IRConstantInt.Create(expr.Value, type);
         return value;
     }
 
     private IRValue GenExprZeroInitValue(HIRExprZeroInit expr)
     {
-        IRValue value = MakeZeroInitialized(expr.Type);
+        IRType type = _lowerer.ToLowerType(expr.Type);
+        IRValue value = MakeZeroInitialized(type);
         return value;
     }
 
