@@ -249,13 +249,13 @@ public class IRGen
         switch (kind)
         {
             case TypeKind.SignedInteger:
-                break;
+                return GenBinaryOpSigned(block, left, right, op);
             case TypeKind.UnsignedInteger:
-                break;
+                return GenBinaryOpUnsigned(block, left, right, op);
             case TypeKind.Float:
-                break;
+                return GenBinaryOpFloat(block, left, right, op);
             case TypeKind.Bool:
-                break;
+                return GenBinaryOpBool(block, left, right, op);
             case TypeKind.Error:
             case TypeKind.Void:
             case TypeKind.AbstractNumber:
@@ -264,7 +264,10 @@ public class IRGen
             default:
                 throw new UnreachableException();
         }
+    }
 
+    private IRValue GenBinaryOpSigned(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
+    {
         IRBinaryOp irOp;
         switch (op)
         {
@@ -284,6 +287,18 @@ public class IRGen
         };
         block.Add(instr);
         return instr;
+    }
+
+    private IRValue GenBinaryOpUnsigned(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
+    {
+    }
+
+    private IRValue GenBinaryOpFloat(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
+    {
+    }
+
+    private IRValue GenBinaryOpBool(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
+    {
     }
 
     private IRValue GenExprCallValue(IRBasicBlock block, HIRExprCall expr)
