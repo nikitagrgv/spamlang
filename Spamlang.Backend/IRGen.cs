@@ -650,12 +650,60 @@ public class IRGen
             case TypeKind.Function:
                 throw new InvalidHIRException($"Unexpected type: {origType.Name}");
             case TypeKind.SignedInteger:
-                break;
+                switch (targetType.Kind)
+                {
+                    case TypeKind.Error:
+                    case TypeKind.Void:
+                    case TypeKind.AbstractNumber:
+                    case TypeKind.Function:
+                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                    case TypeKind.SignedInteger:
+                        break;
+                    case TypeKind.UnsignedInteger:
+                    case TypeKind.Bool:
+                        break;
+                    case TypeKind.Float:
+                        break;
+                    default:
+                        throw new UnreachableException();
+                }
             case TypeKind.UnsignedInteger:
             case TypeKind.Bool:
-                break;
+                switch (targetType.Kind)
+                {
+                    case TypeKind.Error:
+                    case TypeKind.Void:
+                    case TypeKind.AbstractNumber:
+                    case TypeKind.Function:
+                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                    case TypeKind.SignedInteger:
+                        break;
+                    case TypeKind.UnsignedInteger:
+                    case TypeKind.Bool:
+                        break;
+                    case TypeKind.Float:
+                        break;
+                    default:
+                        throw new UnreachableException();
+                }
             case TypeKind.Float:
-                break;
+                switch (targetType.Kind)
+                {
+                    case TypeKind.Error:
+                    case TypeKind.Void:
+                    case TypeKind.AbstractNumber:
+                    case TypeKind.Function:
+                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                    case TypeKind.SignedInteger:
+                        break;
+                    case TypeKind.UnsignedInteger:
+                    case TypeKind.Bool:
+                        break;
+                    case TypeKind.Float:
+                        break;
+                    default:
+                        throw new UnreachableException();
+                }
             default:
                 throw new UnreachableException();
         }
