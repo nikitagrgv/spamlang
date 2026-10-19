@@ -422,12 +422,12 @@ public class IRGen
             case BinaryOp.LogicOr:
                 throw new InvalidHIRException("Cannot perform logical operation on float");
 
-            case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.Equal);
-            case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.NotEqual);
-            case BinaryOp.Less: return AddCompareInstruction(IRCompareOp.ULess);
-            case BinaryOp.LessEqual: return AddCompareInstruction(IRCompareOp.ULessEqual);
-            case BinaryOp.Greater: return AddCompareInstruction(IRCompareOp.UGreater);
-            case BinaryOp.GreaterEqual: return AddCompareInstruction(IRCompareOp.UGreaterEqual);
+            case BinaryOp.Equal: return AddCompareInstruction(IRCompareOp.FEqual);
+            case BinaryOp.NotEqual: return AddCompareInstruction(IRCompareOp.FNotEqual);
+            case BinaryOp.Less: return AddCompareInstruction(IRCompareOp.FLess);
+            case BinaryOp.LessEqual: return AddCompareInstruction(IRCompareOp.FLessEqual);
+            case BinaryOp.Greater: return AddCompareInstruction(IRCompareOp.FGreater);
+            case BinaryOp.GreaterEqual: return AddCompareInstruction(IRCompareOp.FGreaterEqual);
 
             default: throw new UnreachableException();
         }
