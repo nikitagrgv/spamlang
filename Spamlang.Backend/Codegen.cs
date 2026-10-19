@@ -117,7 +117,7 @@ public class Codegen
         List<MInstr> prologueInstructions = new();
         prologueInstructions.Add(new MInstr { Op = MOpcode.Push, Left = rbp });
         prologueInstructions.Add(new MInstr { Op = MOpcode.Mov, Left = rbp, Right = rsp });
-        prologueInstructions.Add(new MInstr { Op = MOpcode.Sub, Left = rsp, Right = new MOpImm { Value = frameSize } });
+        prologueInstructions.Add(new MInstr { Op = MOpcode.Sub, Left = rsp, Right = new MOpImmInt { Value = frameSize } });
 
         // Spill params to stack
         foreach (IRParam param in irfunc.Params)
@@ -436,7 +436,7 @@ public class Codegen
                 {
                     Op = MOpcode.Mov,
                     Left = new MOpReg { Reg = reg, Size = value.Type.Size },
-                    Right = new MOpImm { Value = v.Value },
+                    Right = new MOpImmInt { Value = v.Canonical },
                     Comment = comment,
                 });
 

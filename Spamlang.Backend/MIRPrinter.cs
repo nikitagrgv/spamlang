@@ -120,14 +120,17 @@ public class MIRPrinter
     {
         switch (operand)
         {
-            case MOpImm op:
+            case MOpImmInt op:
+                Write(op.Value.ToString(CultureInfo.InvariantCulture));
+                break;
+            case MOpImmFloat op:
                 Write(op.Value.ToString(CultureInfo.InvariantCulture));
                 break;
             case MOpLabel op:
                 Write(op.Label);
                 break;
             case MOpReg op:
-                Write(op.Reg.GetName(op.Size));
+                Write(op.Name);
                 break;
             case MOpMem op:
             {

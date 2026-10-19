@@ -57,10 +57,15 @@ public sealed class MOpReg : MOperand
     public string Name => Reg.GetName(Size);
 }
 
-// TODO: Float/double
-public sealed class MOpImm : MOperand
+public sealed class MOpImmInt : MOperand
 {
+    // Canonical form
     public required Int128 Value { get; init; }
+}
+
+public sealed class MOpImmFloat : MOperand
+{
+    public required double Value { get; init; }
 }
 
 public sealed class MOpMem : MOperand
