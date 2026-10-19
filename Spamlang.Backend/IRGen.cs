@@ -648,7 +648,6 @@ public class IRGen
             return value;
         }
 
-
         // Truncate,
         // SignExtend,
         // ZeroExtend,
@@ -705,11 +704,11 @@ public class IRGen
                 switch (targetType.Kind)
                 {
                     case TypeKind.SignedInteger:
-                        break;
+                        return AddCastInstruction(IRCastOp.FloatToSigned);
                     case TypeKind.UnsignedInteger:
-                        break;
+                        return AddCastInstruction(IRCastOp.FloatToUnsigned);
                     case TypeKind.Float:
-                        break;
+                        return AddCastInstruction(extended ? IRCastOp.FloatExtend : IRCastOp.FloatTruncate);
                     default:
                         throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
                 }
