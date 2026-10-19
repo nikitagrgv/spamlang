@@ -695,8 +695,13 @@ public class IRGen
                 {
                     case TypeKind.SignedInteger:
                     case TypeKind.UnsignedInteger:
-                        return AddCastInstruction(extended ? IRCastOp.ZeroExtend : IRCastOp.Truncate);
-                        break;
+                        if (loweredOrigType.Size == loweredTargetType.Size)
+                        {
+                            return value;
+                        }
+
+                        Debug.Assert(loweredTargetType.Size > loweredOrigType.Size);
+                        return AddCastInstruction(IRCastOp.ZeroExtend);
                     default:
                         throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
                 }
