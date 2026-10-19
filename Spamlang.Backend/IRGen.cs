@@ -650,19 +650,6 @@ public class IRGen
             return instr;
         }
 
-        // Truncate,
-        // SignExtend,
-        // ZeroExtend,
-        //
-        // FloatExtend,
-        // FloatTruncate,
-        //
-        // UnsignedToFloat,
-        // SignedToFloat,
-        //
-        // FloatToUnsigned,
-        // FloatToSigned,
-
         // NOTE: When extending, orig type decides signedness, not target type!
 
         bool extended = targetType.Size > origType.Size;
