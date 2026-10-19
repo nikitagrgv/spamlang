@@ -627,9 +627,21 @@ public class IRGen
     {
         IRValue value = GenExprValue(block, expr.Value);
 
-        SpamType origType = expr.Value.Type;
-        IRType targetType = _lowerer.ToLowerType(expr.Type);
+        IRValue AddCastInstruction(IRCastOp castOp)
+        {
+            IRType lowered = _lowerer.ToLowerType(expr.Type);
+            IRInstructionCast instr = new()
+            {
+                Value = value,
+                Op = castOp,
+                CastTo = lowered,
+            };
+            block.Add(instr);
+            return instr;
+        }
 
+        SpamType origType = expr.Value.Type;
+        SpamType targetType = expr.Type;
         switch (origType.Kind)
         {
             case TypeKind.Error:
@@ -647,14 +659,6 @@ public class IRGen
             default:
                 throw new UnreachableException();
         }
-
-        IRInstructionCast cast = new()
-        {
-            Value = value,
-            CastTo = targetType,
-        };
-        block.Add(cast);
-        return cast;
     }
 
     private IRValue GenExprFuncRefValue(IRBasicBlock block, HIRExprFuncRef expr)
