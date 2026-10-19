@@ -291,6 +291,25 @@ public class IRGen
 
     private IRValue GenBinaryOpUnsigned(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
     {
+        IRBinaryOp irOp;
+        switch (op)
+        {
+            case BinaryOp.Plus: irOp = IRBinaryOp.Add; break;
+            case BinaryOp.Minus: irOp = IRBinaryOp.Sub; break;
+            case BinaryOp.Mul: irOp = IRBinaryOp.Mul; break;
+            case BinaryOp.Div: irOp = signed ? IRBinaryOp.SDiv : IRBinaryOp.UDiv; break;
+            case BinaryOp.Rem: irOp = signed ? IRBinaryOp.SRem : IRBinaryOp.URem; break;
+            default: throw new UnreachableException();
+        }
+
+        IRInstructionBinary instr = new()
+        {
+            Left = left,
+            Right = right,
+            Op = irOp,
+        };
+        block.Add(instr);
+        return instr;
     }
 
     private IRValue GenBinaryOpFloat(IRBasicBlock block, IRValue left, IRValue right, BinaryOp op)
