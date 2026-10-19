@@ -676,7 +676,7 @@ public class IRGen
                     case TypeKind.Float:
                         return AddCastInstruction(IRCastOp.SignedToFloat);
                     default:
-                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                        throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
                 }
             case TypeKind.UnsignedInteger:
                 switch (targetType.Kind)
@@ -687,7 +687,7 @@ public class IRGen
                     case TypeKind.Float:
                         return AddCastInstruction(IRCastOp.UnsignedToFloat);
                     default:
-                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                        throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
                 }
             case TypeKind.Bool:
                 switch (targetType.Kind)
@@ -699,7 +699,7 @@ public class IRGen
                     case TypeKind.Float:
                         break;
                     default:
-                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                        throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
                 }
             case TypeKind.Float:
                 switch (targetType.Kind)
@@ -711,10 +711,10 @@ public class IRGen
                     case TypeKind.Float:
                         break;
                     default:
-                        throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                        throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
                 }
             default:
-                throw new InvalidHIRException($"Unexpected type: {origType.Name}");
+                throw new InvalidHIRException($"Unexpected cast: \"{origType.Name}\" -> \"{origType.Name}\"");
         }
     }
 
