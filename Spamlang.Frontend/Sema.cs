@@ -1984,8 +1984,7 @@ public class Sema
             case UnaryOp.Not:
                 return kind == TypeKind.Bool;
             case UnaryOp.BitNot:
-                return kind == TypeKind.Bool ||
-                       kind == TypeKind.AbstractNumber ||
+                return kind == TypeKind.AbstractNumber ||
                        kind == TypeKind.SignedInteger ||
                        kind == TypeKind.UnsignedInteger;
             default:
