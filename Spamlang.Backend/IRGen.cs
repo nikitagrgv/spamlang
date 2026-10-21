@@ -178,6 +178,10 @@ public class IRGen
                 return GenExprFuncRefValue(block, hirExprFuncRef);
             case HIRExprIntConst hirExprIntConst:
                 return GenExprIntValue(hirExprIntConst);
+            case HIRExprFloatConst hirExprFloatConst:
+                return GenExprFloatValue();
+            case HIRExprBoolConst hirExprBoolConst:
+                return GenExprBoolValue();
             case HIRExprLoad hirExprLoad:
                 return GenExprLoadValue(block, hirExprLoad);
             case HIRExprUnary hirExprUnary:
@@ -718,6 +722,24 @@ public class IRGen
     {
         IRType type = _lowerer.ToLowerType(expr.Type);
         IRConstantInt value = IRConstantInt.Create(expr.Value, type);
+        return value;
+    }
+
+    private IRValue GenExprFloatValue(HIRExprFloatConst expr)
+    {
+        IRType type = _lowerer.ToLowerType(expr.Type);
+        IRConstantFloat value = new()
+        {
+            FloatType = type,
+            Value = expr.Value,
+        };
+        return value;
+    }
+
+    private IRValue GenExprBoolValue(HIRExprBoolConst expr)
+    {
+        IRType type = _lowerer.ToLowerType(expr.Type);
+        IRConstantInt value = IRConstantInt.Create(expr.Value ? 1 : 0, type);
         return value;
     }
 
