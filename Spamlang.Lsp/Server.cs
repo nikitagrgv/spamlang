@@ -510,9 +510,8 @@ public class Server
     private static Data RunFrontend(string code)
     {
         Diagnostic diag = new();
-        TypeRegistry reg = new();
         Dictionary<int, Symbol> tokenToSymbol = new();
-        Frontend.Frontend.Result result = Frontend.Frontend.Run(code, reg, diag, timers: null, tokenToSymbol);
+        Frontend.Frontend.Result result = Frontend.Frontend.Run(code, diag, timers: null, tokenToSymbol);
         List<int> lineOffsets = CalcLineOffsets(code);
         return new Data
         {
