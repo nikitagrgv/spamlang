@@ -179,9 +179,9 @@ public class IRGen
             case HIRExprIntConst hirExprIntConst:
                 return GenExprIntValue(hirExprIntConst);
             case HIRExprFloatConst hirExprFloatConst:
-                return GenExprFloatValue();
+                return GenExprFloatValue(hirExprFloatConst);
             case HIRExprBoolConst hirExprBoolConst:
-                return GenExprBoolValue();
+                return GenExprBoolValue(hirExprBoolConst);
             case HIRExprLoad hirExprLoad:
                 return GenExprLoadValue(block, hirExprLoad);
             case HIRExprUnary hirExprUnary:
