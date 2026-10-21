@@ -6,7 +6,8 @@ public class FuncABI
     public required MValueLocation? ReturnLocation { get; init; }
 }
 
-public interface ITargetABI
+public interface ITarget
 {
-    public FuncABI Generate(IRSignature signature);
+    public FuncABI GenerateFuncABI(IRSignature signature);
+    public string GetAsmTargetName();
 }

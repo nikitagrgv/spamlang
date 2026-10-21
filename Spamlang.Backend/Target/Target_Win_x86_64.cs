@@ -5,11 +5,11 @@ namespace Spamlang.Backend.Target;
 // TODO: Full ABI for params! stack/floats/structs
 // TODO: SRet ABI (should probably be in IR)
 // TODO: SystemV ABI
-public sealed class TargetABI_Win_X86_64 : ITargetABI
+public sealed class Target_Win_x86_64 : ITarget
 {
     private static readonly Reg[] ParamsRegs = [Reg.Rcx, Reg.Rdx, Reg.R8, Reg.R9];
 
-    public FuncABI Generate(IRSignature signature)
+    public FuncABI GenerateFuncABI(IRSignature signature)
     {
         MValueLocation? retLoc = null;
         List<MValueLocation> paramsLocs = new();
@@ -47,6 +47,11 @@ public sealed class TargetABI_Win_X86_64 : ITargetABI
             ParamLocations = paramsLocs,
             ReturnLocation = retLoc,
         };
+    }
+
+    public string GetAsmTargetName()
+    {
+        return "x86_64-pc-windows-msvc";
     }
 
     private static RegClass GetRegClass(IRType type)

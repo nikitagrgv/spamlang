@@ -10,17 +10,16 @@ public class Backend
         public required MModule MModule { get; init; }
     }
 
-    public static Result Run(HIRCompilationUnit compilationUnit, Timers? timers)
+    public static Result? Run(HIRCompilationUnit compilationUnit, ITarget target, Timers? timers)
     {
-        IRTypeLowerer lowerer = new();
-
         timers?.RestartTimer();
+        IRTypeLowerer lowerer = new();
         IRGen irGen = new(lowerer);
         IRModule irModule = irGen.Run(compilationUnit);
         timers?.FinishTimer("IR");
 
         timers?.RestartTimer();
-        Codegen codegen = new();
+        Codegen codegen = new(target);
         MModule mmodule = codegen.Run(irModule);
         timers?.FinishTimer("MIR");
 

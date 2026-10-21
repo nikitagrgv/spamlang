@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using Spamlang.Backend;
+using Spamlang.Backend.Target;
 using Spamlang.DebugPrinters;
 using Spamlang.Frontend;
 
@@ -90,10 +91,20 @@ public class Compiler
             return false;
         }
 
+        // We only have one target now. Unhardcode this in the future
+        string targetName = "win64x86";
+        ITarget? target = GetTarget(targetName);
+        if (target == null)
+        {
+            Console.Error.WriteLine($"Unsupported target: {targetName}");
+            return false;
+        }
+
         Backend.Backend.Result backendResult;
         try
         {
-            backendResult = Backend.Backend.Run(frontendResult.HIRCompilationUnit, timers);
+            Backend.Backend.Result? result = Backend.Backend.Run(frontendResult.HIRCompilationUnit, target, timers);
+            backendResult = result.Value;
         }
         catch (Exception e)
         {
@@ -117,8 +128,6 @@ public class Compiler
         }
 
         timers.RestartTimer();
-        // Only one target is supported for now
-        string target = "x86_64-pc-windows-msvc";
         string? objPath = CompileAsm(asmPath, target);
         timers.FinishTimer("Compile Asm");
 
@@ -145,6 +154,15 @@ public class Compiler
         }
 
         return true;
+    }
+
+    private static ITarget? GetTarget(string target)
+    {
+        switch (target.ToLower())
+        {
+            case "win64x86": return new Target_Win_x86_64();
+            default: return null;
+        }
     }
 
     private string SaveAsm(MModule mmodule, string file)

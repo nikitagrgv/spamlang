@@ -16,11 +16,11 @@ public class Codegen
     }
 
     private readonly Dictionary<IRSignature, FuncABI> _signatureToAbi = new();
-    private readonly ITargetABI _targetABI;
+    private readonly ITarget _target;
 
-    public Codegen(ITargetABI targetABI)
+    public Codegen(ITarget target)
     {
-        _targetABI = targetABI;
+        _target = target;
     }
 
     public MModule Run(IRModule irmodule)
@@ -529,7 +529,7 @@ public class Codegen
             return abi;
         }
 
-        abi = _targetABI.Generate(signature);
+        abi = _target.GenerateFuncABI(signature);
         _signatureToAbi[signature] = abi;
         return abi;
     }
