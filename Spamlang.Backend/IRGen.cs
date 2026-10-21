@@ -566,8 +566,8 @@ public class IRGen
             case BinaryOp.Div:
             case BinaryOp.Rem: throw MakeCannotPerformOpException(op, "bool");
 
-            case BinaryOp.BitAnd:
-            case BinaryOp.BitOr:
+            case BinaryOp.BitAnd: return AddBinaryInstruction(IRBinaryOp.And);
+            case BinaryOp.BitOr: return AddBinaryInstruction(IRBinaryOp.Or);
             case BinaryOp.BitXor:
             case BinaryOp.BitShiftLeft:
             case BinaryOp.BitShiftRight: throw MakeCannotPerformOpException(op, "bool");
