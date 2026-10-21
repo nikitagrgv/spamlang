@@ -128,7 +128,7 @@ public class Compiler
         }
 
         timers.RestartTimer();
-        string? objPath = CompileAsm(asmPath, target);
+        string? objPath = CompileAsm(asmPath, target.GetAsmTargetName());
         timers.FinishTimer("Compile Asm");
 
         if (objPath == null)
