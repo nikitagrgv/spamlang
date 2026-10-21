@@ -9,8 +9,10 @@ public class Frontend
         public required HIRCompilationUnit HIRCompilationUnit { get; init; }
     }
 
-    public static Result Run(string code, TypeRegistry typeRegistry, Diagnostic diag, Timers? timers, Dictionary<int, Symbol>? outTokenToSymbol = null)
+    public static Result Run(string code, Diagnostic diag, Timers? timers, Dictionary<int, Symbol>? outTokenToSymbol = null)
     {
+        TypeRegistry typeRegistry = new();
+
         timers?.RestartTimer();
         Lexer lexer = new(code, diag);
         List<Token> tokens = lexer.Run();

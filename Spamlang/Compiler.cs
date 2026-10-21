@@ -68,12 +68,10 @@ public class Compiler
         timers.FinishTimer("Read");
 
         Diagnostic diag = new();
-        TypeRegistry typeRegistry = new();
-
         Frontend.Frontend.Result frontendResult;
         try
         {
-            frontendResult = Frontend.Frontend.Run(code, typeRegistry, diag, timers);
+            frontendResult = Frontend.Frontend.Run(code, diag, timers);
         }
         catch (Exception e)
         {
@@ -95,7 +93,7 @@ public class Compiler
         Backend.Backend.Result backendResult;
         try
         {
-            backendResult = Backend.Backend.Run(frontendResult.HIRCompilationUnit, typeRegistry, timers);
+            backendResult = Backend.Backend.Run(frontendResult.HIRCompilationUnit, timers);
         }
         catch (Exception e)
         {
