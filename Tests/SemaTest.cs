@@ -226,6 +226,8 @@ public class SemaTest
 
     [Theory]
     [InlineData("1 / 0")]
+    [InlineData("1.0 / 0")]
+    [InlineData("1 / 0.0")]
     [InlineData("1.0 / 0.0")]
     public void Sema_ReportsErrorOnDivisionByZero(string str)
     {
