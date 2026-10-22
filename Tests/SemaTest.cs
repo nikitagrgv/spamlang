@@ -216,6 +216,7 @@ public class SemaTest
     [InlineData("1.0 % 3")]
     [InlineData("1 % 3.0")]
     [InlineData("-11.0 % 3.0")]
+    [InlineData("(1 as f32) % (2 as f32")]
     public void Sema_PercentageOperatorIsForbiddenForFloat(string str)
     {
         string stmtCode = $"let a = {str}";
