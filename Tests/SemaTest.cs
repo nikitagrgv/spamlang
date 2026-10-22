@@ -159,7 +159,6 @@ public class SemaTest
     [InlineData("-11.0 - 3.0", -11.0 - 3.0)]
     [InlineData("-11.0 * 3.0", -11.0 * 3.0)]
     [InlineData("-11.0 / 3.0", -11.0 / 3.0)]
-    [InlineData("-11.0 % 3.0", -11.0 % 3.0)]
     [InlineData("2.0 + 3.0 * 4.0 - 24.0 / 3.0", 2.0 + 3.0 * 4.0 - 24.0 / 3.0)]
     public void Sema_FoldsConstFloatExpression(string str, double expected)
     {
@@ -210,6 +209,18 @@ public class SemaTest
         Assert.Equal(BuiltinType.F64, stmt.VariableSymbol.Type);
         HIRExprFloatConst init = Assert.IsType<HIRExprFloatConst>(stmt.Init);
         Assert.Equal(3.0, init.Value);
+    }
+
+    [Theory]
+    [InlineData("1.0 % 3.0")]
+    [InlineData("1.0 % 3")]
+    [InlineData("1 % 3.0")]
+    [InlineData("-11.0 % 3.0")]
+    public void Sema_PercentageOperatorIsForbiddenForFloat(string str)
+    {
+        string stmtCode = $"let a = {str}";
+        Tester tester = Tester.BuildStmt(stmtCode);
+        Assert.True(tester.HasErrors);
     }
 
     [Theory]
