@@ -106,6 +106,16 @@ public sealed class IRBasicBlock
     public required string Name { get; init; }
     public required List<IRInstruction> Instructions { get; init; }
 
+    public void Prepend(IReadOnlyList<IRInstruction> instructions)
+    {
+        foreach (IRInstruction instr in instructions)
+        {
+            instr.Parent = this;
+        }
+
+        Instructions.InsertRange(0, instructions);
+    }
+
     public void Add(IRInstruction instruction)
     {
         instruction.Parent = this;

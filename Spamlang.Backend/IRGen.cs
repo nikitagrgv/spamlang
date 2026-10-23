@@ -65,8 +65,13 @@ public class IRGen
         Dictionary<Symbol, IRValue> funcScope = new();
         PushSymScope(funcScope);
 
-        GenParams(entry, funcDecl.Symbol.Params, function.Params);
-        GenLocals(entry, funcDecl.Locals);
+        // TODO: Reuse list
+        List<IRInstruction> allocas = new();
+        GenParams(entry, funcDecl.Symbol.Params, function.Params, allocas);
+        GenLocals(funcDecl.Locals, allocas);
+
+        Debug.Assert(allocas.All(instr => instr is IRInstructionAlloca));
+        entry.Prepend(allocas);
 
         GenStmts(entry, funcDecl.Body.Stmts);
 
@@ -788,7 +793,7 @@ public class IRGen
         }
     }
 
-    private void GenLocals(IRBasicBlock entry, IReadOnlyList<VariableSymbol> locals)
+    private void GenLocals(IReadOnlyList<VariableSymbol> locals, List<IRInstruction> allocas)
     {
         foreach (VariableSymbol sym in locals)
         {
@@ -798,7 +803,7 @@ public class IRGen
             {
                 AllocatedType = type,
             };
-            entry.Add(alloca);
+            allocas.Add(alloca);
 
             if (TryLookupValue(sym) != null)
             {
@@ -809,11 +814,10 @@ public class IRGen
         }
     }
 
-    private void GenParams(IRBasicBlock entry, IReadOnlyList<ParamSymbol> funcParams, List<IRParam> irParams)
+    private void GenParams(IRBasicBlock entry, IReadOnlyList<ParamSymbol> funcParams, List<IRParam> irParams, List<IRInstruction> allocas)
     {
         Debug.Assert(irParams.Count == 0);
 
-        int initialNumInstructions = entry.Instructions.Count;
         foreach (ParamSymbol sym in funcParams)
         {
             IRType type = _lowerer.ToLowerType(sym.Type);
@@ -828,7 +832,14 @@ public class IRGen
             {
                 AllocatedType = type,
             };
-            entry.Add(alloca);
+            allocas.Add(alloca); // Prepended to the entry later
+
+            IRInstructionStore store = new()
+            {
+                Value = irParam,
+                Address = alloca,
+            };
+            entry.Add(store);
 
             if (TryLookupValue(sym) != null)
             {
@@ -836,19 +847,6 @@ public class IRGen
             }
 
             CurrentSymScope().Add(sym, alloca);
-        }
-
-        for (int i = 0; i < irParams.Count; i++)
-        {
-            IRParam param = irParams[i];
-            IRInstruction alloca = entry.Instructions[initialNumInstructions + i];
-            Debug.Assert(alloca is IRInstructionAlloca);
-            IRInstructionStore store = new()
-            {
-                Value = param,
-                Address = alloca,
-            };
-            entry.Add(store);
         }
     }
 
