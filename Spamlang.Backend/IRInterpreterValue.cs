@@ -49,32 +49,12 @@ public struct IRInterpreterValue
     }
 
     [UnscopedRef]
-    public ReadOnlySpan<byte> AsBytes()
-    {
-        if (_heap != null)
-        {
-            return GetHeapBytes(_size);
-        }
-
-        return GetInlineBytes(_size);
-    }
+    public ReadOnlySpan<byte> AsBytes() => _heap is null
+        ? MemoryMarshal.AsBytes(new ReadOnlySpan<ulong>(in _inline)).Slice(0, _size)
+        : MemoryMarshal.AsBytes(_heap.AsSpan()).Slice(0, _size);
 
     private ulong GetWord()
     {
-        return _heap != null ? _heap[0] : _inline;
-    }
-
-    [UnscopedRef]
-    private Span<byte> GetHeapBytes(int size)
-    {
-        Debug.Assert(_heap != null);
-        return MemoryMarshal.AsBytes(_heap.AsSpan()).Slice(0, size);
-    }
-
-    [UnscopedRef]
-    private Span<byte> GetInlineBytes(int size)
-    {
-        Debug.Assert(size > 0 && size <= 8);
-        return MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _inline, 1)).Slice(0, size);
+        return _heap is null ? _inline : _heap[0];
     }
 }
