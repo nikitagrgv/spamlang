@@ -30,22 +30,22 @@ public struct IRInterpreterValue
 
     public UInt64 AsUInt64()
     {
-        return _heap != null ? _heap[0] : _inline;
+        return GetWord();
     }
 
     public UInt32 AsUInt32()
     {
-        return (UInt32)AsUInt64();
+        return (UInt32)GetWord();
     }
 
     public UInt16 AsUInt16()
     {
-        return (UInt16)AsUInt64();
+        return (UInt16)GetWord();
     }
 
     public byte AsUInt8()
     {
-        return (byte)AsUInt64();
+        return (byte)GetWord();
     }
 
     [UnscopedRef]
@@ -57,6 +57,11 @@ public struct IRInterpreterValue
         }
 
         return GetInlineBytes(_size);
+    }
+
+    private ulong GetWord()
+    {
+        return _heap != null ? _heap[0] : _inline;
     }
 
     [UnscopedRef]
