@@ -14,9 +14,9 @@ public class IRFunctionNotFoundException : IRInterpreterException
     }
 }
 
-public class IRSignatureDoesntMatchException : IRInterpreterException
+public class IRUnexpectedSignatureException : IRInterpreterException
 {
-    public IRSignatureDoesntMatchException(IRFunction func) : base($"Unexpected signature for {func.Name}. Expected {func.LoweredSignature}")
+    public IRUnexpectedSignatureException(IRFunction func) : base($"Unexpected signature for {func.Name}. Expected {func.LoweredSignature}")
     {
     }
 }
@@ -53,7 +53,7 @@ public class IRInterpreter
 
         if (func.LoweredSignature.ParamTypes.Count != 0)
         {
-            throw new IRSignatureDoesntMatchException(func);
+            throw new IRUnexpectedSignatureException(func);
         }
 
         // TODO#
