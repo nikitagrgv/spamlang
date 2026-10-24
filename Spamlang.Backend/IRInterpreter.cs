@@ -178,7 +178,19 @@ public class IRInterpreter
 
     private ulong Allocate(int size, int align)
     {
-        Utils.AlignUp();
+        int offset = _memory.Count;
+        offset += AllocaGapSize;
+        offset = Utils.AlignUp(offset, align);
+
+        // Gap + align
+        _memory.AddRange(Enumerable.Repeat(GapTag, offset - _memory.Count));
+
+        // Allocate
+        Debug.Assert(_memory.Count == offset);
+        Debug.Assert(Utils.IsAligned(_memory.Count, align));
+        _memory.AddRange(Enumerable.Repeat(UninitializedTag, size))
+
+        return MemoryStartAddress + (ulong)offset;
     }
 
     private IRFunction? FindFunction(string name)
