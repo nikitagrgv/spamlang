@@ -25,6 +25,18 @@ public readonly struct IRInterpreterValue
         bytes.CopyTo(MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _inline, 1)));
     }
 
+    public IRInterpreterValue(double value)
+    {
+        _size = 8;
+        _inline = BitConverter.DoubleToUInt64Bits(value);
+    }
+
+    public IRInterpreterValue(float value)
+    {
+        _size = 4;
+        _inline = BitConverter.SingleToUInt32Bits(value);
+    }
+
     public UInt64 AsUInt64() => GetWord();
     public UInt32 AsUInt32() => (UInt32)GetWord();
     public UInt16 AsUInt16() => (UInt16)GetWord();
