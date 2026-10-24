@@ -17,8 +17,7 @@ public struct IRInterpreterValue
 
         if (bytes.Length > 8)
         {
-            int numUlongs = (bytes.Length + 7) / 8;
-            _heap = new ulong[numUlongs];
+            _heap = new ulong[(bytes.Length + 7) / 8];
             bytes.CopyTo(GetHeapBytes(bytes.Length));
             return;
         }
