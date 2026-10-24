@@ -58,7 +58,7 @@ public struct IRInterpreterValue
     }
 
     [UnscopedRef]
-    public Span<byte> GetBytes()
+    public ReadOnlySpan<byte> GetBytes()
     {
         if (_heapBytes != null)
         {
