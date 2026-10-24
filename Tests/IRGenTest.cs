@@ -17,7 +17,7 @@ public class IRGenTest
                         }
 
                         fn checkI32(value: i32)
-                        {}w
+                        {}
                         """;
     }
 }
