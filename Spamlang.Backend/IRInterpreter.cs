@@ -115,24 +115,24 @@ public class IRInterpreter
                 // TODO: Handle jumps
                 switch (instr)
                 {
-                    case IRInstructionAlloca irInstructionAlloca:
+                    case IRInstructionAlloca alloca:
                         break;
-                    case IRInstructionBinary irInstructionBinary:
+                    case IRInstructionLoad load:
                         break;
-                    case IRInstructionCall irInstructionCall:
+                    case IRInstructionStore store:
                         break;
-                    case IRInstructionCast irInstructionCast:
+                    case IRInstructionUnary unary:
                         break;
-                    case IRInstructionCompare irInstructionCompare:
+                    case IRInstructionBinary binary:
                         break;
-                    case IRInstructionLoad irInstructionLoad:
+                    case IRInstructionCall call:
                         break;
-                    case IRInstructionRet irInstructionRet:
+                    case IRInstructionCast cast:
+                        break;
+                    case IRInstructionCompare compare:
+                        break;
+                    case IRInstructionRet ret:
                         exit = true;
-                        break;
-                    case IRInstructionStore irInstructionStore:
-                        break;
-                    case IRInstructionUnary irInstructionUnary:
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(instr));
