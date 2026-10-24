@@ -61,7 +61,7 @@ public class Codegen
         foreach (IRParam param in irfunc.Params)
         {
             curOffset += param.Type.Size;
-            curOffset = AlignTo(curOffset, param.Type.Alignment);
+            curOffset = Utils.AlignUp(curOffset, param.Type.Alignment);
             ctx.ParamsOffsets.Add(-curOffset);
         }
 
@@ -80,7 +80,7 @@ public class Codegen
                 if (instr is IRInstructionAlloca alloca)
                 {
                     curOffset += alloca.AllocatedType.Size;
-                    curOffset = AlignTo(curOffset, alloca.AllocatedType.Alignment);
+                    curOffset = Utils.AlignUp(curOffset, alloca.AllocatedType.Alignment);
                     ctx.AllocatedOffsets.Add(-curOffset);
                 }
             }
@@ -98,7 +98,7 @@ public class Codegen
                 }
 
                 curOffset += instr.Type.Size;
-                curOffset = AlignTo(curOffset, instr.Type.Alignment);
+                curOffset = Utils.AlignUp(curOffset, instr.Type.Alignment);
                 ctx.InstrIdToOffset.Add(instr.Id, -curOffset);
             }
         }
@@ -109,7 +109,7 @@ public class Codegen
             frameSize += 0x20; // Shadow space for functions calls (Windows ABI), NOT LINUX!
         }
 
-        frameSize = AlignTo(frameSize, 16); // For functions calls ABI and SSE
+        frameSize = Utils.AlignUp(frameSize, 16); // For functions calls ABI and SSE
 
         // Frame prologue
         MOpReg rbp = new() { Reg = Reg.Rbp, Size = 8 };
@@ -532,11 +532,5 @@ public class Codegen
         abi = _target.GenerateFuncABI(signature);
         _signatureToAbi[signature] = abi;
         return abi;
-    }
-
-    private static int AlignTo(int offset, int alignment)
-    {
-        Debug.Assert(offset >= 0);
-        return (offset + alignment - 1) & ~(alignment - 1);
     }
 }

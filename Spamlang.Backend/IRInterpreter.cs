@@ -116,6 +116,8 @@ public class IRInterpreter
                 switch (instr)
                 {
                     case IRInstructionAlloca alloca:
+                        IRType type = alloca.AllocatedType;
+                        ulong addr = Allocate(type.Size, type.Alignment);
                         break;
                     case IRInstructionLoad load:
                         break;
@@ -143,6 +145,11 @@ public class IRInterpreter
         return returnValue;
     }
 
+    private ulong Allocate(int size, int align)
+    {
+        
+        Utils.AlignUp();
+    }
 
     private IRFunction? FindFunction(string name)
     {
