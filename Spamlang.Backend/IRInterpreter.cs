@@ -33,7 +33,6 @@ public class IRInterpreter
 
     public void OverrideFunction(string name, Delegate impl)
     {
-        impl.DynamicInvoke((int)32);
         IRFunction? func = FindFunction(name);
         if (func == null)
         {
