@@ -21,6 +21,13 @@ public class IRUnexpectedSignatureException : IRInterpreterException
     }
 }
 
+public class IRInvalidException : IRInterpreterException
+{
+    public IRInvalidException(string message) : base(message)
+    {
+    }
+}
+
 public struct IRInterpreterValue
 {
     public byte[] Bytes;
@@ -70,7 +77,20 @@ public class IRInterpreter
 
     private IRInterpreterValue RunFunction(IRFunction func, List<IRInterpreterValue> args)
     {
-        
+        if (func.BasicBlocks.Count == 0)
+        {
+            throw new IRInvalidException("Function has no basic blocks");
+        }
+
+        IRBasicBlock entry = func.BasicBlocks[0];
+        if (entry.Name != "entry")
+        {
+            throw new IRInvalidException("Function entry block is not named 'entry'");
+        }
+
+        foreach (IRInstruction instr in entry.Instructions)
+        {
+        }
     }
 
     private IRFunction? FindFunction(string name)
