@@ -83,10 +83,22 @@ public class IRInterpreter
             throw new IRInvalidException("Function has no basic blocks");
         }
 
+        bool exit = false;
+        IRInterpreterValue? returnValue = null;
         foreach (IRBasicBlock block in func.BasicBlocks)
         {
+            if (exit)
+            {
+                break;
+            }
+
             foreach (IRInstruction instr in block.Instructions)
             {
+                if (exit)
+                {
+                    break;
+                }
+
                 // TODO: Handle jumps
                 switch (instr)
                 {
@@ -103,6 +115,8 @@ public class IRInterpreter
                     case IRInstructionLoad irInstructionLoad:
                         break;
                     case IRInstructionRet irInstructionRet:
+                        exit = true;
+                        irInstructionRet.Value
                         break;
                     case IRInstructionStore irInstructionStore:
                         break;
@@ -113,10 +127,8 @@ public class IRInterpreter
                 }
             }
         }
-        
-        
     }
-    
+
 
     private IRFunction? FindFunction(string name)
     {
