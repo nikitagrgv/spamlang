@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Spamlang.Backend;
@@ -31,6 +32,12 @@ public struct IRInterpreterValue
         bytes.CopyTo(inline);
     }
 
+    public UInt64 AsUInt64()
+    {
+        Debug.Assert(_size == 8);
+        return BitConverter.ToUInt64(AsBytes());
+    }
+
     public UInt32 AsUInt32()
     {
         Debug.Assert(_size == 4);
@@ -43,9 +50,10 @@ public struct IRInterpreterValue
         return BitConverter.ToUInt16(AsBytes());
     }
 
-    public uint AsUInt8()
+    public byte AsUInt8()
     {
         Debug.Assert(_size == 1);
+        return AsBytes()[0];
     }
 
     [UnscopedRef]
