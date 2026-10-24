@@ -46,15 +46,28 @@ public struct IRInterpreterValue
         _type = type;
         _size = bytes.Length;
 
-        if (bytes.Length <= 8)
+        if (bytes.Length > 8)
         {
-            Span<byte> inline = GetInlineBytes(bytes.Length);
-            bytes.CopyTo(inline);
+            _heapBytes = new byte[bytes.Length];
+            bytes.CopyTo(_heapBytes);
             return;
         }
 
-        _heapBytes = new byte[bytes.Length];
-        bytes.CopyTo(_heapBytes);
+        Span<byte> inline = GetInlineBytes(bytes.Length);
+        bytes.CopyTo(inline);
+    }
+
+    [UnscopedRef]
+    public Span<byte> GetBytes()
+    {
+        if (_heapBytes != null)
+        {
+            Debug.Assert(_heapBytes.Length == _size);
+            return _heapBytes;
+        }
+
+        Span<byte> inline = GetInlineBytes(_size);
+        return inline;
     }
 
     [UnscopedRef]
