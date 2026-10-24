@@ -188,7 +188,7 @@ public class IRInterpreter
         // Allocate
         Debug.Assert(_memory.Count == offset);
         Debug.Assert(Utils.IsAligned(_memory.Count, align));
-        _memory.AddRange(Enumerable.Repeat(UninitializedTag, size))
+        _memory.AddRange(Enumerable.Repeat(UninitializedTag, size));
 
         return MemoryStartAddress + (ulong)offset;
     }
