@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+
 namespace Spamlang.Backend;
 
 public class IRInterpreterException : Exception
@@ -30,7 +34,33 @@ public class IRInvalidException : IRInterpreterException
 
 public struct IRInterpreterValue
 {
-    public byte[] Bytes;
+    private IRType _type;
+    private unsafe fixed byte _inlineBytes[8];
+    private byte[]? _heapBytes = null;
+    private int _size = 0;
+
+    public IRInterpreterValue(IRType type, ReadOnlySpan<byte> bytes)
+    {
+        _type = type;
+        _size = bytes.Length;
+
+        if (bytes.Length <= 8)
+        {
+            Span<byte> inline = GetInlineBytes(bytes.Length);
+            bytes.CopyTo(inline);
+            return;
+        }
+
+        _heapBytes = new byte[bytes.Length];
+        bytes.CopyTo(_heapBytes);
+    }
+
+    [UnscopedRef]
+    private unsafe Span<byte> GetInlineBytes(int size)
+    {
+        Debug.Assert(size > 0 && size <= 8);
+        return MemoryMarshal.CreateSpan<byte>(ref _inlineBytes[0], size);
+    }
 }
 
 public class IRInterpreter
