@@ -35,18 +35,17 @@ public struct IRInterpreterValue
 
     public UInt32 AsUInt32()
     {
+        return (UInt32)AsUInt64();
     }
 
     public UInt16 AsUInt16()
     {
-        Debug.Assert(_size == 2);
-        return BitConverter.ToUInt16(AsBytes());
+        return (UInt16)AsUInt64();
     }
 
     public byte AsUInt8()
     {
-        Debug.Assert(_size == 1);
-        return AsBytes()[0];
+        return (byte)AsUInt64();
     }
 
     [UnscopedRef]
