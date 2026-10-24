@@ -14,18 +14,16 @@ public struct IRInterpreterValue
     public IRInterpreterValue(ReadOnlySpan<byte> bytes)
     {
         Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
-
         _size = bytes.Length;
 
         if (bytes.Length > 8)
         {
-            _heap = new ulong[(bytes.Length + 7) / 8];
-            bytes.CopyTo(GetHeapBytes(bytes.Length));
+            _heap = new ulong[(bytes.Length + 7) >> 3];
+            bytes.CopyTo(MemoryMarshal.AsBytes(_heap.AsSpan()));
             return;
         }
 
-        Span<byte> inline = GetInlineBytes(bytes.Length);
-        bytes.CopyTo(inline);
+        bytes.CopyTo(MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _inline, 1)));
     }
 
     public UInt64 AsUInt64()
