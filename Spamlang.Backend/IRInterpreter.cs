@@ -36,12 +36,20 @@ public class IRInterpreter
 {
     private IRModule _module;
 
-    private Dictionary<ulong, Delegate> _funcOverrides = new();
+    // Memory layout:
+    // 0x0000000000000000...0x8000000000000000 - Skipped. For catching nullptr dereferences
+    // 0x8000000000000000...0xFFFFFFFFFFFFFFFF - _memory. For alloca-s
+    // Memory is shared between all frames.
+    // Between each frame there is a gap of 256 bytes filled with 0xCD - for catching OOB accesses
 
-    private const ulong AllocatedStartAddress = 0x8000000000000000;
-    private const ulong AllocatedFrameGap = 256;
-    private List<byte> _allocated = new();
-    private List<long> _framesStack = new();
+    private const ulong MemoryStartAddress = 0x8000000000000000;
+    private const int FrameGapSize = 256;
+    private const byte FrameGapTag = 0xCD;
+
+    private List<byte> _memory = new();
+    private List<int> _frames = new();
+
+    private Dictionary<ulong, Delegate> _funcOverrides = new();
 
     public IRInterpreter(IRModule module)
     {
@@ -147,9 +155,28 @@ public class IRInterpreter
         return returnValue;
     }
 
+    private void PushFrame()
+    {
+        int curSize = _memory.Count;
+        _frames.Add(curSize);
+
+        curSize += FrameGapSize;
+        _memory.AddRange(Enumerable.Repeat(FrameGapTag, FrameGapSize));
+    }
+
+    private void PopFrame()
+    {
+        Debug.Assert(_frames.Count > 0);
+        Debug.Assert(_frames[^1] > _memory.Count);
+
+        int prevSize = _frames[^1];
+        _frames.RemoveAt(_frames.Count - 1);
+        _memory.RemoveRange(prevSize, _memory.Count - prevSize);
+    }
+
     private ulong Allocate(int size, int align)
     {
-        _allocated.Add;
+        _memory.Add;
         Utils.AlignUp();
     }
 
