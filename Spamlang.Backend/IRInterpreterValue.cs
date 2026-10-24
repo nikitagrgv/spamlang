@@ -29,7 +29,7 @@ public struct IRInterpreterValue
     public UInt64 AsUInt64()
     {
         Debug.Assert(_size == 8);
-        return _inline;
+        return _heap != null ? _heap[0] : _inline;
     }
 
     public UInt32 AsUInt32()
