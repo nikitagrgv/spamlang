@@ -27,6 +27,8 @@ public class IRGenTest
 
                           val = val * val;
                           checkI32(val); // 49
+
+                          return 0;
                       }
 
                       fn checkI32(value: i32)
