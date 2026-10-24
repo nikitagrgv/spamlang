@@ -43,8 +43,12 @@ public class IRInterpreter
     // Frames are separated by gaps of 256 bytes filled with 0xCD - for catching OOB accesses.
 
     private const ulong MemoryStartAddress = 0x8000000000000000;
+
     private const int FrameGapSize = 256;
-    private const byte FrameGapTag = 0xCD;
+    private const int AllocaGapSize = 32;
+
+    private const byte GapTag = 0xED;
+    private const byte UninitializedTag = 0xCD;
 
     private List<byte> _memory = new();
     private List<int> _frames = new();
@@ -161,7 +165,7 @@ public class IRInterpreter
         _frames.Add(curSize);
 
         curSize += FrameGapSize;
-        _memory.AddRange(Enumerable.Repeat(FrameGapTag, FrameGapSize));
+        _memory.AddRange(Enumerable.Repeat(GapTag, FrameGapSize));
     }
 
     private void PopFrame()
@@ -176,7 +180,6 @@ public class IRInterpreter
 
     private ulong Allocate(int size, int align)
     {
-        _memory.Add;
         Utils.AlignUp();
     }
 
