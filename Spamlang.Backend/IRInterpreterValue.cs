@@ -7,7 +7,7 @@ namespace Spamlang.Backend;
 
 public struct IRInterpreterValue
 {
-    private ulong _inline;
+    private readonly ulong _inline;
     private readonly ulong[]? _heap = null;
     private readonly int _size = 0;
 
