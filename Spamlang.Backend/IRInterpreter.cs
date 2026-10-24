@@ -21,6 +21,11 @@ public class IRUnexpectedSignatureException : IRInterpreterException
     }
 }
 
+public struct IRInterpreterValue
+{
+    public byte[] Bytes;
+}
+
 public class IRInterpreter
 {
     private IRModule _module;
@@ -63,8 +68,9 @@ public class IRInterpreter
         // TODO#
     }
 
-    private IRValue RunFunction(IRFunction func)
+    private IRInterpreterValue RunFunction(IRFunction func, List<IRInterpreterValue> args)
     {
+        
     }
 
     private IRFunction? FindFunction(string name)
