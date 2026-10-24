@@ -27,6 +27,8 @@ public readonly struct IRInterpreterValue
 
     public IRInterpreterValue(ulong value, int size)
     {
+        Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
+        Debug.Assert(size > 0 && size <= 8);
         _size = size;
         _inline = value;
     }
