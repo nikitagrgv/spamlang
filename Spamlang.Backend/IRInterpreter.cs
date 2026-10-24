@@ -76,11 +76,24 @@ public class IRInterpreter
         // TODO#
     }
 
-    private IRInterpreterValue RunFunction(IRFunction func, List<IRInterpreterValue> args)
+    private IRInterpreterValue? RunFunction(IRFunction func, List<IRInterpreterValue> args)
     {
         if (func.BasicBlocks.Count == 0)
         {
             throw new IRInvalidException("Function has no basic blocks");
+        }
+
+        if (func.Params.Count != args.Count)
+        {
+            throw new IRInvalidException($"Expected {func.Params.Count} arguments, got {args.Count}");
+        }
+
+        Dictionary<int, IRInterpreterValue> idToValue = new();
+        for (int i = 0; i < func.Params.Count; i++)
+        {
+            IRParam param = func.Params[i];
+            IRInterpreterValue value = args[i];
+            idToValue.Add(param.Id, value);
         }
 
         bool exit = false;
@@ -116,7 +129,6 @@ public class IRInterpreter
                         break;
                     case IRInstructionRet irInstructionRet:
                         exit = true;
-                        irInstructionRet.Value
                         break;
                     case IRInstructionStore irInstructionStore:
                         break;
@@ -127,6 +139,8 @@ public class IRInterpreter
                 }
             }
         }
+
+        return returnValue;
     }
 
 
