@@ -57,6 +57,11 @@ public class IRInterpreter
         // TODO#
     }
 
+    private IRValue RunFunction(IRFunction func)
+    {
+        
+    }
+
     private IRFunction? FindFunction(string name)
     {
         foreach (IRFunction func in _module.Functions)
