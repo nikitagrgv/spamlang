@@ -13,6 +13,8 @@ public struct IRInterpreterValue
 
     public IRInterpreterValue(ReadOnlySpan<byte> bytes)
     {
+        Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
+
         _size = bytes.Length;
 
         if (bytes.Length > 8)
@@ -28,14 +30,11 @@ public struct IRInterpreterValue
 
     public UInt64 AsUInt64()
     {
-        Debug.Assert(_size == 8);
         return _heap != null ? _heap[0] : _inline;
     }
 
     public UInt32 AsUInt32()
     {
-        Debug.Assert(_size == 4);
-        return BitConverter.ToUInt32();
     }
 
     public UInt16 AsUInt16()

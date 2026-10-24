@@ -43,6 +43,8 @@ public class IRInterpreter
 
     public IRInterpreter(IRModule module)
     {
+        Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
+
         _module = module;
     }
 
