@@ -23,8 +23,12 @@ public class IRUnexpectedSignatureException : IRInterpreterException
 
 public class IRInterpreter
 {
-    IRModule _module;
-    Dictionary<ulong, Delegate> _funcOverrides = new();
+    private IRModule _module;
+
+    private Dictionary<ulong, Delegate> _funcOverrides = new();
+
+    private const ulong AllocatedStartAddress = 0x8000000000000000;
+    private List<byte> _allocated = new();
 
     public IRInterpreter(IRModule module)
     {
