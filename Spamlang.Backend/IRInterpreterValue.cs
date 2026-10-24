@@ -25,16 +25,22 @@ public readonly struct IRInterpreterValue
         bytes.CopyTo(MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _inline, 1)));
     }
 
-    public IRInterpreterValue(double value)
+    public IRInterpreterValue(ulong value, int size)
     {
-        _size = 8;
-        _inline = BitConverter.DoubleToUInt64Bits(value);
+        _size = size;
+        _inline = value;
     }
 
-    public IRInterpreterValue(float value)
+    public static IRInterpreterValue FromDouble(double value)
     {
-        _size = 4;
-        _inline = BitConverter.SingleToUInt32Bits(value);
+        ulong v = BitConverter.DoubleToUInt64Bits(value);
+        return new IRInterpreterValue(v, 8);
+    }
+
+    public static IRInterpreterValue FromFloat(float value)
+    {
+        ulong v = BitConverter.SingleToUInt32Bits(value);
+        return new IRInterpreterValue(v, 4);
     }
 
     public UInt64 AsUInt64() => GetWord();
