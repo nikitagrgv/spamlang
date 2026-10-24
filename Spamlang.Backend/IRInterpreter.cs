@@ -39,7 +39,9 @@ public class IRInterpreter
     private Dictionary<ulong, Delegate> _funcOverrides = new();
 
     private const ulong AllocatedStartAddress = 0x8000000000000000;
+    private const ulong AllocatedFrameGap = 64;
     private List<byte> _allocated = new();
+    private List<long> _framesStack = new();
 
     public IRInterpreter(IRModule module)
     {
@@ -147,7 +149,7 @@ public class IRInterpreter
 
     private ulong Allocate(int size, int align)
     {
-        
+        _allocated.Add;
         Utils.AlignUp();
     }
 
