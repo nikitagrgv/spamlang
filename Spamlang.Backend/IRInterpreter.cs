@@ -83,14 +83,11 @@ public class IRInterpreter
             throw new IRInvalidException("Function has no basic blocks");
         }
 
-        IRBasicBlock entry = func.BasicBlocks[0];
-        if (entry.Name != "entry")
+        foreach (IRBasicBlock block in func.BasicBlocks)
         {
-            throw new IRInvalidException("Function entry block is not named 'entry'");
-        }
-
-        foreach (IRInstruction instr in entry.Instructions)
-        {
+            foreach (IRInstruction instr in block.Instructions)
+            {
+            }
         }
     }
 
