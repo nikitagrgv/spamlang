@@ -36,10 +36,12 @@ public struct IRInterpreterValue
 {
     const int NumInlineBytes = 8;
 
-    private IRType _type;
+    private readonly IRType _type;
     private unsafe fixed byte _inlineBytes[NumInlineBytes];
-    private byte[]? _heapBytes = null;
-    private int _size = 0;
+    private readonly byte[]? _heapBytes = null;
+    private readonly int _size = 0;
+
+    public IRType Type => _type;
 
     public IRInterpreterValue(IRType type, ReadOnlySpan<byte> bytes)
     {
@@ -55,6 +57,10 @@ public struct IRInterpreterValue
 
         Span<byte> inline = GetInlineBytes(bytes.Length);
         bytes.CopyTo(inline);
+    }
+
+    public uint AsUInt32()
+    {
     }
 
     [UnscopedRef]
