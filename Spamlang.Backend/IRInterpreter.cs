@@ -50,11 +50,11 @@ public class IRInterpreter
             throw new IRFunctionNotFoundException(name);
         }
 
-        if (func.LoweredSignature.ReturnType != IRType.Void || func.LoweredSignature.ParamTypes.Count != 0)
+        if (func.LoweredSignature.ParamTypes.Count != 0)
         {
             throw new IRSignatureDoesntMatchException(func);
         }
-        
+
         // TODO#
     }
 
