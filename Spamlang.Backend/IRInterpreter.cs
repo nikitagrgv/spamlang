@@ -34,8 +34,10 @@ public class IRInvalidException : IRInterpreterException
 
 public struct IRInterpreterValue
 {
+    const int NumInlineBytes = 8;
+
     private IRType _type;
-    private unsafe fixed byte _inlineBytes[8];
+    private unsafe fixed byte _inlineBytes[NumInlineBytes];
     private byte[]? _heapBytes = null;
     private int _size = 0;
 
@@ -58,7 +60,7 @@ public struct IRInterpreterValue
     [UnscopedRef]
     private unsafe Span<byte> GetInlineBytes(int size)
     {
-        Debug.Assert(size > 0 && size <= 8);
+        Debug.Assert(size > 0 && size <= NumInlineBytes);
         return MemoryMarshal.CreateSpan<byte>(ref _inlineBytes[0], size);
     }
 }
