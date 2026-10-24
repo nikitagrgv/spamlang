@@ -35,6 +35,9 @@ public readonly struct IRInterpreterValue
     public Int16 AsInt16() => unchecked((Int16)GetWord());
     public byte AsInt8() => unchecked((byte)GetWord());
 
+    public double AsDouble() => BitConverter.UInt64BitsToDouble(GetWord());
+    public float AsFloat() => BitConverter.UInt32BitsToSingle((uint)GetWord());
+
     [UnscopedRef]
     public ReadOnlySpan<byte> AsBytes() => _heap is null
         ? MemoryMarshal.AsBytes(new ReadOnlySpan<ulong>(in _inline)).Slice(0, _size)
