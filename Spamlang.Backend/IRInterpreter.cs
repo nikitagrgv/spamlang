@@ -40,7 +40,7 @@ public class IRInterpreter
     // 0x0000000000000000...0x8000000000000000 - Skipped. For catching nullptr dereferences
     // 0x8000000000000000...0xFFFFFFFFFFFFFFFF - _memory. For alloca-s
     // Memory is shared between all frames.
-    // Between each frame there is a gap of 256 bytes filled with 0xCD - for catching OOB accesses
+    // Between each frame there is a gap of 256 bytes filled with 0xCD - for catching OOB accesses.
 
     private const ulong MemoryStartAddress = 0x8000000000000000;
     private const int FrameGapSize = 256;
