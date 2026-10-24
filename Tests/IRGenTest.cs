@@ -35,9 +35,9 @@ public class IRGenTest
         IRInterpreter interpreter = MakeInterpreter(code);
 
         int curI32Pos = 0;
-        var CheckI32 = (int a) => { _testOutputHelper.WriteLine(a.ToString()); };
+        var checkI32 = (int a) => { _testOutputHelper.WriteLine(a.ToString()); };
 
-        interpreter.OverrideFunction("checkI32", CheckI32);
+        interpreter.OverrideFunction("checkI32", checkI32);
         interpreter.RunFunction("main");
     }
 
