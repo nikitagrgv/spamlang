@@ -87,9 +87,36 @@ public class IRInterpreter
         {
             foreach (IRInstruction instr in block.Instructions)
             {
+                // TODO: Handle jumps
+                switch (instr)
+                {
+                    case IRInstructionAlloca irInstructionAlloca:
+                        break;
+                    case IRInstructionBinary irInstructionBinary:
+                        break;
+                    case IRInstructionCall irInstructionCall:
+                        break;
+                    case IRInstructionCast irInstructionCast:
+                        break;
+                    case IRInstructionCompare irInstructionCompare:
+                        break;
+                    case IRInstructionLoad irInstructionLoad:
+                        break;
+                    case IRInstructionRet irInstructionRet:
+                        break;
+                    case IRInstructionStore irInstructionStore:
+                        break;
+                    case IRInstructionUnary irInstructionUnary:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(instr));
+                }
             }
         }
+        
+        
     }
+    
 
     private IRFunction? FindFunction(string name)
     {

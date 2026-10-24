@@ -8,7 +8,13 @@ public readonly struct IRInterpreterValue
 {
     private readonly ulong _inline;
     private readonly ulong[]? _heap = null;
-    private readonly int _size = 0;
+    private readonly int _size;
+
+    public IRInterpreterValue()
+    {
+        _inline = 0;
+        _size = 0;
+    }
 
     public IRInterpreterValue(ReadOnlySpan<byte> bytes)
     {
