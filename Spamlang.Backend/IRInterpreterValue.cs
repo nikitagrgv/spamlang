@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Spamlang.Backend;
 
-public struct IRInterpreterValue
+public readonly struct IRInterpreterValue
 {
     private readonly ulong _inline;
     private readonly ulong[]? _heap = null;
