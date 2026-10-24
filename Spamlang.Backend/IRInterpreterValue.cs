@@ -7,24 +7,19 @@ namespace Spamlang.Backend;
 
 public struct IRInterpreterValue
 {
-    const int NumInlineBytes = 8;
-
-    private readonly IRType _type;
-    private unsafe fixed byte _inlineBytes[NumInlineBytes];
-    private readonly byte[]? _heapBytes = null;
+    private ulong _inline;
+    private readonly ulong[]? _heap = null;
     private readonly int _size = 0;
 
-    public IRType Type => _type;
-
-    public IRInterpreterValue(IRType type, ReadOnlySpan<byte> bytes)
+    public IRInterpreterValue(ReadOnlySpan<byte> bytes)
     {
-        _type = type;
         _size = bytes.Length;
 
         if (bytes.Length > 8)
         {
-            _heapBytes = new byte[bytes.Length];
-            bytes.CopyTo(_heapBytes);
+            int numUlongs = (bytes.Length + 7) / 8;
+            _heap = new ulong[numUlongs];
+            bytes.CopyTo(GetHeapBytes(bytes.Length));
             return;
         }
 
@@ -35,13 +30,13 @@ public struct IRInterpreterValue
     public UInt64 AsUInt64()
     {
         Debug.Assert(_size == 8);
-        return BitConverter.ToUInt64(AsBytes());
+        return _inline;
     }
 
     public UInt32 AsUInt32()
     {
         Debug.Assert(_size == 4);
-        return BitConverter.ToUInt32(AsBytes());
+        return BitConverter.ToUInt32();
     }
 
     public UInt16 AsUInt16()
@@ -59,20 +54,25 @@ public struct IRInterpreterValue
     [UnscopedRef]
     public ReadOnlySpan<byte> AsBytes()
     {
-        if (_heapBytes != null)
+        if (_heap != null)
         {
-            Debug.Assert(_heapBytes.Length == _size);
-            return _heapBytes;
+            return GetHeapBytes(_size);
         }
 
-        Span<byte> inline = GetInlineBytes(_size);
-        return inline;
+        return GetInlineBytes(_size);
     }
 
     [UnscopedRef]
-    private unsafe Span<byte> GetInlineBytes(int size)
+    private Span<byte> GetHeapBytes(int size)
     {
-        Debug.Assert(size > 0 && size <= NumInlineBytes);
-        return MemoryMarshal.CreateSpan<byte>(ref _inlineBytes[0], size);
+        Debug.Assert(_heap != null);
+        return MemoryMarshal.AsBytes(_heap.AsSpan()).Slice(0, size);
+    }
+
+    [UnscopedRef]
+    private Span<byte> GetInlineBytes(int size)
+    {
+        Debug.Assert(size > 0 && size <= 8);
+        return MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _inline, 1)).Slice(0, size);
     }
 }
