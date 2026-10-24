@@ -36,7 +36,7 @@ public readonly struct IRInterpreterValue
     public byte AsInt8() => unchecked((byte)GetWord());
 
     public double AsDouble() => BitConverter.UInt64BitsToDouble(GetWord());
-    public float AsFloat() => BitConverter.UInt32BitsToSingle((uint)GetWord());
+    public float AsFloat() => BitConverter.UInt32BitsToSingle(AsUInt32());
 
     [UnscopedRef]
     public ReadOnlySpan<byte> AsBytes() => _heap is null
