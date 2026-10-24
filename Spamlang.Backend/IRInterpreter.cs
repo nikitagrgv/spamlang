@@ -37,7 +37,7 @@ public class IRInterpreter
     private IRModule _module;
 
     // Memory layout:
-    // 0x0000000000000000...0x8000000000000000 - Skipped. For catching nullptr dereferences
+    // 0x0000000000000000...0x8000000000000000 - Skipped. For catching nullptr dereferences and bad addresses.
     // 0x8000000000000000...0xFFFFFFFFFFFFFFFF - _memory. For alloca-s
     // Memory is shared between all frames.
     // Frames are separated by gaps of 256 bytes filled with 0xCD - for catching OOB accesses.
