@@ -24,7 +24,7 @@ public class IRSignatureDoesntMatchException : IRInterpreterException
 public class IRInterpreter
 {
     IRModule _module;
-    Dictionary<IRFunction, Delegate> _overrides = new();
+    Dictionary<ulong, Delegate> _funcOverrides = new();
 
     public IRInterpreter(IRModule module)
     {
