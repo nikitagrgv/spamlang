@@ -38,6 +38,8 @@ public class IRInterpreter
         {
             throw new IRFunctionNotFoundException(name);
         }
+
+        // TODO#
     }
 
     // TODO: Support calling functions with arguments and return values
@@ -59,7 +61,6 @@ public class IRInterpreter
 
     private IRValue RunFunction(IRFunction func)
     {
-        
     }
 
     private IRFunction? FindFunction(string name)
