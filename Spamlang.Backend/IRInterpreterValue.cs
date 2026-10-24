@@ -25,25 +25,15 @@ public readonly struct IRInterpreterValue
         bytes.CopyTo(MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _inline, 1)));
     }
 
-    public UInt64 AsUInt64()
-    {
-        return GetWord();
-    }
+    public UInt64 AsUInt64() => GetWord();
+    public UInt32 AsUInt32() => (UInt32)GetWord();
+    public UInt16 AsUInt16() => (UInt16)GetWord();
+    public byte AsUInt8() => (byte)GetWord();
 
-    public UInt32 AsUInt32()
-    {
-        return (UInt32)GetWord();
-    }
-
-    public UInt16 AsUInt16()
-    {
-        return (UInt16)GetWord();
-    }
-
-    public byte AsUInt8()
-    {
-        return (byte)GetWord();
-    }
+    public Int64 AsInt64() => unchecked((Int64)GetWord());
+    public Int32 AsInt32() => unchecked((Int32)GetWord());
+    public Int16 AsInt16() => unchecked((Int16)GetWord());
+    public byte AsInt8() => unchecked((byte)GetWord());
 
     [UnscopedRef]
     public ReadOnlySpan<byte> AsBytes() => _heap is null
