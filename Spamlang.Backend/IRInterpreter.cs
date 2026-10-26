@@ -124,7 +124,6 @@ public class IRInterpreter
                     break;
                 }
 
-                // TODO: Handle jumps
                 switch (instr)
                 {
                     case IRInstructionAlloca alloca:
