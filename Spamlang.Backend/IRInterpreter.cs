@@ -9,6 +9,13 @@ public class IRInterpreterException : Exception
     }
 }
 
+public class IRInvalidMemoryAddressException : Exception
+{
+    public IRInvalidMemoryAddressException(ulong addr) : base($"Invalid memory address: 0x{addr:x8}")
+    {
+    }
+}
+
 public class IRFunctionNotFoundException : IRInterpreterException
 {
     public IRFunctionNotFoundException(string name) : base($"Function {name} not found")
@@ -190,6 +197,14 @@ public class IRInterpreter
         _memory.AddRange(Enumerable.Repeat(UninitializedTag, size));
 
         return MemoryStartAddress + (ulong)offset;
+    }
+
+    private Span<byte> GetMemory(ulong addr, int size)
+    {
+        if (addr < MemoryStartAddress)
+        {
+            throw new IRInvalidMemoryAddressException();
+        }
     }
 
     private IRFunction? FindFunction(string name)
