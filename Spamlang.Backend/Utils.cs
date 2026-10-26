@@ -4,19 +4,19 @@ namespace Spamlang.Backend;
 
 public static class Utils
 {
-    public static int AlignUp(int offset, int alignment)
+    public static int AlignUp(int value, int alignment)
     {
-        Debug.Assert(offset >= 0);
+        Debug.Assert(value >= 0);
         Debug.Assert(alignment > 0);
-        int aligned = (offset + alignment - 1) & ~(alignment - 1);
+        int aligned = value % alignment != 0 ? value : value + alignment - (value % alignment);
         Debug.Assert(IsAligned(aligned, alignment));
         return aligned;
     }
 
-    public static bool IsAligned(int offset, int alignment)
+    public static bool IsAligned(int value, int alignment)
     {
-        Debug.Assert(offset >= 0);
+        Debug.Assert(value >= 0);
         Debug.Assert(alignment > 0);
-        return offset % alignment == 0;
+        return value % alignment == 0;
     }
 }
