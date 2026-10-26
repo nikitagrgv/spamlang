@@ -203,7 +203,7 @@ public class IRInterpreter
     {
         if (addr < MemoryStartAddress)
         {
-            throw new IRInvalidMemoryAddressException();
+            throw new IRInvalidMemoryAddressException(addr);
         }
     }
 
