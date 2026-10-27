@@ -290,13 +290,12 @@ public class IRInterpreter
         return MemoryStartAddress + (ulong)offset;
     }
 
-    // TODO: Dont allocate memory for every read
-    private byte[] ReadMemory(ulong addr, int size)
+    // NOTE: Don't modify the list while using the span!
+    private ReadOnlySpan<byte> ReadMemory(ulong addr, int size)
     {
         int index = ToMemoryIndex(addr, size);
-        byte[] data = new byte[size];
-        _memory.CopyTo(index, data, 0, size);
-        return data;
+        Span<byte> span = CollectionsMarshal.AsSpan(_memory).Slice(index, size);
+        return span;
     }
 
     private void WriteMemory(ulong addr, ReadOnlySpan<byte> data)
