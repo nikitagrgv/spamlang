@@ -24,8 +24,8 @@ public static class Utils
     public static ulong AlignUp(ulong value, int alignment)
     {
         Debug.Assert(alignment > 0);
-        ulong alignmentUlong = (ulong)alignment;
-        ulong aligned = value % alignmentUlong != 0 ? value : value + alignmentUlong - (value % alignmentUlong);
+        ulong align = (ulong)alignment;
+        ulong aligned = value % align != 0 ? value : value + align - (value % align);
         Debug.Assert(IsAligned(aligned, alignment));
         return aligned;
     }
