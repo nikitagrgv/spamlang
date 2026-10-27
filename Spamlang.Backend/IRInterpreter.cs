@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Spamlang.Backend;
 
@@ -292,16 +293,19 @@ public class IRInterpreter
     // TODO: Dont allocate memory for every read
     private byte[] ReadMemory(ulong addr, int size)
     {
-        (int begin, int end) = GetMemorySpan(addr, size);
-        
+        int index = ToMemoryIndex(addr, size);
+        byte[] data = new byte[size];
+        _memory.CopyTo(index, data, 0, size);
+        return data;
     }
 
     private void WriteMemory(ulong addr, ReadOnlySpan<byte> data)
     {
-        (int begin, int end) = GetMemorySpan(addr, size);
+        int index = ToMemoryIndex(addr, data.Length);
+        data.CopyTo(CollectionsMarshal.AsSpan(_memory).Slice(index, data.Length));
     }
 
-    private (int begin, int end) GetMemorySpan(ulong addr, int size)
+    private int ToMemoryIndex(ulong addr, int size)
     {
         Debug.Assert(size > 0);
 
@@ -330,7 +334,7 @@ public class IRInterpreter
             throw new IRInvalidMemoryAddressException(addr);
         }
 
-        return (begin, end);
+        return begin;
     }
 
     private IRFunction? FindFunction(string name)
