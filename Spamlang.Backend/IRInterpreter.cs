@@ -156,7 +156,7 @@ public class IRInterpreter
                     {
                         IRType type = alloca.AllocatedType;
                         ulong addr = Allocate(type.Size, type.Alignment);
-                        IRInterpreterValue value = new(addr, type.Size);
+                        IRInterpreterValue value = new(addr, alloca.Type.Size);
                         SetRegister(alloca.Id, value);
                         break;
                     }
