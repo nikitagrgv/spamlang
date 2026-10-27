@@ -17,6 +17,13 @@ public class IRInvalidMemoryAddressException : Exception
     }
 }
 
+public class IRUnalignedAccessException : Exception
+{
+    public IRUnalignedAccessException(ulong addr, IRType type) : base($"Type \"{type.Name}\" with alignment {type.Alignment} accessed by unaligned address 0x{addr:x8}")
+    {
+    }
+}
+
 public class IRInvalidRegisterException : Exception
 {
     public IRInvalidRegisterException(int id) : base($"Invalid register id: {id}")
@@ -158,7 +165,10 @@ public class IRInterpreter
                         IRInterpreterValue addrValue = GetRegister(load.Address.Id);
                         ulong addr = addrValue.AsUInt64();
                         if (!Utils.IsAligned(addr, load.Type.Alignment))
-                        
+                        {
+                            throw new IRInvalidMemoryAddressException(addr);
+                        }
+
                         ReadOnlySpan<byte> data = ReadMemory(addr, load.Type.Size);
                         switch (load.Type.Kind)
                         {
