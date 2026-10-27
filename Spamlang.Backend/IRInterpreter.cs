@@ -157,7 +157,7 @@ public class IRInterpreter
                         IRType type = alloca.AllocatedType;
                         ulong addr = Allocate(type.Size, type.Alignment);
                         IRInterpreterValue value = new(addr, alloca.Type.Size);
-                        SetRegister(alloca.Id, value);
+                        SetRegister(alloca, value);
                         break;
                     }
                     case IRInstructionLoad load:
@@ -171,7 +171,7 @@ public class IRInterpreter
 
                         ReadOnlySpan<byte> data = ReadMemory(addr, load.Type.Size);
                         IRInterpreterValue value = new(data);
-                        SetRegister(load.Id, value);
+                        SetRegister(load, value);
                         break;
                     }
                     case IRInstructionStore store:
