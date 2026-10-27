@@ -166,7 +166,7 @@ public class IRInterpreter
                         ulong addr = addrValue.AsUInt64();
                         if (!Utils.IsAligned(addr, load.Type.Alignment))
                         {
-                            throw new IRInvalidMemoryAddressException(addr);
+                            throw new IRUnalignedAccessException(addr, load.Type);
                         }
 
                         ReadOnlySpan<byte> data = ReadMemory(addr, load.Type.Size);
