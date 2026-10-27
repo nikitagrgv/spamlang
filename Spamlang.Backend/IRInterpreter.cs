@@ -145,28 +145,50 @@ public class IRInterpreter
                 switch (instr)
                 {
                     case IRInstructionAlloca alloca:
+                    {
                         IRType type = alloca.AllocatedType;
                         ulong addr = Allocate(type.Size, type.Alignment);
+                        IRInterpreterValue value = 
+
                         break;
+                    }
                     case IRInstructionLoad load:
+                    {
                         break;
+                    }
                     case IRInstructionStore store:
+                    {
                         break;
+                    }
                     case IRInstructionUnary unary:
+                    {
                         break;
+                    }
                     case IRInstructionBinary binary:
+                    {
                         break;
+                    }
                     case IRInstructionCall call:
+                    {
                         break;
+                    }
                     case IRInstructionCast cast:
+                    {
                         break;
+                    }
                     case IRInstructionCompare compare:
+                    {
                         break;
+                    }
                     case IRInstructionRet ret:
+                    {
                         exit = true;
                         break;
+                    }
                     default:
+                    {
                         throw new ArgumentOutOfRangeException(nameof(instr));
+                    }
                 }
             }
         }
