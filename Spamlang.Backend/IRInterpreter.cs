@@ -239,10 +239,34 @@ public class IRInterpreter
 
     private Span<byte> GetMemory(ulong addr, int size)
     {
+        Debug.Assert(size > 0);
+
         if (addr < MemoryStartAddress)
         {
             throw new IRInvalidMemoryAddressException(addr);
         }
+
+        int begin;
+        int end; // exclusive
+        try
+        {
+            checked
+            {
+                begin = (int)(addr - MemoryStartAddress);
+                end = begin + size;
+            }
+        }
+        catch (OverflowException)
+        {
+            throw new IRInvalidMemoryAddressException(addr);
+        }
+
+        if (begin < 0 || end > _memory.Count || begin >= end)
+        {
+            throw new IRInvalidMemoryAddressException(addr);
+        }
+
+        return _memory.
     }
 
     private IRFunction? FindFunction(string name)
