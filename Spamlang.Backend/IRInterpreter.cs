@@ -176,6 +176,15 @@ public class IRInterpreter
                     }
                     case IRInstructionStore store:
                     {
+                        IRInterpreterValue addrValue = GetRegister(store.Address.Id);
+                        ulong addr = addrValue.AsUInt64();
+                        if (!Utils.IsAligned(addr, store.Type.Alignment))
+                        {
+                            throw new IRUnalignedAccessException(addr, store.Type);
+                        }
+
+                        IRInterpreterValue value = GetRegister(store.Value.Id);
+                        WriteMemory(addr, value.AsBytes());
                         break;
                     }
                     case IRInstructionUnary unary:
