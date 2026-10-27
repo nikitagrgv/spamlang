@@ -183,12 +183,8 @@ public class IRInterpreter
 
     private void PushFrame()
     {
-        int curSize = _memory.Count;
-        _frameMemoryOffsets.Add(curSize);
-
-        curSize += FrameGapSize;
+        _frameMemoryOffsets.Add(_memory.Count);
         _memory.AddRange(Enumerable.Repeat(GapTag, FrameGapSize));
-
         _frameRegisters.Add(new List<IRInterpreterValue>());
     }
 
