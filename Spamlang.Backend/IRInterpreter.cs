@@ -131,7 +131,7 @@ public class IRInterpreter
         {
             IRParam param = func.Params[i];
             IRInterpreterValue value = args[i];
-            SetRegister(param.Id, value);
+            SetRegister(param, value);
         }
 
         bool exit = false;
