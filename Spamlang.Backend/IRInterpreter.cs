@@ -117,12 +117,13 @@ public class IRInterpreter
             throw new IRInvalidException($"Expected {func.Params.Count} arguments, got {args.Count}");
         }
 
-        Dictionary<int, IRInterpreterValue> idToValue = new();
+        PushFrame();
+
         for (int i = 0; i < func.Params.Count; i++)
         {
             IRParam param = func.Params[i];
             IRInterpreterValue value = args[i];
-            idToValue.Add(param.Id, value);
+            SetRegister(param.Id, value);
         }
 
         bool exit = false;
@@ -169,6 +170,8 @@ public class IRInterpreter
                 }
             }
         }
+
+        PopFrame();
 
         return returnValue;
     }
