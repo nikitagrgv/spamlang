@@ -37,6 +37,7 @@ public readonly struct IRInterpreterValue
     {
         Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
         Debug.Assert(size > 0 && size <= 8);
+        Debug.Assert(size == 8 || value < 1ul << (size * 8));
         _size = size;
         _inline = value;
     }
