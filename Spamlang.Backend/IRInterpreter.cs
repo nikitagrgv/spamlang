@@ -175,7 +175,7 @@ public class IRInterpreter
 
         if (func.LoweredSignature.ReturnType != IRType.Void && returnValue == null)
         {
-            throw new IRInvalidException("Function has a return value, but it was not returned");
+            throw new IRInvalidException($"Function {func.Name} must return value. Got null");
         }
 
         return returnValue;
