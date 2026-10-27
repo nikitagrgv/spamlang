@@ -250,7 +250,7 @@ public class IRInterpreter
         _memory.RemoveRange(prevSize, _memory.Count - prevSize);
     }
 
-    private void SetRegister(int id, IRInterpreterValue value)
+    private void SetRegister(IRValue irValue, IRInterpreterValue value)
     {
         List<IRInterpreterValue> registers = _frameRegisters[^1];
         if (id >= registers.Count)
