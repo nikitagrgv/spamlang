@@ -252,6 +252,10 @@ public class IRInterpreter
 
     private void SetRegister(IRValue irValue, IRInterpreterValue value)
     {
+        Debug.Assert(irValue.Type.Size == value.Size);
+
+        int id = irValue.Id;
+
         List<IRInterpreterValue> registers = _frameRegisters[^1];
         if (id >= registers.Count)
         {
