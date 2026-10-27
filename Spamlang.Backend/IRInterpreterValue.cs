@@ -10,6 +10,8 @@ public readonly struct IRInterpreterValue
     private readonly ulong[]? _heap = null;
     private readonly int _size;
 
+    public static readonly IRInterpreterValue Empty = new();
+
     public IRInterpreterValue()
     {
         _inline = 0;

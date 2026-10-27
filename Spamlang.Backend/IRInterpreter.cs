@@ -16,6 +16,13 @@ public class IRInvalidMemoryAddressException : Exception
     }
 }
 
+public class IRInvalidRegisterException : Exception
+{
+    public IRInvalidRegisterException(int id) : base($"Invalid register id: {id}")
+    {
+    }
+}
+
 public class IRFunctionNotFoundException : IRInterpreterException
 {
     public IRFunctionNotFoundException(string name) : base($"Function {name} not found")
@@ -56,7 +63,10 @@ public class IRInterpreter
     private const byte UninitializedTag = 0xCD;
 
     private List<byte> _memory = new();
-    private List<int> _frames = new();
+
+    // TODO: Flat list + indices list
+    private List<List<IRInterpreterValue>> _frameRegisters = new();
+    private List<int> _frameMemoryOffsets = new();
 
     private Dictionary<ulong, Delegate> _funcOverrides = new();
 
@@ -166,20 +176,48 @@ public class IRInterpreter
     private void PushFrame()
     {
         int curSize = _memory.Count;
-        _frames.Add(curSize);
+        _frameMemoryOffsets.Add(curSize);
 
         curSize += FrameGapSize;
         _memory.AddRange(Enumerable.Repeat(GapTag, FrameGapSize));
+
+        _frameRegisters.Add(new List<IRInterpreterValue>());
     }
 
     private void PopFrame()
     {
-        Debug.Assert(_frames.Count > 0);
-        Debug.Assert(_frames[^1] > _memory.Count);
+        Debug.Assert(_frameRegisters.Count > 0);
+        Debug.Assert(_frameMemoryOffsets.Count > 0);
+        Debug.Assert(_frameMemoryOffsets[^1] > _memory.Count);
 
-        int prevSize = _frames[^1];
-        _frames.RemoveAt(_frames.Count - 1);
+        _frameRegisters.RemoveAt(_frameRegisters.Count - 1);
+
+        int prevSize = _frameMemoryOffsets[^1];
+        _frameMemoryOffsets.RemoveAt(_frameMemoryOffsets.Count - 1);
         _memory.RemoveRange(prevSize, _memory.Count - prevSize);
+    }
+
+    private void SetRegister(int id, IRInterpreterValue value)
+    {
+        List<IRInterpreterValue> registers = _frameRegisters[^1];
+        if (id >= registers.Count)
+        {
+            int count = id - registers.Count + 1;
+            registers.AddRange(Enumerable.Repeat(IRInterpreterValue.Empty, count));
+        }
+
+        registers[id] = value;
+    }
+
+    private IRInterpreterValue GetRegister(int id)
+    {
+        List<IRInterpreterValue> registers = _frameRegisters[^1];
+        if (id >= registers.Count)
+        {
+            throw new IRInvalidRegisterException(id);
+        }
+
+        return registers[id];
     }
 
     private ulong Allocate(int size, int align)
