@@ -232,6 +232,11 @@ public class IRInterpreter
             registers.AddRange(Enumerable.Repeat(IRInterpreterValue.Empty, count));
         }
 
+        if (!registers[id].IsEmpty)
+        {
+            throw new IRInvalidException($"Register {id} is written twice");
+        }
+
         registers[id] = value;
     }
 
@@ -243,7 +248,13 @@ public class IRInterpreter
             throw new IRInvalidRegisterException(id);
         }
 
-        return registers[id];
+        IRInterpreterValue value = registers[id];
+        if (value.IsEmpty)
+        {
+            throw new IRInvalidException($"Register {id} is empty");
+        }
+
+        return value;
     }
 
     private ulong Allocate(int size, int align)

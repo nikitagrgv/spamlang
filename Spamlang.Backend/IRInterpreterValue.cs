@@ -12,6 +12,8 @@ public readonly struct IRInterpreterValue
 
     public static readonly IRInterpreterValue Empty = new();
 
+    public bool IsEmpty => _size == 0;
+
     public IRInterpreterValue()
     {
         _inline = 0;
