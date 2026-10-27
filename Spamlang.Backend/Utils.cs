@@ -19,4 +19,20 @@ public static class Utils
         Debug.Assert(alignment > 0);
         return value % alignment == 0;
     }
+
+
+    public static ulong AlignUp(ulong value, int alignment)
+    {
+        Debug.Assert(alignment > 0);
+        ulong alignmentUlong = (ulong)alignment;
+        ulong aligned = value % alignmentUlong != 0 ? value : value + alignmentUlong - (value % alignmentUlong);
+        Debug.Assert(IsAligned(aligned, alignment));
+        return aligned;
+    }
+
+    public static bool IsAligned(ulong value, int alignment)
+    {
+        Debug.Assert(alignment > 0);
+        return value % (ulong)alignment == 0;
+    }
 }

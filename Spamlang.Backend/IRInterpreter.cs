@@ -155,10 +155,14 @@ public class IRInterpreter
                     }
                     case IRInstructionLoad load:
                     {
+                        IRInterpreterValue addrValue = GetRegister(load.Address.Id);
+                        ulong addr = addrValue.AsUInt64();
+                        if (!Utils.IsAligned(addr, load.Type.Alignment))
+                        
+                        ReadOnlySpan<byte> data = ReadMemory(addr, load.Type.Size);
                         switch (load.Type.Kind)
                         {
                             case IRTypeKind.Int:
-                                ReadMemory()
                                 break;
                             case IRTypeKind.Ptr:
                                 break;
@@ -169,6 +173,7 @@ public class IRInterpreter
                             default:
                                 throw new UnreachableException();
                         }
+
 
                         break;
                     }
