@@ -13,7 +13,7 @@ public sealed class IRType
 {
     public string Name { get; }
     public int Size { get; }
-    public int Alignment { get; } // TODO: Shouldn't be here? Move to target?
+    public int Alignment { get; } // TODO: Shouldn't be here? Move to target? TODO# ADD ALIGN TO LOAD/STORE
     public IRTypeKind Kind { get; }
 
     public static readonly IRType Void = new("void", 0, 0, IRTypeKind.Void);
