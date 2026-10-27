@@ -266,7 +266,8 @@ public class IRInterpreter
             throw new IRInvalidMemoryAddressException(addr);
         }
 
-        return _memory.
+        throw new NotImplementedException();
+        // return _memory.
     }
 
     private IRFunction? FindFunction(string name)
