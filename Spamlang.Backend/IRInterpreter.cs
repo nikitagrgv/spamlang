@@ -154,6 +154,21 @@ public class IRInterpreter
                     }
                     case IRInstructionLoad load:
                     {
+                        switch (load.Type.Kind)
+                        {
+                            case IRTypeKind.Int:
+                                ReadMemory()
+                                break;
+                            case IRTypeKind.Ptr:
+                                break;
+                            case IRTypeKind.Bool:
+                                break;
+                            case IRTypeKind.Float:
+                                break;
+                            default:
+                                throw new UnreachableException();
+                        }
+
                         break;
                     }
                     case IRInstructionStore store:
@@ -274,7 +289,19 @@ public class IRInterpreter
         return MemoryStartAddress + (ulong)offset;
     }
 
-    private Span<byte> GetMemory(ulong addr, int size)
+    // TODO: Dont allocate memory for every read
+    private byte[] ReadMemory(ulong addr, int size)
+    {
+        (int begin, int end) = GetMemorySpan(addr, size);
+        
+    }
+
+    private void WriteMemory(ulong addr, ReadOnlySpan<byte> data)
+    {
+        (int begin, int end) = GetMemorySpan(addr, size);
+    }
+
+    private (int begin, int end) GetMemorySpan(ulong addr, int size)
     {
         Debug.Assert(size > 0);
 
@@ -303,9 +330,7 @@ public class IRInterpreter
             throw new IRInvalidMemoryAddressException(addr);
         }
 
-        // TODO#
-        throw new NotImplementedException();
-        // return _memory.
+        return (begin, end);
     }
 
     private IRFunction? FindFunction(string name)
