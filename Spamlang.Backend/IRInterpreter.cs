@@ -114,7 +114,7 @@ public class IRInterpreter
 
         if (func.Params.Count != args.Count)
         {
-            throw new IRInvalidException($"Expected {func.Params.Count} arguments, got {args.Count}");
+            throw new IRInvalidException($"Invalid call of function \"{func.Name}\". Expected {func.Params.Count} arguments, got {args.Count}");
         }
 
         PushFrame();
@@ -172,6 +172,11 @@ public class IRInterpreter
         }
 
         PopFrame();
+
+        if (func.LoweredSignature.ReturnType != IRType.Void && returnValue == null)
+        {
+            throw new IRInvalidException("Function has a return value, but it was not returned");
+        }
 
         return returnValue;
     }
