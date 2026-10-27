@@ -170,21 +170,8 @@ public class IRInterpreter
                         }
 
                         ReadOnlySpan<byte> data = ReadMemory(addr, load.Type.Size);
-                        switch (load.Type.Kind)
-                        {
-                            case IRTypeKind.Int:
-                                break;
-                            case IRTypeKind.Ptr:
-                                break;
-                            case IRTypeKind.Bool:
-                                break;
-                            case IRTypeKind.Float:
-                                break;
-                            default:
-                                throw new UnreachableException();
-                        }
-
-
+                        IRInterpreterValue value = new(data);
+                        SetRegister(load.Id, value);
                         break;
                     }
                     case IRInstructionStore store:
