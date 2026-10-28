@@ -245,8 +245,8 @@ public class IRInterpreter
         IRInterpreterValue addrValue;
         switch (load.Address)
         {
-            case IRInstruction instr:
-            case IRParam param:
+            case IRInstruction:
+            case IRParam:
                 addrValue = GetRegister(load.Address);
                 break;
             default:
@@ -266,7 +266,17 @@ public class IRInterpreter
 
     private void ExecuteStore(IRInstructionStore store)
     {
-        IRInterpreterValue addrValue = GetRegister(store.Address);
+        IRInterpreterValue addrValue;
+        switch (store.Address)
+        {
+            case IRInstruction:
+            case IRParam:
+                addrValue = GetRegister(store.Address);
+                break;
+            default:
+                throw new IRInvalidOperandTypeException(store.Address, store);
+        }
+
         ulong addr = addrValue.AsUInt64();
         if (!Utils.IsAligned(addr, store.Type.Alignment))
         {
