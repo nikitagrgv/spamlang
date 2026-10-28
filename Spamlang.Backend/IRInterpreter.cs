@@ -162,7 +162,7 @@ public class IRInterpreter
                     }
                     case IRInstructionLoad load:
                     {
-                        IRInterpreterValue addrValue = GetRegister(load.Address.Id);
+                        IRInterpreterValue addrValue = GetRegister(load.Address);
                         ulong addr = addrValue.AsUInt64();
                         if (!Utils.IsAligned(addr, load.Type.Alignment))
                         {
@@ -176,14 +176,14 @@ public class IRInterpreter
                     }
                     case IRInstructionStore store:
                     {
-                        IRInterpreterValue addrValue = GetRegister(store.Address.Id);
+                        IRInterpreterValue addrValue = GetRegister(store.Address);
                         ulong addr = addrValue.AsUInt64();
                         if (!Utils.IsAligned(addr, store.Type.Alignment))
                         {
                             throw new IRUnalignedAccessException(addr, store.Type);
                         }
 
-                        IRInterpreterValue value = GetRegister(store.Value.Id);
+                        IRInterpreterValue value = GetRegister(store.Value);
                         WriteMemory(addr, value.AsBytes());
                         break;
                     }
@@ -209,6 +209,11 @@ public class IRInterpreter
                     }
                     case IRInstructionRet ret:
                     {
+                        if (ret.Value != null)
+                        {
+                            returnValue = GetRegister(ret.Value);
+                        }
+
                         exit = true;
                         break;
                     }
@@ -271,8 +276,10 @@ public class IRInterpreter
         registers[id] = value;
     }
 
-    private IRInterpreterValue GetRegister(int id)
+    private IRInterpreterValue GetRegister(IRValue irValue)
     {
+        int id = irValue.Id;
+
         List<IRInterpreterValue> registers = _frameRegisters[^1];
         if (id >= registers.Count)
         {
@@ -284,6 +291,8 @@ public class IRInterpreter
         {
             throw new IRInvalidException($"Register {id} is empty");
         }
+
+        Debug.Assert(irValue.Type.Size == value.Size);
 
         return value;
     }
