@@ -31,6 +31,13 @@ public class IRInvalidRegisterException : Exception
     }
 }
 
+public class IRInvalidOperandTypeException : Exception
+{
+    public IRInvalidOperandTypeException(IRValue operand, IRInstruction instr) : base($"Unexpected operand type \"{operand.GetType().Name}\" in instruction %{instr.Id}")
+    {
+    }
+}
+
 public class IRFunctionNotFoundException : IRInterpreterException
 {
     public IRFunctionNotFoundException(string name) : base($"Function {name} not found")
@@ -54,7 +61,7 @@ public class IRInvalidException : IRInterpreterException
 
 public class IRUnexpectedTypeKindException : IRInterpreterException
 {
-    public IRUnexpectedTypeKindException(IRInstruction instr, IRTypeKind kind) : base($"Unexpected type kind \"{kind}\" in instruction {instr.Id}")
+    public IRUnexpectedTypeKindException(IRInstruction instr, IRTypeKind kind) : base($"Unexpected type kind \"{kind}\" in instruction %w{instr.Id}")
     {
     }
 }
@@ -235,7 +242,25 @@ public class IRInterpreter
 
     private void ExecuteLoad(IRInstructionLoad load)
     {
-        IRInterpreterValue addrValue = GetRegister(load.Address);
+        IRInterpreterValue addrValue;
+        switch (load.Address)
+        {
+            case IRConstantFloat constFloat:
+                break;
+            case IRConstantInt constInt:
+                break;
+            case IRFunction func:
+                break;
+            case IRInstruction instr:
+            case IRParam param:
+                addrValue = GetRegister(load.Address);
+                break;
+            default:
+                new IRInvalidRegisterException()
+                throw new ArgumentOutOfRangeException();
+        }
+
+
         ulong addr = addrValue.AsUInt64();
         if (!Utils.IsAligned(addr, load.Type.Alignment))
         {
