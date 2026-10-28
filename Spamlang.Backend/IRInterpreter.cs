@@ -290,7 +290,22 @@ public class IRInterpreter
 
     private void ExecuteUnary(IRInstructionUnary unary)
     {
-        IRInterpreterValue operand = GetRegister(unary.Value);
+        switch (unary.Value)
+        {
+            case IRConstantFloat irConstantFloat:
+                break;
+            case IRConstantInt irConstantInt:
+                break;
+            case IRFunction irFunction:
+                break;
+            case IRInstruction irInstruction:
+                break;
+            case IRParam irParam:
+                break;
+            default:
+                throw new IRInvalidOperandTypeException(unary.Value, unary);
+        }
+
         switch (unary.Type.Kind)
         {
             case IRTypeKind.Int:
