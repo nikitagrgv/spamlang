@@ -174,21 +174,7 @@ public class IRInterpreter
                     }
                     case IRInstructionUnary unary:
                     {
-                        IRInterpreterValue operand = GetRegister(unary.Value);
-                        switch (unary.Type.Kind)
-                        {
-                            case IRTypeKind.Int:
-                                break;
-                            case IRTypeKind.Ptr:
-                                break;
-                            case IRTypeKind.Bool:
-                                break;
-                            case IRTypeKind.Float:
-                                break;
-                            default:
-                                throw new IRUnexpectedTypeKindException(unary, unary.Type.Kind);
-                        }
-
+                        ExecuteUnary(unary);
                         break;
                     }
                     case IRInstructionBinary binary:
@@ -268,6 +254,24 @@ public class IRInterpreter
 
         IRInterpreterValue value = GetRegister(store.Value);
         WriteMemory(addr, value.AsBytes());
+    }
+
+    private void ExecuteUnary(IRInstructionUnary unary)
+    {
+        IRInterpreterValue operand = GetRegister(unary.Value);
+        switch (unary.Type.Kind)
+        {
+            case IRTypeKind.Int:
+                break;
+            case IRTypeKind.Ptr:
+                break;
+            case IRTypeKind.Bool:
+                break;
+            case IRTypeKind.Float:
+                break;
+            default:
+                throw new IRUnexpectedTypeKindException(unary, unary.Type.Kind);
+        }
     }
 
     private void PushFrame()
