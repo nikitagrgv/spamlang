@@ -199,8 +199,7 @@ public class IRInterpreter
                     }
                     case IRInstructionRet ret:
                     {
-                        returnValue = ExecuteRet(ret);
-                        exit = true;
+                        ExecuteRet(ret, out returnValue, out exit);
                         break;
                     }
                     default:
@@ -290,14 +289,17 @@ public class IRInterpreter
     {
     }
 
-    private IRInterpreterValue? ExecuteRet(IRInstructionRet ret)
+    private void ExecuteRet(IRInstructionRet ret, out IRInterpreterValue? returnValue, out bool exit)
     {
-        if (ret.Value == null)
+        exit = true;
+        if (ret.Value != null)
         {
-            return null;
+            returnValue = GetRegister(ret.Value);
         }
-
-        return GetRegister(ret.Value);
+        else
+        {
+            returnValue = null;
+        }
     }
 
     private void PushFrame()
