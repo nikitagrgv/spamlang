@@ -157,56 +157,7 @@ public class IRInterpreter
                     break;
                 }
 
-                switch (instr)
-                {
-                    case IRInstructionAlloca alloca:
-                        ExecuteAlloca(alloca);
-                        break;
-                    case IRInstructionLoad load:
-                    {
-                        ExecuteLoad(load);
-                        break;
-                    }
-                    case IRInstructionStore store:
-                    {
-                        ExecuteStore(store);
-                        break;
-                    }
-                    case IRInstructionUnary unary:
-                    {
-                        ExecuteUnary(unary);
-                        break;
-                    }
-                    case IRInstructionBinary binary:
-                    {
-                        ExecuteBinary(binary);
-                        break;
-                    }
-                    case IRInstructionCall call:
-                    {
-                        ExecuteCall(call);
-                        break;
-                    }
-                    case IRInstructionCast cast:
-                    {
-                        ExecuteCast(cast);
-                        break;
-                    }
-                    case IRInstructionCompare compare:
-                    {
-                        ExecuteCompare(compare);
-                        break;
-                    }
-                    case IRInstructionRet ret:
-                    {
-                        ExecuteRet(ret, out returnValue, out exit);
-                        break;
-                    }
-                    default:
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(instr));
-                    }
-                }
+                ExecuteInstruction(instr, ref exit, ref returnValue);
             }
         }
 
@@ -218,6 +169,60 @@ public class IRInterpreter
         }
 
         return returnValue;
+    }
+
+    private void ExecuteInstruction(IRInstruction instr, ref bool exit, ref IRInterpreterValue? returnValue)
+    {
+        switch (instr)
+        {
+            case IRInstructionAlloca alloca:
+                ExecuteAlloca(alloca);
+                break;
+            case IRInstructionLoad load:
+            {
+                ExecuteLoad(load);
+                break;
+            }
+            case IRInstructionStore store:
+            {
+                ExecuteStore(store);
+                break;
+            }
+            case IRInstructionUnary unary:
+            {
+                ExecuteUnary(unary);
+                break;
+            }
+            case IRInstructionBinary binary:
+            {
+                ExecuteBinary(binary);
+                break;
+            }
+            case IRInstructionCall call:
+            {
+                ExecuteCall(call);
+                break;
+            }
+            case IRInstructionCast cast:
+            {
+                ExecuteCast(cast);
+                break;
+            }
+            case IRInstructionCompare compare:
+            {
+                ExecuteCompare(compare);
+                break;
+            }
+            case IRInstructionRet ret:
+            {
+                ExecuteRet(ret, out returnValue, out exit);
+                break;
+            }
+            default:
+            {
+                throw new ArgumentOutOfRangeException(nameof(instr));
+            }
+        }
     }
 
     private void ExecuteAlloca(IRInstructionAlloca alloca)
