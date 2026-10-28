@@ -160,38 +160,16 @@ public class IRInterpreter
                 switch (instr)
                 {
                     case IRInstructionAlloca alloca:
-                    {
-                        IRType type = alloca.AllocatedType;
-                        ulong addr = Allocate(type.Size, type.Alignment);
-                        IRInterpreterValue value = new(addr, alloca.Type.Size);
-                        SetRegister(alloca, value);
+                        ExecuteAlloca(alloca);
                         break;
-                    }
                     case IRInstructionLoad load:
                     {
-                        IRInterpreterValue addrValue = GetRegister(load.Address);
-                        ulong addr = addrValue.AsUInt64();
-                        if (!Utils.IsAligned(addr, load.Type.Alignment))
-                        {
-                            throw new IRUnalignedAccessException(addr, load.Type);
-                        }
-
-                        ReadOnlySpan<byte> data = ReadMemory(addr, load.Type.Size);
-                        IRInterpreterValue value = new(data);
-                        SetRegister(load, value);
+                        ExecuteLoad(load);
                         break;
                     }
                     case IRInstructionStore store:
                     {
-                        IRInterpreterValue addrValue = GetRegister(store.Address);
-                        ulong addr = addrValue.AsUInt64();
-                        if (!Utils.IsAligned(addr, store.Type.Alignment))
-                        {
-                            throw new IRUnalignedAccessException(addr, store.Type);
-                        }
-
-                        IRInterpreterValue value = GetRegister(store.Value);
-                        WriteMemory(addr, value.AsBytes());
+                        ExecuteStore(store);
                         break;
                     }
                     case IRInstructionUnary unary:
@@ -255,6 +233,41 @@ public class IRInterpreter
         }
 
         return returnValue;
+    }
+
+    private void ExecuteAlloca(IRInstructionAlloca alloca)
+    {
+        IRType type = alloca.AllocatedType;
+        ulong addr = Allocate(type.Size, type.Alignment);
+        IRInterpreterValue value = new(addr, alloca.Type.Size);
+        SetRegister(alloca, value);
+    }
+
+    private void ExecuteLoad(IRInstructionLoad load)
+    {
+        IRInterpreterValue addrValue = GetRegister(load.Address);
+        ulong addr = addrValue.AsUInt64();
+        if (!Utils.IsAligned(addr, load.Type.Alignment))
+        {
+            throw new IRUnalignedAccessException(addr, load.Type);
+        }
+
+        ReadOnlySpan<byte> data = ReadMemory(addr, load.Type.Size);
+        IRInterpreterValue value = new(data);
+        SetRegister(load, value);
+    }
+
+    private void ExecuteStore(IRInstructionStore store)
+    {
+        IRInterpreterValue addrValue = GetRegister(store.Address);
+        ulong addr = addrValue.AsUInt64();
+        if (!Utils.IsAligned(addr, store.Type.Alignment))
+        {
+            throw new IRUnalignedAccessException(addr, store.Type);
+        }
+
+        IRInterpreterValue value = GetRegister(store.Value);
+        WriteMemory(addr, value.AsBytes());
     }
 
     private void PushFrame()
