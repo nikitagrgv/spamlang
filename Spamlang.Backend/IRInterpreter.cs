@@ -285,7 +285,7 @@ public class IRInterpreter
 
         IRInterpreterValue value = GetRegister(store.Value);
         WriteMemory(addr, value.AsBytes());
-        Debug.Assert(store.Id == -1, "Store instruction has no value");
+        Debug.Assert(store.Id == -1, "Store instruction must not have a value");
     }
 
     private void ExecuteUnary(IRInstructionUnary unary)
