@@ -189,6 +189,7 @@ public class IRInterpreter
                     }
                     case IRInstructionUnary unary:
                     {
+                        IRInterpreterValue operand = GetRegister(unary.Value);
                         break;
                     }
                     case IRInstructionBinary binary:
