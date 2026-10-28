@@ -292,15 +292,15 @@ public class IRInterpreter
     {
         switch (unary.Value)
         {
-            case IRConstantFloat irConstantFloat:
+            case IRConstantFloat constFloat:
                 break;
-            case IRConstantInt irConstantInt:
+            case IRConstantInt constInt:
                 break;
-            case IRFunction irFunction:
+            case IRFunction func:
                 break;
-            case IRInstruction irInstruction:
+            case IRInstruction instr:
                 break;
-            case IRParam irParam:
+            case IRParam param:
                 break;
             default:
                 throw new IRInvalidOperandTypeException(unary.Value, unary);
