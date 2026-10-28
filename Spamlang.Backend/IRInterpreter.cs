@@ -179,18 +179,22 @@ public class IRInterpreter
                     }
                     case IRInstructionBinary binary:
                     {
+                        ExecuteBinary(binary);
                         break;
                     }
                     case IRInstructionCall call:
                     {
+                        ExecuteCall(call);
                         break;
                     }
                     case IRInstructionCast cast:
                     {
+                        ExecuteCast(cast);
                         break;
                     }
                     case IRInstructionCompare compare:
                     {
+                        ExecuteCompare(compare);
                         break;
                     }
                     case IRInstructionRet ret:
@@ -268,6 +272,22 @@ public class IRInterpreter
             default:
                 throw new IRUnexpectedTypeKindException(unary, unary.Type.Kind);
         }
+    }
+
+    private void ExecuteBinary(IRInstructionBinary binary)
+    {
+    }
+
+    private void ExecuteCall(IRInstructionCall call)
+    {
+    }
+
+    private void ExecuteCast(IRInstructionCast cast)
+    {
+    }
+
+    private void ExecuteCompare(IRInstructionCompare compare)
+    {
     }
 
     private IRInterpreterValue? ExecuteRet(IRInstructionRet ret)
