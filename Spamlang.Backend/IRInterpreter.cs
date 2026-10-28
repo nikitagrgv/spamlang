@@ -256,8 +256,7 @@ public class IRInterpreter
                 addrValue = GetRegister(load.Address);
                 break;
             default:
-                new IRInvalidRegisterException()
-                throw new ArgumentOutOfRangeException();
+                throw new IRInvalidOperandTypeException(load.Address, load);
         }
 
 
