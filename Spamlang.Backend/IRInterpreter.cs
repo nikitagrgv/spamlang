@@ -145,19 +145,19 @@ public class IRInterpreter
         IRInterpreterValue? returnValue = null;
         foreach (IRBasicBlock block in func.BasicBlocks)
         {
-            if (exit)
-            {
-                break;
-            }
-
             foreach (IRInstruction instr in block.Instructions)
             {
+                ExecuteInstruction(instr, ref exit, ref returnValue);
+
                 if (exit)
                 {
                     break;
                 }
+            }
 
-                ExecuteInstruction(instr, ref exit, ref returnValue);
+            if (exit)
+            {
+                break;
             }
         }
 
