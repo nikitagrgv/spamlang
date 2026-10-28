@@ -245,12 +245,6 @@ public class IRInterpreter
         IRInterpreterValue addrValue;
         switch (load.Address)
         {
-            case IRConstantFloat constFloat:
-                break;
-            case IRConstantInt constInt:
-                break;
-            case IRFunction func:
-                break;
             case IRInstruction instr:
             case IRParam param:
                 addrValue = GetRegister(load.Address);
@@ -258,7 +252,6 @@ public class IRInterpreter
             default:
                 throw new IRInvalidOperandTypeException(load.Address, load);
         }
-
 
         ulong addr = addrValue.AsUInt64();
         if (!Utils.IsAligned(addr, load.Type.Alignment))
