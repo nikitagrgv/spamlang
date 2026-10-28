@@ -195,11 +195,7 @@ public class IRInterpreter
                     }
                     case IRInstructionRet ret:
                     {
-                        if (ret.Value != null)
-                        {
-                            returnValue = GetRegister(ret.Value);
-                        }
-
+                        returnValue = ExecuteRet(ret);
                         exit = true;
                         break;
                     }
@@ -272,6 +268,16 @@ public class IRInterpreter
             default:
                 throw new IRUnexpectedTypeKindException(unary, unary.Type.Kind);
         }
+    }
+
+    private IRInterpreterValue? ExecuteRet(IRInstructionRet ret)
+    {
+        if (ret.Value == null)
+        {
+            return null;
+        }
+
+        return GetRegister(ret.Value);
     }
 
     private void PushFrame()
