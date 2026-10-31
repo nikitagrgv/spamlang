@@ -364,6 +364,46 @@ public class IRInterpreter
         {
             throw new IRInvalidException($"Size {size} not supported for binary");
         }
+
+        switch (binary.Op)
+        {
+            case IRBinaryOp.Add:
+                break;
+            case IRBinaryOp.Sub:
+                break;
+            case IRBinaryOp.Mul:
+                break;
+            case IRBinaryOp.SDiv:
+                break;
+            case IRBinaryOp.UDiv:
+                break;
+            case IRBinaryOp.SRem:
+                break;
+            case IRBinaryOp.URem:
+                break;
+            case IRBinaryOp.And:
+                break;
+            case IRBinaryOp.Or:
+                break;
+            case IRBinaryOp.Xor:
+                break;
+            case IRBinaryOp.ShiftLeft:
+                break;
+            case IRBinaryOp.LogicalShiftRight:
+                break;
+            case IRBinaryOp.ArithmeticShiftRight:
+                break;
+            case IRBinaryOp.FAdd:
+                break;
+            case IRBinaryOp.FSub:
+                break;
+            case IRBinaryOp.FMul:
+                break;
+            case IRBinaryOp.FDiv:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     private void ExecuteCall(IRInstructionCall call)
