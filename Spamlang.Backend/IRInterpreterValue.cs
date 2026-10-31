@@ -48,12 +48,7 @@ public readonly struct IRInterpreterValue
 
     public static IRInterpreterValue FromUInt64Truncated(ulong value, int size)
     {
-        if (size <= 8)
-        {
-            return new IRInterpreterValue(value, size);
-        }
-
-        Span<byte> bytes = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref value, 1));
+        return new IRInterpreterValue(value, size);
     }
 
     public static IRInterpreterValue FromInt128Truncated(Int128 value, int size)
