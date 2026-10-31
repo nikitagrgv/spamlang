@@ -237,7 +237,7 @@ public class IRInterpreter
     {
         IRType type = alloca.AllocatedType;
         ulong addr = Allocate(type.Size, type.Alignment);
-        IRInterpreterValue value = new(addr, alloca.Type.Size);
+        IRInterpreterValue value = IRInterpreterValue.FromUInt64Truncated(addr, alloca.Type.Size);
         SetRegister(alloca, value);
     }
 
@@ -261,7 +261,7 @@ public class IRInterpreter
         }
 
         ReadOnlySpan<byte> data = ReadMemory(addr, load.Type.Size);
-        IRInterpreterValue value = new(data);
+        IRInterpreterValue value = IRInterpreterValue.FromBytes(data);
         SetRegister(load, value);
     }
 
@@ -291,17 +291,27 @@ public class IRInterpreter
 
     private void ExecuteUnary(IRInstructionUnary unary)
     {
+        int size = unary.Type.Size;
         switch (unary.Op)
         {
             case IRUnaryOp.Neg:
-                Int128 value = LoadValueInt128(unary.Value);
-                Int128 result = -value;
-                IRInterpreterValue
-                break;
+            {
+                Int128 operand = LoadValueInt128(unary.Value);
+                Int128 result = -operand;
+                IRInterpreterValue value = IRInterpreterValue.FromInt128Truncated(result, size);
+                SetRegister(unary, value);
+                return;
+            }
             case IRUnaryOp.FNeg:
                 break;
             case IRUnaryOp.BitNot:
-                break;
+            {
+                Int128 operand = LoadValueInt128(unary.Value);
+                Int128 result = -operand;
+                IRInterpreterValue value = IRInterpreterValue.FromInt128Truncated(result, size);
+                SetRegister(unary, value);
+                return;
+            }
             case IRUnaryOp.BoolNot:
                 break;
             default:
@@ -352,7 +362,6 @@ public class IRInterpreter
         }
     }
 
-
     private Int128 LoadValueInt128(IRValue value)
     {
         switch (value)
@@ -369,6 +378,29 @@ public class IRInterpreter
                     case 2: return regValue.AsInt16();
                     case 4: return regValue.AsInt32();
                     case 8: return regValue.AsInt64();
+                    default: throw new IRInvalidOperandTypeException(value);
+                }
+            default:
+                throw new IRInvalidOperandTypeException(value);
+        }
+    }
+
+    private UInt128 LoadValueUInt128(IRValue value)
+    {
+        switch (value)
+        {
+            case IRConstantInt constInt:
+                return (UInt128)constInt.Canonical;
+            case IRInstruction:
+            case IRParam:
+                IRInterpreterValue regValue = GetRegister(value);
+                switch (regValue.Size)
+                {
+                    // Zero-extend from these types to Int128
+                    case 1: return regValue.AsUInt8();
+                    case 2: return regValue.AsUInt16();
+                    case 4: return regValue.AsUInt32();
+                    case 8: return regValue.AsUInt64();
                     default: throw new IRInvalidOperandTypeException(value);
                 }
             default:
