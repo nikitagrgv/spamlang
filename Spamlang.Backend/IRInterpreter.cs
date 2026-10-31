@@ -292,6 +292,12 @@ public class IRInterpreter
     private void ExecuteUnary(IRInstructionUnary unary)
     {
         int size = unary.Type.Size;
+
+        if (size > 8)
+        {
+            throw new IRInvalidException($"Size {size} not supported for unary");
+        }
+
         switch (unary.Op)
         {
             case IRUnaryOp.Neg:
