@@ -34,7 +34,7 @@ public class IRInvalidRegisterException : Exception
 
 public class IRInvalidOperandTypeException : Exception
 {
-    public IRInvalidOperandTypeException(IRValue operand, IRInstruction instr) : base($"Unexpected operand type \"{operand.GetType().Name}\" in instruction %{instr.Id}")
+    public IRInvalidOperandTypeException(IRValue operand) : base($"Unexpected operand type \"{operand.GetType().Name}\"")
     {
     }
 }
@@ -291,28 +291,6 @@ public class IRInterpreter
 
     private void ExecuteUnary(IRInstructionUnary unary)
     {
-        IRInterpreterValue LoadValue()
-        {
-            switch (unary.Value)
-            {
-                case IRConstantFloat constFloat:
-                    return IRInterpreterValue.FromDouble(constFloat.Value);
-                case IRConstantInt constInt:
-                    IBinaryInteger<Int128>.TryWriteLittleEndian()
-                    return new IRInterpreterValue()
-                    break;
-                case IRFunction func:
-                    break;
-                case IRInstruction instr:
-                    break;
-                case IRParam param:
-                    break;
-                default:
-                    throw new IRInvalidOperandTypeException(unary.Value, unary);
-            }
-        }
-
-
         switch (unary.Op)
         {
             case IRUnaryOp.Neg:
@@ -384,6 +362,69 @@ public class IRInterpreter
         else
         {
             returnValue = null;
+        }
+    }
+
+
+    private Int128 LoadValueInt128(IRValue value)
+    {
+        switch (value)
+        {
+            case IRConstantInt constInt:
+                return constInt.Canonical;
+            case IRInstruction:
+            case IRParam:
+                IRInterpreterValue regValue = GetRegister(value);
+                switch (regValue.Size)
+                {
+                    case 1: return regValue.AsInt8();
+                    case 2: return regValue.AsInt16();
+                    case 4: return regValue.AsInt32();
+                    case 8: return regValue.AsInt64();
+                    default: throw new IRInvalidOperandTypeException(value);
+                }
+            default:
+                throw new IRInvalidOperandTypeException(value);
+        }
+    }
+
+    private double LoadValueDouble(IRValue value)
+    {
+        switch (value)
+        {
+            case IRConstantFloat constFloat:
+                return constFloat.Value;
+            case IRInstruction:
+            case IRParam:
+                IRInterpreterValue regValue = GetRegister(value);
+                if (regValue.Size != 8)
+                {
+                    throw new IRInvalidOperandTypeException(value);
+                }
+
+                return regValue.AsDouble();
+            default:
+                throw new IRInvalidOperandTypeException(value);
+        }
+    }
+
+    private float LoadValueFloat(IRValue value)
+    {
+        switch (value)
+        {
+            case IRConstantFloat constFloat:
+                return (float)constFloat.Value;
+            case IRInstruction:
+            case IRParam:
+                IRInterpreterValue regValue = GetRegister(value);
+                if (regValue.Size != 4)
+                {
+                    throw new IRInvalidOperandTypeException(value);
+                }
+
+                return regValue.AsFloat();
+            default:
+                throw new IRInvalidOperandTypeException(value);
         }
     }
 
