@@ -335,9 +335,10 @@ public class IRInterpreter
                 for (int i = 0; i < operandBytes.Length; i++)
                 {
                     byte b = operandBytes[i];
-                    outBytes[i] = (byte)~b;
+                    outBytes[i] = b;
                 }
 
+                outBytes[0] = (byte)(operandBytes[0] ^ 0x01);
                 IRInterpreterValue value = IRInterpreterValue.FromBytes(outBytes.Slice(0, size));
                 SetRegister(unary, value);
                 return;
