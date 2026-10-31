@@ -251,7 +251,7 @@ public class IRInterpreter
                 addrValue = GetRegister(load.Address);
                 break;
             default:
-                throw new IRInvalidOperandTypeException(load.Address, load);
+                throw new IRInvalidOperandTypeException(load.Address);
         }
 
         ulong addr = addrValue.AsUInt64();
@@ -275,7 +275,7 @@ public class IRInterpreter
                 addrValue = GetRegister(store.Address);
                 break;
             default:
-                throw new IRInvalidOperandTypeException(store.Address, store);
+                throw new IRInvalidOperandTypeException(store.Address);
         }
 
         ulong addr = addrValue.AsUInt64();
@@ -303,22 +303,6 @@ public class IRInterpreter
                 break;
             default:
                 throw new UnreachableException();
-        }
-
-        switch (unary.Value)
-        {
-            case IRConstantFloat constFloat:
-                break;
-            case IRConstantInt constInt:
-                break;
-            case IRFunction func:
-                break;
-            case IRInstruction instr:
-                break;
-            case IRParam param:
-                break;
-            default:
-                throw new IRInvalidOperandTypeException(unary.Value, unary);
         }
 
         switch (unary.Type.Kind)
@@ -377,6 +361,7 @@ public class IRInterpreter
                 IRInterpreterValue regValue = GetRegister(value);
                 switch (regValue.Size)
                 {
+                    // Sign-extend from these types to Int128
                     case 1: return regValue.AsInt8();
                     case 2: return regValue.AsInt16();
                     case 4: return regValue.AsInt32();
