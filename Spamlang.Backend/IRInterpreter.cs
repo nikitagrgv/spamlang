@@ -290,6 +290,20 @@ public class IRInterpreter
 
     private void ExecuteUnary(IRInstructionUnary unary)
     {
+        switch (unary.Op)
+        {
+            case IRUnaryOp.Neg:
+                break;
+            case IRUnaryOp.FNeg:
+                break;
+            case IRUnaryOp.BitNot:
+                break;
+            case IRUnaryOp.BoolNot:
+                break;
+            default:
+                throw new UnreachableException();
+        }
+
         switch (unary.Value)
         {
             case IRConstantFloat constFloat:
