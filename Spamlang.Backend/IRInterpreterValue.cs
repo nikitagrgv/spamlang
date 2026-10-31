@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -48,6 +49,14 @@ public readonly struct IRInterpreterValue
     public static IRInterpreterValue FromUInt64Truncated(ulong value, int size)
     {
         return new IRInterpreterValue(value, size);
+    }
+
+    public static IRInterpreterValue FromInt128Truncated(Int128 value, int size)
+    {
+        Span<byte> bytes = stackalloc byte[16];
+        BinaryPrimitives.WriteInt128LittleEndian(bytes, value);
+        Span<byte> slice = bytes.Slice(0, size);
+        return FromBytes(slice);
     }
 
     public static IRInterpreterValue FromBytes(ReadOnlySpan<byte> bytes)
