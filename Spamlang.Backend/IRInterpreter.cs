@@ -302,6 +302,26 @@ public class IRInterpreter
                 SetRegister(unary, value);
                 return;
             }
+            case IRUnaryOp.BitNot:
+            {
+                IRInterpreterValue operand = LoadValueRaw(unary.Value);
+                if (operand.Size > 16)
+                {
+                    throw new IRInvalidException($"Size > 16 not supported for bitnot: {size}");
+                }
+
+                Span<byte> outBytes = stackalloc byte[16];
+                foreach (byte b in operand.AsBytes())
+                {
+                    outBytes[b] = (byte)~b;
+                }
+
+                IRInterpreterValue value = IRInterpreterValue.FromBytes(outBytes.Slice(0, size));
+                SetRegister(unary, value);
+                return;
+            }
+            case IRUnaryOp.BoolNot:
+                break;
             case IRUnaryOp.FNeg:
             {
                 switch (size)
@@ -328,26 +348,6 @@ public class IRInterpreter
                     }
                 }
             }
-            case IRUnaryOp.BitNot:
-            {
-                IRInterpreterValue operand = LoadValueRaw(unary.Value);
-                if (operand.Size > 16)
-                {
-                    throw new IRInvalidException($"Size > 16 not supported for bitnot: {size}");
-                }
-
-                Span<byte> outBytes = stackalloc byte[16];
-                foreach (byte b in operand.AsBytes())
-                {
-                    outBytes[b] = (byte)~b;
-                }
-
-                IRInterpreterValue value = IRInterpreterValue.FromBytes(outBytes.Slice(0, size));
-                SetRegister(unary, value);
-                return;
-            }
-            case IRUnaryOp.BoolNot:
-                break;
             default:
                 throw new UnreachableException();
         }
