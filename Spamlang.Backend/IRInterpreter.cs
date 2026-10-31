@@ -362,6 +362,25 @@ public class IRInterpreter
         }
     }
 
+    private IRInterpreterValue LoadValueRaw(IRValue value)
+    {
+        switch (value)
+        {
+            case IRConstantFloat constFloat:
+                return IRInterpreterValue.FromDouble(constFloat.Value);
+            case IRConstantInt constInt:
+                return IRInterpreterValue.FromInt128Truncated(constInt.Canonical, value.Type.Size);
+            case IRInstruction:
+            case IRParam:
+            {
+                IRInterpreterValue regValue = GetRegister(value);
+                return regValue;
+            }
+            default:
+                throw new IRInvalidOperandTypeException(value);
+        }
+    }
+
     private Int128 LoadValueInt128(IRValue value)
     {
         switch (value)
