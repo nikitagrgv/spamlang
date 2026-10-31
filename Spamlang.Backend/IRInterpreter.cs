@@ -297,7 +297,7 @@ public class IRInterpreter
             case IRUnaryOp.Neg:
             {
                 Int128 operand = LoadValueInt128(unary.Value);
-                Int128 result = -operand;
+                Int128 result = unchecked(-operand);
                 IRInterpreterValue value = IRInterpreterValue.FromInt128Truncated(result, size);
                 SetRegister(unary, value);
                 return;
