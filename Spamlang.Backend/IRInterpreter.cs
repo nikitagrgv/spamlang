@@ -303,7 +303,31 @@ public class IRInterpreter
                 return;
             }
             case IRUnaryOp.FNeg:
-                break;
+            {
+                switch (size)
+                {
+                    case 4:
+                    {
+                        float operand = LoadValueFloat(unary.Value);
+                        float result = -operand;
+                        IRInterpreterValue value = IRInterpreterValue.FromFloat(result);
+                        SetRegister(unary, value);
+                        return;
+                    }
+                    case 8:
+                    {
+                        double operand = LoadValueDouble(unary.Value);
+                        double result = -operand;
+                        IRInterpreterValue value = IRInterpreterValue.FromDouble(result);
+                        SetRegister(unary, value);
+                        return;
+                    }
+                    default:
+                    {
+                        throw new IRInvalidException($"Size {size} not supported for fneg");
+                    }
+                }
+            }
             case IRUnaryOp.BitNot:
             {
                 IRInterpreterValue operand = LoadValueRaw(unary.Value);
