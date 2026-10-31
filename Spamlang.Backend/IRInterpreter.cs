@@ -304,42 +304,19 @@ public class IRInterpreter
             }
             case IRUnaryOp.BitNot:
             {
-                IRInterpreterValue operand = LoadValueRaw(unary.Value);
-                if (operand.Size > 16)
-                {
-                    throw new IRInvalidException($"Size > 16 not supported for bitnot: {size}");
-                }
-
-                Span<byte> outBytes = stackalloc byte[16];
-                ReadOnlySpan<byte> operandBytes = operand.AsBytes();
-                for (int i = 0; i < operandBytes.Length; i++)
-                {
-                    byte b = operandBytes[i];
-                    outBytes[i] = (byte)~b;
-                }
-
-                IRInterpreterValue value = IRInterpreterValue.FromBytes(outBytes.Slice(0, size));
+                IRInterpreterValue raw = LoadValueRaw(unary.Value);
+                ulong operand = raw.AsUInt64();
+                ulong result = ~operand;
+                IRInterpreterValue value = IRInterpreterValue.FromUInt64Truncated(result, size);
                 SetRegister(unary, value);
                 return;
             }
             case IRUnaryOp.BoolNot:
             {
-                IRInterpreterValue operand = LoadValueRaw(unary.Value);
-                if (operand.Size > 16)
-                {
-                    throw new IRInvalidException($"Size > 16 not supported for bool not: {size}");
-                }
-
-                Span<byte> outBytes = stackalloc byte[16];
-                ReadOnlySpan<byte> operandBytes = operand.AsBytes();
-                for (int i = 0; i < operandBytes.Length; i++)
-                {
-                    byte b = operandBytes[i];
-                    outBytes[i] = b;
-                }
-
-                outBytes[0] = (byte)(operandBytes[0] ^ 0x01);
-                IRInterpreterValue value = IRInterpreterValue.FromBytes(outBytes.Slice(0, size));
+                IRInterpreterValue raw = LoadValueRaw(unary.Value);
+                ulong operand = raw.AsUInt64();
+                ulong result = operand ^ 1;
+                IRInterpreterValue value = IRInterpreterValue.FromUInt64Truncated(result, size);
                 SetRegister(unary, value);
                 return;
             }
