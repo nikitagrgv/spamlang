@@ -311,9 +311,11 @@ public class IRInterpreter
                 }
 
                 Span<byte> outBytes = stackalloc byte[16];
-                foreach (byte b in operand.AsBytes())
+                ReadOnlySpan<byte> operandBytes = operand.AsBytes();
+                for (int i = 0; i < operandBytes.Length; i++)
                 {
-                    outBytes[b] = (byte)~b;
+                    byte b = operandBytes[i];
+                    outBytes[i] = (byte)~b;
                 }
 
                 IRInterpreterValue value = IRInterpreterValue.FromBytes(outBytes.Slice(0, size));
@@ -321,7 +323,25 @@ public class IRInterpreter
                 return;
             }
             case IRUnaryOp.BoolNot:
-                break;
+            {
+                IRInterpreterValue operand = LoadValueRaw(unary.Value);
+                if (operand.Size > 16)
+                {
+                    throw new IRInvalidException($"Size > 16 not supported for bitnot: {size}");
+                }
+
+                Span<byte> outBytes = stackalloc byte[16];
+                ReadOnlySpan<byte> operandBytes = operand.AsBytes();
+                for (int i = 0; i < operandBytes.Length; i++)
+                {
+                    byte b = operandBytes[i];
+                    outBytes[i] = (byte)~b;
+                }
+
+                IRInterpreterValue value = IRInterpreterValue.FromBytes(outBytes.Slice(0, size));
+                SetRegister(unary, value);
+                return;
+            }
             case IRUnaryOp.FNeg:
             {
                 switch (size)
