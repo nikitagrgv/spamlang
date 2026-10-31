@@ -294,6 +294,9 @@ public class IRInterpreter
         switch (unary.Op)
         {
             case IRUnaryOp.Neg:
+                Int128 value = LoadValueInt128(unary.Value);
+                Int128 result = -value;
+                IRInterpreterValue
                 break;
             case IRUnaryOp.FNeg:
                 break;

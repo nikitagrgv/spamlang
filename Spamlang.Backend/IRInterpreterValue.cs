@@ -21,7 +21,16 @@ public readonly struct IRInterpreterValue
         _size = 0;
     }
 
-    public IRInterpreterValue(ReadOnlySpan<byte> bytes)
+    private IRInterpreterValue(ulong value, int size)
+    {
+        Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
+        Debug.Assert(size > 0 && size <= 8);
+        Debug.Assert(size == 8 || value < 1ul << (size * 8));
+        _size = size;
+        _inline = value;
+    }
+
+    private IRInterpreterValue(ReadOnlySpan<byte> bytes)
     {
         Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
         _size = bytes.Length;
@@ -36,13 +45,14 @@ public readonly struct IRInterpreterValue
         bytes.CopyTo(MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _inline, 1)));
     }
 
-    public IRInterpreterValue(ulong value, int size)
+    public static IRInterpreterValue FromUInt64Truncated(ulong value, int size)
     {
-        Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
-        Debug.Assert(size > 0 && size <= 8);
-        Debug.Assert(size == 8 || value < 1ul << (size * 8));
-        _size = size;
-        _inline = value;
+        return new IRInterpreterValue(value, size);
+    }
+
+    public static IRInterpreterValue FromBytes(ReadOnlySpan<byte> bytes)
+    {
+        return new IRInterpreterValue(bytes);
     }
 
     public static IRInterpreterValue FromDouble(double value)
