@@ -327,7 +327,7 @@ public class IRInterpreter
                 IRInterpreterValue operand = LoadValueRaw(unary.Value);
                 if (operand.Size > 16)
                 {
-                    throw new IRInvalidException($"Size > 16 not supported for bitnot: {size}");
+                    throw new IRInvalidException($"Size > 16 not supported for bool not: {size}");
                 }
 
                 Span<byte> outBytes = stackalloc byte[16];
