@@ -57,15 +57,15 @@ public readonly struct IRInterpreterValue
         return new IRInterpreterValue(v, 4);
     }
 
-    public UInt64 AsUInt64() => unchecked(GetWord());
-    public UInt32 AsUInt32() => unchecked((UInt32)GetWord());
-    public UInt16 AsUInt16() => unchecked((UInt16)GetWord());
-    public byte AsUInt8() => unchecked((byte)GetWord());
+    public UInt64 AsUInt64() => GetWord();
+    public UInt32 AsUInt32() => UInt32.CreateTruncating(GetWord());
+    public UInt16 AsUInt16() => UInt16.CreateTruncating(GetWord());
+    public byte AsUInt8() => byte.CreateTruncating(GetWord());
 
-    public Int64 AsInt64() => unchecked((Int64)GetWord());
-    public Int32 AsInt32() => unchecked((Int32)GetWord());
-    public Int16 AsInt16() => unchecked((Int16)GetWord());
-    public byte AsInt8() => unchecked((byte)GetWord());
+    public Int64 AsInt64() => Int64.CreateTruncating(GetWord());
+    public Int32 AsInt32() => Int32.CreateTruncating(GetWord());
+    public Int16 AsInt16() => Int16.CreateTruncating(GetWord());
+    public byte AsInt8() => byte.CreateTruncating(GetWord());
 
     public double AsDouble() => BitConverter.UInt64BitsToDouble(GetWord());
     public float AsFloat() => BitConverter.UInt32BitsToSingle(AsUInt32());
@@ -75,12 +75,12 @@ public readonly struct IRInterpreterValue
         ? MemoryMarshal.AsBytes(new ReadOnlySpan<ulong>(in _inline)).Slice(0, _size)
         : MemoryMarshal.AsBytes(_heap.AsSpan()).Slice(0, _size);
 
-    private ulong GetWord()
+    private UInt64 GetWord()
     {
         return _heap is null ? _inline : _heap[0];
     }
 
-    private Int128 AsInt128()
+    private Int128 AsInt128SignExtended()
     {
         if (_size <= 8)
         {
