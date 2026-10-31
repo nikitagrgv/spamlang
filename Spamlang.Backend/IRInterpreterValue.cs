@@ -44,15 +44,6 @@ public readonly struct IRInterpreterValue
         _size = size;
         _inline = value;
     }
-    
-    public IRInterpreterValue(Int128 value, int size)
-    {
-        Debug.Assert(BitConverter.IsLittleEndian, "Only little endian is supported");
-        Debug.Assert(size > 0 && size <= 8);
-        Debug.Assert(size == 8 || value < 1ul << (size * 8));
-        _size = size;
-        _inline = value;
-    }
 
     public static IRInterpreterValue FromDouble(double value)
     {
@@ -87,16 +78,5 @@ public readonly struct IRInterpreterValue
     private UInt64 GetWord()
     {
         return _heap is null ? _inline : _heap[0];
-    }
-
-    private Int128 AsInt128SignExtended()
-    {
-        if (_size <= 8)
-        {
-            return GetWord();
-        }
-
-        ReadOnlySpan<byte> bytes = AsBytes();
-        Int128 value = new();
     }
 }
