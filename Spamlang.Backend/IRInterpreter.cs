@@ -291,16 +291,21 @@ public class IRInterpreter
 
     private void ExecuteUnary(IRInstructionUnary unary)
     {
-        Int128 LoadInt128()
+        IRInterpreterValue LoadValue()
         {
             switch (unary.Value)
             {
+                case IRConstantFloat constFloat:
+                    return IRInterpreterValue.FromDouble(constFloat.Value);
                 case IRConstantInt constInt:
-                    return constInt.Canonical;
+                    IBinaryInteger<Int128>.TryWriteLittleEndian()
+                    return new IRInterpreterValue()
+                    break;
+                case IRFunction func:
+                    break;
                 case IRInstruction instr:
+                    break;
                 case IRParam param:
-                    IRInterpreterValue value = GetRegister(unary.Value);
-                    return value.AsInt64()
                     break;
                 default:
                     throw new IRInvalidOperandTypeException(unary.Value, unary);
