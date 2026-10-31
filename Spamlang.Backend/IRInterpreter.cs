@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace Spamlang.Backend;
@@ -290,6 +291,23 @@ public class IRInterpreter
 
     private void ExecuteUnary(IRInstructionUnary unary)
     {
+        Int128 LoadInt128()
+        {
+            switch (unary.Value)
+            {
+                case IRConstantInt constInt:
+                    return constInt.Canonical;
+                case IRInstruction instr:
+                case IRParam param:
+                    IRInterpreterValue value = GetRegister(unary.Value);
+                    return value.AsInt64()
+                    break;
+                default:
+                    throw new IRInvalidOperandTypeException(unary.Value, unary);
+            }
+        }
+
+
         switch (unary.Op)
         {
             case IRUnaryOp.Neg:

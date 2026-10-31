@@ -57,10 +57,10 @@ public readonly struct IRInterpreterValue
         return new IRInterpreterValue(v, 4);
     }
 
-    public UInt64 AsUInt64() => GetWord();
-    public UInt32 AsUInt32() => (UInt32)GetWord();
-    public UInt16 AsUInt16() => (UInt16)GetWord();
-    public byte AsUInt8() => (byte)GetWord();
+    public UInt64 AsUInt64() => unchecked(GetWord());
+    public UInt32 AsUInt32() => unchecked((UInt32)GetWord());
+    public UInt16 AsUInt16() => unchecked((UInt16)GetWord());
+    public byte AsUInt8() => unchecked((byte)GetWord());
 
     public Int64 AsInt64() => unchecked((Int64)GetWord());
     public Int32 AsInt32() => unchecked((Int32)GetWord());
@@ -78,5 +78,16 @@ public readonly struct IRInterpreterValue
     private ulong GetWord()
     {
         return _heap is null ? _inline : _heap[0];
+    }
+
+    private Int128 AsInt128()
+    {
+        if (_size <= 8)
+        {
+            return GetWord();
+        }
+
+        ReadOnlySpan<byte> bytes = AsBytes();
+        Int128 value = new();
     }
 }
