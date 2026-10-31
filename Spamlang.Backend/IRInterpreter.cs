@@ -306,9 +306,19 @@ public class IRInterpreter
                 break;
             case IRUnaryOp.BitNot:
             {
-                Int128 operand = LoadValueInt128(unary.Value);
-                Int128 result = -operand;
-                IRInterpreterValue value = IRInterpreterValue.FromInt128Truncated(result, size);
+                IRInterpreterValue operand = LoadValueRaw(unary.Value);
+                if (operand.Size > 16)
+                {
+                    throw new IRInvalidException($"Size > 16 not supported for bitnot: {size}");
+                }
+
+                Span<byte> outBytes = stackalloc byte[16];
+                foreach (byte b in operand.AsBytes())
+                {
+                    outBytes[b] = (byte)~b;
+                }
+
+                IRInterpreterValue value = IRInterpreterValue.FromBytes(outBytes.Slice(0, size));
                 SetRegister(unary, value);
                 return;
             }
