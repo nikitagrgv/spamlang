@@ -362,7 +362,7 @@ public class IRInterpreter
         int size = binary.Type.Size;
         if (size > 8)
         {
-            throw new IRInvalidException($"Size {size} not supported for unary");
+            throw new IRInvalidException($"Size {size} not supported for binary");
         }
     }
 
