@@ -359,6 +359,11 @@ public class IRInterpreter
 
     private void ExecuteBinary(IRInstructionBinary binary)
     {
+        int size = binary.Type.Size;
+        if (size > 8)
+        {
+            throw new IRInvalidException($"Size {size} not supported for unary");
+        }
     }
 
     private void ExecuteCall(IRInstructionCall call)
