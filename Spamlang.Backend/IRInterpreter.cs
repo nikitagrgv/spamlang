@@ -372,20 +372,6 @@ public class IRInterpreter
             default:
                 throw new UnreachableException();
         }
-
-        switch (unary.Type.Kind)
-        {
-            case IRTypeKind.Int:
-                break;
-            case IRTypeKind.Ptr:
-                break;
-            case IRTypeKind.Bool:
-                break;
-            case IRTypeKind.Float:
-                break;
-            default:
-                throw new IRUnexpectedTypeKindException(unary, unary.Type.Kind);
-        }
     }
 
     private void ExecuteBinary(IRInstructionBinary binary)
