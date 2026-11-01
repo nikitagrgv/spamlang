@@ -310,8 +310,7 @@ public class IRInterpreter
             }
             case IRUnaryOp.BitNot:
             {
-                IRInterpreterValue raw = LoadValueRaw(unary.Value);
-                ulong operand = raw.AsUInt64();
+                ulong operand = LoadValueUInt64(unary.Value);
                 ulong result = ~operand;
                 IRInterpreterValue value = IRInterpreterValue.FromUInt64Truncated(result, size);
                 SetRegister(unary, value);
@@ -461,7 +460,7 @@ public class IRInterpreter
                 IRInterpreterValue regValue = GetRegister(value);
                 switch (regValue.Size)
                 {
-                    // Sign-extend from these types to Int128
+                    // Sign-extend from these types
                     case 1: return regValue.AsInt8();
                     case 2: return regValue.AsInt16();
                     case 4: return regValue.AsInt32();
@@ -472,6 +471,30 @@ public class IRInterpreter
                 throw new IRInvalidOperandTypeException(value);
         }
     }
+
+    private ulong LoadValueUInt64(IRValue value)
+    {
+        switch (value)
+        {
+            case IRConstantInt constInt:
+                return ulong.CreateChecked(constInt.Canonical);
+            case IRInstruction:
+            case IRParam:
+                IRInterpreterValue regValue = GetRegister(value);
+                switch (regValue.Size)
+                {
+                    // Zero-extend from these types
+                    case 1: return regValue.AsUInt8();
+                    case 2: return regValue.AsUInt16();
+                    case 4: return regValue.AsUInt32();
+                    case 8: return regValue.AsUInt64();
+                    default: throw new IRInvalidOperandTypeException(value);
+                }
+            default:
+                throw new IRInvalidOperandTypeException(value);
+        }
+    }
+
 
     private double LoadValueDouble(IRValue value)
     {
