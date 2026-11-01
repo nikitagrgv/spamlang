@@ -302,8 +302,8 @@ public class IRInterpreter
         {
             case IRUnaryOp.Neg:
             {
-                Int128 operand = LoadValueInt128(unary.Value);
-                Int128 result = unchecked(-operand);
+                long operand = LoadValueInt64(unary.Value);
+                long result = unchecked(-operand);
                 IRInterpreterValue value = IRInterpreterValue.FromInt128Truncated(result, size);
                 SetRegister(unary, value);
                 return;
@@ -450,12 +450,12 @@ public class IRInterpreter
         }
     }
 
-    private Int128 LoadValueInt128(IRValue value)
+    private long LoadValueInt64(IRValue value)
     {
         switch (value)
         {
             case IRConstantInt constInt:
-                return constInt.Canonical;
+                return long.CreateChecked(constInt.Canonical);
             case IRInstruction:
             case IRParam:
                 IRInterpreterValue regValue = GetRegister(value);
@@ -466,29 +466,6 @@ public class IRInterpreter
                     case 2: return regValue.AsInt16();
                     case 4: return regValue.AsInt32();
                     case 8: return regValue.AsInt64();
-                    default: throw new IRInvalidOperandTypeException(value);
-                }
-            default:
-                throw new IRInvalidOperandTypeException(value);
-        }
-    }
-
-    private UInt128 LoadValueUInt128(IRValue value)
-    {
-        switch (value)
-        {
-            case IRConstantInt constInt:
-                return (UInt128)constInt.Canonical;
-            case IRInstruction:
-            case IRParam:
-                IRInterpreterValue regValue = GetRegister(value);
-                switch (regValue.Size)
-                {
-                    // Zero-extend from these types to Int128
-                    case 1: return regValue.AsUInt8();
-                    case 2: return regValue.AsUInt16();
-                    case 4: return regValue.AsUInt32();
-                    case 8: return regValue.AsUInt64();
                     default: throw new IRInvalidOperandTypeException(value);
                 }
             default:
