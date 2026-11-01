@@ -51,6 +51,11 @@ public readonly struct IRInterpreterValue
         return new IRInterpreterValue(value, size);
     }
 
+    public static IRInterpreterValue FromInt64Truncated(long value, int size)
+    {
+        return new IRInterpreterValue(ulong.CreateTruncating(value), size);
+    }
+
     public static IRInterpreterValue FromInt128Truncated(Int128 value, int size)
     {
         Span<byte> bytes = stackalloc byte[16];

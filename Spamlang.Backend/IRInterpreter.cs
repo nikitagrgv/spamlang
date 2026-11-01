@@ -304,7 +304,7 @@ public class IRInterpreter
             {
                 long operand = LoadValueInt64(unary.Value);
                 long result = unchecked(-operand);
-                IRInterpreterValue value = IRInterpreterValue.FromInt128Truncated(result, size);
+                IRInterpreterValue value = IRInterpreterValue.FromInt64Truncated(result, size);
                 SetRegister(unary, value);
                 return;
             }
